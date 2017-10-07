@@ -4,4 +4,25 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/MainTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="201dp"
+        android:text="Fiktion"
+        android:textColor="@color/colorPrimary"
+        android:textSize="54sp" />
+
+    <Button
+        android:id="@+id/MainButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/MainTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="97dp"
+        android:onClick="onClick"
+        android:text="Hit Me!"
+        android:visibility="visible" />
 </RelativeLayout>
