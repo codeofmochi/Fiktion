@@ -28,7 +28,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        Log.d(TAG,"Initialising sign in activity");
+        Log.d(TAG, "Initialising sign in activity");
 
         //Initialise user content
 
@@ -68,19 +68,18 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         boolean validPassword = false;
         String email = UserEmail.getText().toString();
         String password = UserPassword.getText().toString();
-        Log.d(TAG,"Validating credentials");
+        Log.d(TAG, "Validating credentials");
 
         if (password.isEmpty()) {
             UserPassword.setError("Password is required");
-            Log.d(TAG,"Password validation failed");
-        } else
-            {
+            Log.d(TAG, "Password validation failed");
+        } else {
             if (password.length() >= 6) {
                 validPassword = true;
                 UserPassword.setError(null);
             } else {
                 UserPassword.setError("Password must be of at least 6 characters");
-                Log.d(TAG,"Password validation failed");
+                Log.d(TAG, "Password validation failed");
             }
         }
         if (email.contains("@")) {
@@ -88,7 +87,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             UserEmail.setError(null);
         } else {
             UserEmail.setError("Require a valid email");
-            Log.d(TAG,"Email validation failed");
+            Log.d(TAG, "Email validation failed");
 
         }
 
@@ -125,7 +124,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 });
     }
 
-
     private void updateUI(FirebaseUser user) {
         if (user != null) {
             //start details activity
@@ -138,16 +136,14 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         int i = v.getId();
-        switch (i) {
-            case R.id.SignInButton:
-                signIn(UserEmail.getText().toString(), UserPassword.getText().toString());
-                break;
-            case R.id.RegisterButton:
-                Intent registerActivity = new Intent(this,RegisterActivity.class);
-                startActivity(registerActivity);
-                break;
-            default:
-                break;
+        //user clicks on signin button
+        if (i == R.id.SignInButton) {
+            signIn(UserEmail.getText().toString(), UserPassword.getText().toString());
+        }
+        //user clicks on register button
+        else if (i == R.id.RegisterButton) {
+            Intent registerActivity = new Intent(this, RegisterActivity.class);
+            startActivity(registerActivity);
         }
     }
 

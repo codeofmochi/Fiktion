@@ -4,102 +4,122 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_dark"
+    android:background="@color/common_google_signin_btn_text_dark_default"
     tools:context="ch.epfl.sweng.fiktion.UserDetailsActivity">
 
     <TextView
         android:id="@+id/detail_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
         android:text="User Details"
         android:textAlignment="center"
         android:textAllCaps="true"
-        android:textSize="24sp"
+        android:textSize="26sp"
         android:textStyle="bold"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="56dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="30dp" />
+        tools:layout_editor_absoluteY="56dp" />
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/detail_title"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="53dp"
-        android:orientation="vertical">
+        android:layout_centerHorizontal="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_below="@+id/detail_title"
+            android:layout_marginTop="134dp"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/constant_name"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.83"
-                android:text="Name :" />
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/detail_user_name"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/constant_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.56"
+                    android:text="  Name :"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/detail_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.31"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAlignment="center" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/constant_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.68"
+                    android:text="  Email :"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/detail_user_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.46"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/constant_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.71"
+                    android:text="  ID :"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/detail_user_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.98"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/detail_signout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:text="Sign Out" />
+
+            <Button
+                android:id="@+id/verification_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="Send Email Verification" />
+
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/constant_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.85"
-                android:text="Email :" />
-
-            <TextView
-                android:id="@+id/detail_user_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAlignment="center" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/constant_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.96"
-                android:text="ID :" />
-
-            <TextView
-                android:id="@+id/detail_user_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAlignment="center" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/detail_signout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.05"
-            android:onClick="onClick"
-            android:text="Sign Out" />
-    </LinearLayout>
+    </FrameLayout>
 
 </RelativeLayout>

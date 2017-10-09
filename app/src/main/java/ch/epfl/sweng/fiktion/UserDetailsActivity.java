@@ -2,12 +2,16 @@ package ch.epfl.sweng.fiktion;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -43,6 +47,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         super.onStart();
 
         FirebaseUser user = mAuth.getCurrentUser();
+
         if (user != null) {
             // Name, email address, and profile photo Url
             String name = user.getDisplayName();
@@ -58,7 +63,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             user_name_view.setText(name);
             TextView user_email_view = (TextView) findViewById(R.id.detail_user_email);
-            user_email_view.setText(email);
+            user_email_view.setText(email + "(verified : "+user.isEmailVerified()+")");
             TextView user_id_view = (TextView) findViewById(R.id.detail_user_id);
             user_id_view.setText(uid);
         } else {
@@ -73,6 +78,36 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         startActivity(signInIntent);
     }
 
+    private void sendEmailVerification() {
+        // Disable button
+        findViewById(R.id.verification_button).setEnabled(false);
+
+        // Send verification email
+        // [START send_email_verification]
+        final FirebaseUser user = mAuth.getCurrentUser();
+        user.sendEmailVerification()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // [START_EXCLUDE]
+                        // Re-enable button
+                        findViewById(R.id.verification_button).setEnabled(true);
+
+                        if (task.isSuccessful()) {
+                            Toast.makeText(UserDetailsActivity.this,
+                                    "Verification email sent to " + user.getEmail(),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.e(TAG, "sendEmailVerification", task.getException());
+                            Toast.makeText(UserDetailsActivity.this,
+                                    "Failed to send verification email.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END send_email_verification]
+    }
     @Override
     public void onClick(View v) {
         int i = v.getId();
