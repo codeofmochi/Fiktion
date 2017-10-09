@@ -21,8 +21,22 @@ public class Position {
         double diffY = y - that.y;
         return Math.sqrt(diffX*diffX + diffY*diffY);
     }
+    public Position copy() {
+        return new Position(x,y);
+    }
     @Override
     public String toString() {
         return "(" + x + ',' + y + ")";
+    }
+    @Override
+    public boolean equals(Object that) {
+        if(that != null &&
+                that instanceof Position &&
+                ((Position) that).x() == x &&
+                ((Position) that).y() == y) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
