@@ -1,4 +1,4 @@
-package ch.epfl.sweng.bootcamp;
+package ch.epfl.sweng.fiktion;
 
 import android.support.test.runner.AndroidJUnit4;
 

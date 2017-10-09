@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.epfl.sweng.bootcamp.SignInActivity">
+    tools:context="ch.epfl.sweng.fiktion.SignInActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Email"
-            android:inputType="textPersonName"
+            android:inputType="textEmailAddress"
             android:textAlignment="center" />
 
         <EditText
@@ -56,9 +56,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:text="Sign In Failed"
+        android:text="Login Incorrect"
         android:textAlignment="center"
-        android:textColor="@android:color/holo_orange_light"
-        android:visibility="invisible"
-        tools:background="@android:color/holo_red_light" />
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="invisible" />
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package ch.epfl.sweng.bootcamp;
+package ch.epfl.sweng.fiktion;
 
 import android.content.Intent;
 import android.os.Bundle;

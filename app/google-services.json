@@ -1,35 +1,35 @@
 {
   "project_info": {
-    "project_number": "1014224900026",
-    "firebase_url": "https://bootcamp-a0460.firebaseio.com",
-    "project_id": "bootcamp-a0460",
-    "storage_bucket": "bootcamp-a0460.appspot.com"
+    "project_number": "123932428353",
+    "firebase_url": "https://sweng-fiktion.firebaseio.com",
+    "project_id": "sweng-fiktion",
+    "storage_bucket": "sweng-fiktion.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1014224900026:android:7e30437d1ce326cd",
+        "mobilesdk_app_id": "1:123932428353:android:002f53c63fb61f3d",
         "android_client_info": {
-          "package_name": "ch.epfl.sweng.bootcamp"
+          "package_name": "ch.epfl.sweng.fiktion"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1014224900026-d5vdubdosuied2cfoae8lsgrniravcbt.apps.googleusercontent.com",
+          "client_id": "123932428353-hibajoj8kmm5qa48n4cfu7vlj15mioma.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "ch.epfl.sweng.bootcamp",
-            "certificate_hash": "711e72c68fadea4cf069dbe72bd69fca7bf1a3d8"
+            "package_name": "ch.epfl.sweng.fiktion",
+            "certificate_hash": "e0bba2aabdc4801e683f8c2f1cd998d4b48f8a12"
           }
         },
         {
-          "client_id": "1014224900026-9e0q0brvddukasfvfdmq0c6lns4uo6m3.apps.googleusercontent.com",
+          "client_id": "123932428353-cf3kgj02burq19qk9m3iuu85ubnp3h0h.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDfYTRPMWhFtWCfb9TMweZw-M-Yz8Jxzrk"
+          "current_key": "AIzaSyBAc_KUnayNSfC9YU6bSUrGNviFFoFOHzc"
         }
       ],
       "services": {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "1014224900026-9e0q0brvddukasfvfdmq0c6lns4uo6m3.apps.googleusercontent.com",
+              "client_id": "123932428353-cf3kgj02burq19qk9m3iuu85ubnp3h0h.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
