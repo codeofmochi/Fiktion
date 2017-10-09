@@ -143,7 +143,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         //user clicks on register button
         else if (i == R.id.RegisterButton) {
             Intent registerActivity = new Intent(this, RegisterActivity.class);
-            startActivity(registerActivity);
+            startActivityForResult(registerActivity,1);
         }
     }
 

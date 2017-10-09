@@ -49,11 +49,12 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/register_signup"
+            android:id="@+id/register_click"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
             android:onClick="onClick"
             android:text="Register" />
+
     </LinearLayout>
 </RelativeLayout>

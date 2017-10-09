@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,10 +27,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG,"Initialising Register activity");
         setContentView(R.layout.activity_register);
         mAuth = FirebaseAuth.getInstance();
     }
 
+    @Override
+    public void onStart(){
+        super.onStart();
+
+        //initialise widgets
+        reg_email = (EditText)findViewById(R.id.register_email);
+        reg_password = (EditText)findViewById(R.id.register_password);
+
+    }
     private boolean validateCredentials() {
         boolean validEmail = false;
         boolean validPassword = false;
@@ -75,7 +86,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
+                            Toast.makeText(RegisterActivity.this, "Registration Successful!",
+                                    Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
+                            onBackPressed();
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -90,8 +105,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
+        Log.d(TAG,"User clicked somewhere");
         int i = v.getId();
-        if(i == R.id.register_signup){
+        if(i == R.id.register_click){
             createAccount(reg_email.getText().toString(),reg_password.getText().toString());
         }
     }

@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private TextView user_name_view;
     private TextView user_email_view;
     private TextView user_id_view;
+    private Button verification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
         user_email_view = (TextView) findViewById(R.id.detail_user_email);
         user_id_view = (TextView) findViewById(R.id.detail_user_id);
+
+        //initialise button
+        verification = (Button)findViewById(R.id.verification_button);
 
 
     }
@@ -60,12 +65,18 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             String uid = user.getUid();
 
             //initialise textViews
-
             user_name_view.setText(name);
             TextView user_email_view = (TextView) findViewById(R.id.detail_user_email);
-            user_email_view.setText(email + "(verified : "+user.isEmailVerified()+")");
+            user_email_view.setText(email + "(verified : " + user.isEmailVerified() + ")");
             TextView user_id_view = (TextView) findViewById(R.id.detail_user_id);
             user_id_view.setText(uid);
+
+            //show verification button only if not verified
+            if(user.isEmailVerified()){
+                verification.setVisibility(View.GONE);
+            } else {
+                verification.setVisibility(View.VISIBLE);
+            }
         } else {
             Log.d(TAG, "Could not initialise user details, user is not signed in");
         }
@@ -74,7 +85,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private void signOut() {
         mAuth.signOut();
-        Intent signInIntent = new Intent(this,SignInActivity.class);
+        Intent signInIntent = new Intent(this, SignInActivity.class);
         startActivity(signInIntent);
     }
 
@@ -91,6 +102,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                     public void onComplete(@NonNull Task<Void> task) {
                         // [START_EXCLUDE]
                         // Re-enable button
+                        Log.d(TAG,"Sending was successful");
                         findViewById(R.id.verification_button).setEnabled(true);
 
                         if (task.isSuccessful()) {
@@ -108,14 +120,15 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 });
         // [END send_email_verification]
     }
+
     @Override
     public void onClick(View v) {
         int i = v.getId();
-        switch(i) {
-            case R.id.detail_signout:
-                signOut();
-                break;
-            default: break;
+        if(i == R.id.detail_signout) {
+            signOut();
+        } else if(i==R.id.verification_button){
+            Log.d(TAG,"Sending Email Verification");
+            sendEmailVerification();
         }
     }
 }
