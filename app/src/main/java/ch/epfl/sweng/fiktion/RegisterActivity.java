@@ -12,7 +12,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -99,7 +98,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             Log.d(TAG, "createUserWithEmail:success");
                             Toast.makeText(RegisterActivity.this, "Registration Successful!",
                                     Toast.LENGTH_SHORT).show();
-                            FirebaseUser user = mAuth.getCurrentUser();
                             onBackPressed();
 
                         } else {

@@ -37,6 +37,7 @@
             android:id="@+id/SignInButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/holo_green_light"
             android:onClick="onClick"
             android:text="Sign In" />
 
@@ -44,6 +45,7 @@
             android:id="@+id/RegisterButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?android:attr/colorActivatedHighlight"
             android:onClick="onClick"
             android:text="Sign Up" />
 

@@ -110,7 +110,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         //we need toc heck if the credentials are valid before attempting to sign in
         if (!validateCredentials()) {
             Log.d(TAG, "Not valid credentials");
-            findViewById(R.id.SignInFailedView).setVisibility(View.VISIBLE);
             return;
         }
         Log.d(TAG,"Credentials are valid");
@@ -148,7 +147,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             //start details activity
             Intent user_details_activity = new Intent(this, UserDetailsActivity.class);
             startActivity(user_details_activity);
-            findViewById(R.id.SignInFailedView).setVisibility(View.INVISIBLE);
         }
     }
 
