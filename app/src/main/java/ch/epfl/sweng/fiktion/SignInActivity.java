@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,13 +44,13 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    // User is signed in
+                    //user is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
-                    // User is signed out
+                    //user is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-                // ...
+
             }
         };
     }
@@ -57,12 +58,16 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onStart() {
         super.onStart();
-        // If User is signed in, UI will adapt, if User is null , UI will prompt a sign in
+        // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         mAuth.addAuthStateListener(mAuthListener);
         updateUI(currentUser);
     }
 
+    /**
+     * This method checks if the credentials are valid by firebase standards
+     * @return true is the credentials are valid, false otherwise
+     */
     private boolean validateCredentials() {
         boolean validEmail = false;
         boolean validPassword = false;
@@ -95,13 +100,20 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         return validEmail && validPassword;
     }
 
+    /**
+     * Signs the user in using firebase authentication
+     * @param email provided by the user
+     * @param password provided by te user
+     */
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
+        //we need toc heck if the credentials are valid before attempting to sign in
         if (!validateCredentials()) {
             Log.d(TAG, "Not valid credentials");
             findViewById(R.id.SignInFailedView).setVisibility(View.VISIBLE);
             return;
         }
+        Log.d(TAG,"Credentials are valid");
         Log.d(TAG, "signIn:" + email);
 
         mAuth.signInWithEmailAndPassword(email, password)
@@ -112,18 +124,25 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(SignInActivity.this, "Login Successful!",
+                                    Toast.LENGTH_SHORT).show();
                             updateUI(user);
 
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            findViewById(R.id.SignInFailedView).setVisibility(View.VISIBLE);
+                            Toast.makeText(SignInActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
                         }
 
                     }
                 });
     }
 
+    /**
+     * If User is signed in, user is taken to the user details screen
+     * @param user firebase user
+     */
     private void updateUI(FirebaseUser user) {
         if (user != null) {
             //start details activity
@@ -142,6 +161,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         }
         //user clicks on register button
         else if (i == R.id.RegisterButton) {
+            //start registration activity
             Intent registerActivity = new Intent(this, RegisterActivity.class);
             startActivityForResult(registerActivity,1);
         }

@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int i = v.getId();
         if (i == R.id.MainButton) {
             Log.d(TAG, "Advancing");
+            //we advance to the login activity
             Intent signInActivity = new Intent(this, SignInActivity.class);
             startActivity(signInActivity);
         }

@@ -1,6 +1,5 @@
 package ch.epfl.sweng.fiktion;
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,6 +40,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         reg_password = (EditText)findViewById(R.id.register_password);
 
     }
+
+    /**
+     * This method checks if the credentials are valid by firebase standards
+     * @return true is the credentials are valid, false otherwise
+     */
     private boolean validateCredentials() {
         boolean validEmail = false;
         boolean validPassword = false;
@@ -72,13 +76,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         return validEmail && validPassword;
     }
+
+    /**
+     * This method creates a firebase user account using an input email and password
+     * @param email provided by the user
+     * @param password provided by the user
+     */
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
         if (!validateCredentials()) {
             return;
         }
+        Log.d(TAG,"Credentials are valid");
 
-        // [START create_user_with_email]
+        //firebase function that actually creates an account
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -100,7 +111,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                     }
                 });
-        // [END create_user_with_email]
     }
 
     @Override

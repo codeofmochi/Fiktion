@@ -61,14 +61,12 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             // The user's ID, unique to the Firebase project. Do NOT use this value to
             // authenticate with your backend server, if you have one. Use
-            // FirebaseUser.getToken() instead.
+            // FirebaseUser.getToken() instead. [I will keep this advice for now]
             String uid = user.getUid();
 
             //initialise textViews
             user_name_view.setText(name);
-            TextView user_email_view = (TextView) findViewById(R.id.detail_user_email);
             user_email_view.setText(email + "(verified : " + user.isEmailVerified() + ")");
-            TextView user_id_view = (TextView) findViewById(R.id.detail_user_id);
             user_id_view.setText(uid);
 
             //show verification button only if not verified
@@ -83,12 +81,19 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    /**
+     * This method signs the user out from Fiktion
+     */
     private void signOut() {
         mAuth.signOut();
+        Log.d(TAG,"User is signed out");
         Intent signInIntent = new Intent(this, SignInActivity.class);
         startActivity(signInIntent);
     }
 
+    /**
+     * This method will send a verification email to the currently signed in user
+     */
     private void sendEmailVerification() {
         // Disable button
         findViewById(R.id.verification_button).setEnabled(false);
@@ -96,29 +101,35 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         // Send verification email
         // [START send_email_verification]
         final FirebaseUser user = mAuth.getCurrentUser();
-        user.sendEmailVerification()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // [START_EXCLUDE]
-                        // Re-enable button
-                        Log.d(TAG,"Sending was successful");
-                        findViewById(R.id.verification_button).setEnabled(true);
+        if(user!=null) {
+            user.sendEmailVerification()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            // [START_EXCLUDE]
+                            // Re-enable button
+                            Log.d(TAG, "Sending was successful");
+                            findViewById(R.id.verification_button).setEnabled(true);
 
-                        if (task.isSuccessful()) {
-                            Toast.makeText(UserDetailsActivity.this,
-                                    "Verification email sent to " + user.getEmail(),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Log.e(TAG, "sendEmailVerification", task.getException());
-                            Toast.makeText(UserDetailsActivity.this,
-                                    "Failed to send verification email.",
-                                    Toast.LENGTH_SHORT).show();
+                            if (task.isSuccessful()) {
+                                Toast.makeText(UserDetailsActivity.this,
+                                        "Verification email sent to " + user.getEmail(),
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.e(TAG, "sendEmailVerification", task.getException());
+                                Toast.makeText(UserDetailsActivity.this,
+                                        "Failed to send verification email.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
                         }
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END send_email_verification]
+                    });
+        } else{
+            //handles the case if user is not currently signed right after calling this method
+            Toast.makeText(UserDetailsActivity.this,"No User currently signed in",Toast.LENGTH_SHORT).show();
+            findViewById(R.id.verification_button).setEnabled(true);
+        }
+
     }
 
     @Override
