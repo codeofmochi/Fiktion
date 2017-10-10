@@ -135,7 +135,7 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_blue_dark"
                     android:onClick="onClick"
-                    android:text="Choose your name!" />
+                    android:text="Change username" />
             </LinearLayout>
 
             <EditText
@@ -159,7 +159,7 @@
                 android:background="@android:color/holo_blue_dark"
                 android:onClick="onClick"
                 android:text="Confirm"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
         </LinearLayout>
     </FrameLayout>

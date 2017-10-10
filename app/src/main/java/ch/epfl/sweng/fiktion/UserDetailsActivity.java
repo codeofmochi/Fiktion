@@ -59,6 +59,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     public void onStart() {
         super.onStart();
 
+        //initialise user
         user = mAuth.getCurrentUser();
 
         if (user != null) {
@@ -104,8 +105,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private void signOut() {
         mAuth.signOut();
         Log.d(TAG, "User is signed out");
-        Intent signInIntent = new Intent(this, SignInActivity.class);
-        startActivity(signInIntent);
+        onBackPressed();
     }
 
     /**
