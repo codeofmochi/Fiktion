@@ -15,8 +15,8 @@ public class PointOfInterestTest {
     public void correctly_creates_POI() {
         Position pos = new Position(3.5,4.2);
         PointOfInterest poi = new PointOfInterest("Eiffel Tower", pos);
-        assertThat(poi.name(), is("Eiffel Tower"));
-        assertThat(poi.position(), is(pos));
+        assertThat(poi.name, is("Eiffel Tower"));
+        assertThat(poi.position, is(pos));
     }
 
 }
