@@ -27,10 +27,8 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="156dp">
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -107,46 +105,52 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/detail_signout"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/holo_blue_bright"
-                android:onClick="onClick"
-                android:text="Sign Out" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/verification_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:background="@android:color/holo_blue_light"
-                android:onClick="onClick"
-                android:text="Send Email Verification" />
+                <Button
+                    android:id="@+id/detail_signout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/holo_blue_bright"
+                    android:onClick="onClick"
+                    android:text="Sign Out" />
 
-            <Button
-                android:id="@+id/detail_nickname_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/holo_blue_dark"
-                android:onClick="onClick"
-                android:text="Choose your name!" />
+                <Button
+                    android:id="@+id/verification_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/holo_blue_light"
+                    android:onClick="onClick"
+                    android:text="Send Email Verification" />
+
+                <Button
+                    android:id="@+id/detail_nickname_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/holo_blue_dark"
+                    android:onClick="onClick"
+                    android:text="Choose your name!" />
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/detail_new_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/frameLayout"
                 android:layout_marginTop="27dp"
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Type your name"
                 android:inputType="textPersonName"
-                android:visibility="invisible" />
+                android:maxLength="15"
+                android:visibility="visible" />
 
             <Button
                 android:id="@+id/detail_confirm_name"

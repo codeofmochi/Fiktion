@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -64,9 +65,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             // Name, email address, and profile photo Url
             String name = user.getDisplayName();
             //
-
             choose.setVisibility(View.VISIBLE);
             user_newName.setVisibility(View.INVISIBLE);
+            confirmName.setVisibility(View.INVISIBLE);
 
             String email = user.getEmail();
             //Uri photoUrl = user.getPhotoUrl();
@@ -96,11 +97,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        onStart();
-    }
 
     /**
      * This method signs the user out from Fiktion
@@ -163,7 +159,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         final String newName = user_newName.getText().toString();
         findViewById(R.id.detail_confirm_name).setEnabled(false);
         //validate name choice
-        if (!newName.isEmpty() && !newName.equals(user.getDisplayName())) {
+
+        if (!newName.isEmpty()
+                && !newName.equals(user.getDisplayName())
+                && newName.length()<=15) {
+
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                     .setDisplayName(newName).build();
             user.updateProfile(profileUpdates)
@@ -203,8 +203,10 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             Log.d(TAG, "Sending Email Verification");
             sendEmailVerification();
         } else if (i == R.id.detail_nickname_button) {
+            Log.d(TAG, "Setting up UI to change name");
             setUpName();
         } else if (i == R.id.detail_confirm_name) {
+            Log.d(TAG, "Changing name");
             confirmName();
         }
     }
