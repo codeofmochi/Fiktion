@@ -152,7 +152,7 @@
                 android:id="@+id/detail_confirm_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@android:color/holo_blue_dark"
                 android:onClick="onClick"
                 android:text="Confirm"
                 android:visibility="invisible" />
