@@ -31,9 +31,14 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private TextView user_email_view;
     private TextView user_verify_view;
     private EditText user_newName;
+    //Buttons
     private Button verification;
     private Button choose;
     private Button confirmName;
+    private Button pwReset;
+    //Strings
+    private String email;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,51 +58,52 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         verification = (Button) findViewById(R.id.verification_button);
         choose = (Button) findViewById(R.id.detail_nickname_button);
         confirmName = (Button) findViewById(R.id.detail_confirm_name);
+        pwReset = (Button)findViewById(R.id.detail_reset_password);
+        //initialise User
+        user = mAuth.getCurrentUser();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        //initialise user
-        user = mAuth.getCurrentUser();
+        //initialise user details and firebase authentication
 
         if (user != null) {
             // Name, email address, and profile photo Url
-            String name = user.getDisplayName();
+            name = user.getDisplayName();
             //
             choose.setVisibility(View.VISIBLE);
             user_newName.setVisibility(View.INVISIBLE);
             confirmName.setVisibility(View.INVISIBLE);
 
-            String email = user.getEmail();
+            email = user.getEmail();
             //Uri photoUrl = user.getPhotoUrl();
 
             // The user's ID, unique to the Firebase project. Do NOT use this value to
             // authenticate with your backend server, if you have one. Use
             // FirebaseUser.getToken() instead. [I will keep this advice for now]
 
-            //initialise views
+            //initialise views and buttons
+            // show verification button only if not verified
+            // show password reset button only if verified
             user_name_view.setText(name);
             user_email_view.setText(email);
             if (user.isEmailVerified()) {
                 user_verify_view.setText("YES");
+                verification.setVisibility(View.GONE);
+                pwReset.setVisibility(View.VISIBLE);
             } else {
                 user_verify_view.setText("NO");
+                verification.setVisibility(View.VISIBLE);
+                pwReset.setVisibility(View.GONE);
             }
 
-            //show verification button only if not verified
-            if (user.isEmailVerified()) {
-                verification.setVisibility(View.GONE);
-            } else {
-                verification.setVisibility(View.VISIBLE);
-            }
         } else {
             Log.d(TAG, "Could not initialise user details, user is not signed in");
         }
 
     }
-
 
     /**
      * This method signs the user out from Fiktion
@@ -117,7 +123,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
         // Send verification email
 
-        final FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             user.sendEmailVerification()
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
@@ -130,10 +135,10 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Sending was successful");
                                 Toast.makeText(UserDetailsActivity.this,
-                                        "Verification email sent to " + user.getEmail(),
+                                        "Verification email sent to " + email,
                                         Toast.LENGTH_SHORT).show();
                             } else {
-                                Log.e(TAG, "sendEmailVerification", task.getException());
+                                Log.e(TAG, "sendEmailVerification failed", task.getException());
                                 Toast.makeText(UserDetailsActivity.this,
                                         "Failed to send verification email.",
                                         Toast.LENGTH_SHORT).show();
@@ -149,6 +154,42 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    private void sendPasswordResetEmail(){
+
+        if(user!=null) {
+            mAuth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+
+                            // Re-enable button
+                            findViewById(R.id.verification_button).setEnabled(true);
+
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "Sending was successful");
+                                Toast.makeText(UserDetailsActivity.this,
+                                        "Password reset email sent to " + email,
+                                        Toast.LENGTH_SHORT).show();
+                                pwReset.setVisibility(View.GONE);
+                            } else {
+                                Log.e(TAG, "sendPasswordResetEmail failed", task.getException());
+                                Toast.makeText(UserDetailsActivity.this,
+                                        "Failed to send password reset email.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
+        } else {
+
+            //handles the case if user is not currently signed right after calling this method
+            Toast.makeText(UserDetailsActivity.this, "No User currently signed in", Toast.LENGTH_SHORT).show();
+            findViewById(R.id.verification_button).setEnabled(true);
+        }
+
+
+    }
+
     private void setUpName() {
         choose.setVisibility(View.INVISIBLE);
         user_newName.setVisibility(View.VISIBLE);
@@ -158,8 +199,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private void confirmName() {
         final String newName = user_newName.getText().toString();
         findViewById(R.id.detail_confirm_name).setEnabled(false);
-        //validate name choice
 
+        //validate name choice
         if (!newName.isEmpty()
                 && !newName.equals(user.getDisplayName())
                 && newName.length()<=15) {
@@ -208,6 +249,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         } else if (i == R.id.detail_confirm_name) {
             Log.d(TAG, "Changing name");
             confirmName();
+        } else if(i == R.id.detail_reset_password){
+            Log.d(TAG, "Sending password reset email");
+            sendPasswordResetEmail();
         }
     }
 }

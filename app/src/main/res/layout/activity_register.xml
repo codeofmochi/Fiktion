@@ -7,7 +7,7 @@
     tools:context="ch.epfl.sweng.fiktion.RegisterActivity">
 
     <TextView
-        android:id="@+id/registration_title"
+        android:id="@+id/register_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="USER REGISTRATION"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="112dp"
         android:orientation="vertical"
-        android:layout_below="@+id/registration_title"
+        android:layout_below="@+id/register_title"
         android:layout_centerHorizontal="true">
 
         <EditText

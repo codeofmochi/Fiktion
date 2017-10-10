@@ -7,22 +7,6 @@
     android:background="@color/common_google_signin_btn_text_dark_default"
     tools:context="ch.epfl.sweng.fiktion.UserDetailsActivity">
 
-    <TextView
-        android:id="@+id/detail_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="30dp"
-        android:text="User Details"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="56dp" />
-
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
@@ -115,6 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_blue_bright"
+                    android:elevation="4dp"
                     android:onClick="onClick"
                     android:text="Sign Out" />
 
@@ -126,6 +111,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:background="@android:color/holo_blue_light"
+                    android:elevation="4dp"
                     android:onClick="onClick"
                     android:text="Send Email Verification" />
 
@@ -134,8 +120,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_blue_dark"
+                    android:elevation="4dp"
                     android:onClick="onClick"
                     android:text="Change username" />
+
+                <Button
+                    android:id="@+id/detail_reset_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorControlActivated"
+                    android:elevation="4dp"
+                    android:onClick="onClick"
+                    android:text="Reset Password" />
             </LinearLayout>
 
             <EditText
@@ -157,11 +153,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_blue_dark"
+                android:elevation="4dp"
                 android:onClick="onClick"
                 android:text="Confirm"
                 android:visibility="visible" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="30dp"
+            android:text="User Details"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="56dp" />
     </FrameLayout>
 
 </RelativeLayout>
