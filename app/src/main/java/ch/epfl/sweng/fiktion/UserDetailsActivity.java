@@ -22,7 +22,13 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class UserDetailsActivity extends AppCompatActivity implements View.OnClickListener {
 
+    //constants
+        //LOGCAT
     private static final String TAG = "UserDetails";
+        //UI modes
+    private final int default_mode = 20;
+    private final int changeName_mode = 21;
+
     //firebase
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -72,33 +78,14 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         if (user != null) {
             // Name, email address, and profile photo Url
             name = user.getDisplayName();
-            //
-            choose.setVisibility(View.VISIBLE);
-            user_newName.setVisibility(View.INVISIBLE);
-            confirmName.setVisibility(View.INVISIBLE);
-
             email = user.getEmail();
             //Uri photoUrl = user.getPhotoUrl();
+            //String uid = user.getUid();
 
             // The user's ID, unique to the Firebase project. Do NOT use this value to
             // authenticate with your backend server, if you have one. Use
             // FirebaseUser.getToken() instead. [I will keep this advice for now]
-
-            //initialise views and buttons
-            // show verification button only if not verified
-            // show password reset button only if verified
-            user_name_view.setText(name);
-            user_email_view.setText(email);
-            if (user.isEmailVerified()) {
-                user_verify_view.setText("YES");
-                verification.setVisibility(View.GONE);
-                pwReset.setVisibility(View.VISIBLE);
-            } else {
-                user_verify_view.setText("NO");
-                verification.setVisibility(View.VISIBLE);
-                pwReset.setVisibility(View.GONE);
-            }
-
+            updateUI(default_mode);
         } else {
             Log.d(TAG, "Could not initialise user details, user is not signed in");
         }
@@ -156,6 +143,10 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     private void sendPasswordResetEmail(){
 
+
+        // Disable button
+        findViewById(R.id.detail_reset_password).setEnabled(false);
+
         if(user!=null) {
             mAuth.sendPasswordResetEmail(email)
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
@@ -163,7 +154,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                         public void onComplete(@NonNull Task<Void> task) {
 
                             // Re-enable button
-                            findViewById(R.id.verification_button).setEnabled(true);
+                            findViewById(R.id.detail_reset_password).setEnabled(true);
 
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Sending was successful");
@@ -184,16 +175,41 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
             //handles the case if user is not currently signed right after calling this method
             Toast.makeText(UserDetailsActivity.this, "No User currently signed in", Toast.LENGTH_SHORT).show();
-            findViewById(R.id.verification_button).setEnabled(true);
+            // Re-enable button
+            findViewById(R.id.detail_reset_password).setEnabled(true);
+
         }
 
 
     }
 
-    private void setUpName() {
-        choose.setVisibility(View.INVISIBLE);
-        user_newName.setVisibility(View.VISIBLE);
-        confirmName.setVisibility(View.VISIBLE);
+    private void updateUI(int i){
+        if(i == changeName_mode){
+            //activates this mode when user clicks on "choose" button
+            choose.setVisibility(View.INVISIBLE);
+            user_newName.setVisibility(View.VISIBLE);
+            confirmName.setVisibility(View.VISIBLE);
+        } else if(i==default_mode){
+            //UI default mode
+            //initialise views and buttons
+            user_name_view.setText(name);
+            user_email_view.setText(email);
+
+            // show verification button only if not verified
+            // show password reset button only if verified
+            if (user.isEmailVerified()) {
+                user_verify_view.setText("YES");
+                verification.setVisibility(View.GONE);
+                pwReset.setVisibility(View.VISIBLE);
+            } else {
+                user_verify_view.setText("NO");
+                verification.setVisibility(View.VISIBLE);
+                pwReset.setVisibility(View.GONE);
+            }
+            choose.setVisibility(View.VISIBLE);
+            user_newName.setVisibility(View.INVISIBLE);
+            confirmName.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void confirmName() {
@@ -245,7 +261,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             sendEmailVerification();
         } else if (i == R.id.detail_nickname_button) {
             Log.d(TAG, "Setting up UI to change name");
-            setUpName();
+            updateUI(changeName_mode);
         } else if (i == R.id.detail_confirm_name) {
             Log.d(TAG, "Changing name");
             confirmName();

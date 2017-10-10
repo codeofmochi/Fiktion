@@ -83,6 +83,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
      */
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
+
         if (!validateCredentials()) {
             return;
         }
