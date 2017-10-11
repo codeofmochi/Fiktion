@@ -10,7 +10,6 @@ public class Position {
         this.x = x;
         this.y = y;
     }
-    public Position(){}
     public double dist(Position that) {
         double diffX = x - that.x;
         double diffY = y - that.y;
