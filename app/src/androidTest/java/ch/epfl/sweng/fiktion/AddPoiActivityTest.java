@@ -61,7 +61,7 @@ public class AddPoiActivityTest {
         onView(withId(R.id.poiName)).perform(typeText(poiTestName1));
         onView(withId(R.id.addPOIButton)).perform(click());
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -75,7 +75,7 @@ public class AddPoiActivityTest {
         onView(withId(R.id.poiName)).perform(typeText(poiTestName2));
         onView(withId(R.id.addPOIButton)).perform(click());
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -87,7 +87,7 @@ public class AddPoiActivityTest {
         onView(withId(R.id.poiName)).perform(typeText(""));
         onView(withId(R.id.addPOIButton)).perform(click());
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
