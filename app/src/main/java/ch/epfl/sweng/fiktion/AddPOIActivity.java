@@ -27,7 +27,7 @@ public class AddPOIActivity extends AppCompatActivity {
 
     public void addPOI(View view) {
         // Get the entered text
-        String poiName = ((EditText) findViewById(R.id.poiName)).getText().toString();
+        final String poiName = ((EditText) findViewById(R.id.poiName)).getText().toString();
         if (poiName.isEmpty()) {
             ((TextView) findViewById(R.id.addConfirm)).setText("Can't add empty Point of interest");
         } else {
@@ -35,14 +35,33 @@ public class AddPOIActivity extends AppCompatActivity {
             Random rand = new Random();
             Position pos = new Position(rand.nextDouble() * 100, rand.nextDouble() * 100);
             // create the point of interest
-            PointOfInterest poi = new PointOfInterest(poiName, pos);
+            final PointOfInterest poi = new PointOfInterest(poiName, pos);
             // get the database reference
             DatabaseReference db = FirebaseDatabase.getInstance().getReference();
             // get/create the reference of the point of interest
-            DatabaseReference poiRef = db.child("Points of interest").child(poi.name);
-            poiRef.setValue(poi);
-            // display a confirmation message
-            ((TextView) findViewById(R.id.addConfirm)).setText(poiName + " added");
+            final DatabaseReference poiRef = db.child("Points of interest").child(poi.name);
+            // add only if the reference doesn't exist
+            poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()) {
+                        // display warning message
+                        ((TextView) findViewById(R.id.addConfirm)).setText(poiName + " already exists");
+                    } else {
+                        // set value
+                        poiRef.setValue(poi);
+                        // display a confirmation message
+                        ((TextView) findViewById(R.id.addConfirm)).setText(poiName + " added");
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+            
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
     }
