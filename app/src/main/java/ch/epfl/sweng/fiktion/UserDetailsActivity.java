@@ -1,12 +1,8 @@
 package ch.epfl.sweng.fiktion;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.graphics.Color;
-import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,9 +19,9 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 public class UserDetailsActivity extends AppCompatActivity implements View.OnClickListener {
 
     //constants
-        //LOGCAT
+    //LOGCAT
     private static final String TAG = "UserDetails";
-        //UI modes
+    //UI modes
     private final int default_mode = 20;
     private final int changeName_mode = 21;
 
@@ -64,7 +60,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         verification = (Button) findViewById(R.id.verification_button);
         choose = (Button) findViewById(R.id.detail_nickname_button);
         confirmName = (Button) findViewById(R.id.detail_confirm_name);
-        pwReset = (Button)findViewById(R.id.detail_reset_password);
+        pwReset = (Button) findViewById(R.id.detail_reset_password);
         //initialise User
         user = mAuth.getCurrentUser();
     }
@@ -72,7 +68,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG,"Started UserDetailsActivity");
+        Log.d(TAG, "Started UserDetailsActivity");
         //initialise user details and firebase authentication
 
         if (user != null) {
@@ -96,7 +92,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
      * This method signs the user out from Fiktion
      */
     private void signOut() {
-        if(user!=null) {
+        if (user != null) {
             mAuth.signOut();
             Log.d(TAG, "User is signed out");
             onBackPressed();
@@ -143,13 +139,13 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    private void sendPasswordResetEmail(){
+    private void sendPasswordResetEmail() {
 
 
         // Disable button
         findViewById(R.id.detail_reset_password).setEnabled(false);
 
-        if(user!=null) {
+        if (user != null) {
             mAuth.sendPasswordResetEmail(email)
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                         @Override
@@ -185,13 +181,13 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    private void updateUI(int i){
-        if(i == changeName_mode){
+    private void updateUI(int i) {
+        if (i == changeName_mode) {
             //activates this mode when user clicks on "choose" button
             choose.setVisibility(View.INVISIBLE);
             user_newName.setVisibility(View.VISIBLE);
             confirmName.setVisibility(View.VISIBLE);
-        } else if(i==default_mode){
+        } else if (i == default_mode) {
             //UI default mode
             //initialise views and buttons
             user_name_view.setText(name);
@@ -221,7 +217,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         //validate name choice
         if (!newName.isEmpty()
                 && !newName.equals(user.getDisplayName())
-                && newName.length()<=15) {
+                && newName.length() <= 15) {
 
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                     .setDisplayName(newName).build();
@@ -246,7 +242,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                         }
                     });
 
-        } else{
+        } else {
             findViewById(R.id.detail_confirm_name).setEnabled(true);
             user_newName.setError("A new name is required");
         }
@@ -267,7 +263,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         } else if (i == R.id.detail_confirm_name) {
             Log.d(TAG, "Changing name");
             confirmName();
-        } else if(i == R.id.detail_reset_password){
+        } else if (i == R.id.detail_reset_password) {
             Log.d(TAG, "Sending password reset email");
             sendPasswordResetEmail();
         }

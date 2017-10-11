@@ -70,6 +70,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     /**
      * This method checks if the credentials are valid by firebase standards
+     *
      * @return true is the credentials are valid, false otherwise
      */
     private boolean validateCredentials() {
@@ -106,7 +107,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     /**
      * Signs the user in using firebase authentication
-     * @param email provided by the user
+     *
+     * @param email    provided by the user
      * @param password provided by te user
      */
     private void signIn(String email, String password) {
@@ -116,7 +118,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             Log.d(TAG, "Not valid credentials");
             return;
         }
-        Log.d(TAG,"Credentials are valid");
+        Log.d(TAG, "Credentials are valid");
         Log.d(TAG, "signIn:" + email);
 
         mAuth.signInWithEmailAndPassword(email, password)
@@ -147,6 +149,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     /**
      * If User is signed in, user is taken to the user details screen
+     *
      * @param user firebase user
      */
     private void updateUI(FirebaseUser user) {
@@ -168,7 +171,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         else if (i == R.id.RegisterButton) {
             //start registration activity
             Intent registerActivity = new Intent(this, RegisterActivity.class);
-            startActivityForResult(registerActivity,1);
+            startActivityForResult(registerActivity, 1);
         }
     }
 

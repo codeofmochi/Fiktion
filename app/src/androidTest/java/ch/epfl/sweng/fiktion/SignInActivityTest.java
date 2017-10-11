@@ -5,15 +5,8 @@ package ch.epfl.sweng.fiktion;
  */
 
 
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.core.deps.guava.base.Strings;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-
-import ch.epfl.sweng.fiktion.SignInActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -26,13 +19,10 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.assertion.ViewAssertions.*;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 public class SignInActivityTest {
@@ -55,7 +45,6 @@ public class SignInActivityTest {
     public void setUp() {
         mActivity = sinActivityRule.getActivity();
         mAuth = FirebaseAuth.getInstance();
-
     }
 
     @Test
@@ -123,7 +112,7 @@ public class SignInActivityTest {
     }
 
     @Test
-    public void startRegistration(){
+    public void startRegistration() {
         //click on sign up button
         onView(withId(R.id.RegisterButton)).perform(click());
         //check if we can see Registration Activity's title
@@ -131,7 +120,7 @@ public class SignInActivityTest {
     }
 
     @Test
-    public void valid_wrong_login(){
+    public void valid_wrong_login() {
         //type valid credentials and click sign in
         onView(withId(R.id.User_Email)).perform(typeText(valid_email), closeSoftKeyboard());
         onView(withId(R.id.User_Password)).perform(typeText(wrong_password), closeSoftKeyboard());
