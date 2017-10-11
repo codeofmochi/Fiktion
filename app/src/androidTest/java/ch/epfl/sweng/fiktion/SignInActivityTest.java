@@ -81,7 +81,6 @@ public class SignInActivityTest {
             //checks if sign out button works
             onView(withId(R.id.detail_signout)).perform(click());
             onView(withId(R.id.SignInButton));
-
         }
 
     }
