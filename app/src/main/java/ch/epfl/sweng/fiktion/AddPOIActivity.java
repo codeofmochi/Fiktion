@@ -29,7 +29,7 @@ public class AddPOIActivity extends AppCompatActivity {
         // Get the entered text
         final String poiName = ((EditText) findViewById(R.id.poiName)).getText().toString();
         if (poiName.isEmpty()) {
-            ((TextView) findViewById(R.id.addConfirm)).setText("Can't add empty Point of interest");
+            ((TextView) findViewById(R.id.addConfirm)).setText("Write the name of your Point of interest");
         } else {
             // create random position with values between 0 and 100
             Random rand = new Random();
@@ -61,7 +61,7 @@ public class AddPOIActivity extends AppCompatActivity {
                 }
             });
 
-            
+
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
     }
