@@ -61,6 +61,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         mAuth.addAuthStateListener(mAuthListener);
+        //reset password field
+        UserPassword.setText("");
         updateUI(currentUser);
     }
 

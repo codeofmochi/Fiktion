@@ -72,7 +72,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onStart() {
         super.onStart();
-
+        Log.d(TAG,"Started UserDetailsActivity");
         //initialise user details and firebase authentication
 
         if (user != null) {
@@ -96,9 +96,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
      * This method signs the user out from Fiktion
      */
     private void signOut() {
-        mAuth.signOut();
-        Log.d(TAG, "User is signed out");
-        onBackPressed();
+        if(user!=null) {
+            mAuth.signOut();
+            Log.d(TAG, "User is signed out");
+            onBackPressed();
+        }
     }
 
     /**
