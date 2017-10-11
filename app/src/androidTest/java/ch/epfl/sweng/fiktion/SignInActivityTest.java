@@ -8,6 +8,8 @@ package ch.epfl.sweng.fiktion;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.core.deps.guava.base.Strings;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -26,6 +28,7 @@ import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.*;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,6 +39,7 @@ public class SignInActivityTest {
 
     private final String valid_email = "test@test.ch";
     private final String valid_password = "testing";
+    private final String wrong_password = "validbutwrong";
     private final String invalid_email = "invalid";
     private final String invalid_password = "1234";
 
@@ -73,7 +77,11 @@ public class SignInActivityTest {
             //this view is in other activity but no need to tell Espresso
             //check that user id is correctly update in user details activity
             onView(withId(R.id.detail_user_email)).check(matches(withText(valid_email)));
+
+            //checks if sign out button works
             onView(withId(R.id.detail_signout)).perform(click());
+            onView(withId(R.id.SignInButton));
+
         }
 
     }
@@ -121,5 +129,22 @@ public class SignInActivityTest {
         onView(withId(R.id.RegisterButton)).perform(click());
         //check if we can see Registration Activity's title
         onView(withId(R.id.register_title));
+    }
+
+    @Test
+    public void valid_wrong_login(){
+        //type valid credentials and click sign in
+        onView(withId(R.id.User_Email)).perform(typeText(valid_email), closeSoftKeyboard());
+        onView(withId(R.id.User_Password)).perform(typeText(wrong_password), closeSoftKeyboard());
+        onView(withId(R.id.SignInButton)).perform(click());
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //check login failed and we have not advanced to other activities after 2 seconds
+        onView(withId(R.id.User_Email));
     }
 }
