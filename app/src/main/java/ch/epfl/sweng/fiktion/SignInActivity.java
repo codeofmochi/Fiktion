@@ -53,17 +53,19 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
             }
         };
+
+        // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        mAuth.addAuthStateListener(mAuthListener);
+        updateUI(currentUser);
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        mAuth.addAuthStateListener(mAuthListener);
         //reset password field
         UserPassword.setText("");
-        updateUI(currentUser);
     }
 
     /**
@@ -78,14 +80,14 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         Log.d(TAG, "Validating credentials");
 
         if (password.isEmpty()) {
-            UserPassword.setError("Password is required");
+            UserPassword.setError(getString(R.string.required_password_error));
             Log.d(TAG, "Password validation failed");
         } else {
             if (password.length() >= 6) {
                 validPassword = true;
                 UserPassword.setError(null);
             } else {
-                UserPassword.setError("Password must be of at least 6 characters");
+                UserPassword.setError(getString(R.string.invalid_password_error));
                 Log.d(TAG, "Password validation failed");
             }
         }
@@ -93,7 +95,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             validEmail = true;
             UserEmail.setError(null);
         } else {
-            UserEmail.setError("Require a valid email");
+            UserEmail.setError(getString(R.string.invalid_email_error));
             Log.d(TAG, "Email validation failed");
 
         }
@@ -122,6 +124,9 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            //reset textViews content
+                            UserEmail.setText("");
+                            UserPassword.setText("");
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
