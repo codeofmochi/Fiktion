@@ -19,4 +19,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddPOIActivity.class);
         startActivity(intent);
     }
+
+    public void goToFindNearestPOI(View view) {
+        Intent intent = new Intent(this, FindNearestPoisActivity.class);
+        startActivity(intent);
+    }
 }

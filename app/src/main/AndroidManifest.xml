@@ -16,7 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddPOIActivity"></activity>
+        <activity android:name=".AddPOIActivity" />
+        <activity android:name=".FindNearestPoisActivity"></activity>
     </application>
 
 </manifest>

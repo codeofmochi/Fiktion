@@ -13,4 +13,14 @@
         android:layout_marginBottom="124dp"
         android:onClick="goToAddPOI"
         android:text="Add Point of interest" />
+
+    <Button
+        android:id="@+id/findNearPois"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:onClick="goToFindNearestPOI"
+        android:text="Find near points of interest" />
 </RelativeLayout>
