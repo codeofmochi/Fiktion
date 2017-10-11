@@ -26,17 +26,22 @@ public class AddPOIActivity extends AppCompatActivity {
     }
 
     public void addPOI(View view) {
-        // Get the text from the plain text
+        // Get the entered text
         String poiName = ((EditText) findViewById(R.id.poiName)).getText().toString();
         if (poiName.isEmpty()) {
             ((TextView) findViewById(R.id.addConfirm)).setText("Can't add empty Point of interest");
         } else {
+            // create random position with values between 0 and 100
             Random rand = new Random();
             Position pos = new Position(rand.nextDouble() * 100, rand.nextDouble() * 100);
+            // create the point of interest
             PointOfInterest poi = new PointOfInterest(poiName, pos);
+            // get the database reference
             DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+            // get/create the reference of the point of interest
             DatabaseReference poiRef = db.child("Points of interest").child(poi.name);
             poiRef.setValue(poi);
+            // display a confirmation message
             ((TextView) findViewById(R.id.addConfirm)).setText(poiName + " added");
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
