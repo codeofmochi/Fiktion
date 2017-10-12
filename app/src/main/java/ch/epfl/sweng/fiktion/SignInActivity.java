@@ -39,6 +39,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         //Firebase Authenticator
         mAuth = FirebaseAuth.getInstance();
+        //this may be useless for now
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -64,8 +65,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onStart() {
         super.onStart();
-        //reset password field
-        UserPassword.setText("");
     }
 
     /**
@@ -113,7 +112,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
-        //we need toc heck if the credentials are valid before attempting to sign in
+        //we need to check if the credentials are valid before attempting to sign in
         if (!validateCredentials()) {
             Log.d(TAG, "Not valid credentials");
             return;
@@ -127,8 +126,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             //reset textViews content
-                            UserEmail.setText("");
-                            UserPassword.setText("");
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
@@ -154,9 +151,10 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void updateUI(FirebaseUser user) {
         if (user != null) {
-            //start details activity
+            //start details activity and end this one
             Intent user_details_activity = new Intent(this, UserDetailsActivity.class);
             startActivity(user_details_activity);
+            finish();
         }
     }
 

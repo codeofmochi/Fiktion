@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +25,14 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     //UI modes
     private final int default_mode = 20;
     private final int changeName_mode = 21;
+    private final int userSignedOut = 22;
+
 
     //firebase
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
     //views
     private TextView user_name_view;
     private TextView user_email_view;
@@ -61,8 +66,29 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         choose = (Button) findViewById(R.id.detail_nickname_button);
         confirmName = (Button) findViewById(R.id.detail_confirm_name);
         pwReset = (Button) findViewById(R.id.detail_reset_password);
-        //initialise User
+        //initialise User and firebase auth listener
         user = mAuth.getCurrentUser();
+        //thinking about making this static so we can use it in all code
+        //whenever the user gets signed off
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser nUser = firebaseAuth.getCurrentUser();
+                if (nUser != null) {
+                    //user is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    //if user changed, recreate
+                    if(user != nUser){
+                        recreate();
+                    }
+                } else {
+                    //user is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    updateUI(userSignedOut);
+                }
+
+            }
+        };
     }
 
     @Override
@@ -70,6 +96,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         super.onStart();
         Log.d(TAG, "Started UserDetailsActivity");
         //initialise user details and firebase authentication
+        mAuth.addAuthStateListener(mAuthListener);
 
         if (user != null) {
             // Name, email address, and profile photo Url
@@ -83,6 +110,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             // FirebaseUser.getToken() instead. [I will keep this advice for now]
             updateUI(default_mode);
         } else {
+            //this case will probably never happen
             Log.d(TAG, "Could not initialise user details, user is not signed in");
         }
 
@@ -94,8 +122,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private void signOut() {
         if (user != null) {
             mAuth.signOut();
+            //firebase authentication listener will see
+            // that user signed out and call onAuthStateChanged
             Log.d(TAG, "User is signed out");
-            onBackPressed();
         }
     }
 
@@ -140,8 +169,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void sendPasswordResetEmail() {
-
-
         // Disable button
         findViewById(R.id.detail_reset_password).setEnabled(false);
 
@@ -207,6 +234,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             choose.setVisibility(View.VISIBLE);
             user_newName.setVisibility(View.INVISIBLE);
             confirmName.setVisibility(View.INVISIBLE);
+        } else if(i==userSignedOut){
+            Log.d(TAG,"Return to signIn activity");
+            Intent login = new Intent(this, SignInActivity.class);
+            startActivity(login);
+            finish();
         }
     }
 

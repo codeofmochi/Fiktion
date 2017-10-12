@@ -6,14 +6,15 @@ package ch.epfl.sweng.fiktion;
 
 
 import android.support.test.rule.ActivityTestRule;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -21,8 +22,8 @@ import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RegisterActivityTest {
 
     private final String TAG = "RegActivTest";
@@ -47,25 +48,24 @@ public class RegisterActivityTest {
     @Test
     public void newAccountTest() throws InterruptedException {
         regAuth.signOut();
-
         //we type valid credentials and click on the register button
         onView(withId(R.id.register_email)).perform(typeText(new_email));
         onView(withId(R.id.register_password)).perform(typeText(new_password));
         onView(withId(R.id.register_click)).perform(click());
 
 
-        Thread.sleep(2000);
-        //After creating the account the activity finishes and starts SignInActivity with a logged user, therefore
-        //we should see the user details activity and the new email on the field "Email"
-        onView(withId(R.id.detail_user_email)).check(matches(withText(new_email)));
-
+        //busy-waiting for contact with firebase and creation of account
+        int counter = 1000000000;
+        int i=0;
+        while(i<=counter){
+            i++;
+        }
         FirebaseUser user;
         user = regAuth.getCurrentUser();
         if (user != null) {
             user.delete();
-        } else {
-            Log.d(TAG, "Creation failed");
         }
+
     }
 
     @Test
@@ -104,14 +104,16 @@ public class RegisterActivityTest {
     }
 
     @Test
-    public void invalidPasswordTest() {
+    public void invalidPasswordTest() throws InterruptedException {
         //we type valid but existing credentials and click on the register button
-        onView(withId(R.id.register_email)).perform(typeText("valid@Email"));
+
+        onView(withId(R.id.register_email)).perform(typeText("v@e"));
         onView(withId(R.id.register_password)).perform(typeText("not"));
         onView(withId(R.id.register_click)).perform(click());
 
+        onView(withId(R.id.register_password)).check(matches(hasErrorText(regActivity.getString(R.string.invalid_password_error))));
+
         //check that we stay in the same activity (we do not sign in to the new account) and password error displays
         onView(withId(R.id.register_title));
-        onView(withId(R.id.register_password)).check(matches(hasErrorText(regActivity.getString(R.string.invalid_password_error))));
     }
 }
