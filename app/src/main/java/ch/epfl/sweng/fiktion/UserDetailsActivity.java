@@ -76,7 +76,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 FirebaseUser nUser = firebaseAuth.getCurrentUser();
                 if (nUser != null) {
                     //user is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + nUser.getUid());
                     //if user changed, recreate
                     if(user != nUser){
                         recreate();

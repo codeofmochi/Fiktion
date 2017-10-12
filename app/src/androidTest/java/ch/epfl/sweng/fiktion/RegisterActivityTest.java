@@ -28,7 +28,7 @@ public class RegisterActivityTest {
 
     private final String TAG = "RegActivTest";
     private final String new_email = "new@email.com";
-    private final String new_password = "newuser";
+    private final String new_password = "123456";
     private final String exist_email = "test@test.ch";
     private final String exist_password = "testing";
 
@@ -108,7 +108,7 @@ public class RegisterActivityTest {
         //we type valid but existing credentials and click on the register button
 
         onView(withId(R.id.register_email)).perform(typeText("v@e"));
-        onView(withId(R.id.register_password)).perform(typeText("not"));
+        onView(withId(R.id.register_password)).perform(typeText("12345"));
         onView(withId(R.id.register_click)).perform(click());
 
         onView(withId(R.id.register_password)).check(matches(hasErrorText(regActivity.getString(R.string.invalid_password_error))));
