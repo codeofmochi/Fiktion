@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion;
 
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -54,6 +55,7 @@ public class AddPoiActivityTest {
     @BeforeClass public static void setup() {
         removePoiTestName(poiTestName1);
         removePoiTestName(poiTestName2);
+
     }
 
     @Test
@@ -61,7 +63,7 @@ public class AddPoiActivityTest {
         onView(withId(R.id.poiName)).perform(typeText(poiTestName1));
         onView(withId(R.id.addPOIButton)).perform(click());
         try {
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -75,7 +77,7 @@ public class AddPoiActivityTest {
         onView(withId(R.id.poiName)).perform(typeText(poiTestName2));
         onView(withId(R.id.addPOIButton)).perform(click());
         try {
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -87,11 +89,53 @@ public class AddPoiActivityTest {
         onView(withId(R.id.poiName)).perform(typeText(""));
         onView(withId(R.id.addPOIButton)).perform(click());
         try {
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         onView(withId(R.id.addConfirm)).check(matches(withText("Write the name of your Point of interest")));
+    }
+
+    @Test
+    public void addingFailsWithDot() {
+        onView(withId(R.id.poiName)).perform(typeText("."));
+        onView(withId(R.id.addPOIButton)).perform(click());
+        onView(withId(R.id.addConfirm)).check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+    }
+
+    @Test
+    public void addingFailsWithDollar() {
+        onView(withId(R.id.poiName)).perform(typeText("$"));
+        onView(withId(R.id.addPOIButton)).perform(click());
+        onView(withId(R.id.addConfirm)).check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+    }
+
+    @Test
+    public void addingFailsWithHash() {
+        onView(withId(R.id.poiName)).perform(typeText("#"));
+        onView(withId(R.id.addPOIButton)).perform(click());
+        onView(withId(R.id.addConfirm)).check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+    }
+
+    @Test
+    public void addingFailsWithOpenBracket() {
+        onView(withId(R.id.poiName)).perform(typeText("["));
+        onView(withId(R.id.addPOIButton)).perform(click());
+        onView(withId(R.id.addConfirm)).check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+    }
+
+    @Test
+    public void addingFailsWithCloseBracket() {
+        onView(withId(R.id.poiName)).perform(typeText("]"));
+        onView(withId(R.id.addPOIButton)).perform(click());
+        onView(withId(R.id.addConfirm)).check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+    }
+
+    @Test
+    public void addingFailsWithSlash() {
+        onView(withId(R.id.poiName)).perform(typeText("/"));
+        onView(withId(R.id.addPOIButton)).perform(click());
+        onView(withId(R.id.addConfirm)).check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @AfterClass public static void cleanup() {
