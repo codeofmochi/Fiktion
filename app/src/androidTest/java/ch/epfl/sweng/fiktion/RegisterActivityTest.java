@@ -10,6 +10,7 @@ import android.support.test.rule.ActivityTestRule;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -43,6 +44,11 @@ public class RegisterActivityTest {
     public void setUp() {
         regAuth = FirebaseAuth.getInstance();
         regActivity = regActivityRule.getActivity();
+    }
+    @After
+    public void end(){
+        regAuth.signOut();
+        regActivity.finish();
     }
 
     @Test

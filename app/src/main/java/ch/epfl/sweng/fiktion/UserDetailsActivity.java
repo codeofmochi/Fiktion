@@ -39,6 +39,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private TextView user_verify_view;
     private EditText user_newName;
     //Buttons
+    private Button sign_out_button;
     private Button verification;
     private Button choose;
     private Button confirmName;
@@ -62,6 +63,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         user_newName = (EditText) findViewById(R.id.detail_new_name);
 
         //initialise button
+        sign_out_button = (Button) findViewById(R.id.detail_signout);
         verification = (Button) findViewById(R.id.verification_button);
         choose = (Button) findViewById(R.id.detail_nickname_button);
         confirmName = (Button) findViewById(R.id.detail_confirm_name);
@@ -120,6 +122,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
      * This method signs the user out from Fiktion
      */
     private void signOut() {
+
         if (user != null) {
             mAuth.signOut();
             //firebase authentication listener will see
@@ -237,8 +240,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         } else if(i==userSignedOut){
             Log.d(TAG,"Return to signIn activity");
             Intent login = new Intent(this, SignInActivity.class);
-            startActivity(login);
             finish();
+            startActivity(login);
         }
     }
 

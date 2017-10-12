@@ -51,7 +51,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     //user is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-
             }
         };
 
