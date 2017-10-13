@@ -2,17 +2,26 @@ package ch.epfl.sweng.fiktion;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class FindNearestPoisActivity extends AppCompatActivity {
 
     private int p = 50;
+    String[] test = {"one", "two", "three", "four", "five", "six", "seven", "nine", "ten"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_nearest_pois);
 
+        // Display list
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.activity_find_nearest_pois, R.id.POIListDisplay, test);
+        // Binding Array to ListAdapter
+        ListView listView = (ListView) findViewById(R.id.POIListDisplay) ;
+        listView.setAdapter(adapter);
         // SeekBar for search radius
         SeekBar searchRadius = (SeekBar)findViewById(R.id.searchRadius);
         final TextView radiusSelect = (TextView)findViewById(R.id.radiusSelect);
