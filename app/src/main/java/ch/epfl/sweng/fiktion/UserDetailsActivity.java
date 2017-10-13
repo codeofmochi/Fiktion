@@ -23,9 +23,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     //LOGCAT
     private static final String TAG = "UserDetails";
     //UI modes
-    private final int default_mode = 20;
-    private final int changeName_mode = 21;
-    private final int userSignedOut = 22;
+    private enum UIMode{
+        defaultMode,
+        changeNameMode,
+        userSignedOut;
+    }
 
 
     //firebase
@@ -86,7 +88,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 } else {
                     //user is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
-                    updateUI(userSignedOut);
+                    updateUI(UIMode.userSignedOut);
                 }
 
             }
@@ -110,7 +112,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             // The user's ID, unique to the Firebase project. Do NOT use this value to
             // authenticate with your backend server, if you have one. Use
             // FirebaseUser.getToken() instead. [I will keep this advice for now]
-            updateUI(default_mode);
+            updateUI(UIMode.defaultMode);
         } else {
             //this case will probably never happen
             Log.d(TAG, "Could not initialise user details, user is not signed in");
@@ -211,13 +213,13 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    private void updateUI(int i) {
-        if (i == changeName_mode) {
+    private void updateUI(UIMode mode) {
+        if (mode.equals(UIMode.changeNameMode)) {
             //activates this mode when user clicks on "choose" button
             choose.setVisibility(View.INVISIBLE);
             user_newName.setVisibility(View.VISIBLE);
             confirmName.setVisibility(View.VISIBLE);
-        } else if (i == default_mode) {
+        } else if (mode.equals(UIMode.defaultMode)) {
             //UI default mode
             //initialise views and buttons
             user_name_view.setText(name);
@@ -237,7 +239,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             choose.setVisibility(View.VISIBLE);
             user_newName.setVisibility(View.INVISIBLE);
             confirmName.setVisibility(View.INVISIBLE);
-        } else if(i==userSignedOut){
+        } else if(mode.equals(UIMode.userSignedOut)){
             Log.d(TAG,"Return to signIn activity");
             Intent login = new Intent(this, SignInActivity.class);
             finish();
@@ -294,7 +296,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             sendEmailVerification();
         } else if (i == R.id.detail_nickname_button) {
             Log.d(TAG, "Setting up UI to change name");
-            updateUI(changeName_mode);
+            updateUI(UIMode.changeNameMode);
         } else if (i == R.id.detail_confirm_name) {
             Log.d(TAG, "Changing name");
             confirmName();

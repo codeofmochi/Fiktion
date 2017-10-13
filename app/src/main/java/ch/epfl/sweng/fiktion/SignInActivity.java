@@ -15,6 +15,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import static java.lang.System.in;
+
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
 
@@ -39,7 +41,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         //Firebase Authenticator
         mAuth = FirebaseAuth.getInstance();
-        //this may be useless for now
+
+        //TODO: store logged in/out state in the app
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -82,6 +85,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
             UserPassword.setError(getString(R.string.required_password_error));
             Log.d(TAG, "Password validation failed");
         } else {
+            //TODO elaborate password validation
             if (password.length() >= 6) {
                 validPassword = true;
                 UserPassword.setError(null);
@@ -90,6 +94,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 Log.d(TAG, "Password validation failed");
             }
         }
+        //TODO elaborate email validation
         if (email.contains("@")) {
             validEmail = true;
             UserEmail.setError(null);
