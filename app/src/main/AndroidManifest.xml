@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddPOIActivity" />
-        <activity android:name=".FindNearestPoisActivity"></activity>
+        <activity android:name=".FindNearestPoisActivity" />
+        <activity android:name=".DisplayNearestPoisActivity"></activity>
     </application>
 
 </manifest>
