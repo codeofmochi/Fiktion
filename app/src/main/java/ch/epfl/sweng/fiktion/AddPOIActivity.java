@@ -35,7 +35,7 @@ public class AddPOIActivity extends AppCompatActivity {
         TextView confirmText = (TextView)findViewById(R.id.addConfirmationText);
         if (poiName.isEmpty()) {
             // warning message if no text was entered
-            confirmText.setText("Write the name of your Point of interest please");
+            confirmText.setText("Please write the name of your Point of interest");
         } else if (poiName.matches(".*[.$#/\\[\\]].*"))
         {
             // warning message if unaccepted characters are present
