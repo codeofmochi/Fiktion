@@ -22,6 +22,8 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
     private Location myPosition;
     // Marker on Google Maps
     private Marker myPositionMarker;
+    // Camera on first location change
+    private boolean firstLocationChange = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,7 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
         }
         // enable my position
         mMap.setMyLocationEnabled(true);
+
         // listen on location change
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
@@ -57,11 +60,16 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
                 // update my position
                 myPosition = arg0;
                 // update position marker
-                if (myPositionMarker != null) myPositionMarker.remove();
+                if (firstLocationChange) {
+                    // update camera
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(myPosition.getLatitude(), myPosition.getLongitude())));
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                    firstLocationChange = false;
+                }
+                else {
+                    myPositionMarker.remove();
+                }
                 myPositionMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("My Position"));
-                // update camera
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(myPosition.getLatitude(), myPosition.getLongitude())));
-                mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
             }
         });
     }
