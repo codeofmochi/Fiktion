@@ -5,8 +5,8 @@ package ch.epfl.sweng.fiktion;
  */
 
 public class PointOfInterest {
-    public String name = "";
-    public Position position = new Position(0,0);
+    public final String name;
+    public final Position position;
     public PointOfInterest(String name, Position position) {
         this.name = name;
         this.position = position;

@@ -53,7 +53,7 @@
         app:layout_constraintRight_toRightOf="parent" />
 
     <TextView
-        android:id="@+id/addConfirm"
+        android:id="@+id/addConfirmationText"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_below="@+id/addPOIButton"
