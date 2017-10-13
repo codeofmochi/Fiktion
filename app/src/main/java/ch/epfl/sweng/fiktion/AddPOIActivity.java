@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,6 +20,8 @@ import java.util.Random;
 import static android.content.ContentValues.TAG;
 
 public class AddPOIActivity extends AppCompatActivity {
+    // database reference
+    final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,15 +38,8 @@ public class AddPOIActivity extends AppCompatActivity {
         {
             ((TextView) findViewById(R.id.addConfirm)).setText("Those characters are not accepted: . $ # [ ] /");
         } else {
-            // create random position with values between 0 and 100
-            Random rand = new Random();
-            Position pos = new Position(rand.nextDouble() * 100, rand.nextDouble() * 100);
-            // create the point of interest
-            final PointOfInterest poi = new PointOfInterest(poiName, pos);
-            // get the database reference
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference();
             // get/create the reference of the point of interest
-            final DatabaseReference poiRef = db.child("Points of interest").child(poi.name);
+            final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
             // add only if the reference doesn't exist
             poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -51,10 +48,20 @@ public class AddPOIActivity extends AppCompatActivity {
                         // display warning message
                         ((TextView) findViewById(R.id.addConfirm)).setText(poiName + " already exists");
                     } else {
-                        // set value
-                        poiRef.setValue(poi);
                         // display a confirmation message
                         ((TextView) findViewById(R.id.addConfirm)).setText(poiName + " added");
+                        GeoFire geo = new GeoFire(dbRef.child("geofire"));
+
+                        // create random position with values between 0 and 1
+                        Random rand = new Random();
+                        double coord1 = rand.nextDouble();
+                        double coord2 = rand.nextDouble();
+                        geo.setLocation(poiName, new GeoLocation(coord1, coord2));
+
+                        // create point of interest
+                        PointOfInterest poi = new PointOfInterest(poiName, new Position(coord1, coord2));
+                        // set value
+                        poiRef.setValue(poi);
                     }
                 }
 
@@ -63,6 +70,7 @@ public class AddPOIActivity extends AppCompatActivity {
 
                 }
             });
+            // reset the textview
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
     }

@@ -10,14 +10,19 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class FindNearestPoisActivity extends AppCompatActivity {
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+public class FindNearestPoisActivity extends AppCompatActivity {
+    public static final String RADIUS_KEY = "ch.epfl.sweng.fiktion.radius";
     private int p = 50;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_nearest_pois);
-
         SeekBar searchRadius = (SeekBar)findViewById(R.id.searchRadius);
         final TextView radiusSelect = (TextView)findViewById(R.id.radiusSelect);
 
@@ -39,12 +44,9 @@ public class FindNearestPoisActivity extends AppCompatActivity {
         });
     }
 
-    public int getRadius() {
-        return p;
-    }
-
     public void goToDisplayNearestPois(View view) {
         Intent intent = new Intent(this, DisplayNearestPoisActivity.class);
+        intent.putExtra(RADIUS_KEY, p);
         startActivity(intent);
     }
 
