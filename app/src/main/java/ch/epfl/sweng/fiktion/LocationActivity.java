@@ -46,7 +46,7 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
         // enable zoom controls
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        // check permissions
+        // check permissions for location
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -64,11 +64,14 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
                     // update camera
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(myPosition.getLatitude(), myPosition.getLongitude())));
                     mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                    // update first time status
                     firstLocationChange = false;
                 }
                 else {
+                    // remove old marker
                     myPositionMarker.remove();
                 }
+                // add / update my position marker
                 myPositionMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("My Position"));
             }
         });
