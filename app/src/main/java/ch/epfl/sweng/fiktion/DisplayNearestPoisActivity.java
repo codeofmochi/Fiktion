@@ -17,9 +17,11 @@ public class DisplayNearestPoisActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_nearest_pois);
 
+        // Creates a new ListView to display the research results
         ListView lvFoundPois = (ListView)findViewById(R.id.displayResultPois);
-
+        // Creates a new adapter for the input array into the ListView
         ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_expandable_list_item_1, ls);
+        // Sets the Adapter
         lvFoundPois.setAdapter(adapter);
     }
 }
