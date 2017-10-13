@@ -34,7 +34,6 @@
             </intent-filter>
         </activity>
 
-
         <activity
             android:name="ch.epfl.sweng.fiktion.LocationActivity"
             android:label="@string/title_activity_location">
@@ -51,6 +50,10 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".AddPOIActivity" />
+        <activity android:name=".FindNearestPoisActivity" />
+        <activity android:name=".DisplayNearestPoisActivity"></activity>
 
     </application>
 

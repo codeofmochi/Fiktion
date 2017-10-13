@@ -17,4 +17,14 @@ public class MainActivity extends AppCompatActivity {
         Intent mapIntent = new Intent(this, LocationActivity.class);
         startActivity(mapIntent);
     }
+
+    public void startAddPOIActivity(View view) {
+        Intent addPoiIntent = new Intent(this, AddPOIActivity.class);
+        startActivity(addPoiIntent);
+    }
+
+    public void startFindNearestPoisActivity(View view) {
+        Intent findPoiIntent = new Intent(this, FindNearestPoisActivity.class);
+        startActivity(findPoiIntent);
+    }
 }
