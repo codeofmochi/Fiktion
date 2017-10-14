@@ -54,6 +54,8 @@ public class RegisterActivityTest {
         regActivity.finish();
     }
 
+    //TODO: Implement tests that mcck data access to firebase
+    /*
     @Test
     public void newAccountTest() throws InterruptedException {
         regAuth.signOut();
@@ -69,7 +71,6 @@ public class RegisterActivityTest {
         if (user != null) {
             user.delete();
         }
-
     }
 
     @Test
@@ -82,7 +83,7 @@ public class RegisterActivityTest {
         //check that we stay in the same activity (we do not sign in to the new account)
         onView(withId(R.id.register_title));
     }
-
+*/
     @Test
     public void emptyCredentialsTest() {
         //we only click and expect that we stay in the same activity and errors appear
@@ -96,7 +97,7 @@ public class RegisterActivityTest {
 
     @Test
     public void invalidEmailTest() {
-        //we type valid but existing credentials and click on the register button
+        //we type invalid and click on the register button
         onView(withId(R.id.register_email)).perform(typeText("invalidEmail"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText("validpassword"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_click)).perform(click());
@@ -108,7 +109,7 @@ public class RegisterActivityTest {
 
     @Test
     public void invalidPasswordTest() throws InterruptedException {
-        //we type valid but existing credentials and click on the register button
+        //we type invalid password and click on the register button
 
         onView(withId(R.id.register_email)).perform(typeText("v@e"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText("12345"), ViewActions.closeSoftKeyboard());
