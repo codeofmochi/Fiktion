@@ -1,6 +1,5 @@
 package ch.epfl.sweng.fiktion;
 
-import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -14,9 +13,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by pedro on 14/10/17.
@@ -54,15 +50,13 @@ public class FireDatabase {
         });
     }
 
-    public static void findNearPois(Position pos, int radius, final ListView resultsListView, final Context context) {
+    public static void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude, pos.longitude), radius);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-            private List<String> ls = new ArrayList<>();
-
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                ls.add(key);
+                adapter.add(key);
             }
 
             @Override
@@ -77,15 +71,18 @@ public class FireDatabase {
 
             @Override
             public void onGeoQueryReady() {
-                // Creates a new adapter for the input list into the ListView
-                ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_list_item_1, ls);
-                // Sets the Adapter
+                if (adapter.isEmpty()) {
+                    adapter.add("No results found");
+                }
+                // Show the results by setting the Adapter
                 resultsListView.setAdapter(adapter);
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-
+                adapter.clear();
+                adapter.add("An error has occurred");
+                resultsListView.setAdapter(adapter);
             }
         });
     }
