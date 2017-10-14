@@ -2,22 +2,11 @@ package ch.epfl.sweng.fiktion;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.Random;
-
-import static android.content.ContentValues.TAG;
 
 public class AddPOIActivity extends AppCompatActivity {
     // database reference
@@ -46,7 +35,7 @@ public class AddPOIActivity extends AppCompatActivity {
             Position pos = new Position(rand.nextDouble(),rand.nextDouble());
             PointOfInterest poi = new PointOfInterest(poiName, pos);
             // ask the database to add the poi
-            Firebase.addPoi(poi, confirmText);
+            FireDatabase.addPoi(poi, confirmText);
             ((EditText)findViewById(R.id.poiName)).setText("");
         }
     }

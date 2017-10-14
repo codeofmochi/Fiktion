@@ -18,10 +18,9 @@ import java.util.Random;
  * Created by pedro on 14/10/17.
  */
 
-public class Firebase {
+public class FireDatabase {
     final private static DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     final private static GeoFire geofire = new GeoFire(dbRef.child("geofire"));
-
     public static void addPoi(final PointOfInterest poi, final TextView confirmText) {
         final String poiName = poi.name;
         // get/create the reference of the point of interest
