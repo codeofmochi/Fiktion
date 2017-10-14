@@ -1,18 +1,22 @@
 package ch.epfl.sweng.fiktion;
 
-import android.view.View;
-import android.widget.EditText;
+import android.content.Context;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by pedro on 14/10/17.
@@ -21,6 +25,7 @@ import java.util.Random;
 public class FireDatabase {
     final private static DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     final private static GeoFire geofire = new GeoFire(dbRef.child("geofire"));
+
     public static void addPoi(final PointOfInterest poi, final TextView confirmText) {
         final String poiName = poi.name;
         // get/create the reference of the point of interest
@@ -29,7 +34,7 @@ public class FireDatabase {
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
+                if (dataSnapshot.exists()) {
                     // display warning message if poi already exsists
                     confirmText.setText(poiName + " already exists");
                 } else {
@@ -45,6 +50,42 @@ public class FireDatabase {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 confirmText.setText("failed to add " + poiName);
+            }
+        });
+    }
+
+    public static void findNearPois(Position pos, int radius, final ListView resultsListView, final Context context) {
+        // query the points of interests within the radius
+        GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude, pos.longitude), radius);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            private List<String> ls = new ArrayList<>();
+
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                ls.add(key);
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                // Creates a new adapter for the input list into the ListView
+                ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_list_item_1, ls);
+                // Sets the Adapter
+                resultsListView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
             }
         });
     }
