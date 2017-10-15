@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion;
+package ch.epfl.sweng.fiktion.providers;
 
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -14,11 +14,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import ch.epfl.sweng.fiktion.PointOfInterest;
+import ch.epfl.sweng.fiktion.Position;
+
 /**
  * Created by pedro on 14/10/17.
  */
 
-public class FirebaseDatabaseProvider extends DatabaseProvider{
+public class FirebaseDatabaseProvider extends DatabaseProvider {
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private final GeoFire geofire = new GeoFire(dbRef.child("geofire"));
 

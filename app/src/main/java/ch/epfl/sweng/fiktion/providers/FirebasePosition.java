@@ -1,4 +1,6 @@
-package ch.epfl.sweng.fiktion;
+package ch.epfl.sweng.fiktion.providers;
+
+import ch.epfl.sweng.fiktion.Position;
 
 /**
  * Created by pedro on 15/10/17.

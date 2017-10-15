@@ -2,22 +2,12 @@ package ch.epfl.sweng.fiktion;
 
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.firebase.geofire.GeoFire;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -30,64 +20,36 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  * Created by pedro on 11/10/17.
  */
 
-@RunWith(AndroidJUnit4.class)
 public class AddPoiActivityTest {
-    final static String poiTestName1 = "poiTest1";
-    final static String poiTestName2 = "poiTest2";
-    private ViewInteraction poiNameView =  onView(withId(R.id.poiName));
-    private ViewInteraction addPoiButtonView = onView(withId(R.id.addPOIButton));
-    private ViewInteraction confirmTextView = onView(withId(R.id.addConfirmationText));
+    private final ViewInteraction poiNameView = onView(withId(R.id.poiName));
+    private final ViewInteraction addPoiButtonView = onView(withId(R.id.addPOIButton));
+    private final ViewInteraction confirmTextView = onView(withId(R.id.addConfirmationText));
+    private final String unacceptedCharactersWarning = "Those characters are not accepted: . $ # [ ] /";
 
     @Rule
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
             new ActivityTestRule<>(AddPOIActivity.class);
 
-    private static void removePoiTestName(String poiTestName) {
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-        final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiTestName);
-        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
-                    poiRef.removeValue();
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
-        GeoFire geofire = new GeoFire(dbRef.child("geofire"));
-        geofire.removeLocation(poiTestName);
-    }
-
-    @BeforeClass public static void setup() {
-        removePoiTestName(poiTestName1);
-        removePoiTestName(poiTestName2);
-
+    @BeforeClass
+    public static void setDatabase() {
+        DatabaseActivity.database = new LocalDatabaseProvider();
     }
 
     @Test
     public void testCanAddPOI() {
+        String poiTestName1 = "poiTest1";
         poiNameView.perform(typeText(poiTestName1));
         addPoiButtonView.perform(click());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         confirmTextView.check(matches(withText(poiTestName1 + " added")));
     }
 
     @Test
-    public void testDoesntAddTwice() {
+    public void addingFailsOnSecondAdd() {
+        String poiTestName2 = "poiTest2";
         poiNameView.perform(typeText(poiTestName2));
         addPoiButtonView.perform(click());
         poiNameView.perform(typeText(poiTestName2));
         addPoiButtonView.perform(click());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         confirmTextView.check(matches(withText(poiTestName2 + " already exists")));
     }
 
@@ -95,11 +57,6 @@ public class AddPoiActivityTest {
     public void addingFailsOnEmptyString() {
         poiNameView.perform(typeText(""));
         addPoiButtonView.perform(click());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         confirmTextView.check(matches(withText("Please write the name of your Point of interest")));
     }
 
@@ -107,46 +64,41 @@ public class AddPoiActivityTest {
     public void addingFailsWithDot() {
         poiNameView.perform(typeText("."));
         addPoiButtonView.perform(click());
-        confirmTextView.check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+        confirmTextView.check(matches(withText(unacceptedCharactersWarning)));
     }
 
     @Test
     public void addingFailsWithDollar() {
         poiNameView.perform(typeText("$"));
         addPoiButtonView.perform(click());
-        confirmTextView.check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+        confirmTextView.check(matches(withText(unacceptedCharactersWarning)));
     }
 
     @Test
     public void addingFailsWithHash() {
         poiNameView.perform(typeText("#"));
         addPoiButtonView.perform(click());
-        confirmTextView.check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+        confirmTextView.check(matches(withText(unacceptedCharactersWarning)));
     }
 
     @Test
     public void addingFailsWithOpenBracket() {
         poiNameView.perform(typeText("["));
         addPoiButtonView.perform(click());
-        confirmTextView.check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+        confirmTextView.check(matches(withText(unacceptedCharactersWarning)));
     }
 
     @Test
     public void addingFailsWithCloseBracket() {
         poiNameView.perform(typeText("]"));
         addPoiButtonView.perform(click());
-        confirmTextView.check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
+        confirmTextView.check(matches(withText(unacceptedCharactersWarning)));
     }
 
     @Test
     public void addingFailsWithSlash() {
         poiNameView.perform(typeText("/"));
         addPoiButtonView.perform(click());
-        confirmTextView.check(matches(withText("Those characters are not accepted: . $ # [ ] /")));
-    }
-
-    @AfterClass public static void cleanup() {
-        removePoiTestName(poiTestName1);
-        removePoiTestName(poiTestName2);
+        confirmTextView.check(matches(withText(unacceptedCharactersWarning)));
     }
 }

@@ -1,16 +1,13 @@
 package ch.epfl.sweng.fiktion;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Random;
 
-public class AddPOIActivity extends AppCompatActivity {
-    // database reference
-
+public class AddPOIActivity extends DatabaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +31,7 @@ public class AddPOIActivity extends AppCompatActivity {
             Position pos = new Position(rand.nextDouble(), rand.nextDouble());
             PointOfInterest poi = new PointOfInterest(poiName, pos);
             // ask the database to add the poi
-            DatabaseProvider db = new FirebaseDatabaseProvider();
-            db.addPoi(poi, confirmText);
+            database.addPoi(poi, confirmText);
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
     }
