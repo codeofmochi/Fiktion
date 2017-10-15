@@ -5,10 +5,16 @@ package ch.epfl.sweng.fiktion;
  */
 
 public class PointOfInterest {
-    public final String name;
-    public final Position position;
+    private final String name;
+    private final Position position;
     public PointOfInterest(String name, Position position) {
         this.name = name;
         this.position = position;
+    }
+    public String name() {
+        return name;
+    }
+    public Position position() {
+        return position;
     }
 }

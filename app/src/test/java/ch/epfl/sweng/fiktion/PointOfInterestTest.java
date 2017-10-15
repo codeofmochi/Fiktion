@@ -12,11 +12,11 @@ import static org.junit.Assert.assertThat;
 public class PointOfInterestTest {
 
     @Test
-    public void correctly_creates_POI() {
+    public void correctlyCreatesPOITest() {
         Position pos = new Position(3.5,4.2);
         PointOfInterest poi = new PointOfInterest("Eiffel Tower", pos);
-        assertThat(poi.name, is("Eiffel Tower"));
-        assertThat(poi.position, is(pos));
+        assertThat(poi.name(), is("Eiffel Tower"));
+        assertThat(poi.position(), is(pos));
     }
 
 }

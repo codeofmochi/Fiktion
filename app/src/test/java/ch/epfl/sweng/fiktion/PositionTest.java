@@ -11,16 +11,9 @@ import static org.junit.Assert.assertThat;
 
 public class PositionTest {
     @Test
-    public void correctly_creates_Position() {
+    public void correctlyCreatesPositionTest() {
         Position p = new Position(42, 7.3);
-        assertThat(p.x,is(42.0));
-        assertThat(p.y,is(7.3));
-    }
-
-    @Test
-    public void dist_Position() {
-        Position p1 = new Position(3.0,5.0);
-        Position p2 = new Position(7.0,8.0);
-        assertThat(p1.dist(p2), is(5.0));
+        assertThat(p.latitude(),is(42.0));
+        assertThat(p.longitude(),is(7.3));
     }
 }

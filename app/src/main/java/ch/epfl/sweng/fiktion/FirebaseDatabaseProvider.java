@@ -19,11 +19,12 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class FirebaseDatabaseProvider extends DatabaseProvider{
-    final private static DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-    final private static GeoFire geofire = new GeoFire(dbRef.child("geofire"));
+    private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private final GeoFire geofire = new GeoFire(dbRef.child("geofire"));
 
     public void addPoi(final PointOfInterest poi, final TextView confirmText) {
-        final String poiName = poi.name;
+
+        final String poiName = poi.name();
         // get/create the reference of the point of interest
         final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
         // add only if the reference doesn't exist
@@ -34,12 +35,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider{
                     // display warning message if poi already exsists
                     confirmText.setText(poiName + " already exists");
                 } else {
+                    // set values in database
+                    FirebasePointOfInterest fPoi = new FirebasePointOfInterest(poi);
+                    poiRef.setValue(fPoi);
+                    Position pos = poi.position();
+                    geofire.setLocation(poiName, new GeoLocation(pos.latitude(), pos.longitude()));
+
                     // display a confirmation message
                     confirmText.setText(poiName + " added");
-                    Position pos = poi.position;
-                    // set values in database
-                    geofire.setLocation(poiName, new GeoLocation(pos.latitude, pos.longitude));
-                    poiRef.setValue(poi);
                 }
             }
 
@@ -52,7 +55,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider{
 
     public void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter) {
         // query the points of interests within the radius
-        GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude, pos.longitude), radius);
+        GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude(), pos.longitude()), radius);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {

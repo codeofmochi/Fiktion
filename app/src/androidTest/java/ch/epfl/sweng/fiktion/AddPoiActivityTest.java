@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.firebase.geofire.GeoFire;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,8 +43,8 @@ public class AddPoiActivityTest {
             new ActivityTestRule<>(AddPOIActivity.class);
 
     private static void removePoiTestName(String poiTestName) {
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-        final DatabaseReference poiRef = db.child("Points of interest").child(poiTestName);
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiTestName);
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -54,6 +55,8 @@ public class AddPoiActivityTest {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+        GeoFire geofire = new GeoFire(dbRef.child("geofire"));
+        geofire.removeLocation(poiTestName);
     }
 
     @BeforeClass public static void setup() {

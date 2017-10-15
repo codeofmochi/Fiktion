@@ -5,9 +5,15 @@ package ch.epfl.sweng.fiktion;
  */
 
 public class Position {
-    public final double latitude,longitude;
+    private final double latitude,longitude;
     public Position(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+    public double latitude() {
+        return latitude;
+    }
+    public double longitude() {
+        return longitude;
     }
 }
