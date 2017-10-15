@@ -34,7 +34,8 @@ public class AddPOIActivity extends AppCompatActivity {
             Position pos = new Position(rand.nextDouble(), rand.nextDouble());
             PointOfInterest poi = new PointOfInterest(poiName, pos);
             // ask the database to add the poi
-            FireDatabase.addPoi(poi, confirmText);
+            DatabaseProvider db = new FirebaseDatabaseProvider();
+            db.addPoi(poi, confirmText);
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
     }

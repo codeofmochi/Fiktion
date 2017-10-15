@@ -18,11 +18,11 @@ import com.google.firebase.database.ValueEventListener;
  * Created by pedro on 14/10/17.
  */
 
-public class FireDatabase {
+public class FirebaseDatabaseProvider extends DatabaseProvider{
     final private static DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     final private static GeoFire geofire = new GeoFire(dbRef.child("geofire"));
 
-    public static void addPoi(final PointOfInterest poi, final TextView confirmText) {
+    public void addPoi(final PointOfInterest poi, final TextView confirmText) {
         final String poiName = poi.name;
         // get/create the reference of the point of interest
         final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
@@ -50,7 +50,7 @@ public class FireDatabase {
         });
     }
 
-    public static void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter) {
+    public void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude, pos.longitude), radius);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {

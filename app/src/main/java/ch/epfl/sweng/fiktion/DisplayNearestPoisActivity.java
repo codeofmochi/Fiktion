@@ -21,7 +21,8 @@ public class DisplayNearestPoisActivity extends AppCompatActivity {
         ListView resultsListView = (ListView) findViewById(R.id.displayResultPois);
         Position position = new Position(0, 0);
         ArrayAdapter<String> adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1);
-        FireDatabase.findNearPois(position, radius, resultsListView, adapter);
+        DatabaseProvider db = new FirebaseDatabaseProvider();
+        db.findNearPois(position, radius, resultsListView, adapter);
 
     }
 }
