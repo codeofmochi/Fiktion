@@ -49,50 +49,6 @@
           "status": 2
         }
       }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:123932428353:android:7e30437d1ce326cd",
-        "android_client_info": {
-          "package_name": "ch.epfl.sweng.fiktion"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "123932428353-95dk0sf0fl3hgb488go2mvva4qm60hl7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "ch.epfl.sweng.fiktion",
-            "certificate_hash": "e0bba2aabdc4801e683f8c2f1cd998d4b48f8a12"
-          }
-        },
-        {
-          "client_id": "123932428353-cf3kgj02burq19qk9m3iuu85ubnp3h0h.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBAc_KUnayNSfC9YU6bSUrGNviFFoFOHzc"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "123932428353-cf3kgj02burq19qk9m3iuu85ubnp3h0h.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
     }
   ],
   "configuration_version": "1"
