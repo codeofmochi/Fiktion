@@ -2,6 +2,8 @@ package ch.epfl.sweng.fiktion;
 
 import org.junit.Test;
 
+import ch.epfl.sweng.fiktion.models.Position;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 

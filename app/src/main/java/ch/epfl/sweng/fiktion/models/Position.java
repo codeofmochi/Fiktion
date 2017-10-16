@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion;
+package ch.epfl.sweng.fiktion.models;
 
 /**
  * Created by pedro on 09/10/17.

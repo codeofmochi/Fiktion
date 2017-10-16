@@ -4,8 +4,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import ch.epfl.sweng.fiktion.PointOfInterest;
-import ch.epfl.sweng.fiktion.Position;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 
 /**
  * Created by pedro on 15/10/17.

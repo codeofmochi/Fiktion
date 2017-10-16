@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import ch.epfl.sweng.fiktion.models.Position;
+
 public class DisplayNearestPoisActivity extends DatabaseActivity {
 
     @Override

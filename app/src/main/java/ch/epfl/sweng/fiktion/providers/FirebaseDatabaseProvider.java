@@ -14,8 +14,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import ch.epfl.sweng.fiktion.PointOfInterest;
-import ch.epfl.sweng.fiktion.Position;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 
 /**
  * Created by pedro on 14/10/17.

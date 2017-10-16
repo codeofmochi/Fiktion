@@ -7,8 +7,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.epfl.sweng.fiktion.PointOfInterest;
-import ch.epfl.sweng.fiktion.Position;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 
 
 /**

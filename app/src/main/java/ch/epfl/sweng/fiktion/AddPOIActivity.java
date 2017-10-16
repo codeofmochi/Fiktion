@@ -7,6 +7,9 @@ import android.widget.TextView;
 
 import java.util.Random;
 
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
+
 public class AddPOIActivity extends DatabaseActivity {
 
     @Override

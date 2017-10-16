@@ -1,6 +1,6 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import ch.epfl.sweng.fiktion.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
 
 /**
  * Created by pedro on 15/10/17.
