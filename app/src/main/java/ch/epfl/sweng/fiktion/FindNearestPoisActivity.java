@@ -36,7 +36,7 @@ public class FindNearestPoisActivity extends AppCompatActivity {
         });
     }
 
-    public void goToDisplayNearestPois(View view) {
+    public void startDisplayNearestPoisActivity(View view) {
         Intent intent = new Intent(this, DisplayNearestPoisActivity.class);
         intent.putExtra(RADIUS_KEY, p);
         startActivity(intent);

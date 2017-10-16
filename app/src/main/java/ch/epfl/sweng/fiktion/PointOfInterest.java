@@ -17,4 +17,12 @@ public class PointOfInterest {
     public Position position() {
         return position;
     }
+
+    @Override
+    public boolean equals(Object that) {
+        return that != null &&
+                that instanceof PointOfInterest &&
+                name.equals(((PointOfInterest) that).name);
+
+    }
 }

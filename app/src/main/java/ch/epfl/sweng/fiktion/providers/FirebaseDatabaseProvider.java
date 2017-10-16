@@ -21,7 +21,7 @@ import ch.epfl.sweng.fiktion.Position;
  * Created by pedro on 14/10/17.
  */
 
-public class FirebaseDatabaseProvider extends DatabaseProvider {
+public class FirebaseDatabaseProvider implements DatabaseProvider {
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private final GeoFire geofire = new GeoFire(dbRef.child("geofire"));
 

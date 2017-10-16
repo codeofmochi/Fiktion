@@ -11,7 +11,7 @@ import ch.epfl.sweng.fiktion.Position;
  * Created by pedro on 15/10/17.
  */
 
-public abstract class DatabaseProvider {
+public interface DatabaseProvider {
     public abstract void addPoi(final PointOfInterest poi, final TextView confirmText);
 
     public abstract void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter);
