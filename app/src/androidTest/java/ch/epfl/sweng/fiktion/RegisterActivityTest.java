@@ -47,8 +47,9 @@ public class RegisterActivityTest {
         regAuth = FirebaseAuth.getInstance();
         regActivity = regActivityRule.getActivity();
     }
+
     @After
-    public void end(){
+    public void end() {
         regAuth.signOut();
         regActivity.finish();
     }

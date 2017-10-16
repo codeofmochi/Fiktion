@@ -68,8 +68,7 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
                     mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
                     // update first time status
                     firstLocationChange = false;
-                }
-                else {
+                } else {
                     // remove old marker
                     myPositionMarker.remove();
                 }

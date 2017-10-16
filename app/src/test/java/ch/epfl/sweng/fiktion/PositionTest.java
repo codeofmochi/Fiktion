@@ -15,7 +15,7 @@ public class PositionTest {
     @Test
     public void correctlyCreatesPositionTest() {
         Position p = new Position(42, 7.3);
-        assertThat(p.latitude(),is(42.0));
-        assertThat(p.longitude(),is(7.3));
+        assertThat(p.latitude(), is(42.0));
+        assertThat(p.longitude(), is(7.3));
     }
 }

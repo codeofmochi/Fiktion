@@ -6,9 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
 public class DisplayNearestPoisActivity extends AppCompatActivity {
 

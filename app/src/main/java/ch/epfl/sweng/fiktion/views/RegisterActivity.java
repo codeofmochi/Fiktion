@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import ch.epfl.sweng.fiktion.R;
 
-public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "RegisterActivity";
 
@@ -28,23 +28,24 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"Initialising Register activity");
+        Log.d(TAG, "Initialising Register activity");
         setContentView(R.layout.activity_register);
         mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
 
         //initialise widgets
-        reg_email = (EditText)findViewById(R.id.register_email);
-        reg_password = (EditText)findViewById(R.id.register_password);
+        reg_email = (EditText) findViewById(R.id.register_email);
+        reg_password = (EditText) findViewById(R.id.register_password);
 
     }
 
     /**
      * This method checks if the credentials are valid by firebase standards
+     *
      * @return true is the credentials are valid, false otherwise
      */
     private boolean validateCredentials() {
@@ -52,19 +53,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         boolean validPassword = false;
         String email = reg_email.getText().toString();
         String password = reg_password.getText().toString();
-        Log.d(TAG,"Validating credentials");
+        Log.d(TAG, "Validating credentials");
 
         if (password.isEmpty()) {
             reg_password.setError(getString(R.string.required_password_error));
-            Log.d(TAG,"Password validation failed");
-        } else
-        {
+            Log.d(TAG, "Password validation failed");
+        } else {
             if (password.length() >= 6) {
                 validPassword = true;
                 reg_password.setError(null);
             } else {
                 reg_password.setError(getString(R.string.invalid_password_error));
-                Log.d(TAG,"Password validation failed");
+                Log.d(TAG, "Password validation failed");
             }
         }
         if (email.contains("@")) {
@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             reg_email.setError(null);
         } else {
             reg_email.setError(getString(R.string.invalid_email_error));
-            Log.d(TAG,"Email validation failed");
+            Log.d(TAG, "Email validation failed");
 
         }
 
@@ -81,7 +81,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     /**
      * This method creates a firebase user account using an input email and password
-     * @param email provided by the user
+     *
+     * @param email    provided by the user
      * @param password provided by the user
      */
     private void createAccount(String email, String password) {
@@ -90,7 +91,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         if (!validateCredentials()) {
             return;
         }
-        Log.d(TAG,"Credentials are valid");
+        Log.d(TAG, "Credentials are valid");
 
         //firebase function that actually creates an account
         Task<AuthResult> authResultTask = mAuth.createUserWithEmailAndPassword(email, password)
@@ -115,17 +116,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
-    private void login(){
+    private void login() {
         Intent intent = new Intent(this, SignInActivity.class);
         startActivity(intent);
         finish();
     }
+
     @Override
     public void onClick(View v) {
-        Log.d(TAG,"User clicked somewhere");
+        Log.d(TAG, "User clicked somewhere");
         int i = v.getId();
-        if(i == R.id.register_click){
-            createAccount(reg_email.getText().toString(),reg_password.getText().toString());
+        if (i == R.id.register_click) {
+            createAccount(reg_email.getText().toString(), reg_password.getText().toString());
         }
     }
 }

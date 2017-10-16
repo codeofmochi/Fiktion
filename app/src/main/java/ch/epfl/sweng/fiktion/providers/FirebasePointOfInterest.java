@@ -9,7 +9,10 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 public class FirebasePointOfInterest {
     public String name;
     public FirebasePosition position;
-    public FirebasePointOfInterest() {}
+
+    public FirebasePointOfInterest() {
+    }
+
     public FirebasePointOfInterest(PointOfInterest poi) {
         this.name = poi.name();
         this.position = new FirebasePosition(poi.position());

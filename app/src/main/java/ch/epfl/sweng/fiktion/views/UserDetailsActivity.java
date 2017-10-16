@@ -24,8 +24,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     //constants
     //LOGCAT
     private static final String TAG = "UserDetails";
+
     //UI modes
-    private enum UIMode{
+    private enum UIMode {
         defaultMode,
         changeNameMode,
         userSignedOut;
@@ -84,7 +85,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                     //user is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + nUser.getUid());
                     //if user changed, recreate
-                    if(user != nUser){
+                    if (user != nUser) {
                         recreate();
                     }
                 } else {
@@ -241,8 +242,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             choose.setVisibility(View.VISIBLE);
             user_newName.setVisibility(View.INVISIBLE);
             confirmName.setVisibility(View.INVISIBLE);
-        } else if(mode.equals(UIMode.userSignedOut)){
-            Log.d(TAG,"Return to signIn activity");
+        } else if (mode.equals(UIMode.userSignedOut)) {
+            Log.d(TAG, "Return to signIn activity");
             Intent login = new Intent(this, SignInActivity.class);
             finish();
             startActivity(login);

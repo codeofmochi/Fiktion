@@ -7,8 +7,11 @@ import ch.epfl.sweng.fiktion.models.Position;
  */
 
 public class FirebasePosition {
-    public double latitude,longitude;
-    public FirebasePosition() {}
+    public double latitude, longitude;
+
+    public FirebasePosition() {
+    }
+
     public FirebasePosition(Position pos) {
         latitude = pos.latitude();
         longitude = pos.longitude();

@@ -8,10 +8,10 @@ import android.widget.TextView;
 
 import java.util.Random;
 
-import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
 public class AddPOIActivity extends AppCompatActivity {
 
