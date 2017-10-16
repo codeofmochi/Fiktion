@@ -18,15 +18,18 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 
 /**
- * Created by pedro on 14/10/17.
+ * Firebase database provider
+ *
+ * @author pedro
  */
-
 public class FirebaseDatabaseProvider extends DatabaseProvider {
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private final GeoFire geofire = new GeoFire(dbRef.child("geofire"));
 
+    /**
+     * {@inheritDoc}
+     */
     public void addPoi(final PointOfInterest poi, final TextView confirmText) {
-
         final String poiName = poi.name();
         // get/create the reference of the point of interest
         final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
@@ -56,6 +59,9 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude(), pos.longitude()), radius);

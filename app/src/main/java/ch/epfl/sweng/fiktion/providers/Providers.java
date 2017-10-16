@@ -1,9 +1,11 @@
 package ch.epfl.sweng.fiktion.providers;
 
-/**
- * Created by pedro on 16/10/17.
- */
 
+/**
+ * Class that holds provider instances
+ *
+ * @author pedro
+ */
 public class Providers {
     public static DatabaseProvider database = new FirebaseDatabaseProvider();
 }

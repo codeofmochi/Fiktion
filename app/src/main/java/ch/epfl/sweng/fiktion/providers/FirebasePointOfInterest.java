@@ -3,16 +3,25 @@ package ch.epfl.sweng.fiktion.providers;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 
 /**
- * Created by pedro on 15/10/17.
+ * A point of interest implementation for Firebase
+ *
+ * @author pedro
  */
-
 public class FirebasePointOfInterest {
     public String name;
     public FirebasePosition position;
 
+    /**
+     * Default constructor for calls to DataSnapshot.getValue(FirebasePointOfInterest.class)
+     */
     public FirebasePointOfInterest() {
     }
 
+    /**
+     * Constructs a Firebase point of position
+     *
+     * @param poi a point of interest
+     */
     public FirebasePointOfInterest(PointOfInterest poi) {
         this.name = poi.name();
         this.position = new FirebasePosition(poi.position());

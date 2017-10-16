@@ -17,9 +17,11 @@ public class FindNearestPoisActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_nearest_pois);
+        // get the seekbar and the value TextView
         SeekBar searchRadius = (SeekBar) findViewById(R.id.searchRadius);
         final TextView radiusSelect = (TextView) findViewById(R.id.radiusSelect);
 
+        // add a listener that will listen the seekbar changes
         searchRadius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
@@ -38,6 +40,7 @@ public class FindNearestPoisActivity extends AppCompatActivity {
         });
     }
 
+    // start new activity that will display the pois in range
     public void startDisplayNearestPoisActivity(View view) {
         Intent intent = new Intent(this, DisplayNearestPoisActivity.class);
         intent.putExtra(RADIUS_KEY, p);

@@ -3,15 +3,24 @@ package ch.epfl.sweng.fiktion.providers;
 import ch.epfl.sweng.fiktion.models.Position;
 
 /**
- * Created by pedro on 15/10/17.
+ * A position implementation for Firebase
+ *
+ * @author pedro
  */
-
 public class FirebasePosition {
     public double latitude, longitude;
 
+    /**
+     * Default constructor for calls to DataSnapshot.getValue(FirebasePosition.class)
+     */
     public FirebasePosition() {
     }
 
+    /**
+     * Constructs a Firebase position
+     *
+     * @param pos a position
+     */
     public FirebasePosition(Position pos) {
         latitude = pos.latitude();
         longitude = pos.longitude();
