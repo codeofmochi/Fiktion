@@ -1,8 +1,9 @@
 package ch.epfl.sweng.fiktion;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -52,7 +53,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Log.d(TAG,"Validating credentials");
 
         if (password.isEmpty()) {
-            reg_password.setError("Password is required");
+            reg_password.setError(getString(R.string.required_password_error));
             Log.d(TAG,"Password validation failed");
         } else
         {
@@ -60,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 validPassword = true;
                 reg_password.setError(null);
             } else {
-                reg_password.setError("Password must be of at least 6 characters");
+                reg_password.setError(getString(R.string.invalid_password_error));
                 Log.d(TAG,"Password validation failed");
             }
         }
@@ -68,7 +69,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             validEmail = true;
             reg_email.setError(null);
         } else {
-            reg_email.setError("Require a valid email");
+            reg_email.setError(getString(R.string.invalid_email_error));
             Log.d(TAG,"Email validation failed");
 
         }
@@ -90,7 +91,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Log.d(TAG,"Credentials are valid");
 
         //firebase function that actually creates an account
-        mAuth.createUserWithEmailAndPassword(email, password)
+        Task<AuthResult> authResultTask = mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -99,8 +100,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             Log.d(TAG, "createUserWithEmail:success");
                             Toast.makeText(RegisterActivity.this, "Registration Successful!",
                                     Toast.LENGTH_SHORT).show();
-                            onBackPressed();
-
+                            login();
+                            finish();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -112,6 +113,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
+    private void login(){
+        Intent intent = new Intent(this, SignInActivity.class);
+        startActivity(intent);
+        finish();
+    }
     @Override
     public void onClick(View v) {
         Log.d(TAG,"User clicked somewhere");

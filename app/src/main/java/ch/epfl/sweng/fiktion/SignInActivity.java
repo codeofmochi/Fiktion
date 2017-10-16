@@ -15,6 +15,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import static java.lang.System.in;
+
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
 
@@ -39,6 +41,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         //Firebase Authenticator
         mAuth = FirebaseAuth.getInstance();
+
+        //TODO: store logged in/out state in the app
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -50,22 +54,24 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     //user is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-
             }
         };
+
+        // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        mAuth.addAuthStateListener(mAuthListener);
+        updateUI(currentUser);
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        mAuth.addAuthStateListener(mAuthListener);
-        updateUI(currentUser);
     }
 
     /**
      * This method checks if the credentials are valid by firebase standards
+     *
      * @return true is the credentials are valid, false otherwise
      */
     private boolean validateCredentials() {
@@ -76,22 +82,24 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         Log.d(TAG, "Validating credentials");
 
         if (password.isEmpty()) {
-            UserPassword.setError("Password is required");
+            UserPassword.setError(getString(R.string.required_password_error));
             Log.d(TAG, "Password validation failed");
         } else {
+            //TODO elaborate password validation
             if (password.length() >= 6) {
                 validPassword = true;
                 UserPassword.setError(null);
             } else {
-                UserPassword.setError("Password must be of at least 6 characters");
+                UserPassword.setError(getString(R.string.invalid_password_error));
                 Log.d(TAG, "Password validation failed");
             }
         }
+        //TODO elaborate email validation
         if (email.contains("@")) {
             validEmail = true;
             UserEmail.setError(null);
         } else {
-            UserEmail.setError("Require a valid email");
+            UserEmail.setError(getString(R.string.invalid_email_error));
             Log.d(TAG, "Email validation failed");
 
         }
@@ -102,17 +110,18 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     /**
      * Signs the user in using firebase authentication
-     * @param email provided by the user
+     *
+     * @param email    provided by the user
      * @param password provided by te user
      */
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
-        //we need toc heck if the credentials are valid before attempting to sign in
+        //we need to check if the credentials are valid before attempting to sign in
         if (!validateCredentials()) {
             Log.d(TAG, "Not valid credentials");
             return;
         }
-        Log.d(TAG,"Credentials are valid");
+        Log.d(TAG, "Credentials are valid");
         Log.d(TAG, "signIn:" + email);
 
         mAuth.signInWithEmailAndPassword(email, password)
@@ -120,6 +129,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            //reset textViews content
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
@@ -130,7 +140,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
+                            Toast.makeText(SignInActivity.this, R.string.toast_authentication_failed,
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -140,13 +150,15 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     /**
      * If User is signed in, user is taken to the user details screen
+     *
      * @param user firebase user
      */
     private void updateUI(FirebaseUser user) {
         if (user != null) {
-            //start details activity
+            //start details activity and end this one
             Intent user_details_activity = new Intent(this, UserDetailsActivity.class);
             startActivity(user_details_activity);
+            finish();
         }
     }
 
@@ -161,7 +173,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         else if (i == R.id.RegisterButton) {
             //start registration activity
             Intent registerActivity = new Intent(this, RegisterActivity.class);
-            startActivityForResult(registerActivity,1);
+            startActivityForResult(registerActivity, 1);
         }
     }
 
