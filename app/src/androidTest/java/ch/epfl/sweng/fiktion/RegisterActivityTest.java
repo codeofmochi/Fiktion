@@ -6,11 +6,9 @@ package ch.epfl.sweng.fiktion;
 
 
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.core.deps.guava.util.concurrent.ThreadFactoryBuilder;
 import android.support.test.rule.ActivityTestRule;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,7 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import static android.support.test.espresso.Espresso.closeSoftKeyboard;
+import ch.epfl.sweng.fiktion.views.RegisterActivity;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;

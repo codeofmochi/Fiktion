@@ -6,15 +6,14 @@ package ch.epfl.sweng.fiktion;
 
 
 import android.support.test.rule.ActivityTestRule;
-import android.widget.TextView;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.junit.MockitoJUnitRunner;
+
+import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -25,7 +24,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SignInActivityTest {

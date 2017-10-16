@@ -15,7 +15,7 @@ import ch.epfl.sweng.fiktion.models.Position;
  * Created by pedro on 16/10/17.
  */
 
-public class LocalDatabaseProvider implements DatabaseProvider {
+public class LocalDatabaseProvider extends DatabaseProvider {
     List<PointOfInterest> poiList = new ArrayList<>();
 
     public void addPoi(PointOfInterest poi, TextView confirmText) {

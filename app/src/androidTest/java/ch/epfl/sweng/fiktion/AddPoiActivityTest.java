@@ -8,6 +8,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -32,7 +34,7 @@ public class AddPoiActivityTest {
 
     @BeforeClass
     public static void setDatabase() {
-        DatabaseActivity.database = new LocalDatabaseProvider();
+        Providers.database = new LocalDatabaseProvider();
     }
 
     @Test

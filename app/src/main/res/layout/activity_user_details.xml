@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/common_google_signin_btn_text_dark_default"
-    tools:context="ch.epfl.sweng.fiktion.UserDetailsActivity">
+    tools:context="ch.epfl.sweng.fiktion.views.UserDetailsActivity">
 
     <FrameLayout
         android:id="@+id/frameLayout"

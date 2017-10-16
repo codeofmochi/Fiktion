@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion;
+package ch.epfl.sweng.fiktion.views;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -13,6 +13,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import ch.epfl.sweng.fiktion.R;
 
 public class LocationActivity extends AppCompatActivity implements OnMapReadyCallback {
 

@@ -1,16 +1,19 @@
-package ch.epfl.sweng.fiktion;
+package ch.epfl.sweng.fiktion.views;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Random;
 
+import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 
-public class AddPOIActivity extends DatabaseActivity {
+public class AddPOIActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,7 @@ public class AddPOIActivity extends DatabaseActivity {
             Position pos = new Position(rand.nextDouble(), rand.nextDouble());
             PointOfInterest poi = new PointOfInterest(poiName, pos);
             // ask the database to add the poi
-            database.addPoi(poi, confirmText);
+            Providers.database.addPoi(poi, confirmText);
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
     }

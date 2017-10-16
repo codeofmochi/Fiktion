@@ -1,13 +1,16 @@
-package ch.epfl.sweng.fiktion;
+package ch.epfl.sweng.fiktion.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Position;
 
-public class DisplayNearestPoisActivity extends DatabaseActivity {
+public class DisplayNearestPoisActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +25,6 @@ public class DisplayNearestPoisActivity extends DatabaseActivity {
         ListView resultsListView = (ListView) findViewById(R.id.displayResultPois);
         Position position = new Position(0, 0);
         ArrayAdapter<String> adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1);
-        database.findNearPois(position, radius, resultsListView, adapter);
+        Providers.database.findNearPois(position, radius, resultsListView, adapter);
     }
 }

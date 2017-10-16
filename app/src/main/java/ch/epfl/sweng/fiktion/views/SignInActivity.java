@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion;
+package ch.epfl.sweng.fiktion.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +15,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import static java.lang.System.in;
+import ch.epfl.sweng.fiktion.R;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
