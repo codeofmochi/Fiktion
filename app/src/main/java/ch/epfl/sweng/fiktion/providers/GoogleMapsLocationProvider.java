@@ -30,6 +30,32 @@ public class GoogleMapsLocationProvider extends LocationProvider {
     private boolean firstLocationChange = true;
 
     /**
+     * Helper internal method to update the current location and its marker
+     * @param newLocation A new Location to replace the old one
+     */
+    private void updateLocation(Location newLocation) {
+        // update location
+        location = newLocation;
+        LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        // update position marker
+        if (firstLocationChange) {
+            // update camera
+            gmap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+            gmap.moveCamera(CameraUpdateFactory.zoomTo(15));
+            // update first time status
+            firstLocationChange = false;
+        } else {
+            // remove old marker
+            myLocationMarker.remove();
+        }
+        // update location marker
+        myLocationMarker = gmap.addMarker(
+                new MarkerOptions().position(latlng).title("My position")
+        );
+    }
+
+    /**
      * To be called onMapReady callback in desired UI
      *
      * @param created A GoogleMap given by onMapReady callback
@@ -57,25 +83,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
             gmap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                 @Override
                 public void onMyLocationChange(Location newLocation) {
-                    // update location
-                    location = newLocation;
-                    LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
-
-                    // update position marker
-                    if (firstLocationChange) {
-                        // update camera
-                        gmap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
-                        gmap.moveCamera(CameraUpdateFactory.zoomTo(15));
-                        // update first time status
-                        firstLocationChange = false;
-                    } else {
-                        // remove old marker
-                        myLocationMarker.remove();
-                    }
-                    // update location marker
-                    myLocationMarker = gmap.addMarker(
-                            new MarkerOptions().position(latlng).title("My position")
-                    );
+                    updateLocation(newLocation);
                 }
             });
 

@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 
 public final class AndroidPermissions {
 
+    // Permissions requests IDs
     public static final int MY_PERMISSIONS_FINE_LOCATION = 1;
 
     /**
