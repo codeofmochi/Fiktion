@@ -26,4 +26,13 @@ public class FirebasePointOfInterest {
         this.name = poi.name();
         this.position = new FirebasePosition(poi.position());
     }
+
+    /**
+     * Returns the real version PointOfInterest
+     *
+     * @return the point of interest
+     */
+    public PointOfInterest toPoi() {
+        return new PointOfInterest(name, position.toPosition());
+    }
 }

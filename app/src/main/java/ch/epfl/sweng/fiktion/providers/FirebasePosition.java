@@ -25,4 +25,13 @@ public class FirebasePosition {
         latitude = pos.latitude();
         longitude = pos.longitude();
     }
+
+    /**
+     * Returns the real version Position
+     *
+     * @return the position
+     */
+    public Position toPosition() {
+        return new Position(latitude, longitude);
+    }
 }

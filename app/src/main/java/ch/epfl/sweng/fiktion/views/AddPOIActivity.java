@@ -11,6 +11,7 @@ import java.util.Random;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
 public class AddPOIActivity extends AppCompatActivity {
@@ -24,7 +25,7 @@ public class AddPOIActivity extends AppCompatActivity {
     public void addPOI(View view) {
         // Get the entered text
         final String poiName = ((EditText) findViewById(R.id.poiName)).getText().toString();
-        TextView confirmText = (TextView) findViewById(R.id.addConfirmationText);
+        final TextView confirmText = (TextView) findViewById(R.id.addConfirmationText);
         if (poiName.isEmpty()) {
             // warning message if no text was entered
             confirmText.setText("Please write the name of your Point of interest");
@@ -37,7 +38,22 @@ public class AddPOIActivity extends AppCompatActivity {
             Position pos = new Position(rand.nextDouble(), rand.nextDouble());
             PointOfInterest poi = new PointOfInterest(poiName, pos);
             // ask the database to add the poi
-            Providers.database.addPoi(poi, confirmText);
+            Providers.database.addPoi(poi, new DatabaseProvider.AddPoiListener() {
+                @Override
+                public void onSuccess() {
+                    confirmText.setText(poiName + " added");
+                }
+
+                @Override
+                public void onAlreadyExists() {
+                    confirmText.setText(poiName + " already exists");
+                }
+
+                @Override
+                public void onFailure() {
+                    confirmText.setText("failed to add " + poiName);
+                }
+            });
             ((EditText) findViewById(R.id.poiName)).setText("");
         }
     }

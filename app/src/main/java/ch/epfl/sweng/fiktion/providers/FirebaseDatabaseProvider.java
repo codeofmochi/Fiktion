@@ -1,8 +1,6 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.util.Log;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -29,7 +27,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void addPoi(final PointOfInterest poi, final TextView confirmText) {
+    public void addPoi(final PointOfInterest poi, final AddPoiListener listener) {
         final String poiName = poi.name();
         // get/create the reference of the point of interest
         final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
@@ -38,8 +36,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // display warning message if poi already exsists
-                    confirmText.setText(poiName + " already exists");
+                    // inform the listener that the poi already exists
+                    listener.onAlreadyExists();
                 } else {
                     // set values in database
                     FirebasePointOfInterest fPoi = new FirebasePointOfInterest(poi);
@@ -47,28 +45,79 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     Position pos = poi.position();
                     geofire.setLocation(poiName, new GeoLocation(pos.latitude(), pos.longitude()));
 
-                    // display a confirmation message
-                    confirmText.setText(poiName + " added");
+                    // inform the listener that the operation succeeded
+                    listener.onSuccess();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                confirmText.setText("failed to add " + poiName);
+                // inform the listener that the operation failed
+                listener.onFailure();
             }
         });
+    }
+
+    @Override
+    public void getPoi(String poiName, final GetPoiListener listener) {
+        // get the reference of the poi
+        final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("mylogs", "getPoiDatachange");
+                if (dataSnapshot.exists()) {
+                    Log.d("mylogs", dataSnapshot.toString());
+                    // inform the listener that we got the matching poi
+                    listener.onSuccess(dataSnapshot.getValue(FirebasePointOfInterest.class).toPoi());
+                    Log.d("mylogs", "getPoiDone");
+                } else {
+                    Log.d("mylogs", "getPoiDoesntExist");
+                    // inform the listener that the poi doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    private interface Helper {
+
     }
 
     /**
      * {@inheritDoc}
      */
-    public void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter) {
+    public void findNearPois(Position pos, int radius, final FindNearPoisListener listener) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude(), pos.longitude()), radius);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
-            public void onKeyEntered(String key, GeoLocation location) {
-                adapter.add(key);
+            public void onKeyEntered(final String key, GeoLocation location) {
+                // for a near poi, retrieve it from the firebase
+                getPoi(key, new GetPoiListener() {
+                    @Override
+                    public void onSuccess(PointOfInterest poi) {
+                        // inform the listener that we got a new poi
+                        listener.onNewValue(poi);
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
+
             }
 
             @Override
@@ -83,18 +132,13 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
             @Override
             public void onGeoQueryReady() {
-                if (adapter.isEmpty()) {
-                    adapter.add("No results found");
-                }
-                // Show the results by setting the Adapter
-                resultsListView.setAdapter(adapter);
+
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-                adapter.clear();
-                adapter.add("An error has occurred");
-                resultsListView.setAdapter(adapter);
+                // inform the listener that the operation failed
+                listener.onFailure();
             }
         });
     }
