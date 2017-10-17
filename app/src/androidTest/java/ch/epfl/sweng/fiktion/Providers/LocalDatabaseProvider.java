@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.providers;
+package ch.epfl.sweng.fiktion.Providers;
 
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -9,6 +9,7 @@ import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 
 
 /**
@@ -22,25 +23,42 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void addPoi(PointOfInterest poi, TextView confirmText) {
+    public void addPoi(PointOfInterest poi, AddPoiListener listener) {
         if (poiList.contains(poi)) {
-            confirmText.setText(poi.name() + " already exists");
+            // inform the listener that the poi already exists
+            listener.onAlreadyExists();
         } else {
+            // add the poi
             poiList.add(poi);
-            confirmText.setText(poi.name() + " added");
+            // inform the listener that the operation succeeded
+            listener.onSuccess();
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void findNearPois(Position pos, int radius, ListView resultsListView, ArrayAdapter<String> adapter) {
+    public void getPoi(String name, GetPoiListener listener) {
         for (PointOfInterest poi : poiList) {
-            if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
-                adapter.add(poi.name());
+            if (poi.name().equals(name)) {
+                // inform the listener that we have the poi
+                listener.onSuccess(poi);
+                return;
             }
         }
-        resultsListView.setAdapter(adapter);
+        // inform the listener that the poi doesnt exist
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
+        for (PointOfInterest poi : poiList) {
+            if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
+                listener.onNewValue(poi);
+            }
+        }
     }
 
     /**

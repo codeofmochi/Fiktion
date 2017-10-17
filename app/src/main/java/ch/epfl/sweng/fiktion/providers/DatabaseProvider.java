@@ -1,9 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 
@@ -16,22 +12,89 @@ import ch.epfl.sweng.fiktion.models.Position;
 public abstract class DatabaseProvider {
 
     /**
-     * add a point of interest to the database, set the the TextView according to if the operation
-     * succeeded
-     *
-     * @param poi         the point of interest
-     * @param confirmText the TextView to modify
+     * Listener that listens the result of the addition of a point of interest
      */
-    public abstract void addPoi(final PointOfInterest poi, final TextView confirmText);
+    public interface AddPoiListener {
+        /**
+         * what to do if the addition succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the poi already exists
+         */
+        void onAlreadyExists();
+
+        /**
+         * what to do if the addition failed
+         */
+        void onFailure();
+    }
 
     /**
-     * find the points of interest that are within radius range from a position, add the results to
-     * the adapter and display it with the ListView
-     *
-     * @param pos             the position
-     * @param radius          the radius
-     * @param resultsListView listView that displays the results
-     * @param adapter         adapter that holds the list of results
+     * Listener that listens the result of the retrieval of a point of interest
      */
-    public abstract void findNearPois(Position pos, int radius, final ListView resultsListView, final ArrayAdapter<String> adapter);
+    public interface GetPoiListener {
+
+        /**
+         * what to do if the retrieval succeeds
+         *
+         * @param poi the retrieved point of interest
+         */
+        void onSuccess(PointOfInterest poi);
+
+        /**
+         * what to do if no mathing point of interest is found
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the retrieval failed
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the results of searching near points of interest
+     */
+    public interface FindNearPoisListener {
+
+        /**
+         * what to do when we get a new near point of interest
+         *
+         * @param poi the point of interest
+         */
+        void onNewValue(PointOfInterest poi);
+
+        /**
+         * what to do if operation failed
+         */
+        void onFailure();
+    }
+
+    /**
+     * add a point of interest to the database, inform the listener of the result
+     *
+     * @param poi      the point of interest
+     * @param listener the listener
+     */
+    public abstract void addPoi(final PointOfInterest poi, final AddPoiListener listener);
+
+    /**
+     * get the point of interest from the database, inform the listener of the result
+     *
+     * @param name     the name of the desired point of interest
+     * @param listener the listener
+     */
+    public abstract void getPoi(String name, final GetPoiListener listener);
+
+    /**
+     * find the points of interest that are within radius range from a position and inform the
+     * listener of the results
+     *
+     * @param pos      the position
+     * @param radius   the radius
+     * @param listener the listener
+     */
+    public abstract void findNearPois(Position pos, int radius, final FindNearPoisListener listener);
 }
