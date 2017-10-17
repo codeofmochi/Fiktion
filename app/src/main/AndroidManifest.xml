@@ -7,6 +7,7 @@
 
     <!-- Google Maps -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <permission android:name="ch.epfl.sweng.fiktion.permission.MAPS_RECEIVE" />
 
     <uses-permission android:name="ch.epfl.sweng.fiktion.permission.MAPS_RECEIVE" />

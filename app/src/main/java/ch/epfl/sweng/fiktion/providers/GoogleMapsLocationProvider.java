@@ -2,10 +2,9 @@ package ch.epfl.sweng.fiktion.providers;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,7 +14,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
-import ch.epfl.sweng.fiktion.models.Position;
 
 /**
  * A Google Maps implementation for current location
@@ -33,6 +31,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
 
     /**
      * To be called onMapReady callback in desired UI
+     *
      * @param created A GoogleMap given by onMapReady callback
      */
     public void mapReady(Activity ctx, GoogleMap created) {
@@ -42,42 +41,44 @@ public class GoogleMapsLocationProvider extends LocationProvider {
         gmap.getUiSettings().setZoomControlsEnabled(true);
 
         // check permissions
-        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION)
+                && ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             AndroidPermissions.promptLocationPermission(ctx);
-        }
-        // check location enable and ask otherwise
-        AndroidServices.promptLocationEnable(ctx);
+        } else {
+            // check location enable and ask otherwise
+            AndroidServices.promptLocationEnable(ctx);
 
-        // enable my position
-        gmap.setMyLocationEnabled(true);
+            // enable my position
+            gmap.setMyLocationEnabled(true);
 
-        // listen on location change
-        gmap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-            @Override
-            public void onMyLocationChange(Location newLocation) {
-                // update location
-                location = newLocation;
-                LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+            // listen on location change
+            gmap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                @Override
+                public void onMyLocationChange(Location newLocation) {
+                    // update location
+                    location = newLocation;
+                    LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                // update position marker
-                if(firstLocationChange) {
-                    // update camera
-                    gmap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
-                    gmap.moveCamera(CameraUpdateFactory.zoomTo(15));
-                    // update first time status
-                    firstLocationChange = false;
-                } else {
-                    // remove old marker
-                    myLocationMarker.remove();
+                    // update position marker
+                    if (firstLocationChange) {
+                        // update camera
+                        gmap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                        gmap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                        // update first time status
+                        firstLocationChange = false;
+                    } else {
+                        // remove old marker
+                        myLocationMarker.remove();
+                    }
+                    // update location marker
+                    myLocationMarker = gmap.addMarker(
+                            new MarkerOptions().position(latlng).title("My position")
+                    );
                 }
-                // update location marker
-                myLocationMarker = gmap.addMarker(
-                    new MarkerOptions().position(latlng).title("My position")
-                );
-            }
-        });
+            });
+
+        }
     }
 }
