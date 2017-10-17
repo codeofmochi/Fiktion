@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">Bootcamp</string>
+    <string name="app_name">Fiktion</string>
+    <string name="title_activity_location">Nearby</string>
+    <string name="invalid_email_error">Requires a valid email</string>
+    <string name="invalid_password_error">Password must be at least 6 characters</string>
+    <string name="required_password_error">Password is required</string>
+    <string name="toast_authentication_failed">Authentication Failed</string>
+    <string name="gps_network_not_enabled">GPS location is not enabled.</string>
+    <string name="open_location_settings">Settings</string>
+    <string name="Cancel">Cancel</string>
+    <string name="gps_permission">GPS location is required to find nearby places</string>
+    <string name="OK">OK</string>
 </resources>
