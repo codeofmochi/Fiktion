@@ -20,9 +20,11 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="180dp"
+        android:layout_height="220dp"
+        android:layout_marginEnd="60dp"
         android:layout_marginLeft="60dp"
         android:layout_marginRight="60dp"
+        android:layout_marginStart="60dp"
         android:layout_marginTop="80dp"
         android:background="#FFF"
         android:clipToPadding="false"
@@ -35,7 +37,7 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Where are we going?"
@@ -45,7 +47,7 @@
         <EditText
             android:id="@+id/placeText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
             android:layout_weight="1"
             android:drawableRight="@drawable/explore_icon"
             android:drawableTint="@color/colorText"
@@ -57,7 +59,7 @@
         <EditText
             android:id="@+id/fictionText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
             android:layout_weight="1"
             android:drawableRight="@drawable/movie_icon"
             android:drawableTint="@color/colorText"
@@ -67,13 +69,33 @@
             android:textSize="17sp" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/searchButton"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_weight="1"
+            android:background="#BBB"
+            android:drawableRight="@drawable/search_icon"
+            android:drawableTint="@android:color/white"
+            android:text="Search"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <Space
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/useGPSButton"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
             android:layout_weight="1"
+            android:background="@color/colorPrimary"
             android:drawableRight="@drawable/location_icon"
             android:drawableTint="@android:color/white"
-            android:text="Or use my GPS" />
+            android:text="Or use my GPS"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
