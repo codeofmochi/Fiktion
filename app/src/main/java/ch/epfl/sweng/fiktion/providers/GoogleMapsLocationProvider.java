@@ -30,6 +30,14 @@ public class GoogleMapsLocationProvider extends LocationProvider {
     private boolean firstLocationChange = true;
 
     /**
+     * Helper getter to know if GPS started tracking
+     * @return true if GPS is tracking, false otherwise
+     */
+    public boolean hasLocation() {
+        return !this.firstLocationChange;
+    }
+
+    /**
      * Helper internal method to update the current location and its marker
      * @param newLocation A new Location to replace the old one
      */
