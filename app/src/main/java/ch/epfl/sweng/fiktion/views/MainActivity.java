@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startAddPOIActivity(View view) {
-        Intent addPoiIntent = new Intent(this, SimpleAddPOIActivity.class);
+        Intent addPoiIntent = new Intent(this, AddPOIActivity.class);
         startActivity(addPoiIntent);
     }
 
