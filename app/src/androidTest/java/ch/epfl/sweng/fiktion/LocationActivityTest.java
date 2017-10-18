@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion;
 
+import android.location.Location;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
@@ -27,11 +28,15 @@ public class LocationActivityTest {
      */
     @Test
     public void testMarkerMyLocationExists() {
-        // get my position marker UI
+        // setup UI automator
         UiDevice device = UiDevice.getInstance(getInstrumentation());
-        UiObject marker = device.findObject(new UiSelector().descriptionContains("My position"));
         // busy wait until GPS is ready
-        while(!LocationActivity.gmaps.hasLocation());
+        long t= System.currentTimeMillis();
+        long end = t+15000;
+        while(System.currentTimeMillis() < end && !LocationActivity.gmaps.hasLocation());
+
+        // get marker when popped
+        UiObject marker = device.findObject(new UiSelector().descriptionContains("My position"));
         try {
             // try to click the marker
             marker.click();
