@@ -40,6 +40,16 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     /**
+     * Reset location provider when focus is lost
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        // resetting the provider here ensures that a new location is get on activity resume
+        gmaps = new GoogleMapsLocationProvider();
+    }
+
+    /**
      * Handle permission request result
      */
     @Override
