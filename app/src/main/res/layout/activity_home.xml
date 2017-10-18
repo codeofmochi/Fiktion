@@ -12,6 +12,8 @@
         android:layout_height="wrap_content"
         android:elevation="0dp"
         android:paddingBottom="20dp"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
         tools:context="ch.epfl.sweng.fiktion.views.HomeActivity">
 
         <ImageView
