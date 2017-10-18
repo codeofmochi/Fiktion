@@ -35,10 +35,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startSignInActivity(View view) {
-        Log.d(TAG, "Advancing");
         //we advance to the login activity
         Intent signInActivity = new Intent(this, SignInActivity.class);
         startActivity(signInActivity);
+    }
+
+    public void startHomeActivity(View view) {
+        Intent i = new Intent(this, HomeActivity.class);
+        startActivity(i);
     }
 
 }

@@ -58,6 +58,15 @@
             android:text="Use GPS"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />
+
+        <Button
+            android:id="@+id/startHomeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="startHomeActivity"
+            android:text="View Home"
+            tools:layout_editor_absoluteX="66dp"
+            tools:layout_editor_absoluteY="387dp" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
