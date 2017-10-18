@@ -10,8 +10,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_margin="5dp"
-        android:elevation="3dp"
-        card_view:cardCornerRadius="0dp">
+        android:elevation="3dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -34,25 +33,25 @@
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
                 android:textColor="#3C3C3C"
-                android:textSize="15dp" />
+                android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/count"
+                android:id="@+id/featured"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/title"
-                android:paddingBottom="@dimen/songs_count_padding_bottom"
-                android:paddingLeft="@dimen/album_title_padding"
-                android:paddingRight="@dimen/album_title_padding"
-                android:textSize="@dimen/songs_count" />
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="12dp" />
 
             <ImageView
                 android:id="@+id/overflow"
-                android:layout_width="@dimen/ic_album_overflow_width"
-                android:layout_height="@dimen/ic_album_overflow_height"
+                android:layout_width="20dp"
+                android:layout_height="30dp"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/thumbnail"
-                android:layout_marginTop="@dimen/ic_album_overflow_margin_top"
+                android:layout_marginTop="10dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_dots" />
 
