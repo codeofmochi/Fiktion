@@ -16,7 +16,7 @@ import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
 public class LocationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     // Maps and location provider for this activity
-    GoogleMapsLocationProvider gmaps = new GoogleMapsLocationProvider();
+    public static GoogleMapsLocationProvider gmaps = new GoogleMapsLocationProvider();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
