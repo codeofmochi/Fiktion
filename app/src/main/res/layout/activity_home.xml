@@ -19,13 +19,15 @@
         app:srcCompat="@drawable/tokyo_bg" />
 
     <LinearLayout
-        android:layout_width="250dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="82dp"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:layout_marginTop="80dp"
         android:background="#FFF"
         android:clipToPadding="false"
         android:elevation="10dp"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="10dp"
         app:layout_constraintLeft_toRightOf="@+id/bg_img"
         app:layout_constraintRight_toLeftOf="@+id/bg_img"
@@ -38,7 +40,41 @@
             android:layout_weight="1"
             android:text="Where are we going?"
             android:textColor="@color/colorPrimary"
-            android:textSize="18sp" />
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/placeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableRight="@drawable/explore_icon"
+            android:drawableTint="@color/colorText"
+            android:ems="10"
+            android:hint="Place to visit"
+            android:inputType="text"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/fictionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableRight="@drawable/movie_icon"
+            android:drawableTint="@color/colorText"
+            android:ems="10"
+            android:hint="Work of fiction"
+            android:inputType="text"
+            android:textSize="17sp" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableRight="@drawable/location_icon"
+            android:drawableTint="@android:color/white"
+            android:text="Or use my GPS" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
