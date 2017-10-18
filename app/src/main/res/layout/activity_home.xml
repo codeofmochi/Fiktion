@@ -23,10 +23,22 @@
         android:layout_height="160dp"
         android:layout_marginTop="82dp"
         android:background="#FFF"
+        android:clipToPadding="false"
         android:elevation="10dp"
         android:orientation="horizontal"
+        android:padding="10dp"
         app:layout_constraintLeft_toRightOf="@+id/bg_img"
         app:layout_constraintRight_toLeftOf="@+id/bg_img"
-        app:layout_constraintTop_toTopOf="@+id/bg_img"></LinearLayout>
+        app:layout_constraintTop_toTopOf="@+id/bg_img">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Where are we going?"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
