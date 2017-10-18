@@ -12,8 +12,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+
+
+import static ch.epfl.sweng.fiktion.providers.Providers.database;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
 
 /**
  * A Google Maps implementation for current location
@@ -29,8 +36,12 @@ public class GoogleMapsLocationProvider extends LocationProvider {
     // Helper boolean to detect first location change
     private boolean firstLocationChange = true;
 
+    //boolean to active showNearPOIs
+    private boolean wantNearPOIs = true;
+
     /**
      * Helper getter to know if GPS started tracking
+     *
      * @return true if GPS is tracking, false otherwise
      */
     public boolean hasLocation() {
@@ -39,6 +50,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
 
     /**
      * Helper internal method to update the current location and its marker
+     *
      * @param newLocation A new Location to replace the old one
      */
     private void updateLocation(Location newLocation) {
@@ -61,6 +73,9 @@ public class GoogleMapsLocationProvider extends LocationProvider {
         myLocationMarker = gmap.addMarker(
                 new MarkerOptions().position(latlng).title("My position")
         );
+        // display nearby POIs on map if wantNearPOIS = true, temp radius value = 50
+        showNearPOIs();
+
     }
 
     /**
@@ -96,5 +111,36 @@ public class GoogleMapsLocationProvider extends LocationProvider {
             });
 
         }
+    }
+
+    private void showNearPOIs() {
+
+        database.findNearPois(this.getPosition(), 50, new DatabaseProvider.FindNearPoisListener() {
+
+            @Override
+            public void onNewValue(PointOfInterest poi) {
+                // add the poi name to the to the list of pois if in radius
+
+                if (Math.sqrt(Math.pow(poi.position().longitude(), 2) + Math.pow(poi.position().latitude(), 2)) < 50) {
+                    /** for each point of interest from the list, creates a blue marker with the POIs name,
+                     *  and is visible only if the boolean wantNearPOIs is true.
+                     *  this can be later on easily changed to add more info for example with
+                     *  .snippet(String) additionnal info can be displayed
+                     */
+                    gmap.addMarker(new MarkerOptions()
+                            .position(new LatLng(poi.position().latitude(), poi.position().longitude()))
+                            .title(poi.name())
+                            .icon(defaultMarker(HUE_BLUE))
+                            .visible(wantNearPOIs));
+                }
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+
+
     }
 }
