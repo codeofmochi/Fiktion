@@ -4,6 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:elevation="0dp"
     tools:context="ch.epfl.sweng.fiktion.views.HomeActivity">
+
+    <ImageView
+        android:id="@+id/bg_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:elevation="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/tokyo_bg" />
+
+    <LinearLayout
+        android:layout_width="250dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="82dp"
+        android:background="#FFF"
+        android:elevation="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toRightOf="@+id/bg_img"
+        app:layout_constraintRight_toLeftOf="@+id/bg_img"
+        app:layout_constraintTop_toTopOf="@+id/bg_img"></LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
