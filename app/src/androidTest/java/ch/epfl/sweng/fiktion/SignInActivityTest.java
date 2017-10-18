@@ -45,7 +45,6 @@ public class SignInActivityTest {
         mActivity = sinActivityRule.getActivity();
     }
 
-//TODO: Implement tests that mock data access to firebase
 /*
     //valid login test needs to wait for response of the firebase, ask assistants
     @Test
@@ -66,7 +65,7 @@ public class SignInActivityTest {
 */
 
     @Test
-    public void invalid_login() {
+    public void invalid_email() {
         //type invalid credentials and click sign in
 
         onView(withId(R.id.User_Email)).perform(typeText(invalid_email), closeSoftKeyboard());
@@ -74,7 +73,16 @@ public class SignInActivityTest {
         onView(withId(R.id.SignInButton)).perform(click());
 
         onView(withId(R.id.User_Email)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_email_error))));
-        onView(withId(R.id.User_Password)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_password_error))));
+    }
+    @Test
+    public void validEmail_invalidPassword() {
+        //type invalid credentials and click sign in
+
+        onView(withId(R.id.User_Email)).perform(typeText(valid_email), closeSoftKeyboard());
+        onView(withId(R.id.User_Password)).perform(typeText(invalid_password), closeSoftKeyboard());
+        onView(withId(R.id.SignInButton)).perform(click());
+
+        onView(withId(R.id.User_Password)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_email_error))));
     }
 
     @Test

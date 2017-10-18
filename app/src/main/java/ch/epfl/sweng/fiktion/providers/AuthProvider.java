@@ -31,22 +31,32 @@ public abstract class AuthProvider {
     public abstract void signOut();
 
     /**
-     * Return true if the email and password are valid, false otherwise.
+     * Validate the email provided by the user.
+     * @email provided by the user
      * @return empty string if valid, error message otherwise
      */
-    public abstract String validateEmailAndPassword(String email, String password);
+    public abstract String validateEmail(String email);
+
+    /**
+     * Validate the password provided by the user.
+     * @param password provided by the user
+     * @return empty string if valid, error message otherwise
+     */
+    public abstract String validatePassword(String password);
 
     /**
      * Creates a new account using the provided informations
      * @param email used to create the account
      * @param password used to create the account
      */
-    public abstract void createUserWithEmailAndPassword(String email, String password);
+    public abstract void createUserWithEmailAndPassword(String email, String password, final AuthListener listener);
 
     /**
      * Sends a password reset mail, defines what to do afterwards
      * @param listener what to do after email attempt
      */
-    public abstract void sendPasswordResetEmail(AuthListener listener);
+    public abstract void sendPasswordResetEmail(String email,AuthListener listener);
+
+    public abstract Boolean isConnected();
 
 }
