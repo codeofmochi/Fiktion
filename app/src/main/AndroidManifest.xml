@@ -41,7 +41,7 @@
             android:label="@string/title_activity_location">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.epfl.sweng.fiktion.views.MainActivity" />
+                android:value="ch.epfl.sweng.fiktion.views.HomeActivity" />
         </activity>
 
         <!-- Google Maps API Key -->

@@ -102,6 +102,7 @@
                 android:background="@color/colorPrimary"
                 android:drawableRight="@drawable/location_icon"
                 android:drawableTint="@android:color/white"
+                android:onClick="startLocationActivity"
                 android:text="Or use my GPS"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
