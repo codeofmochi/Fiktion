@@ -74,6 +74,7 @@ public class SignInActivityTest {
 
         onView(withId(R.id.User_Email)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_email_error))));
     }
+
     @Test
     public void validEmail_invalidPassword() {
         //type invalid credentials and click sign in
@@ -82,7 +83,7 @@ public class SignInActivityTest {
         onView(withId(R.id.User_Password)).perform(typeText(invalid_password), closeSoftKeyboard());
         onView(withId(R.id.SignInButton)).perform(click());
 
-        onView(withId(R.id.User_Password)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_email_error))));
+        onView(withId(R.id.User_Password)).check(matches(hasErrorText("Password must be at least 6 characters")));
     }
 
     @Test
@@ -94,7 +95,6 @@ public class SignInActivityTest {
         onView(withId(R.id.SignInButton)).perform(click());
 
         onView(withId(R.id.User_Email)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_email_error))));
-        onView(withId(R.id.User_Password)).check(matches(hasErrorText(mActivity.getString(R.string.required_password_error))));
     }
 
     @Test

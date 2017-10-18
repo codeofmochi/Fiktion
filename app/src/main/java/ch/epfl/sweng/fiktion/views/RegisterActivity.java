@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -20,7 +20,6 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText regEmail;
     private EditText regPassword;
     private EditText regConfirmPassword;
-    AuthProvider mAuth = new FirebaseAuthProvider();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         //we need to check if the credentials are valid before attempting to sign in
         //first we check if the email is valid, do not proceed if it is not valid
-        String emailErr = mAuth.validateEmail(email);
+        String emailErr = Providers.auth.validateEmail(email);
         if (!emailErr.isEmpty()) {
             Log.d(TAG, "Email is not valid");
             //we set an error corresponding to the failure
@@ -59,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
         //after making sure the email is valid we check if the password is valid and if not we do not proceed
-        String passwordErr = mAuth.validatePassword(password);
+        String passwordErr = Providers.auth.validatePassword(password);
         if (!passwordErr.isEmpty()) {
             Log.d(TAG, "Password is not valid");
             //we set an error corresponding to the failure
@@ -73,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
         Log.d(TAG, "Credentials are valid");
 
-        mAuth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
+        Providers.auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "createUserWithEmail:success");
