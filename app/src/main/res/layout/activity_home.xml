@@ -26,6 +26,7 @@
             app:srcCompat="@drawable/tokyo_bg" />
 
         <LinearLayout
+            android:id="@+id/centerBox"
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:layout_marginEnd="60dp"
@@ -41,8 +42,7 @@
             app:layout_constraintLeft_toRightOf="@+id/bg_img"
             app:layout_constraintRight_toLeftOf="@+id/bg_img"
             app:layout_constraintTop_toTopOf="@+id/bg_img"
-            app:layout_goneMarginBottom="20dp"
-            android:id="@+id/centerBox">
+            app:layout_goneMarginBottom="20dp">
 
             <TextView
                 android:id="@+id/title"
@@ -114,6 +114,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:text="Trending today"
@@ -121,6 +122,27 @@
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/centerBox" />
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@+id/trendingTitle"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:context="MainActivity"
+            tools:layout_editor_absoluteX="8dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:scrollbars="vertical" />
+
+        </RelativeLayout>
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
