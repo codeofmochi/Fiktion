@@ -37,6 +37,7 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         // setup google maps
         gmaps.mapReady(this, googleMap);
+        gmaps.showNearPOIs(50);
     }
 
     /**
