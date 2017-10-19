@@ -14,6 +14,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
+import ch.epfl.sweng.fiktion.models.Position;
+
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
 
 /**
  * A Google Maps implementation for current location
@@ -31,6 +35,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
 
     /**
      * Helper getter to know if GPS started tracking
+     *
      * @return true if GPS is tracking, false otherwise
      */
     public boolean hasLocation() {
@@ -38,7 +43,45 @@ public class GoogleMapsLocationProvider extends LocationProvider {
     }
 
     /**
+     * Listener that listens for marker placement
+     */
+    public interface MarkerPlacementListener {
+
+        /**
+         * What to do when a marker is added
+         *
+         * @param pos the position of the marker
+         */
+        void onAddedMarker(Position pos);
+    }
+
+    /**
+     * Adds a listener that listens for marker placement
+     *
+     * @param listener the listener
+     */
+    public void addMarkerPlacementListener(final MarkerPlacementListener listener) {
+        // set a click listener on the map which will add a marker on the click
+        gmap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            Marker m;
+
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // if the marker already exists, then remove it
+                if (m != null) {
+                    m.remove();
+                }
+                // add a marker ont click position
+                m = gmap.addMarker(new MarkerOptions().position(latLng).title("new point of interest").icon(defaultMarker(HUE_BLUE)));
+                // inform the listener of an added marker
+                listener.onAddedMarker(new Position(latLng.latitude, latLng.longitude));
+            }
+        });
+    }
+
+    /**
      * Helper internal method to update the current location and its marker
+     *
      * @param newLocation A new Location to replace the old one
      */
     private void updateLocation(Location newLocation) {
