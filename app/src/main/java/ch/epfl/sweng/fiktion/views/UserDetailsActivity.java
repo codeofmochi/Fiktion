@@ -2,7 +2,6 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -11,15 +10,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
-public class UserDetailsActivity extends AppCompatActivity implements View.OnClickListener {
+public class UserDetailsActivity extends AppCompatActivity {
 
     //constants
     //LOGCAT
@@ -32,11 +27,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         userSignedOut;
     }
 
+    //Authenticator initiation
 
-    //firebase
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+    public AuthProvider auth = Providers.auth;
 
     //views
     private TextView user_name_view;
@@ -59,7 +52,6 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_user_details);
 
         Log.d(TAG, "Initialising User Details activity");
-        mAuth = FirebaseAuth.getInstance();
 
         //initialise views
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
@@ -73,29 +65,8 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         choose = (Button) findViewById(R.id.detail_nickname_button);
         confirmName = (Button) findViewById(R.id.detail_confirm_name);
         pwReset = (Button) findViewById(R.id.detail_reset_password);
-        //initialise User and firebase auth listener
-        user = mAuth.getCurrentUser();
-        //thinking about making this static so we can use it in all code
-        //whenever the user gets signed off
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser nUser = firebaseAuth.getCurrentUser();
-                if (nUser != null) {
-                    //user is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + nUser.getUid());
-                    //if user changed, recreate
-                    if (user != nUser) {
-                        recreate();
-                    }
-                } else {
-                    //user is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                    updateUI(UIMode.userSignedOut);
-                }
 
-            }
-        };
+
     }
 
     @Override
@@ -103,12 +74,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         super.onStart();
         Log.d(TAG, "Started UserDetailsActivity");
         //initialise user details and firebase authentication
-        mAuth.addAuthStateListener(mAuthListener);
 
-        if (user != null) {
+        if (auth.isConnected()) {
             // Name, email address, and profile photo Url
-            name = user.getDisplayName();
-            email = user.getEmail();
+            //name = user.getDisplayName();
+            //email = user.getEmail();
             //Uri photoUrl = user.getPhotoUrl();
             //String uid = user.getUid();
 
@@ -128,10 +98,11 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
      */
     private void signOut() {
 
-        if (user != null) {
-            mAuth.signOut();
+        if (auth.isConnected()) {
+            auth.signOut();
             //firebase authentication listener will see
             // that user signed out and call onAuthStateChanged
+            updateUI(UIMode.userSignedOut);
             Log.d(TAG, "User is signed out");
         }
     }
@@ -145,29 +116,24 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
 
         // Send verification email
 
-        if (user != null) {
-            user.sendEmailVerification()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+        if (auth.isConnected()) {
+            auth.sendEmailVerification(new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    Log.d(TAG, "Sending was successful");
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Verification email sent to " + email,
+                            Toast.LENGTH_SHORT).show();
+                }
 
-                            // Re-enable button
-                            findViewById(R.id.verification_button).setEnabled(true);
-
-                            if (task.isSuccessful()) {
-                                Log.d(TAG, "Sending was successful");
-                                Toast.makeText(UserDetailsActivity.this,
-                                        "Verification email sent to " + email,
-                                        Toast.LENGTH_SHORT).show();
-                            } else {
-                                Log.e(TAG, "sendEmailVerification failed", task.getException());
-                                Toast.makeText(UserDetailsActivity.this,
-                                        "Failed to send verification email.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-                    });
+                @Override
+                public void onFailure() {
+                    Log.e(TAG, "sendEmailVerification failed");
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Failed to send verification email.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             //handles the case if user is not currently signed right after calling this method
             Toast.makeText(UserDetailsActivity.this, "No User currently signed in", Toast.LENGTH_SHORT).show();
@@ -180,37 +146,34 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         // Disable button
         findViewById(R.id.detail_reset_password).setEnabled(false);
 
-        if (user != null) {
-            mAuth.sendPasswordResetEmail(email)
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+        if (auth.isConnected()) {
+            auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    findViewById(R.id.detail_reset_password).setEnabled(true);
 
-                            // Re-enable button
-                            findViewById(R.id.detail_reset_password).setEnabled(true);
+                    Log.d(TAG, "Sending was successful");
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Password reset email sent to " + email,
+                            Toast.LENGTH_SHORT).show();
+                    pwReset.setVisibility(View.GONE);
+                }
 
-                            if (task.isSuccessful()) {
-                                Log.d(TAG, "Sending was successful");
-                                Toast.makeText(UserDetailsActivity.this,
-                                        "Password reset email sent to " + email,
-                                        Toast.LENGTH_SHORT).show();
-                                pwReset.setVisibility(View.GONE);
-                            } else {
-                                Log.e(TAG, "sendPasswordResetEmail failed", task.getException());
-                                Toast.makeText(UserDetailsActivity.this,
-                                        "Failed to send password reset email.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
+                @Override
+                public void onFailure() {
+                    findViewById(R.id.detail_reset_password).setEnabled(true);
+                    Log.e(TAG, "sendPasswordResetEmail failed");
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Failed to send password reset email.",
+                            Toast.LENGTH_SHORT).show();
 
-                        }
-                    });
+                }
+            });
         } else {
-
             //handles the case if user is not currently signed right after calling this method
             Toast.makeText(UserDetailsActivity.this, "No User currently signed in", Toast.LENGTH_SHORT).show();
             // Re-enable button
             findViewById(R.id.detail_reset_password).setEnabled(true);
-
         }
 
 
@@ -228,6 +191,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             user_name_view.setText(name);
             user_email_view.setText(email);
 
+            /*
             // show verification button only if not verified
             // show password reset button only if verified
             if (user.isEmailVerified()) {
@@ -239,6 +203,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 verification.setVisibility(View.VISIBLE);
                 pwReset.setVisibility(View.GONE);
             }
+            */
             choose.setVisibility(View.VISIBLE);
             user_newName.setVisibility(View.INVISIBLE);
             confirmName.setVisibility(View.INVISIBLE);
@@ -250,6 +215,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    /*
     private void confirmName() {
         final String newName = user_newName.getText().toString();
         findViewById(R.id.detail_confirm_name).setEnabled(false);
@@ -288,24 +254,31 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         }
 
     }
+    */
 
-    @Override
-    public void onClick(View v) {
-        int i = v.getId();
-        if (i == R.id.detail_signout) {
-            signOut();
-        } else if (i == R.id.verification_button) {
-            Log.d(TAG, "Sending Email Verification");
-            sendEmailVerification();
-        } else if (i == R.id.detail_nickname_button) {
+    public void clickSendEmailVerification(View v) {
+        Log.d(TAG, "Sending Email Verification");
+        sendEmailVerification();
+    }
+
+    /*
+        public void clickChangeUsername(View v){
             Log.d(TAG, "Setting up UI to change name");
-            updateUI(UIMode.changeNameMode);
-        } else if (i == R.id.detail_confirm_name) {
+        }
+
+        public void clickConfirmName(View v){
             Log.d(TAG, "Changing name");
             confirmName();
-        } else if (i == R.id.detail_reset_password) {
-            Log.d(TAG, "Sending password reset email");
-            sendPasswordResetEmail();
         }
+    */
+    public void clickSignOut(View v) {
+        Log.d(TAG, "Signing Out");
+        signOut();
     }
+
+    public void clickSendPasswordReset(View v) {
+        Log.d(TAG, "Sending password reset email");
+        sendPasswordResetEmail();
+    }
+
 }

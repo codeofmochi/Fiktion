@@ -12,6 +12,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 /**
@@ -25,8 +26,10 @@ public class FirebaseAuthProvider extends AuthProvider {
     // firebase authentification instance
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     // firebase user that we authenticate
-    private final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseUser user;
     // firebase status
+
+
     private FirebaseAuth.AuthStateListener state;
 
     /**
@@ -74,6 +77,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                     //reset textViews content
                     // Sign in success
                     Log.d(TAG, "signInWithEmail:success");
+                    user = auth.getCurrentUser();
                     listener.onSuccess();
                 } else {
                     // Sign in fails
@@ -90,6 +94,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public void signOut() {
         auth.signOut();
+        user = null;
     }
 
     /**
@@ -147,7 +152,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             // Account creation was successful
                             Log.d(TAG, "accountCreation: success");
                             listener.onSuccess();
-
+                            user = auth.getCurrentUser();
                         } else {
                             // Account creation failed
                             Log.w(TAG, "accountCreation: failure", task.getException());
@@ -163,23 +168,51 @@ public class FirebaseAuthProvider extends AuthProvider {
      * @param listener what to do after email attempt
      */
     @Override
-    public void sendPasswordResetEmail(String email, final AuthListener listener) {
-        auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            //reset textViews content
-                            // Password reset email sent successfully
-                            Log.d(TAG, "TransmittingPasswordResetEmail: success");
-                            listener.onSuccess();
-                        } else {
-                            // Password reset email failed to send
-                            Log.w(TAG, "TransmittingPasswordResetEmail: failure", task.getException());
-                            listener.onFailure();
-                        }
+    public void sendPasswordResetEmail( final AuthListener listener) {
+        String email = user.getEmail();
+        if(user != null) {
+            if(email != null) {
+                auth.sendPasswordResetEmail(email)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    //reset textViews content
+                                    // Password reset email sent successfully
+                                    Log.d(TAG, "TransmittingPasswordResetEmail: success");
+                                    listener.onSuccess();
+                                } else {
+                                    // Password reset email failed to send
+                                    Log.w(TAG, "TransmittingPasswordResetEmail: failure", task.getException());
+                                    listener.onFailure();
+                                }
+                            }
+                        });
+            } else{
+                listener.onFailure();
+            }
+        }else{
+            listener.onFailure();
+        }
+    }
+
+    @Override
+    public void sendEmailVerification(final AuthListener listener) {
+        user = auth.getCurrentUser();
+        if(auth.getCurrentUser()!=null){
+            user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        listener.onSuccess();
+                    }else{
+                        listener.onFailure();
                     }
-                });
+                }
+            });
+        }else{
+            listener.onFailure();
+        }
     }
 
     @Override

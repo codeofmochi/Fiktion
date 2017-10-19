@@ -17,6 +17,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.security.Provider;
+
+import ch.epfl.sweng.fiktion.Providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.RegisterActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -36,7 +40,6 @@ public class RegisterActivityTest {
     private final String exist_email = "test@test.ch";
     private final String exist_password = "testing";
 
-    private FirebaseAuth regAuth;
     private RegisterActivity regActivity;
 
     @Rule
@@ -45,13 +48,13 @@ public class RegisterActivityTest {
 
     @Before
     public void setUp() {
-        regAuth = FirebaseAuth.getInstance();
+        Providers.auth = new LocalAuthProvider();
         regActivity = regActivityRule.getActivity();
     }
 
     @After
     public void end() {
-        regAuth.signOut();
+        Providers.auth.signOut();
         regActivity.finish();
     }
 
@@ -117,11 +120,11 @@ public class RegisterActivityTest {
 
         //check that we stay in the same activity (we do not sign in to the new account) and email error displays
         onView(withId(R.id.register_title));
-        onView(withId(R.id.register_email)).check(matches(hasErrorText(regActivity.getString(R.string.invalid_email_error))));
+        onView(withId(R.id.register_email)).check(matches(hasErrorText("Requires a valid email")));
     }
 
     @Test
-    public void invalidPasswordTest() throws InterruptedException {
+    public void invalidPasswordTest() {
         //we type invalid password and click on the register button
 
         onView(withId(R.id.register_email)).perform(typeText("v@e"), ViewActions.closeSoftKeyboard());

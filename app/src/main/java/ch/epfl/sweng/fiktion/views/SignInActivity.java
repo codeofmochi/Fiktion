@@ -96,8 +96,8 @@ public class SignInActivity extends AppCompatActivity{
         //start details activity and end this one
         if (isConnected) {
             Intent user_details_activity = new Intent(this, UserDetailsActivity.class);
+            this.finish();
             startActivity(user_details_activity);
-            finish();
         }
     }
 

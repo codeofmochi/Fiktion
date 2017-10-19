@@ -1,18 +1,21 @@
 package ch.epfl.sweng.fiktion.Providers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.FiktionUser;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 
 /**
- * Created by rodri on 18.10.2017.
+ * Created by Rodrigo on 18.10.2017.
  */
 
 public class LocalAuthProvider extends AuthProvider {
 
-    List<FiktionUser> userList = new ArrayList<>();
+    List<FiktionUser> userList = new ArrayList<FiktionUser>
+            (Collections.singletonList(new FiktionUser("", "test@test.ch", "ID")));
     FiktionUser currUser;
     Boolean signedIn = false;
 
@@ -27,8 +30,11 @@ public class LocalAuthProvider extends AuthProvider {
     public void signIn(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        currUser = new FiktionUser("",email,"ID");
-        signedIn = true;
+        if (password.equals("testing")) {
+            currUser = new FiktionUser("", email, "ID");
+            signedIn = true;
+            listener.onSuccess();
+        }
     }
 
     /**
@@ -86,7 +92,7 @@ public class LocalAuthProvider extends AuthProvider {
     public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        FiktionUser newUser = new FiktionUser("",email,"ID");
+        FiktionUser newUser = new FiktionUser("", email, "ID");
         if (userList.contains(newUser)) {
             listener.onFailure();
         } else {
@@ -95,19 +101,38 @@ public class LocalAuthProvider extends AuthProvider {
             signedIn = true;
             listener.onSuccess();
         }
-
     }
 
     /**
      * Sends a password reset mail, defines what to do afterwards
      *
-     * @param email
      * @param listener what to do after email attempt
      */
     @Override
-    public void sendPasswordResetEmail(String email, AuthListener listener) {
-
+    public void sendPasswordResetEmail(AuthListener listener) {
+        if(isConnected()){
+            listener.onSuccess();
+        }else {
+            listener.onFailure();
+        }
     }
+
+    /**
+     * Sends a verification email, defines what to do afterwards
+     *
+     * @param listener what to do after email attempt
+     */
+    @Override
+    public void sendEmailVerification(AuthListener listener) {
+        if(isConnected()){
+            listener.onSuccess();
+        }else {
+            listener.onFailure();
+        }
+    }
+
+
+
 
     @Override
     public Boolean isConnected() {

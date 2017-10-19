@@ -3,6 +3,8 @@ package ch.epfl.sweng.fiktion.providers;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 
+import ch.epfl.sweng.fiktion.models.FiktionUser;
+
 /**
  * Created by rodri on 17.10.2017.
  */
@@ -46,7 +48,6 @@ public abstract class AuthProvider {
 
     /**
      * Creates a new account using the provided informations
-     * @param email used to create the account
      * @param password used to create the account
      */
     public abstract void createUserWithEmailAndPassword(String email, String password, final AuthListener listener);
@@ -55,7 +56,9 @@ public abstract class AuthProvider {
      * Sends a password reset mail, defines what to do afterwards
      * @param listener what to do after email attempt
      */
-    public abstract void sendPasswordResetEmail(String email,AuthListener listener);
+    public abstract void sendPasswordResetEmail(AuthListener listener);
+
+    public abstract void sendEmailVerification(AuthListener listener);
 
     public abstract Boolean isConnected();
 
