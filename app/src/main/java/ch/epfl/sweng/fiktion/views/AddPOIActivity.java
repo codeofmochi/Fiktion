@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ListAdapter;
 
@@ -24,19 +25,22 @@ public class AddPOIActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_poi);
     }
 
-    public void getLocationFromMap() {
-        Intent intent = new Intent(this, GetLocationFromMapActivity.class);
-        startActivityForResult(intent, 1);
-    }
-
     // get the coordinates from the child GetLocationFromMapActivity
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
-                double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
-                double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
-                // TODO use this values
+                Double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
+                Double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
+
+                ((EditText)findViewById(R.id.add_poi_latitude)).setText(latitude.toString());
+                ((EditText)findViewById(R.id.add_poi_longitude)).setText(longitude.toString());
             }
         }
+    }
+
+    public void startGetLocationFromMapActivity(View view) {
+        Intent getLocationFromMapIntent = new Intent(this, GetLocationFromMapActivity.class);
+        startActivityForResult(getLocationFromMapIntent, 1);
     }
 }

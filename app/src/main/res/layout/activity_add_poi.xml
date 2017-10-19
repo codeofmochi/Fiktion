@@ -141,6 +141,7 @@
                     android:id="@+id/add_poi_map"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
+                    android:onClick="startGetLocationFromMapActivity"
                     android:text="Chose position on map" />
 
                 <EditText
