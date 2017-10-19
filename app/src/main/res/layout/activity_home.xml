@@ -160,6 +160,14 @@
                     android:text="Akihabara, Tokyo"
                     android:textSize="20sp" />
 
+                <TextView
+                    android:id="@+id/featured"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Featured in Steins;Gate, Love Live!, Oreimo, Shirobako, No Game No Life, The Idolm@ster, more »"
+                    android:textColor="@color/colorPrimary" />
+
                 <LinearLayout
                     android:id="@+id/itemPhotos"
                     android:layout_width="match_parent"
