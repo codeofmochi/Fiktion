@@ -2,35 +2,30 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
-public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
+public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
 
     //TextViews
-    private EditText reg_email;
-    private EditText reg_password;
-    FirebaseAuth mAuth;
+    private EditText regEmail;
+    private EditText regPassword;
+    private EditText regConfirmPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Initialising Register activity");
         setContentView(R.layout.activity_register);
-        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
@@ -38,45 +33,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onStart();
 
         //initialise widgets
-        reg_email = (EditText) findViewById(R.id.register_email);
-        reg_password = (EditText) findViewById(R.id.register_password);
+        regEmail = (EditText) findViewById(R.id.register_email);
+        regPassword = (EditText) findViewById(R.id.register_password);
+        regConfirmPassword = (EditText) findViewById(R.id.register_confirm_password);
 
-    }
-
-    /**
-     * This method checks if the credentials are valid by firebase standards
-     *
-     * @return true is the credentials are valid, false otherwise
-     */
-    private boolean validateCredentials() {
-        boolean validEmail = false;
-        boolean validPassword = false;
-        String email = reg_email.getText().toString();
-        String password = reg_password.getText().toString();
-        Log.d(TAG, "Validating credentials");
-
-        if (password.isEmpty()) {
-            reg_password.setError(getString(R.string.required_password_error));
-            Log.d(TAG, "Password validation failed");
-        } else {
-            if (password.length() >= 6) {
-                validPassword = true;
-                reg_password.setError(null);
-            } else {
-                reg_password.setError(getString(R.string.invalid_password_error));
-                Log.d(TAG, "Password validation failed");
-            }
-        }
-        if (email.contains("@")) {
-            validEmail = true;
-            reg_email.setError(null);
-        } else {
-            reg_email.setError(getString(R.string.invalid_email_error));
-            Log.d(TAG, "Email validation failed");
-
-        }
-
-        return validEmail && validPassword;
     }
 
     /**
@@ -88,46 +48,69 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
 
-        if (!validateCredentials()) {
+        //we need to check if the credentials are valid before attempting to sign in
+        //first we check if the email is valid, do not proceed if it is not valid
+        String emailErr = Providers.auth.validateEmail(email);
+        if (!emailErr.isEmpty()) {
+            Log.d(TAG, "Email is not valid");
+            //we set an error corresponding to the failure
+            regEmail.setError(emailErr);
+            return;
+        }
+        //after making sure the email is valid we check if the password is valid and if not we do not proceed
+        String passwordErr = Providers.auth.validatePassword(password);
+        if (!passwordErr.isEmpty()) {
+            Log.d(TAG, "Password is not valid");
+            //we set an error corresponding to the failure
+            regPassword.setError(passwordErr);
+            return;
+        }
+        if (!regConfirmPassword.getText().toString().equals(password)) {
+            //we set an error and cancel action if the password confirmation failed
+            regConfirmPassword.setError("Both fields must be equal");
             return;
         }
         Log.d(TAG, "Credentials are valid");
 
-        //firebase function that actually creates an account
-        Task<AuthResult> authResultTask = mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            Toast.makeText(RegisterActivity.this, "Registration Successful!",
-                                    Toast.LENGTH_SHORT).show();
-                            login();
-                            finish();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+        Providers.auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                //account creation was successful
+                Log.d(TAG, "createUserWithEmail:success");
+                Toast.makeText(RegisterActivity.this, "Registration Successful!",
+                        Toast.LENGTH_SHORT).show();
+                login();
+                finish();
+            }
 
-                    }
-                });
+            @Override
+            public void onFailure() {
+                //account creation failed
+                Log.d(TAG, "createUserWithEmail:failure");
+                Toast.makeText(RegisterActivity.this, "Could not create user with given email",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
+    /**
+     * Starts a sign in activity
+     */
     private void login() {
         Intent intent = new Intent(this, SignInActivity.class);
         startActivity(intent);
         finish();
     }
 
-    @Override
-    public void onClick(View v) {
-        Log.d(TAG, "User clicked somewhere");
-        int i = v.getId();
-        if (i == R.id.register_click) {
-            createAccount(reg_email.getText().toString(), reg_password.getText().toString());
-        }
+
+    /**
+     * Starts the creation of a user account
+     *
+     * @param v button clicked
+     */
+    public void register(View v) {
+        Log.d(TAG, "registration attempt");
+        createAccount(regEmail.getText().toString(), regPassword.getText().toString());
     }
 }

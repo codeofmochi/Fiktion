@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,7 +40,7 @@ public class GetLocationFromMapActivity extends AppCompatActivity implements OnM
     public void onMapReady(GoogleMap googleMap) {
         // setup google maps
         gmaps.mapReady(this, googleMap);
-
+        findViewById(R.id.selfLocationButton).setVisibility(View.VISIBLE);
         // add a listener that listens marker placements
         gmaps.addMarkerPlacementListener(new GoogleMapsLocationProvider.MarkerPlacementListener() {
             @Override
@@ -57,6 +58,18 @@ public class GetLocationFromMapActivity extends AppCompatActivity implements OnM
         newPosition = position;
     }
 
+    // use own position to retrieve
+    public void setOwnPosition(View view) {
+        if (gmaps.getLocation() == null) {
+            // if the location is not loaded yet, show a loading message
+            Toast.makeText(this, "Loading location", Toast.LENGTH_SHORT).show();
+        } else {
+            // get the user's position from the map and retrieve it
+            newPosition = gmaps.getPosition();
+            retrieveCoordinates(null);
+        }
+    }
+
     // retrieves the coordonates to the parent activity
     public void retrieveCoordinates(View view) {
         // intent with the latitude and longitude
@@ -67,6 +80,13 @@ public class GetLocationFromMapActivity extends AppCompatActivity implements OnM
         setResult(RESULT_OK, retrieveCoordsIntent);
         // close this activity
         finish();
+    }
+
+    // if the activity pauses, reset the map
+    @Override
+    public void onPause() {
+        super.onPause();
+        gmaps = new GoogleMapsLocationProvider();
     }
 
     /**

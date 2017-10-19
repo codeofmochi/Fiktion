@@ -14,8 +14,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 
+import static ch.epfl.sweng.fiktion.providers.Providers.database;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
 
@@ -139,5 +141,35 @@ public class GoogleMapsLocationProvider extends LocationProvider {
             });
 
         }
+    }
+
+    /**
+     * Function to show nearby POIs on map
+     *
+     * @param radius radius to search in km
+     */
+    public void showNearPOIs(final int radius) {
+        gmap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(Location newLocation) {
+                // first update position
+                updateLocation(newLocation);
+                // find nearest pois
+                database.findNearPois(getPosition(), radius, new DatabaseProvider.FindNearPoisListener() {
+                    @Override
+                    public void onNewValue(PointOfInterest poi) {
+                        // write new marker
+                        gmap.addMarker(new MarkerOptions()
+                                .position(new LatLng(poi.position().latitude(), poi.position().longitude()))
+                                .title(poi.name())
+                                .icon(defaultMarker(HUE_BLUE)));
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                });
+            }
+        });
     }
 }
