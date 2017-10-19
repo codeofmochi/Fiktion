@@ -114,6 +114,7 @@
                         android:id="@+id/add_poi_latitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="latitude"
@@ -123,18 +124,12 @@
                         android:id="@+id/add_poi_longitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="longitude"
                         android:inputType="textPersonName" />
 
-                    <Button
-                        android:id="@+id/add_poi_my_pos"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="My Position"
-                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <Button
