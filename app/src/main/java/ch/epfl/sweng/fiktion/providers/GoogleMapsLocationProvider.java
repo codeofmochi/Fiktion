@@ -12,11 +12,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
-
 
 import static ch.epfl.sweng.fiktion.providers.Providers.database;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
@@ -35,9 +33,6 @@ public class GoogleMapsLocationProvider extends LocationProvider {
     private Marker myLocationMarker;
     // Helper boolean to detect first location change
     private boolean firstLocationChange = true;
-
-    //boolean to active showNearPOIs
-    private boolean wantNearPOIs = true;
 
     /**
      * Helper getter to know if GPS started tracking
@@ -73,9 +68,6 @@ public class GoogleMapsLocationProvider extends LocationProvider {
         myLocationMarker = gmap.addMarker(
                 new MarkerOptions().position(latlng).title("My position")
         );
-        // display nearby POIs on map if wantNearPOIS = true, temp radius value = 50
-        showNearPOIs();
-
     }
 
     /**
@@ -113,33 +105,32 @@ public class GoogleMapsLocationProvider extends LocationProvider {
         }
     }
 
-    private void showNearPOIs() {
-
-        database.findNearPois(this.getPosition(), 50, new DatabaseProvider.FindNearPoisListener() {
-
+    /**
+     * Function to show nearby POIs on map
+     * @param radius radius to search in km
+     */
+    public void showNearPOIs(final int radius) {
+        gmap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
-            public void onNewValue(PointOfInterest poi) {
-                // add the poi name to the to the list of pois if in radius
+            public void onMyLocationChange(Location newLocation) {
+                // first update position
+                updateLocation(newLocation);
+                // find nearest pois
+                database.findNearPois(getPosition(), radius, new DatabaseProvider.FindNearPoisListener() {
+                    @Override
+                    public void onNewValue(PointOfInterest poi) {
+                        // write new marker
+                        gmap.addMarker(new MarkerOptions()
+                                .position(new LatLng(poi.position().latitude(), poi.position().longitude()))
+                                .title(poi.name())
+                                .icon(defaultMarker(HUE_BLUE)));
+                    }
 
-                /** for each point of interest from the list, creates a blue marker with the POIs name,
-                 *  and is visible only if the boolean wantNearPOIs is true.
-                 *  this can be later on easily changed to add more info for example with
-                 *  .snippet(String) additionnal info can be displayed
-                 */
-                gmap.addMarker(new MarkerOptions()
-                        .position(new LatLng(poi.position().latitude(), poi.position().longitude()))
-                        .title(poi.name())
-                        .icon(defaultMarker(HUE_BLUE))
-                        .visible(wantNearPOIs));
-
-            }
-
-            @Override
-            public void onFailure() {
-
+                    @Override
+                    public void onFailure() {
+                    }
+                });
             }
         });
-
-
     }
 }
