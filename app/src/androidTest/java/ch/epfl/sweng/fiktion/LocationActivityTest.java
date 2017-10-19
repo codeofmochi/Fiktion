@@ -67,7 +67,7 @@ public class LocationActivityTest {
     }
 
     @Test
-    public static void nearbyMarkerTest() {
+    public void nearbyMarkerTest() {
 
         // busy wait until GPS is ready
         long t = System.currentTimeMillis();
