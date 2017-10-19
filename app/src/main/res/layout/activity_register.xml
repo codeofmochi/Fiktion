@@ -64,13 +64,23 @@
             android:inputType="textPassword"
             android:textAlignment="center" />
 
+        <EditText
+            android:id="@+id/register_confirm_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05"
+            android:ems="10"
+            android:hint="Confirm password"
+            android:inputType="textPassword"
+            android:textAlignment="center" />
+
         <Button
             android:id="@+id/register_click"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
             android:background="@android:color/holo_blue_dark"
-            android:onClick="onClick"
+            android:onClick="register"
             android:text="Register" />
 
     </LinearLayout>
