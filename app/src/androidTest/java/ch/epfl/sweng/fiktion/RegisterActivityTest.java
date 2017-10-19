@@ -21,6 +21,7 @@ import ch.epfl.sweng.fiktion.views.RegisterActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
@@ -92,7 +93,19 @@ public class RegisterActivityTest {
         //check that we stay in the same activity (we do not sign in to the new account)
         onView(withId(R.id.register_title));
         onView(withId(R.id.register_email)).check(matches(hasErrorText(regActivity.getString(R.string.invalid_email_error))));
-        onView(withId(R.id.register_password)).check(matches(hasErrorText(regActivity.getString(R.string.required_password_error))));
+    }
+
+    @Test
+    public void passwordConfirmationFailed() {
+        //we only click and expect that we stay in the same activity and errors appear
+        onView(withId(R.id.register_email)).perform(typeText(new_email), closeSoftKeyboard());
+        onView(withId(R.id.register_password)).perform(typeText(new_password), closeSoftKeyboard());
+        onView(withId(R.id.register_confirm_password)).perform(typeText("different"), closeSoftKeyboard());
+        onView(withId(R.id.register_click)).perform(click());
+
+        //check that we stay in the same activity (we do not sign in to the new account)
+        //check that there is an error in register_confirmation_password box
+        onView(withId(R.id.register_confirm_password)).check(matches(hasErrorText("Both fields must be equal")));
     }
 
     @Test

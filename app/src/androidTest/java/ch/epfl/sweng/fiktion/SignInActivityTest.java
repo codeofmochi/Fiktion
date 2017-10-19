@@ -8,11 +8,14 @@ package ch.epfl.sweng.fiktion;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import ch.epfl.sweng.fiktion.Providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -39,6 +42,11 @@ public class SignInActivityTest {
     @Rule
     public ActivityTestRule<SignInActivity> sinActivityRule =
             new ActivityTestRule<SignInActivity>(SignInActivity.class);
+
+    @BeforeClass
+    public static void setAuth(){
+        Providers.auth = new LocalAuthProvider();
+    }
 
     @Before
     public void before() {

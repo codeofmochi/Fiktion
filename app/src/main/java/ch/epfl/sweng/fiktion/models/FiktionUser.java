@@ -16,4 +16,34 @@ public class FiktionUser {
         id = input_id;
     }
 
+    public void changeName(String newName){
+        name = newName;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null || !FiktionUser.class.isAssignableFrom(other.getClass())) {
+            return false;
+        }
+
+        FiktionUser otherUser = (FiktionUser) other;
+
+        return this.name.equals(otherUser.name)
+                && this.email.equals(otherUser.email)
+                && this.id.equals(otherUser.id);
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getEmail(){
+        return email;
+    }
+
+    public String getID(){
+        return id;
+    }
+
+
 }

@@ -2,7 +2,6 @@ package ch.epfl.sweng.fiktion.providers;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,20 +10,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.List;
-
-import ch.epfl.sweng.fiktion.R;
-import ch.epfl.sweng.fiktion.views.MainActivity;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
-import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
-
-import static android.support.v4.content.ContextCompat.startActivity;
 
 /**
- * Created by rodri on 17.10.2017.
+ * Created by Rodrigo on 17.10.2017.
  */
 
 public class FirebaseAuthProvider extends AuthProvider {
@@ -40,6 +31,7 @@ public class FirebaseAuthProvider extends AuthProvider {
 
     /**
      * Set a StateListener to detect user account changes
+     *
      * @param act the current activity in which we want to detect an account change
      */
     public void createStateListener(final Activity act) {
@@ -75,7 +67,7 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void signIn(String email, String password, final AuthListener listener) {
-        auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
@@ -119,12 +111,13 @@ public class FirebaseAuthProvider extends AuthProvider {
 
     /**
      * Validate the password provided by the user.
+     *
      * @param password provided by the user
      * @return empty string if valid, error message otherwise
      */
     @Override
-    public String validatePassword(String password){
-        String errMessage="";
+    public String validatePassword(String password) {
+        String errMessage = "";
         if (password.isEmpty()) {
             errMessage = "Requires a valid password";
             Log.d(TAG, "Password validation failed");
@@ -146,22 +139,22 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void createUserWithEmailAndPassword(String email, String password, final AuthListener listener) {
-        auth.createUserWithEmailAndPassword(email,password)
+        auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    // Account creation was successful
-                    Log.d(TAG, "accountCreation: success");
-                    listener.onSuccess();
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Account creation was successful
+                            Log.d(TAG, "accountCreation: success");
+                            listener.onSuccess();
 
-                } else {
-                    // Account creation failed
-                    Log.w(TAG, "accountCreation: failure", task.getException());
-                    listener.onFailure();
-                }
-            }
-        });
+                        } else {
+                            // Account creation failed
+                            Log.w(TAG, "accountCreation: failure", task.getException());
+                            listener.onFailure();
+                        }
+                    }
+                });
     }
 
     /**
@@ -191,6 +184,6 @@ public class FirebaseAuthProvider extends AuthProvider {
 
     @Override
     public Boolean isConnected() {
-        return auth.getCurrentUser()!=null;
+        return auth.getCurrentUser() != null;
     }
 }

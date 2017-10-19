@@ -35,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
         //initialise widgets
         regEmail = (EditText) findViewById(R.id.register_email);
         regPassword = (EditText) findViewById(R.id.register_password);
-        regConfirmPassword = (EditText)findViewById(R.id.register_confirm_password);
+        regConfirmPassword = (EditText) findViewById(R.id.register_confirm_password);
 
     }
 
@@ -63,10 +63,9 @@ public class RegisterActivity extends AppCompatActivity {
             Log.d(TAG, "Password is not valid");
             //we set an error corresponding to the failure
             regPassword.setError(passwordErr);
-            regPassword.getText().clear();
             return;
         }
-        if(!regConfirmPassword.getText().toString().equals(password)){
+        if (!regConfirmPassword.getText().toString().equals(password)) {
             regConfirmPassword.setError("Both fields must be equal");
             return;
         }
