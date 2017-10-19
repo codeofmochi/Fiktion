@@ -70,8 +70,8 @@ public class SignInActivity extends AppCompatActivity{
         Providers.auth.signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
+                //sign in was successful
                 Log.d(TAG, "signIn successful");
-
                 Toast.makeText(SignInActivity.this, "Login Successful!",
                         Toast.LENGTH_SHORT).show();
                 updateUI(true);
@@ -79,6 +79,7 @@ public class SignInActivity extends AppCompatActivity{
 
             @Override
             public void onFailure() {
+                //sing in failed
                 Log.d(TAG, "signIn failure");
                 Toast.makeText(SignInActivity.this, R.string.toast_authentication_failed,
                         Toast.LENGTH_SHORT).show();

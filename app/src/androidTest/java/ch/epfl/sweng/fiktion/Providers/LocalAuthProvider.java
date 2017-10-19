@@ -1,11 +1,10 @@
 package ch.epfl.sweng.fiktion.Providers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import ch.epfl.sweng.fiktion.models.FiktionUser;
+import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 
 /**
@@ -14,9 +13,9 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 
 public class LocalAuthProvider extends AuthProvider {
 
-    List<FiktionUser> userList = new ArrayList<FiktionUser>
-            (Collections.singletonList(new FiktionUser("", "test@test.ch", "ID")));
-    FiktionUser currUser;
+    List<User> userList = new ArrayList<User>
+            (Collections.singletonList(new User("", "test@test.ch", "ID")));
+    User currUser;
     Boolean signedIn = false;
 
     /**
@@ -31,7 +30,7 @@ public class LocalAuthProvider extends AuthProvider {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
         if (password.equals("testing")) {
-            currUser = new FiktionUser("", email, "ID");
+            currUser = new User("", email, "ID");
             signedIn = true;
             listener.onSuccess();
         }
@@ -92,7 +91,7 @@ public class LocalAuthProvider extends AuthProvider {
     public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        FiktionUser newUser = new FiktionUser("", email, "ID");
+        User newUser = new User("", email, "ID");
         if (userList.contains(newUser)) {
             listener.onFailure();
         } else {
@@ -131,9 +130,10 @@ public class LocalAuthProvider extends AuthProvider {
         }
     }
 
-
-
-
+    /**
+     *
+     * @return true if there is a user currently signed in, false otherwise
+     */
     @Override
     public Boolean isConnected() {
         return signedIn;

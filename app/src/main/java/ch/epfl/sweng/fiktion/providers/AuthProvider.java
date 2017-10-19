@@ -1,10 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-
-import ch.epfl.sweng.fiktion.models.FiktionUser;
-
 /**
  * Created by rodri on 17.10.2017.
  */

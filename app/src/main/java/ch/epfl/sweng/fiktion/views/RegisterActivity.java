@@ -66,6 +66,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
         if (!regConfirmPassword.getText().toString().equals(password)) {
+            //we set an error and cancel action if the password confirmation failed
             regConfirmPassword.setError("Both fields must be equal");
             return;
         }
@@ -74,6 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
         Providers.auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
+                //account creation was successful
                 Log.d(TAG, "createUserWithEmail:success");
                 Toast.makeText(RegisterActivity.this, "Registration Successful!",
                         Toast.LENGTH_SHORT).show();
@@ -83,6 +85,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onFailure() {
+                //account creation failed
                 Log.d(TAG, "createUserWithEmail:failure");
                 Toast.makeText(RegisterActivity.this, "Could not create user with given email",
                         Toast.LENGTH_SHORT).show();
@@ -91,6 +94,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Starts a sign in activity
+     */
     private void login() {
         Intent intent = new Intent(this, SignInActivity.class);
         startActivity(intent);
@@ -98,6 +104,11 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Starts the creation of a user account
+     *
+     * @param v button clicked
+     */
     public void register(View v) {
         Log.d(TAG, "registration attempt");
         createAccount(regEmail.getText().toString(), regPassword.getText().toString());

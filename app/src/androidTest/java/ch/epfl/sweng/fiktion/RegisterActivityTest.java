@@ -48,12 +48,15 @@ public class RegisterActivityTest {
 
     @Before
     public void setUp() {
+        //define authenticator as our local and not the firebase one
         Providers.auth = new LocalAuthProvider();
+        //define context
         regActivity = regActivityRule.getActivity();
     }
 
     @After
     public void end() {
+        //we need to sign out everytime in case it fails
         Providers.auth.signOut();
         regActivity.finish();
     }
