@@ -23,7 +23,7 @@ public class AddPOIActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_poi);
 
-        listView = (ExpandableListView)findViewById(R.id.poi_added_fictions);
+        listView = (ExpandableListView)findViewById(R.id.add_poi_added_fictions);
         initData();
         fIListAdapter = new FictionInputExpandableListAdapter(this,listDataHeader,listHash);
         listView.setAdapter(fIListAdapter);
