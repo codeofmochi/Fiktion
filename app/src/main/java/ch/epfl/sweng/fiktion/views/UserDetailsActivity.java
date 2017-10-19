@@ -122,7 +122,7 @@ public class UserDetailsActivity extends AppCompatActivity {
                 public void onSuccess() {
                     Log.d(TAG, "Sending was successful");
                     Toast.makeText(UserDetailsActivity.this,
-                            "Verification email sent to " + email,
+                            "Verification email sent",
                             Toast.LENGTH_SHORT).show();
                 }
 
@@ -154,7 +154,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
                     Log.d(TAG, "Sending was successful");
                     Toast.makeText(UserDetailsActivity.this,
-                            "Password reset email sent to " + email,
+                            "Password reset email sent",
                             Toast.LENGTH_SHORT).show();
                     pwReset.setVisibility(View.GONE);
                 }
