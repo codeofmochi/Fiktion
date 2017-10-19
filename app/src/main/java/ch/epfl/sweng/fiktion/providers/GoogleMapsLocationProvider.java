@@ -121,18 +121,17 @@ public class GoogleMapsLocationProvider extends LocationProvider {
             public void onNewValue(PointOfInterest poi) {
                 // add the poi name to the to the list of pois if in radius
 
-                if (Math.sqrt(Math.pow(poi.position().longitude(), 2) + Math.pow(poi.position().latitude(), 2)) < 50) {
-                    /** for each point of interest from the list, creates a blue marker with the POIs name,
-                     *  and is visible only if the boolean wantNearPOIs is true.
-                     *  this can be later on easily changed to add more info for example with
-                     *  .snippet(String) additionnal info can be displayed
-                     */
-                    gmap.addMarker(new MarkerOptions()
-                            .position(new LatLng(poi.position().latitude(), poi.position().longitude()))
-                            .title(poi.name())
-                            .icon(defaultMarker(HUE_BLUE))
-                            .visible(wantNearPOIs));
-                }
+                /** for each point of interest from the list, creates a blue marker with the POIs name,
+                 *  and is visible only if the boolean wantNearPOIs is true.
+                 *  this can be later on easily changed to add more info for example with
+                 *  .snippet(String) additionnal info can be displayed
+                 */
+                gmap.addMarker(new MarkerOptions()
+                        .position(new LatLng(poi.position().latitude(), poi.position().longitude()))
+                        .title(poi.name())
+                        .icon(defaultMarker(HUE_BLUE))
+                        .visible(wantNearPOIs));
+
             }
 
             @Override
