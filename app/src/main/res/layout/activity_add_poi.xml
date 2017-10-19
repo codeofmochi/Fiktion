@@ -55,10 +55,6 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="25dp" />
-
                 <EditText
                     android:id="@+id/add_poi_name"
                     android:layout_width="match_parent"
@@ -67,24 +63,36 @@
                     android:hint="Name of the Point"
                     android:inputType="textPersonName" />
 
-                <EditText
-                    android:id="@+id/add_poi_fiction"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/add_poi_fiction"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="Add a new Fiction"
+                        android:inputType="textPersonName" />
+
+                    <Button
+                        android:id="@+id/add_poi_button"
+                        android:layout_width="96dp"
+                        android:layout_height="37dp"
+                        android:text="Add" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/add_poi_fiction_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Add a new Fiction to the Point"
-                    android:inputType="textPersonName" />
-
-                <Button
-                    android:id="@+id/add_poi_button"
-                    android:layout_width="148dp"
-                    android:layout_height="37dp"
-                    android:text="Add a Fiction" />
-
-                <ExpandableListView
-                    android:id="@+id/add_poi_added_fictions"
-                    android:layout_width="316dp"
-                    android:layout_height="175dp" />
+                    android:paddingTop="10dp"
+                    android:textAlignment="viewStart"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/add_poi_position_title"
@@ -96,23 +104,65 @@
                     android:textColor="@color/colorPrimary"
                     android:textSize="18sp" />
 
-                <EditText
-                    android:id="@+id/add_poi_longitude"
-                    android:layout_width="180dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/add_poi_latitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="latitude"
+                        android:inputType="textPersonName" />
+
+                    <EditText
+                        android:id="@+id/add_poi_longitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="longitude"
+                        android:inputType="textPersonName" />
+
+                    <Button
+                        android:id="@+id/add_poi_my_pos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="My Position"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/add_poi_map"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="longitude"
-                    android:inputType="textPersonName" />
+                    android:text="Chose position on map" />
 
                 <EditText
-                    android:id="@+id/add_poi_latitude"
-                    android:layout_width="180dp"
+                    android:id="@+id/add_poi_description"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="#EEEEFF"
                     android:ems="10"
-                    android:hint="latitude"
-                    android:inputType="textPersonName" />
+                    android:hint="Add a description to the Point"
+                    android:inputType="textMultiLine"
+                    android:padding="10dp"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/add_poi_finish"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Add this Point !" />
 
             </LinearLayout>
+
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>
