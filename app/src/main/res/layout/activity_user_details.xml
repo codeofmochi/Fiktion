@@ -114,7 +114,7 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_blue_bright"
                     android:elevation="4dp"
-                    android:onClick="onClick"
+                    android:onClick="clickSignOut"
                     android:text="Sign Out" />
 
                 <Button
@@ -126,7 +126,7 @@
                     android:layout_centerVertical="true"
                     android:background="@android:color/holo_blue_light"
                     android:elevation="4dp"
-                    android:onClick="onClick"
+                    android:onClick="clickSendEmailVerification"
                     android:text="Send Email Verification" />
 
                 <Button
@@ -135,7 +135,6 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_blue_dark"
                     android:elevation="4dp"
-                    android:onClick="onClick"
                     android:text="Change username" />
 
                 <Button
@@ -144,7 +143,7 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/colorControlActivated"
                     android:elevation="4dp"
-                    android:onClick="onClick"
+                    android:onClick="clickSendPasswordReset"
                     android:text="Reset Password" />
             </LinearLayout>
 
@@ -168,7 +167,6 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_blue_dark"
                 android:elevation="4dp"
-                android:onClick="onClick"
                 android:text="Confirm"
                 android:visibility="visible" />
 

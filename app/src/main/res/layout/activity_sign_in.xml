@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_bright"
-            android:onClick="onClick"
+            android:onClick="signIn"
             android:text="Sign In" />
 
         <Button
@@ -53,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_dark"
-            android:onClick="onClick"
+            android:onClick="register"
             android:text="Sign Up" />
 
     </LinearLayout>

@@ -8,4 +8,5 @@ package ch.epfl.sweng.fiktion.providers;
  */
 public class Providers {
     public static DatabaseProvider database = new FirebaseDatabaseProvider();
+    public static AuthProvider auth = new FirebaseAuthProvider();
 }

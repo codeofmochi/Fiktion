@@ -17,10 +17,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.security.Provider;
+
+import ch.epfl.sweng.fiktion.Providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.RegisterActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
@@ -35,7 +40,6 @@ public class RegisterActivityTest {
     private final String exist_email = "test@test.ch";
     private final String exist_password = "testing";
 
-    private FirebaseAuth regAuth;
     private RegisterActivity regActivity;
 
     @Rule
@@ -44,13 +48,16 @@ public class RegisterActivityTest {
 
     @Before
     public void setUp() {
-        regAuth = FirebaseAuth.getInstance();
+        //define authenticator as our local and not the firebase one
+        Providers.auth = new LocalAuthProvider();
+        //define context
         regActivity = regActivityRule.getActivity();
     }
 
     @After
     public void end() {
-        regAuth.signOut();
+        //we need to sign out everytime in case it fails
+        Providers.auth.signOut();
         regActivity.finish();
     }
 
@@ -92,7 +99,19 @@ public class RegisterActivityTest {
         //check that we stay in the same activity (we do not sign in to the new account)
         onView(withId(R.id.register_title));
         onView(withId(R.id.register_email)).check(matches(hasErrorText(regActivity.getString(R.string.invalid_email_error))));
-        onView(withId(R.id.register_password)).check(matches(hasErrorText(regActivity.getString(R.string.required_password_error))));
+    }
+
+    @Test
+    public void passwordConfirmationFailed() {
+        //we only click and expect that we stay in the same activity and errors appear
+        onView(withId(R.id.register_email)).perform(typeText(new_email), closeSoftKeyboard());
+        onView(withId(R.id.register_password)).perform(typeText(new_password), closeSoftKeyboard());
+        onView(withId(R.id.register_confirm_password)).perform(typeText("different"), closeSoftKeyboard());
+        onView(withId(R.id.register_click)).perform(click());
+
+        //check that we stay in the same activity (we do not sign in to the new account)
+        //check that there is an error in register_confirmation_password box
+        onView(withId(R.id.register_confirm_password)).check(matches(hasErrorText("Both fields must be equal")));
     }
 
     @Test
@@ -104,11 +123,11 @@ public class RegisterActivityTest {
 
         //check that we stay in the same activity (we do not sign in to the new account) and email error displays
         onView(withId(R.id.register_title));
-        onView(withId(R.id.register_email)).check(matches(hasErrorText(regActivity.getString(R.string.invalid_email_error))));
+        onView(withId(R.id.register_email)).check(matches(hasErrorText("Requires a valid email")));
     }
 
     @Test
-    public void invalidPasswordTest() throws InterruptedException {
+    public void invalidPasswordTest() {
         //we type invalid password and click on the register button
 
         onView(withId(R.id.register_email)).perform(typeText("v@e"), ViewActions.closeSoftKeyboard());

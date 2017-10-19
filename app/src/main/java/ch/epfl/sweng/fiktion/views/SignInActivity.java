@@ -2,30 +2,21 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
-public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignInActivity extends AppCompatActivity{
 
-
-    private static final String TAG = "SignIn";
+    private static final String TAG = "SignInLog";
     private EditText UserEmail;
     private EditText UserPassword;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,34 +25,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         Log.d(TAG, "Initialising sign in activity");
 
         //Initialise user content
-
         //Views
         UserEmail = (EditText) findViewById(R.id.User_Email);
         UserPassword = (EditText) findViewById(R.id.User_Password);
-
-        //Firebase Authenticator
-        mAuth = FirebaseAuth.getInstance();
-
-        //TODO: store logged in/out state in the app
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    //user is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    //user is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-            }
-        };
-
         // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        mAuth.addAuthStateListener(mAuthListener);
-        updateUI(currentUser);
-
+        updateUI(Providers.auth.isConnected());
     }
 
     @Override
@@ -69,44 +37,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         super.onStart();
     }
 
-    /**
-     * This method checks if the credentials are valid by firebase standards
-     *
-     * @return true is the credentials are valid, false otherwise
-     */
-    private boolean validateCredentials() {
-        boolean validEmail = false;
-        boolean validPassword = false;
-        String email = UserEmail.getText().toString();
-        String password = UserPassword.getText().toString();
-        Log.d(TAG, "Validating credentials");
-
-        if (password.isEmpty()) {
-            UserPassword.setError(getString(R.string.required_password_error));
-            Log.d(TAG, "Password validation failed");
-        } else {
-            //TODO elaborate password validation
-            if (password.length() >= 6) {
-                validPassword = true;
-                UserPassword.setError(null);
-            } else {
-                UserPassword.setError(getString(R.string.invalid_password_error));
-                Log.d(TAG, "Password validation failed");
-            }
-        }
-        //TODO elaborate email validation
-        if (email.contains("@")) {
-            validEmail = true;
-            UserEmail.setError(null);
-        } else {
-            UserEmail.setError(getString(R.string.invalid_email_error));
-            Log.d(TAG, "Email validation failed");
-
-        }
-
-
-        return validEmail && validPassword;
-    }
 
     /**
      * Signs the user in using firebase authentication
@@ -117,64 +47,71 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
         //we need to check if the credentials are valid before attempting to sign in
-        if (!validateCredentials()) {
-            Log.d(TAG, "Not valid credentials");
+        //first we check if the email is valid, do not proceed if it is not valid
+        String emailErr = Providers.auth.validateEmail(email);
+        if (!emailErr.isEmpty()) {
+            Log.d(TAG, "Email is not valid");
+            //we set an error corresponding to the failure
+            UserEmail.setError(emailErr);
+            return;
+        }
+
+        //after making sure the email is valid we check if the password is valid and if not we do not proceed
+        String passwordErr = Providers.auth.validatePassword(password);
+        if (!passwordErr.isEmpty()) {
+            Log.d(TAG, "Password is not valid");
+            //we set an error corresponding to the failure
+            UserPassword.setError(passwordErr);
             return;
         }
         Log.d(TAG, "Credentials are valid");
         Log.d(TAG, "signIn:" + email);
 
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            //reset textViews content
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(SignInActivity.this, "Login Successful!",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(user);
+        Providers.auth.signIn(email, password, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                //sign in was successful
+                Log.d(TAG, "signIn successful");
+                Toast.makeText(SignInActivity.this, "Login Successful!",
+                        Toast.LENGTH_SHORT).show();
+                updateUI(true);
+            }
 
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(SignInActivity.this, R.string.toast_authentication_failed,
-                                    Toast.LENGTH_SHORT).show();
-                        }
+            @Override
+            public void onFailure() {
+                //sing in failed
+                Log.d(TAG, "signIn failure");
+                Toast.makeText(SignInActivity.this, R.string.toast_authentication_failed,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
-                    }
-                });
     }
 
     /**
      * If User is signed in, user is taken to the user details screen
      *
-     * @param user firebase user
+     * @param isConnected true, if there is a user signed in, false otherwise
      */
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            //start details activity and end this one
+    private void updateUI(Boolean isConnected) {
+        //start details activity and end this one
+        if (isConnected) {
             Intent user_details_activity = new Intent(this, UserDetailsActivity.class);
+            this.finish();
             startActivity(user_details_activity);
-            finish();
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        int i = v.getId();
+    public void signIn(View v) {
         //user clicks on signin button
-        if (i == R.id.SignInButton) {
-            signIn(UserEmail.getText().toString(), UserPassword.getText().toString());
-        }
+        signIn(UserEmail.getText().toString(), UserPassword.getText().toString());
+    }
+
+    public void register(View v) {
         //user clicks on register button
-        else if (i == R.id.RegisterButton) {
-            //start registration activity
-            Intent registerActivity = new Intent(this, RegisterActivity.class);
-            startActivityForResult(registerActivity, 1);
-        }
+        //start registration activity
+        Intent registerActivity = new Intent(this, RegisterActivity.class);
+        startActivityForResult(registerActivity, 1);
     }
 
 
