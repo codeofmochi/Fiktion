@@ -14,7 +14,9 @@
         android:paddingBottom="20dp"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
-        tools:context="ch.epfl.sweng.fiktion.views.HomeActivity">
+        tools:context="ch.epfl.sweng.fiktion.views.HomeActivity"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp">
 
         <ImageView
             android:id="@+id/bg_img"
@@ -22,29 +24,24 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:elevation="0dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/tokyo_bg" />
+            app:srcCompat="@drawable/tokyo_bg"
+            tools:layout_editor_absoluteY="0dp"
+            tools:layout_editor_absoluteX="0dp" />
 
         <LinearLayout
             android:id="@+id/centerBox"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="220dp"
             android:layout_marginEnd="60dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="60dp"
             android:layout_marginStart="60dp"
-            android:layout_marginTop="80dp"
             android:background="#FFF"
             android:clipToPadding="false"
             android:elevation="10dp"
             android:orientation="vertical"
             android:padding="10dp"
-            app:layout_constraintLeft_toRightOf="@+id/bg_img"
-            app:layout_constraintRight_toLeftOf="@+id/bg_img"
-            app:layout_constraintTop_toTopOf="@+id/bg_img"
-            app:layout_goneMarginBottom="20dp">
+            app:layout_goneMarginBottom="20dp"
+            tools:layout_editor_absoluteY="80dp"
+            tools:layout_editor_absoluteX="60dp">
 
             <TextView
                 android:id="@+id/title"
@@ -115,35 +112,23 @@
             android:id="@+id/trendingTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:text="Trending today"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/centerBox" />
+            tools:layout_editor_absoluteY="320dp"
+            tools:layout_editor_absoluteX="20dp" />
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <LinearLayout
+            android:id="@+id/trendingLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trendingTitle"
-            tools:context="MainActivity">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:scrollbars="vertical" />
-
-        </RelativeLayout>
+            android:layout_height="71dp"
+            android:layout_marginStart="174dp"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="8dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@+id/trendingTitle"></LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
