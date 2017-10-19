@@ -135,7 +135,6 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_blue_dark"
                     android:elevation="4dp"
-                    android:onClick="onClick"
                     android:text="Change username" />
 
                 <Button
