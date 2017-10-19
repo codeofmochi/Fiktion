@@ -74,7 +74,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
                     m.remove();
                 }
                 // add a marker ont click position
-                m = gmap.addMarker(new MarkerOptions().position(latLng).title("new point of interest").icon(defaultMarker(HUE_BLUE)));
+                m = gmap.addMarker(new MarkerOptions().position(latLng).title("New point of interest").icon(defaultMarker(HUE_BLUE)));
                 // inform the listener of an added marker
                 listener.onAddedMarker(new Position(latLng.latitude, latLng.longitude));
             }

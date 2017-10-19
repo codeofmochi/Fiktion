@@ -62,7 +62,7 @@ public class GetLocationFromMapActivity extends AppCompatActivity implements OnM
     public void setOwnPosition(View view) {
         if (gmaps.getLocation() == null) {
             // if the location is not loaded yet, show a loading message
-            Toast.makeText(this, "Loading location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Loading location...", Toast.LENGTH_SHORT).show();
         } else {
             // get the user's position from the map and retrieve it
             newPosition = gmaps.getPosition();
