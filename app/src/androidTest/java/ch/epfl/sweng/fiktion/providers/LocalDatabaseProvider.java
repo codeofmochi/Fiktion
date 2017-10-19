@@ -1,15 +1,10 @@
-package ch.epfl.sweng.fiktion.Providers;
-
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
-import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 
 
 /**
