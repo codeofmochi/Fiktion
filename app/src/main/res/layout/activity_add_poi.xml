@@ -81,6 +81,7 @@
                         android:id="@+id/add_poi_button"
                         android:layout_width="96dp"
                         android:layout_height="37dp"
+                        android:onClick="addFiction"
                         android:text="Add" />
 
                 </LinearLayout>
@@ -155,6 +156,7 @@
                     android:id="@+id/add_poi_finish"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
+                    android:onClick="creatAndSendPoi"
                     android:text="Add this Point !" />
 
             </LinearLayout>
