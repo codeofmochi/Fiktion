@@ -14,10 +14,12 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.core.deps.guava.util.concurrent.Runnables.doNothing;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -57,55 +59,77 @@ public class AddPOIActivityTest {
     private ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
     private ViewInteraction addPoiName = onView(withId(R.id.add_poi_name));
 
-    public void doesToastMatch(String s) {
+    private void doesToastMatch(String s) {
         onView(withText(s)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    public void waitASecond() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void failsOnNoTextTest() {
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
+        waitASecond();
         doesToastMatch("You can't enter an empty fiction name");
     }
 
     @Test
     public void failsWithDotTest() {
         addPoiName.perform(typeText("."));
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
+        waitASecond();
         doesToastMatch("Those characters are not accepted: . $ # [ ] /");
     }
 
     @Test
     public void failsWithDollarTest() {
         addPoiName.perform(typeText("$"));
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
+        waitASecond();
         doesToastMatch("Those characters are not accepted: . $ # [ ] /");
     }
 
     @Test
     public void failsWithHashTest() {
         addPoiName.perform(typeText("#"));
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
+        waitASecond();
         doesToastMatch("Those characters are not accepted: . $ # [ ] /");
     }
 
     @Test
     public void failsWithOpenBracketTest() {
         addPoiName.perform(typeText("["));
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
+        waitASecond();
         doesToastMatch("Those characters are not accepted: . $ # [ ] /");
     }
 
     @Test
     public void failsWithCloseBracketTest() {
         addPoiName.perform(typeText("]"));
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
+        waitASecond();
         doesToastMatch("Those characters are not accepted: . $ # [ ] /");
     }
 
     @Test
     public void failsWithSlashTest() {
         addPoiName.perform(typeText("/"));
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
+        waitASecond();
         doesToastMatch("Those characters are not accepted: . $ # [ ] /");
     }
 }
