@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.Providers;
+package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
