@@ -57,11 +57,10 @@ public class AddPOIActivity extends AppCompatActivity {
         final String fiction = ((EditText) findViewById(R.id.add_poi_fiction)).getText().toString();
         if (fiction.isEmpty()) {
             // warning message if no text was entered
-            showToast("You can't enter an empty fiction name", Toast.LENGTH_SHORT);
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError("You can't enter an empty fiction name");
         } else if (fiction.matches(".*[.$#/\\[\\]].*")) {
             // warning message if unaccepted characters are present
-            showToast("Those characters are not accepted: . $ # [ ] /", Toast.LENGTH_SHORT);
-            ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Those characters are not accepted: . $ # [ ] /");
         } else {
             fictionList.add(fiction);
             if (fictionListText.isEmpty()) {
@@ -81,46 +80,77 @@ public class AddPOIActivity extends AppCompatActivity {
         double longitude = 0.0;
         double latitude = 0.0;
 
-        if (name.isEmpty()) {
-            // warning message if no text was entered
-            showToast("You can't enter an empty point of interest name", Toast.LENGTH_SHORT);
-        } else if (name.matches(".*[.$#/\\[\\]].*")) {
-            // warning message if unaccepted characters are present
-            showToast("Those characters are not accepted: . $ # [ ] /", Toast.LENGTH_SHORT);
+        boolean isCorrect = true;
+
+        if(name.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_name)).setError("You can't enter an empty point of interest name");
+            isCorrect = false;
+        }
+
+        if(name.matches(".*[.$#/\\[\\]].*")) {
+            ((EditText) findViewById(R.id.add_poi_name)).setError("Those characters are not accepted: . $ # [ ] /");
+            isCorrect = false;
+        }
+
+        if(longitudeString.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_longitude)).setError("You can't enter an empty longitude");
+            isCorrect = false;
+        }
+
+        if(!isNumeric(longitudeString)) {
+            ((EditText) findViewById(R.id.add_poi_longitude)).setError("You need to enter a number");
+            isCorrect = false;
         } else {
-            if (isNumeric(longitudeString) && isNumeric(latitudeString)) {
-                longitude = Double.parseDouble(longitudeString);
-                latitude = Double.parseDouble(latitudeString);
+            // If longitude is a number, parse it to double
+            longitude = Double.parseDouble(longitudeString);
 
-                if (longitude < -180 || longitude > 180 || latitude < -90 | latitude > 90) {
-                    showToast("Please enter coordinates in range -90 to 90 for latitude and -180 to 180 for longitude", Toast.LENGTH_SHORT);
-                    ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
-                } else {
-                    database.addPoi(new PointOfInterest(name, new Position(latitude, longitude)), new DatabaseProvider.AddPoiListener() {
-                        @Override
-                        public void onSuccess() {
-                            showToast("The Point of Interest " + name + " was added !", Toast.LENGTH_SHORT);
-                        }
-
-                        @Override
-                        public void onAlreadyExists() {
-                            showToast("The Point of Interest " + name + " already exists !", Toast.LENGTH_SHORT);
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            showToast("Failed to add " + name + " !", Toast.LENGTH_SHORT);
-                        }
-                    });
-                }
-            } else {
-                showToast("Please enter valid coordinates", Toast.LENGTH_SHORT);
-                ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
-                ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
+            if(longitude < -180 || longitude > 180) {
+                ((EditText) findViewById(R.id.add_poi_longitude)).setError("The longitude must be in range [-180;180]");
+                isCorrect = false;
             }
         }
 
+        if(latitudeString.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_latitude)).setError("You can't enter an empty latitude");
+            isCorrect = false;
+        }
+
+        if(!isNumeric(latitudeString)) {
+            ((EditText) findViewById(R.id.add_poi_latitude)).setError("You need to enter a number");
+            isCorrect = false;
+        } else {
+            latitude = Double.parseDouble(latitudeString);
+            if(latitude < -90 || latitude > 90) {
+                ((EditText) findViewById(R.id.add_poi_latitude)).setError("The latitude must be in range [-90;90]");
+                isCorrect = false;
+            }
+        }
+
+        if(isCorrect) {
+            database.addPoi(new PointOfInterest(name, new Position(latitude, longitude)), new DatabaseProvider.AddPoiListener() {
+                @Override
+                public void onSuccess() {
+                    showToast("The Point of Interest " + name + " was added !", Toast.LENGTH_SHORT);
+                }
+
+                @Override
+                public void onAlreadyExists() {
+                    showToast("The Point of Interest " + name + " already exists !", Toast.LENGTH_SHORT);
+                }
+
+                @Override
+                public void onFailure() {
+                    showToast("Failed to add " + name + " !", Toast.LENGTH_SHORT);
+                }
+            });
+
+            ((TextView) findViewById(R.id.add_poi_fiction_list)).setText("");
+            ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
+            ((EditText) findViewById(R.id.add_poi_name)).setText("");
+            ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
+            ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
+            ((EditText) findViewById(R.id.add_poi_description)).setText("");
+        }
     }
 
     // send a toast with text s
