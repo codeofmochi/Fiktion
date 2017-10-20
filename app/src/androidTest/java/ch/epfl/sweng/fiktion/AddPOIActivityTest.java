@@ -2,7 +2,6 @@ package ch.epfl.sweng.fiktion;
 
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
-import android.widget.Button;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -19,7 +18,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.core.deps.guava.util.concurrent.Runnables.doNothing;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -58,6 +56,11 @@ public class AddPOIActivityTest {
 
     private ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
     private ViewInteraction addPoiName = onView(withId(R.id.add_poi_name));
+    private ViewInteraction addPoiLatitude = onView(withId(R.id.add_poi_latitude));
+    private ViewInteraction addPoiLongitude = onView(withId(R.id.add_poi_longitude));
+    private ViewInteraction addPoiFiction= onView(withId(R.id.add_poi_fiction));
+    private ViewInteraction addPoiFictionButton = onView(withId(R.id.add_poi_fiction_button));
+    private ViewInteraction addPoiFictionList = onView(withId(R.id.add_poi_fiction_list));
 
     private void doesToastMatch(String s) {
         onView(withText(s)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
@@ -76,7 +79,7 @@ public class AddPOIActivityTest {
         closeSoftKeyboard();
         addPoiFinish.perform(click());
         waitASecond();
-        doesToastMatch("You can't enter an empty fiction name");
+        doesToastMatch("You can't enter an empty point of interest name");
     }
 
     @Test
@@ -131,5 +134,147 @@ public class AddPOIActivityTest {
         addPoiFinish.perform(click());
         waitASecond();
         doesToastMatch("Those characters are not accepted: . $ # [ ] /");
+    }
+
+    @Test
+    public void failsWIthEmptyLatitudeOrLongitudeTest() {
+        addPoiName.perform(typeText("poiTest1"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter valid coordinates");
+        addPoiLatitude.perform(typeText("15"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter valid coordinates");
+        addPoiLongitude.perform(typeText("30"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter valid coordinates");
+    }
+
+    @Test
+    public void failsWithOutOfBoundsCoordinatesTest() {
+        addPoiName.perform(typeText("poiTest2"));
+        addPoiLatitude.perform(typeText("45"));
+        addPoiLongitude.perform(typeText("220"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter coordinates in range -90 to 90 for latitude and -180 to 180 for longitude");
+        addPoiLatitude.perform(typeText("100"));
+        addPoiLongitude.perform(typeText("60"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter coordinates in range -90 to 90 for latitude and -180 to 180 for longitude");
+        addPoiLatitude.perform(typeText("-120"));
+        addPoiLongitude.perform(typeText("60"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter coordinates in range -90 to 90 for latitude and -180 to 180 for longitude");
+        addPoiLatitude.perform(typeText("30"));
+        addPoiLongitude.perform(typeText("-200"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter coordinates in range -90 to 90 for latitude and -180 to 180 for longitude");
+    }
+
+    @Test
+    public void failsOnWrongCoordinateInputTest() {
+        addPoiName.perform(typeText("poiTest4"));
+        addPoiLatitude.perform(typeText("32#2"));
+        addPoiLongitude.perform(typeText("1:2"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter valid coordinates");
+        addPoiLatitude.perform(typeText("45.3"));
+        addPoiLongitude.perform(typeText("56:2"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter valid coordinates");
+        addPoiLatitude.perform(typeText("16#2"));
+        addPoiLongitude.perform(typeText("02"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("Please enter valid coordinates");
+    }
+
+    @Test
+    public void succeedsOnCorrectInputsTest() {
+        addPoiName.perform(typeText("poiTest4"));
+        addPoiLatitude.perform(typeText("45"));
+        addPoiLongitude.perform(typeText("90"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("The Point of Interest poiTest4 was added !");
+    }
+
+    @Test
+    public void failsOnAddingTwiceTest() {
+        addPoiName.perform(typeText("poiTest5"));
+        addPoiLatitude.perform(typeText("45"));
+        addPoiLongitude.perform(typeText("90"));
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("The Point of Interest poiTest5 was added !");
+        addPoiFinish.perform(click());
+        waitASecond();
+        doesToastMatch("The Point of Interest poiTest5 already exists !");
+    }
+
+    @Test
+    public void addingFictionFailsOnWrongInputTest() {
+        addPoiFiction.perform(typeText("["));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        waitASecond();
+        doesToastMatch("Those characters are not accepted: . $ # [ ] /");
+        addPoiFiction.perform(typeText("hello$test"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        waitASecond();
+        doesToastMatch("Those characters are not accepted: . $ # [ ] /");
+        addPoiFiction.perform(typeText("hello[test"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        waitASecond();
+        doesToastMatch("Those characters are not accepted: . $ # [ ] /");
+        addPoiFiction.perform(typeText("hello]test"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        waitASecond();
+        doesToastMatch("Those characters are not accepted: . $ # [ ] /");
+        addPoiFiction.perform(typeText("hello.test"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        waitASecond();
+        doesToastMatch("Those characters are not accepted: . $ # [ ] /");
+        addPoiFiction.perform(typeText("hello/test"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        waitASecond();
+        doesToastMatch("Those characters are not accepted: . $ # [ ] /");
+    }
+
+    @Test
+    public void addingFictionWorksTest() {
+        addPoiFiction.perform(typeText("hello test"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        addPoiFictionList.check(matches(withText("hello test")));
+        addPoiFiction.perform(typeText("my fiction"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        addPoiFictionList.check(matches(withText("hello test, my fiction")));
     }
 }

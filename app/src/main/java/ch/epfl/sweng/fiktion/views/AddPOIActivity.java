@@ -83,7 +83,7 @@ public class AddPOIActivity extends AppCompatActivity {
 
         if (name.isEmpty()) {
             // warning message if no text was entered
-            showToast("You can't enter an empty fiction name", Toast.LENGTH_SHORT);
+            showToast("You can't enter an empty point of interest name", Toast.LENGTH_SHORT);
         } else if (name.matches(".*[.$#/\\[\\]].*")) {
             // warning message if unaccepted characters are present
             showToast("Those characters are not accepted: . $ # [ ] /", Toast.LENGTH_SHORT);

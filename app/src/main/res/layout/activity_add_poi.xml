@@ -78,7 +78,7 @@
                         android:inputType="textPersonName" />
 
                     <Button
-                        android:id="@+id/add_poi_button"
+                        android:id="@+id/add_poi_fiction_button"
                         android:layout_width="96dp"
                         android:layout_height="37dp"
                         android:onClick="addFiction"
