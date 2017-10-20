@@ -73,7 +73,7 @@ public class AddPOIActivity extends AppCompatActivity {
         }
     }
 
-    public void creatAndSendPoi(View view) {
+    public void createAndSendPoi(View view) {
         final String name = ((EditText) findViewById(R.id.add_poi_name)).getText().toString();
         final String longitudeString = ((EditText) findViewById(R.id.add_poi_longitude)).getText().toString();
         final String latitudeString = ((EditText) findViewById(R.id.add_poi_latitude)).getText().toString();

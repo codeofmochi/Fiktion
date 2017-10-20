@@ -156,7 +156,7 @@
                     android:id="@+id/add_poi_finish"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:onClick="creatAndSendPoi"
+                    android:onClick="createAndSendPoi"
                     android:text="Add this Point !" />
 
             </LinearLayout>
