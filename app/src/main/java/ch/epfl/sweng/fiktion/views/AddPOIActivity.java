@@ -82,51 +82,47 @@ public class AddPOIActivity extends AppCompatActivity {
 
         boolean isCorrect = true;
 
-        if(name.isEmpty()) {
+        if (name.isEmpty()) {
             ((EditText) findViewById(R.id.add_poi_name)).setError("You can't enter an empty point of interest name");
             isCorrect = false;
         }
 
-        if(name.matches(".*[.$#/\\[\\]].*")) {
+        if (name.matches(".*[.$#/\\[\\]].*")) {
             ((EditText) findViewById(R.id.add_poi_name)).setError("Those characters are not accepted: . $ # [ ] /");
             isCorrect = false;
         }
 
-        if(longitudeString.isEmpty()) {
+        if (longitudeString.isEmpty()) {
             ((EditText) findViewById(R.id.add_poi_longitude)).setError("You can't enter an empty longitude");
             isCorrect = false;
-        }
-
-        if(!isNumeric(longitudeString)) {
+        } else if (!isNumeric(longitudeString)) {
             ((EditText) findViewById(R.id.add_poi_longitude)).setError("You need to enter a number");
             isCorrect = false;
         } else {
             // If longitude is a number, parse it to double
             longitude = Double.parseDouble(longitudeString);
 
-            if(longitude < -180 || longitude > 180) {
+            if (longitude < -180 || longitude > 180) {
                 ((EditText) findViewById(R.id.add_poi_longitude)).setError("The longitude must be in range [-180;180]");
                 isCorrect = false;
             }
         }
 
-        if(latitudeString.isEmpty()) {
+        if (latitudeString.isEmpty()) {
             ((EditText) findViewById(R.id.add_poi_latitude)).setError("You can't enter an empty latitude");
             isCorrect = false;
-        }
-
-        if(!isNumeric(latitudeString)) {
+        } else if (!isNumeric(latitudeString)) {
             ((EditText) findViewById(R.id.add_poi_latitude)).setError("You need to enter a number");
             isCorrect = false;
         } else {
             latitude = Double.parseDouble(latitudeString);
-            if(latitude < -90 || latitude > 90) {
+            if (latitude < -90 || latitude > 90) {
                 ((EditText) findViewById(R.id.add_poi_latitude)).setError("The latitude must be in range [-90;90]");
                 isCorrect = false;
             }
         }
 
-        if(isCorrect) {
+        if (isCorrect) {
             database.addPoi(new PointOfInterest(name, new Position(latitude, longitude)), new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
