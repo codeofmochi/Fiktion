@@ -1,6 +1,5 @@
 package ch.epfl.sweng.fiktion.views;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -10,8 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.List;
-
 import ch.epfl.sweng.fiktion.R;
 
 public class HomeActivity extends AppCompatActivity {
@@ -20,6 +17,7 @@ public class HomeActivity extends AppCompatActivity {
     private String[] menuItems = {"Home", "Nearby", "Profile", "Discover", "Contribute", "Settings"};
     private DrawerLayout drawerLayout;
     private ListView drawerList;
+
     // click menu items listener
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -27,8 +25,23 @@ public class HomeActivity extends AppCompatActivity {
             selectItem(pos);
         }
     }
+
     // what to do on menu item select
     private void selectItem(int pos) {
+        switch (pos) {
+            case 0:
+                // home
+                this.recreate();
+                break;
+            case 1:
+                // location activity
+                Intent i = new Intent(this, LocationActivity.class);
+                startActivity(i);
+                break;
+            default:
+                break;
+        }
+
         drawerList.setItemChecked(pos, true);
         drawerLayout.closeDrawer(drawerList);
     }
