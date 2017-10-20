@@ -81,7 +81,10 @@ public class FindAndDisplayNearestPoisActivityTest {
         return new ViewAssertion() {
             @Override
             public void check(View view, NoMatchingViewException noViewFoundException) {
-                assertThat(((ListView)view).getChildCount(), is(count));
+                if (view instanceof ListView)
+                    assertThat(((ListView)view).getChildCount(), is(count));
+                else
+                    throw noViewFoundException;
             }
         };
     }

@@ -22,7 +22,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  * Created by pedro on 11/10/17.
  */
 
-public class AddPoiActivityTest {
+public class SimpleAddPoiActivityTest {
     private final ViewInteraction poiNameView = onView(withId(R.id.poiName));
     private final ViewInteraction addPoiButtonView = onView(withId(R.id.addPOIButton));
     private final ViewInteraction confirmTextView = onView(withId(R.id.addConfirmationText));
