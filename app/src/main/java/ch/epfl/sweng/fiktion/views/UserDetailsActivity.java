@@ -37,6 +37,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     private TextView user_email_view;
     private TextView user_verify_view;
     private EditText user_newName;
+    private EditText user_newEmail;
     //Buttons
     private Button confirmName;
     private Button pwReset;
@@ -59,6 +60,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         user_email_view = (TextView) findViewById(R.id.detail_user_email);
         user_verify_view = (TextView) findViewById(R.id.detail_user_verify);
         user_newName = (EditText) findViewById(R.id.detail_new_name);
+        user_newEmail = (EditText) findViewById(R.id.detail_new_email);
 
         //initialise button
         confirmName = (Button) findViewById(R.id.detail_confirm_name);
@@ -247,6 +249,41 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    private void confirmEmail() {
+        final String newEmail = user_newName.getText().toString();
+        findViewById(R.id.detail_confirm_name).setEnabled(false);
+
+        //validate name choice
+        if (!newName.isEmpty()
+                && !newName.equals(user.getName())
+                && newName.length() <= 15) {
+
+            user.changeName(newName, new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    user_name_view.setText(newName);
+                    recreate();
+                    Toast.makeText(UserDetailsActivity.this,
+                            "User's name is now : " + newName,
+                            Toast.LENGTH_LONG).show();
+                    user_newName.getText().clear();
+                }
+
+                @Override
+                public void onFailure() {
+                    findViewById(R.id.detail_confirm_name).setEnabled(true);
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Failed to update User's name.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else{
+            findViewById(R.id.detail_confirm_name).setEnabled(true);
+            Toast.makeText(this, "Please type a new username", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     public void clickSendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending Email Verification");
         sendEmailVerification();
@@ -266,4 +303,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         confirmName();
     }
 
+    public void clickConfirmEmailChange(@SuppressWarnings("UnusedParameters") View v){
+        confirmEmail();
+    }
 }
