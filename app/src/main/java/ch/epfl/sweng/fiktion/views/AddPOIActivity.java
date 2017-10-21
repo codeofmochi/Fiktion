@@ -115,6 +115,7 @@ public class AddPOIActivity extends AppCompatActivity {
             ((EditText) findViewById(R.id.add_poi_latitude)).setError("You need to enter a number");
             isCorrect = false;
         } else {
+
             latitude = Double.parseDouble(latitudeString);
             if (latitude < -90 || latitude > 90) {
                 ((EditText) findViewById(R.id.add_poi_latitude)).setError("The latitude must be in range [-90;90]");

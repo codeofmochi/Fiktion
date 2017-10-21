@@ -1,7 +1,7 @@
 package ch.epfl.sweng.fiktion;
 
-/**
- * Created by rodri on 10.10.2017.
+/*
+  Created by rodri on 10.10.2017.
  */
 
 
@@ -41,8 +41,8 @@ public class SignInActivityTest {
 
 
     @Rule
-    public ActivityTestRule<SignInActivity> sinActivityRule =
-            new ActivityTestRule<SignInActivity>(SignInActivity.class);
+    public final ActivityTestRule<SignInActivity> sinActivityRule =
+            new ActivityTestRule<>(SignInActivity.class);
 
     @BeforeClass
     public static void setAuth(){

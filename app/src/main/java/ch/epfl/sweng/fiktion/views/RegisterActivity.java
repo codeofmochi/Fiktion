@@ -109,7 +109,7 @@ public class RegisterActivity extends AppCompatActivity {
      *
      * @param v button clicked
      */
-    public void register(View v) {
+    public void register(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "registration attempt");
         createAccount(regEmail.getText().toString(), regPassword.getText().toString());
     }

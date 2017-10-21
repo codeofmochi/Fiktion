@@ -22,6 +22,7 @@ import static ch.epfl.sweng.fiktion.views.LocationActivity.gmaps;
 /**
  * Created by dialexo on 18.10.17.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public class LocationActivityTest {
 
     // setup UI automator
