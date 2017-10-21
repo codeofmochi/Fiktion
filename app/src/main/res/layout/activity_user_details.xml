@@ -141,12 +141,6 @@
                     android:text="Reset Password"
                     tools:ignore="UnusedAttribute" />
 
-                <Button
-                    android:id="@+id/detail_edit_account_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Edit Account" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
