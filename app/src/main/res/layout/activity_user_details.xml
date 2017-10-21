@@ -207,12 +207,11 @@
                         tools:layout_editor_absoluteY="97dp" />
 
                     <Button
-                        android:id="@+id/detail_confirm_name"
+                        android:id="@+id/detail_confirm_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@android:color/holo_blue_dark"
                         android:elevation="4dp"
-                        android:onClick="clickConfirmNameChange"
                         android:text="Confirm"
                         android:visibility="visible"
                         tools:ignore="UnusedAttribute"
