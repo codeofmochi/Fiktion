@@ -250,7 +250,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void confirmEmail() {
-        final String newEmail = user_newName.getText().toString();
+        final String newEmail = user_newEmail.getText().toString();
         findViewById(R.id.detail_confirm_email).setEnabled(false);
 
         //validate name choice
@@ -266,6 +266,7 @@ public class UserDetailsActivity extends AppCompatActivity {
                             "User's email is now : " + newEmail,
                             Toast.LENGTH_LONG).show();
                     user_newName.getText().clear();
+                    recreate();
                 }
 
                 @Override

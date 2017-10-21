@@ -200,8 +200,7 @@
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="Change email"
-                        android:inputType="textPersonName"
-                        android:maxLength="15"
+                        android:inputType="textEmailAddress"
                         android:visibility="visible"
                         tools:layout_editor_absoluteX="16dp"
                         tools:layout_editor_absoluteY="97dp" />
@@ -212,6 +211,7 @@
                         android:layout_height="wrap_content"
                         android:background="@android:color/holo_blue_dark"
                         android:elevation="4dp"
+                        android:onClick="clickConfirmEmailChange"
                         android:text="Confirm"
                         android:visibility="visible"
                         tools:ignore="UnusedAttribute"
