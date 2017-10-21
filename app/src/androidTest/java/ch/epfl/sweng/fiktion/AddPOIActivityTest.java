@@ -1,6 +1,11 @@
 package ch.epfl.sweng.fiktion;
 
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.action.GeneralLocation;
+import android.support.test.espresso.action.GeneralSwipeAction;
+import android.support.test.espresso.action.Press;
+import android.support.test.espresso.action.Swipe;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.BeforeClass;
@@ -73,7 +78,7 @@ public class AddPOIActivityTest {
         onView(withText(s)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 
-    public void waitASecond() {
+    private void waitASecond() {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -81,72 +86,78 @@ public class AddPOIActivityTest {
         }
     }
 
-    public void smallWait() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private static ViewAction swipeUpCenterTopFast() {
+        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.TOP_CENTER, Press.FINGER);
+    }
+
+    private static ViewAction swipeDownCenterBottomFast() {
+        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.BOTTOM_CENTER, Press.FINGER);
     }
 
     @Test
     public void failsOnNoTextTest() {
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("You can't enter an empty point of interest name")));
     }
 
     @Test
     public void failsWithDotTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("."));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
     public void failsWithDollarTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("$"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
     public void failsWithHashTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("#"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
     public void failsWithOpenBracketTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("["));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
     public void failsWithCloseBracketTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("]"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
     public void failsWithSlashTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("/"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
@@ -154,72 +165,82 @@ public class AddPOIActivityTest {
     @Test
     public void failsWIthEmptyLatitudeOrLongitudeTest() {
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLatitude.check(matches(hasErrorText("You can't enter an empty latitude")));
         addPoiLongitude.check(matches(hasErrorText("You can't enter an empty longitude")));
         addPoiLatitude.perform(typeText("15"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You can't enter an empty longitude")));
         addPoiLatitude.perform(clearText());
         addPoiLongitude.perform(typeText("30"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLatitude.check(matches(hasErrorText("You can't enter an empty latitude")));
     }
 
     @Test
     public void failsWithOutOfBoundsCoordinatesTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest2"));
+        closeSoftKeyboard();
         addPoiLatitude.perform(typeText("45"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("220"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("The longitude must be in range [-180;180]")));
         addPoiLatitude.perform(clearText());
         addPoiLongitude.perform(clearText());
         addPoiLatitude.perform(typeText("100"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("60"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLatitude.check(matches(hasErrorText("The latitude must be in range [-90;90]")));
         addPoiLatitude.perform(clearText());
         addPoiLongitude.perform(clearText());
         addPoiLatitude.perform(typeText("-120"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("60"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLatitude.check(matches(hasErrorText("The latitude must be in range [-90;90]")));
         addPoiLatitude.perform(clearText());
         addPoiLongitude.perform(clearText());
         addPoiLatitude.perform(typeText("30"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("-200"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("The longitude must be in range [-180;180]")));
     }
 
     @Test
     public void failsOnWrongCoordinateInputTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest3"));
+        closeSoftKeyboard();
         addPoiLatitude.perform(typeText("32#2"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("1:2"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
         addPoiLatitude.check(matches(hasErrorText("You need to enter a number")));
         addPoiLatitude.perform(typeText("45.3"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("56!2"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
         addPoiLatitude.check(matches(hasErrorText("You need to enter a number")));
@@ -227,11 +248,14 @@ public class AddPOIActivityTest {
 
     @Test
     public void succeedsOnCorrectInputsTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest4"));
+        closeSoftKeyboard();
         addPoiLatitude.perform(typeText("45"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         waitASecond();
         doesToastMatch("The Point of Interest poiTest4 was added !");
@@ -239,19 +263,25 @@ public class AddPOIActivityTest {
 
     @Test
     public void failsOnAddingTwiceTest() {
+        closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest5"));
+        closeSoftKeyboard();
         addPoiLatitude.perform(typeText("45"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         waitASecond();
         doesToastMatch("The Point of Interest poiTest5 was added !");
+        addPoiScroll.perform(swipeDownCenterBottomFast());
         addPoiName.perform(typeText("poiTest5"));
+        closeSoftKeyboard();
         addPoiLatitude.perform(typeText("45"));
+        closeSoftKeyboard();
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
-        addPoiScroll.perform(swipeUp());
+        addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         waitASecond();
         doesToastMatch("The Point of Interest poiTest5 already exists !");
@@ -259,6 +289,7 @@ public class AddPOIActivityTest {
 
     @Test
     public void addingFictionFailsOnWrongInputTest() {
+        closeSoftKeyboard();
         addPoiFiction.perform(typeText("["));
         closeSoftKeyboard();
         addPoiFictionButton.perform(click());
@@ -292,6 +323,7 @@ public class AddPOIActivityTest {
 
     @Test
     public void addingFictionWorksTest() {
+        closeSoftKeyboard();
         addPoiFiction.perform(typeText("hello test"));
         closeSoftKeyboard();
         addPoiFictionButton.perform(click());
