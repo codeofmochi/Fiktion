@@ -144,4 +144,9 @@ public class LocalAuthProvider extends AuthProvider {
     public User getCurrentUser() {
         return currUser;
     }
+
+    @Override
+    public void changeName(String name, AuthListener listener) {
+
+    }
 }

@@ -74,6 +74,8 @@ public abstract class AuthProvider {
      */
     public abstract User getCurrentUser();
 
+    public abstract void changeName(String name,final AuthListener listener);
+
 
 
 }

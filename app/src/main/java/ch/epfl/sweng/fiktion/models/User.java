@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.models;
 
-import com.google.firebase.auth.FirebaseUser;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
 /**
  * Created by rodrigo on 09.10.2017.
@@ -13,7 +14,6 @@ public class User {
     //we could use same id as firebase id or create our own id system
     private final String id;
     private boolean emailVerified;
-    private FirebaseUser fbInstance;
 
     public User(String input_name, String input_email, String input_id, Boolean input_verified) {
         name = input_name;
@@ -22,8 +22,34 @@ public class User {
         emailVerified = input_verified;
     }
 
-    public void changeName(String newName) {
-        name = newName;
+    public void changeName(final String newName, final AuthProvider.AuthListener listener) {
+        Providers.auth.changeName(newName, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                name = newName;
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onFailure() {
+                listener.onFailure();
+            }
+        });
+    }
+
+    public void changeEmail(final String newEmail, final AuthProvider.AuthListener listener) {
+        Providers.auth.changeName(newEmail, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                email = newEmail;
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onFailure() {
+                listener.onFailure();
+            }
+        });
     }
 
     @Override
@@ -63,6 +89,7 @@ public class User {
     public Boolean isEmailVerified() {
         return emailVerified;
     }
+
 
 
 }

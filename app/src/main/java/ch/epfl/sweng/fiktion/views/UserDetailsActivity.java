@@ -24,7 +24,6 @@ public class UserDetailsActivity extends AppCompatActivity {
     //UI modes
     private enum UIMode {
         defaultMode,
-        changeNameMode,
         userSignedOut
     }
 
@@ -39,9 +38,6 @@ public class UserDetailsActivity extends AppCompatActivity {
     private TextView user_verify_view;
     private EditText user_newName;
     //Buttons
-    private Button sign_out_button;
-    private Button verification;
-    private Button choose;
     private Button confirmName;
     private Button pwReset;
     //Strings
@@ -55,6 +51,8 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         Log.d(TAG, "Initialising User Details activity");
 
+        user = auth.getCurrentUser();
+
 
         //initialise views
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
@@ -63,12 +61,8 @@ public class UserDetailsActivity extends AppCompatActivity {
         user_newName = (EditText) findViewById(R.id.detail_new_name);
 
         //initialise button
-        sign_out_button = (Button) findViewById(R.id.detail_signout);
-        verification = (Button) findViewById(R.id.verification_button);
-        choose = (Button) findViewById(R.id.detail_nickname_button);
         confirmName = (Button) findViewById(R.id.detail_confirm_name);
         pwReset = (Button) findViewById(R.id.detail_reset_password);
-
 
     }
 
@@ -83,6 +77,11 @@ public class UserDetailsActivity extends AppCompatActivity {
             user = auth.getCurrentUser();
             name = user.getName();
             email = user.getEmail();
+            if(user.isEmailVerified()){
+                user_verify_view.setText("Email is verified");
+            } else{
+                user_verify_view.setText("Email is not verified");
+            }
 
             //Uri photoUrl = user.getPhotoUrl();
             //String uid = user.getID();
@@ -132,6 +131,8 @@ public class UserDetailsActivity extends AppCompatActivity {
                     Toast.makeText(UserDetailsActivity.this,
                             "Verification email sent",
                             Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.verification_button).setEnabled(true);
+
                 }
 
                 @Override
@@ -140,6 +141,8 @@ public class UserDetailsActivity extends AppCompatActivity {
                     Toast.makeText(UserDetailsActivity.this,
                             "Failed to send verification email.",
                             Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.verification_button).setEnabled(true);
+
                 }
             });
         } else {
@@ -188,33 +191,18 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void updateUI(UIMode mode) {
-        if (mode.equals(UIMode.changeNameMode)) {
-            //activates this mode when user clicks on "choose" button
-            choose.setVisibility(View.INVISIBLE);
-            user_newName.setVisibility(View.VISIBLE);
-            confirmName.setVisibility(View.VISIBLE);
-        } else if (mode.equals(UIMode.defaultMode)) {
+        if (mode.equals(UIMode.defaultMode)) {
             //UI default mode
             //initialise views and buttons
             user_name_view.setText(name);
             user_email_view.setText(email);
-
-            /*
-            // show verification button only if not verified
-            // show password reset button only if verified
-            if (user.isEmailVerified()) {
-                user_verify_view.setText("YES");
-                verification.setVisibility(View.GONE);
+            user_newName.setVisibility(View.VISIBLE);
+            confirmName.setVisibility(View.VISIBLE);
+            if(user.isEmailVerified()){
                 pwReset.setVisibility(View.VISIBLE);
-            } else {
-                user_verify_view.setText("NO");
-                verification.setVisibility(View.VISIBLE);
+            } else{
                 pwReset.setVisibility(View.GONE);
             }
-            */
-            choose.setVisibility(View.VISIBLE);
-            user_newName.setVisibility(View.INVISIBLE);
-            confirmName.setVisibility(View.INVISIBLE);
         } else if (mode.equals(UIMode.userSignedOut)) {
             Log.d(TAG, "Return to signIn activity");
             Intent login = new Intent(this, SignInActivity.class);
@@ -223,62 +211,47 @@ public class UserDetailsActivity extends AppCompatActivity {
         }
     }
 
-    /*
+
     private void confirmName() {
         final String newName = user_newName.getText().toString();
         findViewById(R.id.detail_confirm_name).setEnabled(false);
 
         //validate name choice
         if (!newName.isEmpty()
-                && !newName.equals(user.getDisplayName())
+                && !newName.equals(user.getName())
                 && newName.length() <= 15) {
 
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(newName).build();
-            user.updateProfile(profileUpdates)
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            findViewById(R.id.detail_confirm_name).setEnabled(true);
-                            if (task.isSuccessful()) {
-                                Log.d(TAG, "DisplayName was updated");
-                                user_name_view.setText(newName);
-                                recreate();
-                                Toast.makeText(UserDetailsActivity.this,
-                                        "User's name is now : " + newName,
-                                        Toast.LENGTH_LONG).show();
-                            } else {
-                                Log.e(TAG, "DisplayName failed to update", task.getException());
-                                Toast.makeText(UserDetailsActivity.this,
-                                        "Failed to update User's name.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+            user.changeName(newName, new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    user_name_view.setText(newName);
+                    recreate();
+                    Toast.makeText(UserDetailsActivity.this,
+                            "User's name is now : " + newName,
+                            Toast.LENGTH_LONG).show();
+                    user_newName.getText().clear();
+                }
 
-        } else {
+                @Override
+                public void onFailure() {
+                    findViewById(R.id.detail_confirm_name).setEnabled(true);
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Failed to update User's name.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else{
             findViewById(R.id.detail_confirm_name).setEnabled(true);
-            user_newName.setError("A new name is required");
+            Toast.makeText(this, "Please type a new username", Toast.LENGTH_SHORT).show();
         }
 
     }
-    */
 
     public void clickSendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending Email Verification");
         sendEmailVerification();
     }
 
-    /*
-        public void clickChangeUsername(View v){
-            Log.d(TAG, "Setting up UI to change name");
-        }
-
-        public void clickConfirmName(View v){
-            Log.d(TAG, "Changing name");
-            confirmName();
-        }
-    */
     public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Signing Out");
         signOut();
@@ -287,6 +260,10 @@ public class UserDetailsActivity extends AppCompatActivity {
     public void clickSendPasswordReset(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending password reset email");
         sendPasswordResetEmail();
+    }
+
+    public void clickConfirmNameChange(@SuppressWarnings("UnusedParameters") View v){
+        confirmName();
     }
 
 }

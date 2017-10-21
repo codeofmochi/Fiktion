@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
@@ -226,6 +227,28 @@ public class FirebaseAuthProvider extends AuthProvider {
             return new User(user.getDisplayName(), user.getEmail(), user.getUid(), user.isEmailVerified());
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public void changeName(String newName, final AuthListener listener) {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(newName).build();
+        if (isConnected()) {
+            user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "DisplayName was updated");
+                        listener.onSuccess();
+                    } else {
+                        Log.e(TAG, "DisplayName failed to update");
+                        listener.onFailure();
+                    }
+                }
+            });
+        }else{
+            listener.onFailure();
         }
     }
 }
