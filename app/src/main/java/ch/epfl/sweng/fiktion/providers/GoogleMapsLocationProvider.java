@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 
 import static ch.epfl.sweng.fiktion.providers.Providers.database;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
@@ -41,6 +42,43 @@ public class GoogleMapsLocationProvider extends LocationProvider {
      */
     public boolean hasLocation() {
         return !this.firstLocationChange;
+    }
+
+    /**
+     * Listener that listens for marker placement
+     */
+    public interface MarkerPlacementListener {
+
+        /**
+         * What to do when a marker is added
+         *
+         * @param pos the position of the marker
+         */
+        void onAddedMarker(Position pos);
+    }
+
+    /**
+     * Adds a listener that listens for marker placement
+     *
+     * @param listener the listener
+     */
+    public void addMarkerPlacementListener(final MarkerPlacementListener listener) {
+        // set a click listener on the map which will add a marker on the click
+        gmap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            Marker m;
+
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // if the marker already exists, then remove it
+                if (m != null) {
+                    m.remove();
+                }
+                // add a marker ont click position
+                m = gmap.addMarker(new MarkerOptions().position(latLng).title("New point of interest").icon(defaultMarker(HUE_BLUE)));
+                // inform the listener of an added marker
+                listener.onAddedMarker(new Position(latLng.latitude, latLng.longitude));
+            }
+        });
     }
 
     /**
@@ -107,6 +145,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
 
     /**
      * Function to show nearby POIs on map
+     *
      * @param radius radius to search in km
      */
     public void showNearPOIs(final int radius) {
