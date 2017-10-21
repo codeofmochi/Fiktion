@@ -25,12 +25,12 @@ public class UserDetailsActivity extends AppCompatActivity {
     private enum UIMode {
         defaultMode,
         changeNameMode,
-        userSignedOut;
+        userSignedOut
     }
 
     //Authenticator initiation
 
-    public AuthProvider auth = Providers.auth;
+    private final AuthProvider auth = Providers.auth;
     private User user;
 
     //views
@@ -83,6 +83,7 @@ public class UserDetailsActivity extends AppCompatActivity {
             user = auth.getCurrentUser();
             name = user.getName();
             email = user.getEmail();
+
             //Uri photoUrl = user.getPhotoUrl();
             //String uid = user.getID();
             // The user's ID, unique to the Firebase project. Do NOT use this value to
@@ -263,7 +264,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
     */
 
-    public void clickSendEmailVerification(View v) {
+    public void clickSendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending Email Verification");
         sendEmailVerification();
     }
@@ -278,12 +279,12 @@ public class UserDetailsActivity extends AppCompatActivity {
             confirmName();
         }
     */
-    public void clickSignOut(View v) {
+    public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Signing Out");
         signOut();
     }
 
-    public void clickSendPasswordReset(View v) {
+    public void clickSendPasswordReset(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending password reset email");
         sendPasswordResetEmail();
     }

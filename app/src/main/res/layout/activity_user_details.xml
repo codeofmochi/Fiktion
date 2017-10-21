@@ -115,7 +115,8 @@
                     android:background="@android:color/holo_blue_bright"
                     android:elevation="4dp"
                     android:onClick="clickSignOut"
-                    android:text="Sign Out" />
+                    android:text="Sign Out"
+                    tools:ignore="UnusedAttribute" />
 
                 <Button
                     android:id="@+id/verification_button"
@@ -127,7 +128,8 @@
                     android:background="@android:color/holo_blue_light"
                     android:elevation="4dp"
                     android:onClick="clickSendEmailVerification"
-                    android:text="Send Email Verification" />
+                    android:text="Send Email Verification"
+                    tools:ignore="UnusedAttribute" />
 
                 <Button
                     android:id="@+id/detail_nickname_button"
@@ -135,7 +137,8 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_blue_dark"
                     android:elevation="4dp"
-                    android:text="Change username" />
+                    android:text="Change username"
+                    tools:ignore="UnusedAttribute" />
 
                 <Button
                     android:id="@+id/detail_reset_password"
@@ -144,7 +147,8 @@
                     android:background="?attr/colorControlActivated"
                     android:elevation="4dp"
                     android:onClick="clickSendPasswordReset"
-                    android:text="Reset Password" />
+                    android:text="Reset Password"
+                    tools:ignore="UnusedAttribute" />
             </LinearLayout>
 
             <EditText
@@ -168,7 +172,8 @@
                 android:background="@android:color/holo_blue_dark"
                 android:elevation="4dp"
                 android:text="Confirm"
-                android:visibility="visible" />
+                android:visibility="visible"
+                tools:ignore="UnusedAttribute" />
 
         </LinearLayout>
 

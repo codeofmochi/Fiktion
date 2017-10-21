@@ -12,7 +12,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
@@ -20,10 +19,11 @@ import ch.epfl.sweng.fiktion.views.SignInActivity;
  * Created by Rodrigo on 17.10.2017.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public class FirebaseAuthProvider extends AuthProvider {
 
     //testing
-    public final static String TAG = "FBAuthProv";
+    private final static String TAG = "FBAuthProv";
     // firebase authentification instance
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     // firebase user that we authenticate

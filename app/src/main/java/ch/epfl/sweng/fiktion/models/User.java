@@ -1,24 +1,28 @@
 package ch.epfl.sweng.fiktion.models;
 
+import com.google.firebase.auth.FirebaseUser;
+
 /**
  * Created by rodrigo on 09.10.2017.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public class User {
     private String name;
     private String email;
     //we could use same id as firebase id or create our own id system
     private final String id;
     private boolean emailVerified;
+    private FirebaseUser fbInstance;
 
-    public User(String input_name, String input_email, String input_id,Boolean input_verified) {
+    public User(String input_name, String input_email, String input_id, Boolean input_verified) {
         name = input_name;
         email = input_email;
         id = input_id;
         emailVerified = input_verified;
     }
 
-    public void changeName(String newName){
+    public void changeName(String newName) {
         name = newName;
     }
 
@@ -36,30 +40,27 @@ public class User {
     }
 
     /**
-     * 
      * @return the user display name
      */
-    public String getName(){
+    public String getName() {
         return name;
     }
 
     /**
-     *
      * @return user email
      */
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
     /**
-     *
      * @return user ID
      */
-    public String getID(){
+    public String getID() {
         return id;
     }
 
-    public Boolean isEmailVerified(){
+    public Boolean isEmailVerified() {
         return emailVerified;
     }
 

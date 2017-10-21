@@ -10,12 +10,13 @@ import ch.epfl.sweng.fiktion.models.User;
  * Created by Rodrigo on 18.10.2017.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public class LocalAuthProvider extends AuthProvider {
 
-    List<User> userList = new ArrayList<User>
-            (Collections.singletonList(new User("", "test@test.ch", "ID")));
-    User currUser;
-    Boolean signedIn = false;
+    private final List<User> userList = new ArrayList<>
+            (Collections.singletonList(new User("", "test@test.ch", "ID", false)));
+    private User currUser;
+    private Boolean signedIn = false;
 
     /**
      * Signs in a user with an email, a password and what to do afterwards
@@ -29,7 +30,7 @@ public class LocalAuthProvider extends AuthProvider {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
         if (password.equals("testing")) {
-            currUser = new User("", email, "ID");
+            currUser = new User("", email, "ID", false);
             signedIn = true;
             listener.onSuccess();
         } else {
@@ -92,7 +93,7 @@ public class LocalAuthProvider extends AuthProvider {
     public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        User newUser = new User("", email, "ID");
+        User newUser = new User("", email, "ID", false);
         if (userList.contains(newUser)) {
             listener.onFailure();
         } else {
@@ -137,5 +138,10 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public Boolean isConnected() {
         return signedIn;
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return currUser;
     }
 }

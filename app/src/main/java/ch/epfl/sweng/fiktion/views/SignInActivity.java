@@ -102,12 +102,12 @@ public class SignInActivity extends AppCompatActivity{
         }
     }
 
-    public void signIn(View v) {
+    public void signIn(@SuppressWarnings("UnusedParameters") View v) {
         //user clicks on signin button
         signIn(UserEmail.getText().toString(), UserPassword.getText().toString());
     }
 
-    public void register(View v) {
+    public void register(@SuppressWarnings("UnusedParameters") View v) {
         //user clicks on register button
         //start registration activity
         Intent registerActivity = new Intent(this, RegisterActivity.class);

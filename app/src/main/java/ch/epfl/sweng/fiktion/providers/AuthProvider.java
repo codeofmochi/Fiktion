@@ -6,14 +6,15 @@ import ch.epfl.sweng.fiktion.models.User;
  * Created by rodri on 17.10.2017.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public abstract class AuthProvider {
 
     /**
      * Defines what actions to take on auth op callback
      */
     public interface AuthListener {
-        public abstract void onSuccess();
-        public abstract void onFailure();
+        void onSuccess();
+        void onFailure();
     }
 
     /**
@@ -31,7 +32,7 @@ public abstract class AuthProvider {
 
     /**
      * Validate the email provided by the user.
-     * @email provided by the user
+     * @param email provided by the user
      * @return empty string if valid, error message otherwise
      */
     public abstract String validateEmail(String email);
@@ -55,10 +56,24 @@ public abstract class AuthProvider {
      */
     public abstract void sendPasswordResetEmail(AuthListener listener);
 
+    /**
+     * Sends an email verification to the current user connected
+     * @param listener awaits the result and acts accordingly
+     */
     public abstract void sendEmailVerification(AuthListener listener);
 
+    /**
+     * Verifies if the user is currently connected or not
+     * @return true if user is signed in, false otherwise
+     */
     public abstract Boolean isConnected();
 
+    /**
+     *
+     * @return Currently signed in User or null if there is not any
+     */
     public abstract User getCurrentUser();
+
+
 
 }
