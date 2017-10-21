@@ -42,6 +42,7 @@ public class User {
             @Override
             public void onSuccess() {
                 email = newEmail;
+                emailVerified = false;
                 listener.onSuccess();
             }
 

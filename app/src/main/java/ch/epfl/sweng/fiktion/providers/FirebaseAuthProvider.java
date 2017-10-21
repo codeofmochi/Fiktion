@@ -251,4 +251,27 @@ public class FirebaseAuthProvider extends AuthProvider {
             listener.onFailure();
         }
     }
+
+    @Override
+    public void changeEmail(String newEmail, final AuthListener listener) {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(newEmail).build();
+        if (isConnected()) {
+            user.updateEmail(newEmail).
+                    addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Email was updated");
+                        listener.onSuccess();
+                    } else {
+                        Log.e(TAG, "Email failed to update");
+                        listener.onFailure();
+                    }
+                }
+            });
+        }else{
+            listener.onFailure();
+        }
+    }
 }

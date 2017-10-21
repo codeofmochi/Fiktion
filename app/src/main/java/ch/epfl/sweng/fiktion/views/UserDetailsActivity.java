@@ -251,35 +251,34 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     private void confirmEmail() {
         final String newEmail = user_newName.getText().toString();
-        findViewById(R.id.detail_confirm_name).setEnabled(false);
+        findViewById(R.id.detail_confirm_email).setEnabled(false);
 
         //validate name choice
-        if (!newName.isEmpty()
-                && !newName.equals(user.getName())
-                && newName.length() <= 15) {
+        if (!newEmail.isEmpty()
+                && !newEmail.equals(user.getEmail())) {
 
-            user.changeName(newName, new AuthProvider.AuthListener() {
+            user.changeEmail(newEmail, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
-                    user_name_view.setText(newName);
+                    user_email_view.setText(newEmail);
                     recreate();
                     Toast.makeText(UserDetailsActivity.this,
-                            "User's name is now : " + newName,
+                            "User's email is now : " + newEmail,
                             Toast.LENGTH_LONG).show();
                     user_newName.getText().clear();
                 }
 
                 @Override
                 public void onFailure() {
-                    findViewById(R.id.detail_confirm_name).setEnabled(true);
+                    findViewById(R.id.detail_confirm_email).setEnabled(true);
                     Toast.makeText(UserDetailsActivity.this,
-                            "Failed to update User's name.",
+                            "Failed to update User's email. You may need to re-authenticate",
                             Toast.LENGTH_SHORT).show();
                 }
             });
         } else{
-            findViewById(R.id.detail_confirm_name).setEnabled(true);
-            Toast.makeText(this, "Please type a new username", Toast.LENGTH_SHORT).show();
+            findViewById(R.id.detail_confirm_email).setEnabled(true);
+            Toast.makeText(this, "Please type a new email", Toast.LENGTH_SHORT).show();
         }
 
     }

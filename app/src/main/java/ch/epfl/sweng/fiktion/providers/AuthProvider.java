@@ -76,6 +76,9 @@ public abstract class AuthProvider {
 
     public abstract void changeName(String name,final AuthListener listener);
 
+    public abstract void changeEmail(String newName, final AuthListener listener);
 
 
-}
+
+
+    }

@@ -149,4 +149,9 @@ public class LocalAuthProvider extends AuthProvider {
     public void changeName(String name, AuthListener listener) {
 
     }
+
+    @Override
+    public void changeEmail(String newName, AuthListener listener) {
+
+    }
 }
