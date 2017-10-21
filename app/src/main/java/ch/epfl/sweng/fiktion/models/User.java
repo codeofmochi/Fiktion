@@ -38,7 +38,7 @@ public class User {
     }
 
     public void changeEmail(final String newEmail, final AuthProvider.AuthListener listener) {
-        Providers.auth.changeName(newEmail, new AuthProvider.AuthListener() {
+        Providers.auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 email = newEmail;
@@ -90,7 +90,6 @@ public class User {
     public Boolean isEmailVerified() {
         return emailVerified;
     }
-
 
 
 }

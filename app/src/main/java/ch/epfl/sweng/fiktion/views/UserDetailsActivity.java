@@ -79,9 +79,9 @@ public class UserDetailsActivity extends AppCompatActivity {
             user = auth.getCurrentUser();
             name = user.getName();
             email = user.getEmail();
-            if(user.isEmailVerified()){
+            if (user.isEmailVerified()) {
                 user_verify_view.setText("Email is verified");
-            } else{
+            } else {
                 user_verify_view.setText("Email is not verified");
             }
 
@@ -120,8 +120,8 @@ public class UserDetailsActivity extends AppCompatActivity {
         findViewById(R.id.verification_button).setEnabled(false);
 
         // Send verification email only if user does not have a verified email
-        if(user.isEmailVerified()){
-            Toast.makeText(this,"User's email is verified",Toast.LENGTH_SHORT).show();
+        if (user.isEmailVerified()) {
+            Toast.makeText(this, "User's email is verified", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -200,9 +200,9 @@ public class UserDetailsActivity extends AppCompatActivity {
             user_email_view.setText(email);
             user_newName.setVisibility(View.VISIBLE);
             confirmName.setVisibility(View.VISIBLE);
-            if(user.isEmailVerified()){
+            if (user.isEmailVerified()) {
                 pwReset.setVisibility(View.VISIBLE);
-            } else{
+            } else {
                 pwReset.setVisibility(View.GONE);
             }
         } else if (mode.equals(UIMode.userSignedOut)) {
@@ -242,7 +242,7 @@ public class UserDetailsActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
             });
-        } else{
+        } else {
             findViewById(R.id.detail_confirm_name).setEnabled(true);
             Toast.makeText(this, "Please type a new username", Toast.LENGTH_SHORT).show();
         }
@@ -250,7 +250,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     private void confirmEmail() {
-        final String newEmail = user_newName.getText().toString();
+        final String newEmail = user_newEmail.getText().toString();
         findViewById(R.id.detail_confirm_email).setEnabled(false);
 
         //validate name choice
@@ -265,7 +265,7 @@ public class UserDetailsActivity extends AppCompatActivity {
                     Toast.makeText(UserDetailsActivity.this,
                             "User's email is now : " + newEmail,
                             Toast.LENGTH_LONG).show();
-                    user_newName.getText().clear();
+                    user_newEmail.getText().clear();
                 }
 
                 @Override
@@ -276,10 +276,11 @@ public class UserDetailsActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
             });
-        } else{
+        } else {
             findViewById(R.id.detail_confirm_email).setEnabled(true);
             Toast.makeText(this, "Please type a new email", Toast.LENGTH_SHORT).show();
         }
+        this.onRestart();
 
     }
 
@@ -298,11 +299,11 @@ public class UserDetailsActivity extends AppCompatActivity {
         sendPasswordResetEmail();
     }
 
-    public void clickConfirmNameChange(@SuppressWarnings("UnusedParameters") View v){
+    public void clickConfirmNameChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmName();
     }
 
-    public void clickConfirmEmailChange(@SuppressWarnings("UnusedParameters") View v){
+    public void clickConfirmEmailChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmEmail();
     }
 }

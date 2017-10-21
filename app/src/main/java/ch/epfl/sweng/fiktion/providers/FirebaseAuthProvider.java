@@ -234,6 +234,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     public void changeName(String newName, final AuthListener listener) {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(newName).build();
+
         if (isConnected()) {
             user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -254,8 +255,6 @@ public class FirebaseAuthProvider extends AuthProvider {
 
     @Override
     public void changeEmail(String newEmail, final AuthListener listener) {
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(newEmail).build();
         if (isConnected()) {
             user.updateEmail(newEmail).
                     addOnCompleteListener(new OnCompleteListener<Void>() {
