@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 /**
@@ -28,8 +29,6 @@ public class FirebaseAuthProvider extends AuthProvider {
     // firebase user that we authenticate
     private FirebaseUser user;
     // firebase status
-
-
     private FirebaseAuth.AuthStateListener state;
 
     /**
@@ -56,7 +55,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                     Intent i = new Intent(act, SignInActivity.class);
                     act.startActivity(i);
                 }
-                Toast.makeText(act, "You have been logged out unexpectedly. Please try again.", Toast.LENGTH_SHORT);
+                Toast.makeText(act, "You have been logged out unexpectedly. Please try again.", Toast.LENGTH_SHORT).show();
             }
         };
     }
@@ -168,10 +167,10 @@ public class FirebaseAuthProvider extends AuthProvider {
      * @param listener what to do after email attempt
      */
     @Override
-    public void sendPasswordResetEmail( final AuthListener listener) {
+    public void sendPasswordResetEmail(final AuthListener listener) {
         String email = user.getEmail();
-        if(user != null) {
-            if(email != null) {
+        if (user != null) {
+            if (email != null) {
                 auth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -188,10 +187,10 @@ public class FirebaseAuthProvider extends AuthProvider {
                                 }
                             }
                         });
-            } else{
+            } else {
                 listener.onFailure();
             }
-        }else{
+        } else {
             listener.onFailure();
         }
     }
@@ -199,18 +198,18 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public void sendEmailVerification(final AuthListener listener) {
         user = auth.getCurrentUser();
-        if(auth.getCurrentUser()!=null){
+        if (auth.getCurrentUser() != null) {
             user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         listener.onSuccess();
-                    }else{
+                    } else {
                         listener.onFailure();
                     }
                 }
             });
-        }else{
+        } else {
             listener.onFailure();
         }
     }
@@ -218,5 +217,15 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public Boolean isConnected() {
         return auth.getCurrentUser() != null;
+    }
+
+    @Override
+    public User getCurrentUser() {
+        user = auth.getCurrentUser();
+        if (isConnected()) {
+            return new User(user.getDisplayName(), user.getEmail(), user.getUid(), user.isEmailVerified());
+        } else {
+            return null;
+        }
     }
 }

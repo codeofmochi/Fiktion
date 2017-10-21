@@ -1,5 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.models.User;
+
 /**
  * Created by rodri on 17.10.2017.
  */
@@ -56,5 +58,7 @@ public abstract class AuthProvider {
     public abstract void sendEmailVerification(AuthListener listener);
 
     public abstract Boolean isConnected();
+
+    public abstract User getCurrentUser();
 
 }

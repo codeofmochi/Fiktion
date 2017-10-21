@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
@@ -30,6 +31,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     //Authenticator initiation
 
     public AuthProvider auth = Providers.auth;
+    private User user;
 
     //views
     private TextView user_name_view;
@@ -52,6 +54,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_details);
 
         Log.d(TAG, "Initialising User Details activity");
+
 
         //initialise views
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
@@ -77,11 +80,11 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         if (auth.isConnected()) {
             // Name, email address, and profile photo Url
-            //name = user.getDisplayName();
-            //email = user.getEmail();
+            user = auth.getCurrentUser();
+            name = user.getName();
+            email = user.getEmail();
             //Uri photoUrl = user.getPhotoUrl();
-            //String uid = user.getUid();
-
+            //String uid = user.getID();
             // The user's ID, unique to the Firebase project. Do NOT use this value to
             // authenticate with your backend server, if you have one. Use
             // FirebaseUser.getToken() instead. [I will keep this advice for now]
@@ -114,7 +117,11 @@ public class UserDetailsActivity extends AppCompatActivity {
         // Disable button
         findViewById(R.id.verification_button).setEnabled(false);
 
-        // Send verification email
+        // Send verification email only if user does not have a verified email
+        if(user.isEmailVerified()){
+            Toast.makeText(this,"User's email is verified",Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (auth.isConnected()) {
             auth.sendEmailVerification(new AuthProvider.AuthListener() {
