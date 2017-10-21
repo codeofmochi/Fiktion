@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.User;
-import ch.epfl.sweng.fiktion.providers.AuthProvider;
 
 /**
  * Created by Rodrigo on 18.10.2017.
@@ -33,6 +32,8 @@ public class LocalAuthProvider extends AuthProvider {
             currUser = new User("", email, "ID");
             signedIn = true;
             listener.onSuccess();
+        } else {
+            listener.onFailure();
         }
     }
 
@@ -109,9 +110,9 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public void sendPasswordResetEmail(AuthListener listener) {
-        if(isConnected()){
+        if (isConnected()) {
             listener.onSuccess();
-        }else {
+        } else {
             listener.onFailure();
         }
     }
@@ -123,15 +124,14 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public void sendEmailVerification(AuthListener listener) {
-        if(isConnected()){
+        if (isConnected()) {
             listener.onSuccess();
-        }else {
+        } else {
             listener.onFailure();
         }
     }
 
     /**
-     *
      * @return true if there is a user currently signed in, false otherwise
      */
     @Override
