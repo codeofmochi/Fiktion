@@ -4,7 +4,8 @@ package ch.epfl.sweng.fiktion.models;
  * Created by Rodrigo on 19.10.2017.
  */
 
-public class ValidationErrorMessages {
+@SuppressWarnings("DefaultFileTemplate")
+class ValidationErrorMessages {
 
     public static String INVALID_PASSWORD = "Requires a valid email";
     public static String INVALID_EMAIL = "Requires a valid password";

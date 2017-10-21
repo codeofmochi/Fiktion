@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
  * Created by pedro on 09/10/17.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public class PointOfInterestTest {
 
     @Test
