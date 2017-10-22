@@ -53,8 +53,6 @@ public class UserDetailsActivity extends AppCompatActivity {
         Log.d(TAG, "Initialising User Details activity");
 
         user = auth.getCurrentUser();
-
-
         //initialise views
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
         user_email_view = (TextView) findViewById(R.id.detail_user_email);
@@ -155,6 +153,9 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * this method will send a password reset email to the currently signed in user
+     */
     private void sendPasswordResetEmail() {
         // Disable button
         findViewById(R.id.detail_reset_password).setEnabled(false);
@@ -192,6 +193,12 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * this method will set the UI according to the mode it is.
+     * It will prompt a sign in if the user is not currently signed in
+     * It will display user's informations if he is signed in
+     * @param mode UIMode that we want to set for the UI
+     */
     private void updateUI(UIMode mode) {
         if (mode.equals(UIMode.defaultMode)) {
             //UI default mode
@@ -213,6 +220,9 @@ public class UserDetailsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method will delete the user's account if he is recently signed in, fail otherwise
+     */
     private void deleteAccount() {
 
         auth.deleteAccount(new AuthProvider.AuthListener() {
@@ -232,6 +242,9 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * This method will send a request to change the current user's username
+     */
     private void confirmName() {
         final String newName = user_newName.getText().toString();
         findViewById(R.id.detail_confirm_name).setEnabled(false);
@@ -267,6 +280,10 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * This method will send a request to change the current user's email address.
+     * It will fail if the user has not signed in recently
+     */
     private void confirmEmail() {
         final String newEmail = user_newEmail.getText().toString();
         findViewById(R.id.detail_confirm_email).setEnabled(false);
@@ -302,29 +319,53 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Starts the email verification request
+     * @param v button pressed
+     */
     public void clickSendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending Email Verification");
         sendEmailVerification();
     }
 
+    /**
+     * Starts the sign out request
+     * @param v
+     */
     public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Signing Out");
         signOut();
     }
 
+    /**
+     * Starts the password reset email request
+     * @param v
+     */
     public void clickSendPasswordReset(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending password reset email");
         sendPasswordResetEmail();
     }
 
+    /**
+     * Start the name change request
+     * @param v
+     */
     public void clickConfirmNameChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmName();
     }
 
+    /**
+     * Start the email change request
+     * @param v
+     */
     public void clickConfirmEmailChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmEmail();
     }
 
+    /**
+     * Start the delete account request
+     * @param v
+     */
     public void clickDeleteAccount(View v){
         deleteAccount();
     }

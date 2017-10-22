@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -21,7 +20,7 @@ import ch.epfl.sweng.fiktion.views.SignInActivity;
  */
 
 @SuppressWarnings("DefaultFileTemplate")
-public class FirebaseAuthProvider extends AuthProvider {
+class FirebaseAuthProvider extends AuthProvider {
 
     //testing
     private final static String TAG = "FBAuthProv";
@@ -197,6 +196,10 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Sends an email verification to the current user connected
+     * @param listener awaits the result and acts accordingly
+     */
     @Override
     public void sendEmailVerification(final AuthListener listener) {
         user = auth.getCurrentUser();
@@ -216,11 +219,19 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Verifies if the user is currently connected or not
+     * @return true if user is signed in, false otherwise
+     */
     @Override
     public Boolean isConnected() {
         return auth.getCurrentUser() != null;
     }
 
+    /**
+     *
+     * @return Currently signed in User or null if there is not any
+     */
     @Override
     public User getCurrentUser() {
         user = auth.getCurrentUser();
@@ -233,6 +244,11 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Enables the user to change his username
+     * @param newName new username provided by the user
+     * @param listener actions to be done in case of failure or success
+     */
     @Override
     public void changeName(String newName, final AuthListener listener) {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -256,6 +272,11 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Enables the user to change his primary email
+     * @param newEmail new email provided by the user
+     * @param listener actions to be done in case of failure or success
+     */
     @Override
     public void changeEmail(String newEmail, final AuthListener listener) {
         if (isConnected()) {
@@ -277,6 +298,10 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Enables the user to delete his account if he has signed in recently
+     * @param listener actions to be done in case of failure or success
+     */
     @Override
     public void deleteAccount(final AuthListener listener){
         //TODO delete application user in database after implementation of user storage in database
