@@ -61,6 +61,7 @@ public class UserDetailsActivityTest {
 
     @Test
     public void changeUserInfos_newValues(){
+        //TODO check that toasts appear
         //change name
         String newName = "new name";
         onView(withId(R.id.detail_new_name)).perform(typeText(newName),closeSoftKeyboard());
@@ -74,6 +75,24 @@ public class UserDetailsActivityTest {
         onView(withId(R.id.detail_confirm_email)).perform(click());
 
         onView(withId(R.id.detail_user_email)).check(matches(withText(newEmail)));
+
+    }
+    @Test
+    public void changeUserInfos_sameValues(){
+        //TODO check that toasts appear
+        //Try to change name with the same value
+
+        onView(withId(R.id.detail_new_name)).perform(typeText(user.getName()),closeSoftKeyboard());
+        onView(withId(R.id.detail_confirm_name)).perform(click());
+
+        onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
+
+        //change email
+        String newEmail = "new@email.ch";
+        onView(withId(R.id.detail_new_email)).perform(typeText(user.getEmail()),closeSoftKeyboard());
+        onView(withId(R.id.detail_confirm_email)).perform(click());
+
+        onView(withId(R.id.detail_user_email)).check(matches(withText(user.getEmail())));
 
     }
 
