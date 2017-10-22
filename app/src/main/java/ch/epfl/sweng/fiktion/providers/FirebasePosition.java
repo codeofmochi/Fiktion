@@ -8,7 +8,8 @@ import ch.epfl.sweng.fiktion.models.Position;
  * @author pedro
  */
 public class FirebasePosition {
-    public double latitude, longitude;
+    public double latitude;
+    public double longitude;
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebasePosition.class)
