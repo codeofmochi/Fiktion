@@ -154,4 +154,9 @@ public class LocalAuthProvider extends AuthProvider {
     public void changeEmail(String newName, AuthListener listener) {
 
     }
+
+    @Override
+    public void deleteAccount(AuthListener listener) {
+
+    }
 }

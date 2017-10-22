@@ -53,6 +53,7 @@ public class User {
         });
     }
 
+
     @Override
     public boolean equals(Object other) {
         if (other == null || !User.class.isAssignableFrom(other.getClass())) {

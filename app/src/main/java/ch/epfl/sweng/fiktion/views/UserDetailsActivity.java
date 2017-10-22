@@ -213,6 +213,24 @@ public class UserDetailsActivity extends AppCompatActivity {
         }
     }
 
+    private void deleteAccount() {
+
+        auth.deleteAccount(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(UserDetailsActivity.this,
+                        "Account deleted successfully",Toast.LENGTH_SHORT).show();
+                updateUI(UIMode.userSignedOut);
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(UserDetailsActivity.this,
+                        "You did not sign in recently, please re-authenticate and try again", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
 
     private void confirmName() {
         final String newName = user_newName.getText().toString();
@@ -305,5 +323,9 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     public void clickConfirmEmailChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmEmail();
+    }
+
+    public void clickDeleteAccount(View v){
+        deleteAccount();
     }
 }

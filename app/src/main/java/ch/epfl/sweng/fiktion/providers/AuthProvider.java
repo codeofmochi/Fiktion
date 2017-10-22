@@ -78,7 +78,7 @@ public abstract class AuthProvider {
 
     public abstract void changeEmail(String newName, final AuthListener listener);
 
-
+    public abstract void deleteAccount(AuthListener listener);
 
 
     }

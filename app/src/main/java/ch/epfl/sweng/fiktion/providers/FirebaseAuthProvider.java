@@ -37,16 +37,17 @@ public class FirebaseAuthProvider extends AuthProvider {
      *
      * @param act the current activity in which we want to detect an account change
      */
-    public void createStateListener(final Activity act) {
+    private void createStateListener(final Activity act) {
         state = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser nUser = firebaseAuth.getCurrentUser();
-                if (nUser != null) {
+                FirebaseUser newUser = firebaseAuth.getCurrentUser();
+                if (newUser != null) {
                     //user is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + nUser.getUid());
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + newUser.getUid());
                     //if user changed, recreate
-                    if (user != nUser) {
+                    if (user != newUser) {
+                        auth.signOut();
                         Intent i = new Intent(act, SignInActivity.class);
                         act.startActivity(i);
                     }
@@ -56,9 +57,9 @@ public class FirebaseAuthProvider extends AuthProvider {
                     Intent i = new Intent(act, SignInActivity.class);
                     act.startActivity(i);
                 }
-                Toast.makeText(act, "You have been logged out unexpectedly. Please try again.", Toast.LENGTH_SHORT).show();
             }
         };
+        auth.addAuthStateListener(state);
     }
 
     /**
@@ -224,6 +225,8 @@ public class FirebaseAuthProvider extends AuthProvider {
     public User getCurrentUser() {
         user = auth.getCurrentUser();
         if (isConnected()) {
+            //TODO get user ID or EMAIL and get it from our database
+            //for now I just create a new mock user
             return new User(user.getDisplayName(), user.getEmail(), user.getUid(), user.isEmailVerified());
         } else {
             return null;
@@ -270,6 +273,29 @@ public class FirebaseAuthProvider extends AuthProvider {
                 }
             });
         }else{
+            listener.onFailure();
+        }
+    }
+
+    @Override
+    public void deleteAccount(final AuthListener listener){
+        //TODO delete application user in database after implementation of user storage in database
+        if(user!= null) {
+            user.delete()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "Account deleted successfully on firebase");
+                                listener.onSuccess();
+                            } else {
+                                Log.d(TAG, "Failed to delete account on firebase");
+                                listener.onFailure();
+                            }
+                        }
+                    });
+        } else{
+            Log.d(TAG, "Failed to delete account on firebase, no user currently signed in");
             listener.onFailure();
         }
     }
