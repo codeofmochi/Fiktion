@@ -22,8 +22,8 @@ public class GetLocationFromMapActivity extends AppCompatActivity implements OnM
     public static final String NEW_POI_LONGITUDE = "ch.epfl.sweng.fiktion.GetLocationFromMapActivity.newLongitude";
 
     // Maps and location provider for this activity
-    public static GoogleMapsLocationProvider gmaps = new GoogleMapsLocationProvider();
-    Position newPosition;
+    private static GoogleMapsLocationProvider gmaps = new GoogleMapsLocationProvider();
+    private Position newPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +107,6 @@ public class GetLocationFromMapActivity extends AppCompatActivity implements OnM
                 } else {
                     // permission denied
                 }
-                return;
             }
         }
     }

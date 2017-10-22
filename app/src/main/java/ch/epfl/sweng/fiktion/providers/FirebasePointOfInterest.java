@@ -7,7 +7,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
  *
  * @author pedro
  */
-public class FirebasePointOfInterest {
+class FirebasePointOfInterest {
     public String name;
     public FirebasePosition position;
 
