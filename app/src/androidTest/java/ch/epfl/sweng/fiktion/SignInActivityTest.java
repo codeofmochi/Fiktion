@@ -47,7 +47,6 @@ public class SignInActivityTest {
     @BeforeClass
     public static void setAuth(){
         Providers.auth = new LocalAuthProvider();
-
     }
 
     @Before

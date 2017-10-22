@@ -15,6 +15,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
+@SuppressWarnings("JavaDoc")
 public class UserDetailsActivity extends AppCompatActivity {
 
     //constants
@@ -52,7 +53,6 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         Log.d(TAG, "Initialising User Details activity");
 
-        user = auth.getCurrentUser();
         //initialise views
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
         user_email_view = (TextView) findViewById(R.id.detail_user_email);
@@ -73,6 +73,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         //initialise user details and firebase authentication
 
         if (auth.isConnected()) {
+            Log.d(TAG,"User signed in");
             // Name, email address, and profile photo Url
             user = auth.getCurrentUser();
             name = user.getName();

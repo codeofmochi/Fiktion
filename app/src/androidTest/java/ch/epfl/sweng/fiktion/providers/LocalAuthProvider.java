@@ -14,9 +14,9 @@ import ch.epfl.sweng.fiktion.models.User;
 public class LocalAuthProvider extends AuthProvider {
 
     private final List<User> userList = new ArrayList<>
-            (Collections.singletonList(new User("", "test@test.ch", "ID", false)));
-    private User currUser;
-    private Boolean signedIn = false;
+            (Collections.singletonList(new User("default", "default@test.ch", "id", true)));
+    private User currUser = new User("default","default@test.ch","id",true);
+    private Boolean signedIn = true;
 
     /**
      * Signs in a user with an email, a password and what to do afterwards
@@ -147,16 +147,32 @@ public class LocalAuthProvider extends AuthProvider {
 
     @Override
     public void changeName(String name, AuthListener listener) {
-
+        if(!currUser.getName().equals(name)) {
+            userList.remove(currUser);
+            currUser = new User(name, currUser.getEmail(), currUser.getID(), currUser.isEmailVerified());
+            userList.add(currUser);
+            listener.onSuccess();
+        }else{
+            listener.onFailure();
+        }
     }
 
     @Override
-    public void changeEmail(String newName, AuthListener listener) {
-
+    public void changeEmail(String newEmail, AuthListener listener) {
+        if(!currUser.getEmail().equals(newEmail)) {
+            userList.remove(currUser);
+            currUser = new User(currUser.getName(), newEmail, currUser.getID(), currUser.isEmailVerified());
+            userList.add(currUser);
+            listener.onSuccess();
+        } else{
+            listener.onFailure();
+        }
     }
 
     @Override
     public void deleteAccount(AuthListener listener) {
-
+        userList.remove(currUser);
+        currUser = null;
+        listener.onSuccess();
     }
 }

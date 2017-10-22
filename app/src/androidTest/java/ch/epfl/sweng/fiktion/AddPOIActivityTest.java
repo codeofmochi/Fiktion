@@ -37,6 +37,7 @@ import static org.hamcrest.Matchers.not;
  * Created by pedro on 20/10/17.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public class AddPOIActivityTest {
     @Rule
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
