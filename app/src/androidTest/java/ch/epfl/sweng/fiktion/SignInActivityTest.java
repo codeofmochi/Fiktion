@@ -32,8 +32,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class SignInActivityTest {
 
     private final String valid_email = "test@test.ch";
-    private final String valid_password = "testing";
-    private final String wrong_password = "validbutwrong";
     private final String invalid_email = "invalid";
     private final String invalid_password = "1234";
 
@@ -45,7 +43,7 @@ public class SignInActivityTest {
             new ActivityTestRule<>(SignInActivity.class);
 
     @BeforeClass
-    public static void setAuth(){
+    public static void setAuth() {
         Providers.auth = new LocalAuthProvider();
         Providers.auth.signOut();
     }
@@ -54,8 +52,9 @@ public class SignInActivityTest {
     public void before() {
         mActivity = sinActivityRule.getActivity();
     }
+
     @After
-    public void after(){
+    public void after() {
         Providers.auth.signOut();
     }
 
@@ -63,6 +62,9 @@ public class SignInActivityTest {
     //valid login test needs to wait for response of the firebase, ask assistants
     @Test
     public void valid_login() {
+
+
+        String valid_password = "testing";
 
         onView(withId(R.id.User_Email)).perform(typeText(valid_email), closeSoftKeyboard());
         onView(withId(R.id.User_Password)).perform(typeText(valid_password), closeSoftKeyboard());
@@ -120,6 +122,8 @@ public class SignInActivityTest {
     @Test
     public void valid_wrong_login() {
         //type valid credentials and click sign in
+
+        String wrong_password = "validbutwrong";
         onView(withId(R.id.User_Email)).perform(typeText(valid_email), closeSoftKeyboard());
         onView(withId(R.id.User_Password)).perform(typeText(wrong_password), closeSoftKeyboard());
         onView(withId(R.id.SignInButton)).perform(click());
