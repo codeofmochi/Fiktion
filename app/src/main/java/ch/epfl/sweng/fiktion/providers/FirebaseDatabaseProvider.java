@@ -27,6 +27,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addPoi(final PointOfInterest poi, final AddPoiListener listener) {
         final String poiName = poi.name();
         // get/create the reference of the point of interest
@@ -58,6 +59,9 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getPoi(String poiName, final GetPoiListener listener) {
         // get the reference of the poi
@@ -68,8 +72,13 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                 Log.d("mylogs", "getPoiDatachange");
                 if (dataSnapshot.exists()) {
                     Log.d("mylogs", dataSnapshot.toString());
-                    // inform the listener that we got the matching poi
-                    listener.onSuccess(dataSnapshot.getValue(FirebasePointOfInterest.class).toPoi());
+                    FirebasePointOfInterest fPoi = dataSnapshot.getValue(FirebasePointOfInterest.class);
+                    if (fPoi == null) {
+                        listener.onFailure();
+                    } else {
+                        // inform the listener that we got the matching poi
+                        listener.onSuccess(fPoi.toPoi());
+                    }
                     Log.d("mylogs", "getPoiDone");
                 } else {
                     Log.d("mylogs", "getPoiDoesntExist");
@@ -86,13 +95,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         });
     }
 
-    private interface Helper {
-
-    }
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public void findNearPois(Position pos, int radius, final FindNearPoisListener listener) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude(), pos.longitude()), radius);

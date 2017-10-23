@@ -23,7 +23,7 @@ import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LON
 public class AddPOIActivity extends AppCompatActivity {
 
     // List of the fictions name
-    private List<String> fictionList = new ArrayList<>();
+    private final List<String> fictionList = new ArrayList<>();
     // Displayed fiction list (as a big string)
     private String fictionListText = "";
 
@@ -123,36 +123,35 @@ public class AddPOIActivity extends AppCompatActivity {
             }
         }
 
-        if (isCorrect) {
+        if (isCorrect && fictionListText.isEmpty()) {
             database.addPoi(new PointOfInterest(name, new Position(latitude, longitude)), new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
-                    showToast("The Point of Interest " + name + " was added !", Toast.LENGTH_SHORT);
+                    showToast("The Point of Interest " + name + " was added !");
+                    ((TextView) findViewById(R.id.add_poi_fiction_list)).setText("");
+                    ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
+                    ((EditText) findViewById(R.id.add_poi_name)).setText("");
+                    ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
+                    ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
+                    ((EditText) findViewById(R.id.add_poi_description)).setText("");
                 }
 
                 @Override
                 public void onAlreadyExists() {
-                    showToast("The Point of Interest " + name + " already exists !", Toast.LENGTH_SHORT);
+                    showToast("The Point of Interest " + name + " already exists !");
                 }
 
                 @Override
                 public void onFailure() {
-                    showToast("Failed to add " + name + " !", Toast.LENGTH_SHORT);
+                    showToast("Failed to add " + name + " !");
                 }
             });
-
-            ((TextView) findViewById(R.id.add_poi_fiction_list)).setText("");
-            ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
-            ((EditText) findViewById(R.id.add_poi_name)).setText("");
-            ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
-            ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
-            ((EditText) findViewById(R.id.add_poi_description)).setText("");
         }
     }
 
     // send a toast with text s
-    private void showToast(String s, int toastLength) {
-        Toast.makeText(this, s, toastLength).show();
+    private void showToast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
     // check if a String is a number
