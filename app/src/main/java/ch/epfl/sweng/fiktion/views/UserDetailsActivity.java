@@ -15,7 +15,10 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
-@SuppressWarnings("JavaDoc")
+/**This activity displays the user's information and allows him to apply changes to its profile
+ *
+ * @author Rodrigo
+ */
 public class UserDetailsActivity extends AppCompatActivity {
 
     //constants

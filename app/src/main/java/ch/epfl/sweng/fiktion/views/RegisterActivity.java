@@ -12,6 +12,10 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
+/**
+ * This activity enables the user to create a new account using its email and password
+ * @author Rodrigo
+ */
 public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
