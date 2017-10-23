@@ -113,6 +113,7 @@ public class RegisterActivity extends AppCompatActivity {
      *
      * @param v button clicked
      */
+    //Methods are called by android and we have no use for the View v argument -> ignore waring
     public void register(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "registration attempt");
         createAccount(regEmail.getText().toString(), regPassword.getText().toString());

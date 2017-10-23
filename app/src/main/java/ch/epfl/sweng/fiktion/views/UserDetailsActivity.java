@@ -16,7 +16,6 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
 /**This activity displays the user's information and allows him to apply changes to its profile
- *
  * @author Rodrigo
  */
 public class UserDetailsActivity extends AppCompatActivity {
@@ -327,6 +326,8 @@ public class UserDetailsActivity extends AppCompatActivity {
      * Starts the email verification request
      * @param v button pressed
      */
+    //Methods are called by android and we have no use for the View v argument -> ignore waring
+    //same for the other click*(View v) methods
     public void clickSendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending Email Verification");
         sendEmailVerification();
@@ -370,7 +371,7 @@ public class UserDetailsActivity extends AppCompatActivity {
      * Start the delete account request
      * @param v
      */
-    public void clickDeleteAccount(View v){
+    public void clickDeleteAccount(@SuppressWarnings("UnusedParameters")View v){
         deleteAccount();
     }
 }
