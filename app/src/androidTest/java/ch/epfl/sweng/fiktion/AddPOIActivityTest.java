@@ -33,6 +33,7 @@ import static ch.epfl.sweng.fiktion.providers.Providers.database;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+
 /**
  * Created by pedro on 20/10/17.
  */
@@ -43,7 +44,7 @@ public class AddPOIActivityTest {
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
             new ActivityTestRule<>(AddPOIActivity.class);
 
-    private static DatabaseProvider.AddPoiListener emptyAddPoiListener = new DatabaseProvider.AddPoiListener() {
+    private final static DatabaseProvider.AddPoiListener emptyAddPoiListener = new DatabaseProvider.AddPoiListener() {
         @Override
         public void onSuccess() {
         }
@@ -65,14 +66,14 @@ public class AddPOIActivityTest {
         database.addPoi(new PointOfInterest("p3", new Position(2, 3)), emptyAddPoiListener);
     }
 
-    private ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
-    private ViewInteraction addPoiName = onView(withId(R.id.add_poi_name));
-    private ViewInteraction addPoiLatitude = onView(withId(R.id.add_poi_latitude));
-    private ViewInteraction addPoiLongitude = onView(withId(R.id.add_poi_longitude));
-    private ViewInteraction addPoiFiction = onView(withId(R.id.add_poi_fiction));
-    private ViewInteraction addPoiFictionButton = onView(withId(R.id.add_poi_fiction_button));
-    private ViewInteraction addPoiFictionList = onView(withId(R.id.add_poi_fiction_list));
-    private ViewInteraction addPoiScroll = onView(withId(R.id.add_poi_scroll));
+    private final ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
+    private final ViewInteraction addPoiName = onView(withId(R.id.add_poi_name));
+    private final ViewInteraction addPoiLatitude = onView(withId(R.id.add_poi_latitude));
+    private final ViewInteraction addPoiLongitude = onView(withId(R.id.add_poi_longitude));
+    private final ViewInteraction addPoiFiction = onView(withId(R.id.add_poi_fiction));
+    private final ViewInteraction addPoiFictionButton = onView(withId(R.id.add_poi_fiction_button));
+    private final ViewInteraction addPoiFictionList = onView(withId(R.id.add_poi_fiction_list));
+    private final ViewInteraction addPoiScroll = onView(withId(R.id.add_poi_scroll));
 
     private void doesToastMatch(String s) {
         onView(withText(s)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
@@ -236,6 +237,8 @@ public class AddPOIActivityTest {
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
         addPoiLatitude.check(matches(hasErrorText("You need to enter a number")));
+        addPoiLatitude.perform(clearText());
+        addPoiLongitude.perform(clearText());
         addPoiLatitude.perform(typeText("45.3"));
         closeSoftKeyboard();
         addPoiLongitude.perform(typeText("56!2"));
@@ -243,7 +246,6 @@ public class AddPOIActivityTest {
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
-        addPoiLatitude.check(matches(hasErrorText("You need to enter a number")));
     }
 
     @Test

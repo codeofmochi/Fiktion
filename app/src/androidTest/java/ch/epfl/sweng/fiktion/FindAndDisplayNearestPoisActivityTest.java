@@ -15,8 +15,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.List;
-
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -30,6 +28,7 @@ import static ch.epfl.sweng.fiktion.providers.Providers.database;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+
 /**
  * Created by pedro on 20/10/17.
  */
@@ -40,15 +39,18 @@ public class FindAndDisplayNearestPoisActivityTest {
     public final ActivityTestRule<FindNearestPoisActivity> mActivityRule =
             new ActivityTestRule<>(FindNearestPoisActivity.class);
 
-    private static DatabaseProvider.AddPoiListener emptyAddPoiListener = new DatabaseProvider.AddPoiListener() {
+    private static final DatabaseProvider.AddPoiListener emptyAddPoiListener = new DatabaseProvider.AddPoiListener() {
         @Override
-        public void onSuccess() {}
+        public void onSuccess() {
+        }
 
         @Override
-        public void onAlreadyExists() {}
+        public void onAlreadyExists() {
+        }
 
         @Override
-        public void onFailure() {}
+        public void onFailure() {
+        }
     };
 
     @BeforeClass
@@ -59,7 +61,7 @@ public class FindAndDisplayNearestPoisActivityTest {
         database.addPoi(new PointOfInterest("p3", new Position(0.6, 0.6)), emptyAddPoiListener);
     }
 
-    public ViewAction setProgress(final int progress) {
+    private ViewAction setProgress(final int progress) {
         return new ViewAction() {
             @Override
             public void perform(UiController uiController, View view) {
@@ -78,12 +80,12 @@ public class FindAndDisplayNearestPoisActivityTest {
         };
     }
 
-    public ViewAssertion countMatches(final int count) {
+    private ViewAssertion countMatches(final int count) {
         return new ViewAssertion() {
             @Override
             public void check(View view, NoMatchingViewException noViewFoundException) {
                 if (view instanceof ListView)
-                    assertThat(((ListView)view).getChildCount(), is(count));
+                    assertThat(((ListView) view).getChildCount(), is(count));
                 else
                     throw noViewFoundException;
             }
