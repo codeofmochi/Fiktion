@@ -1,7 +1,7 @@
 package ch.epfl.sweng.fiktion;
 
-/**
- * Created by rodri on 11.10.2017.
+/*
+  Created by rodri on 11.10.2017.
  */
 
 
@@ -39,7 +39,7 @@ public class RegisterActivityTest {
     private RegisterActivity regActivity;
 
     @Rule
-    public ActivityTestRule<RegisterActivity> regActivityRule =
+    public final ActivityTestRule<RegisterActivity> regActivityRule =
             new ActivityTestRule<>(RegisterActivity.class);
 
     @Before

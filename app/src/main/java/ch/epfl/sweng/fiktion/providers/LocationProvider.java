@@ -28,6 +28,7 @@ public abstract class LocationProvider {
      * @return Position : current position
      */
     public Position getPosition() {
-        return new Position(this.location.getLatitude(), this.location.getLongitude());
+        if(location == null) return null;
+        else return new Position(this.location.getLatitude(), this.location.getLongitude());
     }
 }

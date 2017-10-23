@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
-import ch.epfl.sweng.fiktion.views.AddPOIActivity;
+import ch.epfl.sweng.fiktion.views.SimpleAddPOIActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -18,19 +18,15 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
-/**
- * Created by pedro on 11/10/17.
- */
-
-public class AddPoiActivityTest {
+public class SimpleAddPoiActivityTest {
     private final ViewInteraction poiNameView = onView(withId(R.id.poiName));
     private final ViewInteraction addPoiButtonView = onView(withId(R.id.addPOIButton));
     private final ViewInteraction confirmTextView = onView(withId(R.id.addConfirmationText));
     private final String unacceptedCharactersWarning = "Those characters are not accepted: . $ # [ ] /";
 
     @Rule
-    public final ActivityTestRule<AddPOIActivity> mActivityRule =
-            new ActivityTestRule<>(AddPOIActivity.class);
+    public final ActivityTestRule<SimpleAddPOIActivity> mActivityRule =
+            new ActivityTestRule<>(SimpleAddPOIActivity.class);
 
     @BeforeClass
     public static void setDatabase() {

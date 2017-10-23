@@ -13,7 +13,7 @@ import ch.epfl.sweng.fiktion.models.Position;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
-    List<PointOfInterest> poiList = new ArrayList<>();
+    private final List<PointOfInterest> poiList = new ArrayList<>();
 
     /**
      * {@inheritDoc}

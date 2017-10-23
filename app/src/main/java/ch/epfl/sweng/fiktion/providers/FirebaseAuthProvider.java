@@ -11,25 +11,25 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
-import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 /**
  * Created by Rodrigo on 17.10.2017.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public class FirebaseAuthProvider extends AuthProvider {
 
     //testing
-    public final static String TAG = "FBAuthProv";
+    private final static String TAG = "FBAuthProv";
     // firebase authentification instance
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     // firebase user that we authenticate
     private FirebaseUser user;
     // firebase status
-
-
     private FirebaseAuth.AuthStateListener state;
 
     /**
@@ -56,7 +56,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                     Intent i = new Intent(act, SignInActivity.class);
                     act.startActivity(i);
                 }
-                Toast.makeText(act, "You have been logged out unexpectedly. Please try again.", Toast.LENGTH_SHORT);
+                Toast.makeText(act, "You have been logged out unexpectedly. Please try again.", Toast.LENGTH_SHORT).show();
             }
         };
     }
@@ -168,10 +168,10 @@ public class FirebaseAuthProvider extends AuthProvider {
      * @param listener what to do after email attempt
      */
     @Override
-    public void sendPasswordResetEmail( final AuthListener listener) {
+    public void sendPasswordResetEmail(final AuthListener listener) {
         String email = user.getEmail();
-        if(user != null) {
-            if(email != null) {
+        if (user != null) {
+            if (email != null) {
                 auth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -188,10 +188,10 @@ public class FirebaseAuthProvider extends AuthProvider {
                                 }
                             }
                         });
-            } else{
+            } else {
                 listener.onFailure();
             }
-        }else{
+        } else {
             listener.onFailure();
         }
     }
@@ -199,13 +199,51 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public void sendEmailVerification(final AuthListener listener) {
         user = auth.getCurrentUser();
-        if(auth.getCurrentUser()!=null){
+        if (auth.getCurrentUser() != null) {
             user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         listener.onSuccess();
-                    }else{
+                    } else {
+                        listener.onFailure();
+                    }
+                }
+            });
+        } else {
+            listener.onFailure();
+        }
+    }
+
+    @Override
+    public Boolean isConnected() {
+        return auth.getCurrentUser() != null;
+    }
+
+    @Override
+    public User getCurrentUser() {
+        user = auth.getCurrentUser();
+        if (isConnected()) {
+            return new User(user.getDisplayName(), user.getEmail(), user.getUid(), user.isEmailVerified());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void changeName(String newName, final AuthListener listener) {
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(newName).build();
+
+        if (isConnected()) {
+            user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "DisplayName was updated");
+                        listener.onSuccess();
+                    } else {
+                        Log.e(TAG, "DisplayName failed to update");
                         listener.onFailure();
                     }
                 }
@@ -216,7 +254,23 @@ public class FirebaseAuthProvider extends AuthProvider {
     }
 
     @Override
-    public Boolean isConnected() {
-        return auth.getCurrentUser() != null;
+    public void changeEmail(String newEmail, final AuthListener listener) {
+        if (isConnected()) {
+            user.updateEmail(newEmail).
+                    addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Email was updated");
+                        listener.onSuccess();
+                    } else {
+                        Log.e(TAG, "Email failed to update");
+                        listener.onFailure();
+                    }
+                }
+            });
+        }else{
+            listener.onFailure();
+        }
     }
 }
