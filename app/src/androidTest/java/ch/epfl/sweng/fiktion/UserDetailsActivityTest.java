@@ -59,6 +59,8 @@ public class UserDetailsActivityTest {
         onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
     }
 
+    //moving this to ProfileSettingsActivity
+    /*
     @Test
     public void changeUserInfos_newValues(){
         //TODO check that toasts appear
@@ -96,6 +98,6 @@ public class UserDetailsActivityTest {
 
     }
 
-
+*/
 
 }

@@ -125,6 +125,13 @@
                 android:orientation="vertical">
 
                 <Button
+                    android:id="@+id/detail_edit_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="clickEditAccount"
+                    android:text="Edit Account" />
+
+                <Button
                     android:id="@+id/detail_signout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -133,111 +140,6 @@
                     android:onClick="clickSignOut"
                     android:text="Sign Out"
                     tools:ignore="UnusedAttribute" />
-
-                <Button
-                    android:id="@+id/verification_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:background="@android:color/holo_blue_light"
-                    android:elevation="4dp"
-                    android:onClick="clickSendEmailVerification"
-                    android:text="Send Email Verification"
-                    tools:ignore="UnusedAttribute" />
-
-                <Button
-                    android:id="@+id/detail_reset_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/holo_blue_bright"
-                    android:elevation="4dp"
-                    android:onClick="clickSendPasswordReset"
-                    android:text="Reset Password"
-                    tools:ignore="UnusedAttribute" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    tools:layout_editor_absoluteX="55dp"
-                    tools:layout_editor_absoluteY="255dp">
-
-                    <EditText
-                        android:id="@+id/detail_new_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:hint="Change username"
-                        android:inputType="textPersonName"
-                        android:maxLength="15"
-                        android:visibility="visible"
-                        tools:layout_editor_absoluteX="16dp"
-                        tools:layout_editor_absoluteY="97dp" />
-
-                    <Button
-                        android:id="@+id/detail_confirm_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/holo_blue_dark"
-                        android:elevation="4dp"
-                        android:onClick="clickConfirmNameChange"
-                        android:text="Confirm"
-                        android:visibility="visible"
-                        tools:ignore="UnusedAttribute"
-                        tools:layout_editor_absoluteX="8dp"
-                        tools:layout_editor_absoluteY="89dp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    tools:layout_editor_absoluteX="55dp"
-                    tools:layout_editor_absoluteY="255dp">
-
-                    <EditText
-                        android:id="@+id/detail_new_email"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:hint="Change email"
-                        android:inputType="textEmailAddress"
-                        android:visibility="visible"
-                        tools:layout_editor_absoluteX="16dp"
-                        tools:layout_editor_absoluteY="97dp" />
-
-                    <Button
-                        android:id="@+id/detail_confirm_email"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/holo_blue_dark"
-                        android:elevation="4dp"
-                        android:onClick="clickConfirmEmailChange"
-                        android:text="Confirm"
-                        android:visibility="visible"
-                        tools:ignore="UnusedAttribute"
-                        tools:layout_editor_absoluteX="8dp"
-                        tools:layout_editor_absoluteY="89dp" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/detail_delete_account"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="clickDeleteAccount"
-                    android:text="Delete Account" />
 
             </LinearLayout>
 

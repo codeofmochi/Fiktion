@@ -44,7 +44,7 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.MainActivity" />
-                android:value="ch.epfl.sweng.fiktion.views.HomeActivity" />
+            android:value="ch.epfl.sweng.fiktion.views.HomeActivity" />
         </activity>
 
         <!-- Google Maps API Key -->
@@ -62,8 +62,9 @@
         <activity android:name=".views.UserDetailsActivity" />
         <activity android:name=".views.RegisterActivity" />
         <activity android:name=".views.AddPOIActivity" />
-        <activity android:name=".views.GetLocationFromMapActivity"></activity>
-        <activity android:name=".views.HomeActivity"></activity>
+        <activity android:name=".views.GetLocationFromMapActivity" />
+        <activity android:name=".views.HomeActivity" />
+        <activity android:name=".views.ProfileSettingsActivity"></activity>
     </application>
 
 </manifest>
