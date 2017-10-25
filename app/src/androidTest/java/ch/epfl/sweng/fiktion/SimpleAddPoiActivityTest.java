@@ -18,6 +18,12 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
+
+/**
+ * Created by pedro on 11/10/17.
+ */
+
+@SuppressWarnings("DefaultFileTemplate")
 public class SimpleAddPoiActivityTest {
     private final ViewInteraction poiNameView = onView(withId(R.id.poiName));
     private final ViewInteraction addPoiButtonView = onView(withId(R.id.addPOIButton));

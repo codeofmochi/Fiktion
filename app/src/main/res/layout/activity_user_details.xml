@@ -28,6 +28,22 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp">
 
+        <TextView
+            android:id="@+id/detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="30dp"
+            android:text="User Details"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="56dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -135,7 +151,7 @@
                     android:id="@+id/detail_reset_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorControlActivated"
+                    android:background="@android:color/holo_blue_bright"
                     android:elevation="4dp"
                     android:onClick="clickSendPasswordReset"
                     android:text="Reset Password"
@@ -176,6 +192,7 @@
                         tools:ignore="UnusedAttribute"
                         tools:layout_editor_absoluteX="8dp"
                         tools:layout_editor_absoluteY="89dp" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -211,27 +228,20 @@
                         tools:ignore="UnusedAttribute"
                         tools:layout_editor_absoluteX="8dp"
                         tools:layout_editor_absoluteY="89dp" />
+
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/detail_delete_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="clickDeleteAccount"
+                    android:text="Delete Account" />
 
             </LinearLayout>
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/detail_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="30dp"
-            android:text="User Details"
-            android:textAlignment="center"
-            android:textAllCaps="true"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="56dp" />
 
     </FrameLayout>
 

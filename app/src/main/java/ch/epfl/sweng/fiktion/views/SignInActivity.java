@@ -12,6 +12,10 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
+/**This activity prompts a sign in or sign up if the user is not already connected
+ * //TODO Describe what happens when the user is already signed in
+ * @author Rodrigo
+ */
 public class SignInActivity extends AppCompatActivity{
 
     private static final String TAG = "SignInLog";
@@ -102,6 +106,9 @@ public class SignInActivity extends AppCompatActivity{
         }
     }
 
+
+    //Methods are called by android and we have no use for the View v argument -> ignore waring
+    //same for the other method with View v argument
     public void signIn(@SuppressWarnings("UnusedParameters") View v) {
         //user clicks on signin button
         signIn(UserEmail.getText().toString(), UserPassword.getText().toString());
@@ -111,7 +118,7 @@ public class SignInActivity extends AppCompatActivity{
         //user clicks on register button
         //start registration activity
         Intent registerActivity = new Intent(this, RegisterActivity.class);
-        startActivityForResult(registerActivity, 1);
+        startActivity(registerActivity);
     }
 
 

@@ -3,11 +3,10 @@ package ch.epfl.sweng.fiktion.models;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
-/**
- * Created by rodrigo on 09.10.2017.
+/**This class represents the User in the application
+ *@author Rodrigo
  */
 
-@SuppressWarnings("DefaultFileTemplate")
 public class User {
     private String name;
     private String email;
@@ -52,6 +51,7 @@ public class User {
             }
         });
     }
+
 
     @Override
     public boolean equals(Object other) {

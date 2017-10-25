@@ -15,6 +15,11 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
+/**
+ * This activity displays the user's information and allows him to apply changes to its profile
+ *
+ * @author Rodrigo
+ */
 public class UserDetailsActivity extends AppCompatActivity {
 
     //constants
@@ -52,9 +57,6 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         Log.d(TAG, "Initialising User Details activity");
 
-        user = auth.getCurrentUser();
-
-
         //initialise views
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
         user_email_view = (TextView) findViewById(R.id.detail_user_email);
@@ -75,6 +77,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         //initialise user details and firebase authentication
 
         if (auth.isConnected()) {
+            Log.d(TAG, "User signed in");
             // Name, email address, and profile photo Url
             user = auth.getCurrentUser();
             name = user.getName();
@@ -155,6 +158,9 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * this method will send a password reset email to the currently signed in user
+     */
     private void sendPasswordResetEmail() {
         // Disable button
         findViewById(R.id.detail_reset_password).setEnabled(false);
@@ -192,6 +198,13 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * this method will set the UI according to the mode it is.
+     * It will prompt a sign in if the user is not currently signed in
+     * It will display user's informations if he is signed in
+     *
+     * @param mode UIMode that we want to set for the UI
+     */
     private void updateUI(UIMode mode) {
         if (mode.equals(UIMode.defaultMode)) {
             //UI default mode
@@ -213,7 +226,31 @@ public class UserDetailsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method will delete the user's account if he is recently signed in, fail otherwise
+     */
+    private void deleteAccount() {
 
+        auth.deleteAccount(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(UserDetailsActivity.this,
+                        "Account deleted successfully", Toast.LENGTH_SHORT).show();
+                updateUI(UIMode.userSignedOut);
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(UserDetailsActivity.this,
+                        "You did not sign in recently, please re-authenticate and try again", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    /**
+     * This method will send a request to change the current user's username
+     */
     private void confirmName() {
         final String newName = user_newName.getText().toString();
         findViewById(R.id.detail_confirm_name).setEnabled(false);
@@ -249,6 +286,10 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * This method will send a request to change the current user's email address.
+     * It will fail if the user has not signed in recently
+     */
     private void confirmEmail() {
         final String newEmail = user_newEmail.getText().toString();
         findViewById(R.id.detail_confirm_email).setEnabled(false);
@@ -284,26 +325,57 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Starts the email verification request
+     *
+     * @param v button pressed
+     */
+    //Methods are called by android and we have no use for the View v argument -> ignore waring
+    //same for the other click*(View v) methods
     public void clickSendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending Email Verification");
         sendEmailVerification();
     }
 
+    /**
+     * Starts the sign out request
+     *
+     */
     public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Signing Out");
         signOut();
     }
 
+    /**
+     * Starts the password reset email request
+     *
+     */
     public void clickSendPasswordReset(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending password reset email");
         sendPasswordResetEmail();
     }
 
+    /**
+     * Start the name change request
+     *
+     */
     public void clickConfirmNameChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmName();
     }
 
+    /**
+     * Start the email change request
+     *
+     */
     public void clickConfirmEmailChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmEmail();
+    }
+
+    /**
+     * Start the delete account request
+     *
+     */
+    public void clickDeleteAccount(@SuppressWarnings("UnusedParameters") View v) {
+        deleteAccount();
     }
 }

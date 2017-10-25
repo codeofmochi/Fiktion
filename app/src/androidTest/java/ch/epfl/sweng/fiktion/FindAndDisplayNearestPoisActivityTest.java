@@ -28,6 +28,12 @@ import static ch.epfl.sweng.fiktion.providers.Providers.database;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+
+/**
+ * Created by pedro on 20/10/17.
+ */
+
+@SuppressWarnings("DefaultFileTemplate")
 public class FindAndDisplayNearestPoisActivityTest {
     @Rule
     public final ActivityTestRule<FindNearestPoisActivity> mActivityRule =

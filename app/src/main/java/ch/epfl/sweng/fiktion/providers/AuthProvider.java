@@ -74,11 +74,23 @@ public abstract class AuthProvider {
      */
     public abstract User getCurrentUser();
 
+    /**
+     * Enables the user to change his username
+     * @param name new username provided by the user
+     * @param listener actions to be done in case of failure or success
+     */
     public abstract void changeName(String name,final AuthListener listener);
 
-    public abstract void changeEmail(String newName, final AuthListener listener);
+    /**
+     * Enables the user to change his primary email
+     * @param email new email provided by the user
+     * @param listener actions to be done in case of failure or success
+     */
+    public abstract void changeEmail(String email, final AuthListener listener);
 
-
-
-
+    /**
+     * Enables the user to delete his account if he has signed in recently
+     * @param listener actions to be done in case of failure or success
+     */
+    public abstract void deleteAccount(AuthListener listener);
     }

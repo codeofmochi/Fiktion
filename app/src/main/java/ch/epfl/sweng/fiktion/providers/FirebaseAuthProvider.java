@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -21,7 +20,7 @@ import ch.epfl.sweng.fiktion.views.SignInActivity;
  */
 
 @SuppressWarnings("DefaultFileTemplate")
-public class FirebaseAuthProvider extends AuthProvider {
+class FirebaseAuthProvider extends AuthProvider {
 
     //testing
     private final static String TAG = "FBAuthProv";
@@ -37,16 +36,17 @@ public class FirebaseAuthProvider extends AuthProvider {
      *
      * @param act the current activity in which we want to detect an account change
      */
-    public void createStateListener(final Activity act) {
+    private void createStateListener(final Activity act) {
         state = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser nUser = firebaseAuth.getCurrentUser();
-                if (nUser != null) {
+                FirebaseUser newUser = firebaseAuth.getCurrentUser();
+                if (newUser != null) {
                     //user is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + nUser.getUid());
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + newUser.getUid());
                     //if user changed, recreate
-                    if (user != nUser) {
+                    if (user != newUser) {
+                        auth.signOut();
                         Intent i = new Intent(act, SignInActivity.class);
                         act.startActivity(i);
                     }
@@ -56,9 +56,9 @@ public class FirebaseAuthProvider extends AuthProvider {
                     Intent i = new Intent(act, SignInActivity.class);
                     act.startActivity(i);
                 }
-                Toast.makeText(act, "You have been logged out unexpectedly. Please try again.", Toast.LENGTH_SHORT).show();
             }
         };
+        auth.addAuthStateListener(state);
     }
 
     /**
@@ -196,6 +196,10 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Sends an email verification to the current user connected
+     * @param listener awaits the result and acts accordingly
+     */
     @Override
     public void sendEmailVerification(final AuthListener listener) {
         user = auth.getCurrentUser();
@@ -215,21 +219,36 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Verifies if the user is currently connected or not
+     * @return true if user is signed in, false otherwise
+     */
     @Override
     public Boolean isConnected() {
         return auth.getCurrentUser() != null;
     }
 
+    /**
+     *
+     * @return Currently signed in User or null if there is not any
+     */
     @Override
     public User getCurrentUser() {
         user = auth.getCurrentUser();
         if (isConnected()) {
+            //TODO get user ID or EMAIL and get it from our database
+            //for now I just create a new mock user
             return new User(user.getDisplayName(), user.getEmail(), user.getUid(), user.isEmailVerified());
         } else {
             return null;
         }
     }
 
+    /**
+     * Enables the user to change his username
+     * @param newName new username provided by the user
+     * @param listener actions to be done in case of failure or success
+     */
     @Override
     public void changeName(String newName, final AuthListener listener) {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -253,6 +272,11 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
+    /**
+     * Enables the user to change his primary email
+     * @param newEmail new email provided by the user
+     * @param listener actions to be done in case of failure or success
+     */
     @Override
     public void changeEmail(String newEmail, final AuthListener listener) {
         if (isConnected()) {
@@ -270,6 +294,33 @@ public class FirebaseAuthProvider extends AuthProvider {
                 }
             });
         }else{
+            listener.onFailure();
+        }
+    }
+
+    /**
+     * Enables the user to delete his account if he has signed in recently
+     * @param listener actions to be done in case of failure or success
+     */
+    @Override
+    public void deleteAccount(final AuthListener listener){
+        //TODO delete application user in database after implementation of user storage in database
+        if(user!= null) {
+            user.delete()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "Account deleted successfully on firebase");
+                                listener.onSuccess();
+                            } else {
+                                Log.d(TAG, "Failed to delete account on firebase");
+                                listener.onFailure();
+                            }
+                        }
+                    });
+        } else{
+            Log.d(TAG, "Failed to delete account on firebase, no user currently signed in");
             listener.onFailure();
         }
     }
