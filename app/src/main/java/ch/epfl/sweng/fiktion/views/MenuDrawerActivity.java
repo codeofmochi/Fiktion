@@ -48,6 +48,8 @@ public class MenuDrawerActivity extends AppCompatActivity {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
                     Intent i = new Intent(this, HomeActivity.class);
+                    // every time we get back to home, we clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                 }
                 break;
@@ -58,6 +60,8 @@ public class MenuDrawerActivity extends AppCompatActivity {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
                     Intent i = new Intent(this, LocationActivity.class);
+                    // every time we get back to home, we clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                 }
                 break;
@@ -74,6 +78,8 @@ public class MenuDrawerActivity extends AppCompatActivity {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
                     Intent i = new Intent(this, AddPOIActivity.class);
+                    // every time we get back to home, we clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                 }
                 break;

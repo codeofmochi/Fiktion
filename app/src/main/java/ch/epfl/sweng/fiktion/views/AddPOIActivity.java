@@ -20,7 +20,7 @@ import static ch.epfl.sweng.fiktion.providers.Providers.database;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LONGITUDE;
 
-public class AddPOIActivity extends AppCompatActivity {
+public class AddPOIActivity extends MenuDrawerActivity {
 
     // List of the fictions name
     private final List<String> fictionList = new ArrayList<>();
@@ -29,8 +29,8 @@ public class AddPOIActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        includeLayout = R.layout.activity_add_poi;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_poi);
     }
 
     // get the coordinates from the child GetLocationFromMapActivity
