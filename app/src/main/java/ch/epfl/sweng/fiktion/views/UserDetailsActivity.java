@@ -15,7 +15,9 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
-/**This activity displays the user's information and allows him to apply changes to its profile
+/**
+ * This activity displays the user's information and allows him to apply changes to its profile
+ *
  * @author Rodrigo
  */
 public class UserDetailsActivity extends AppCompatActivity {
@@ -75,7 +77,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         //initialise user details and firebase authentication
 
         if (auth.isConnected()) {
-            Log.d(TAG,"User signed in");
+            Log.d(TAG, "User signed in");
             // Name, email address, and profile photo Url
             user = auth.getCurrentUser();
             name = user.getName();
@@ -200,6 +202,7 @@ public class UserDetailsActivity extends AppCompatActivity {
      * this method will set the UI according to the mode it is.
      * It will prompt a sign in if the user is not currently signed in
      * It will display user's informations if he is signed in
+     *
      * @param mode UIMode that we want to set for the UI
      */
     private void updateUI(UIMode mode) {
@@ -232,7 +235,7 @@ public class UserDetailsActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 Toast.makeText(UserDetailsActivity.this,
-                        "Account deleted successfully",Toast.LENGTH_SHORT).show();
+                        "Account deleted successfully", Toast.LENGTH_SHORT).show();
                 updateUI(UIMode.userSignedOut);
             }
 
@@ -324,6 +327,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     /**
      * Starts the email verification request
+     *
      * @param v button pressed
      */
     //Methods are called by android and we have no use for the View v argument -> ignore waring
@@ -335,7 +339,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     /**
      * Starts the sign out request
-     * @param v
+     *
      */
     public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Signing Out");
@@ -344,7 +348,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     /**
      * Starts the password reset email request
-     * @param v
+     *
      */
     public void clickSendPasswordReset(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Sending password reset email");
@@ -353,7 +357,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     /**
      * Start the name change request
-     * @param v
+     *
      */
     public void clickConfirmNameChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmName();
@@ -361,7 +365,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     /**
      * Start the email change request
-     * @param v
+     *
      */
     public void clickConfirmEmailChange(@SuppressWarnings("UnusedParameters") View v) {
         confirmEmail();
@@ -369,9 +373,9 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     /**
      * Start the delete account request
-     * @param v
+     *
      */
-    public void clickDeleteAccount(@SuppressWarnings("UnusedParameters")View v){
+    public void clickDeleteAccount(@SuppressWarnings("UnusedParameters") View v) {
         deleteAccount();
     }
 }
