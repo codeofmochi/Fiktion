@@ -7,6 +7,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,15 +34,49 @@ public class HomeActivity extends AppCompatActivity {
 
     // what to do on menu item select
     private void selectItem(int pos) {
+        // close current activity
         switch (pos) {
-            case 0:
-                // home
-                this.recreate();
+            case 0: {
+                // home activity
+                if (this.getClass().equals(HomeActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                else {
+                    Intent i = new Intent(this, HomeActivity.class);
+                    startActivity(i);
+                }
                 break;
-            case 1:
+            }
+            case 1: {
                 // location activity
-                Intent i = new Intent(this, LocationActivity.class);
-                startActivity(i);
+                if(this.getClass().equals(LocationActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                else {
+                    Intent i = new Intent(this, LocationActivity.class);
+                    startActivity(i);
+                }
+                break;
+            }
+            case 2:
+                // profile activity
+                break;
+            case 3:
+                // discover activity
+                break;
+            case 4: {
+                // add POI activity
+                if(this.getClass().equals(AddPOIActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                else {
+                    Intent i = new Intent(this, AddPOIActivity.class);
+                    startActivity(i);
+                }
+                break;
+            }
+            case 5:
+                // settings activity
                 break;
             default:
                 break;
