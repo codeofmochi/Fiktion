@@ -11,7 +11,7 @@ public class HomeActivity extends MenuDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // give layout to parent class
-        layout = R.layout.activity_home;
+        includeLayout = R.layout.activity_home;
         super.onCreate(savedInstanceState);
     }
 

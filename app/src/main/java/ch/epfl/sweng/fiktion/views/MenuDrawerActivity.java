@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -24,9 +25,9 @@ public class MenuDrawerActivity extends AppCompatActivity {
 
     // menu drawer properties
     private String[] menuItems = {"Home", "Nearby", "Profile", "Discover", "Contribute", "Settings"};
-    protected DrawerLayout drawerLayout;
-    protected ListView drawerList;
-    protected int layout;
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    protected int includeLayout;
     private ActionBarDrawerToggle drawerToggle;
 
     // click menu items listener
@@ -98,8 +99,13 @@ public class MenuDrawerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // setup views
+        setContentView(R.layout.activity_menu_drawer);
+        ViewStub stub = (ViewStub) findViewById(R.id.layout_stub);
+        stub.setLayoutResource(includeLayout);
+        stub.inflate();
+
         // setup menu
-        setContentView(layout);
         this.drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         this.drawerList = (ListView) findViewById(R.id.menu_drawer);
 
