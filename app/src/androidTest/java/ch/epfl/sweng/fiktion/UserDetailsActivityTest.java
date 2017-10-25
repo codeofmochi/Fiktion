@@ -14,7 +14,9 @@ import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
@@ -50,7 +52,21 @@ public class UserDetailsActivityTest {
         onView(withId(R.id.detail_user_email)).check(matches(withText(user.getEmail())));
         onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
     }
-  
+
+    @Test
+    public void clickEditAccount(){
+        onView(withId(R.id.detail_edit_account)).perform(click());
+
+        //check we see the ProfileSettingsActivity
+        onView(withId(R.id.update_confirm_email)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void clickSignOut(){
+        onView(withId(R.id.detail_signout)).perform(click());
+        //check we come back to sign in activity
+        onView(withId(R.id.User_Email)).check(matches(isDisplayed()));
+    }
     //moving this to ProfileSettingsActivity
   /*
     @Test
