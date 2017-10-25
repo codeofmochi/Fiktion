@@ -67,47 +67,5 @@ public class UserDetailsActivityTest {
         //check we come back to sign in activity
         onView(withId(R.id.User_Email)).check(matches(isDisplayed()));
     }
-    //moving this to ProfileSettingsActivity
-  /*
-    @Test
-    public void changeUserInfos_newValues(){
-        //TODO check that toasts appear
-        //change name
-        String newName = "new name";
-        onView(withId(R.id.detail_new_name)).perform(typeText(newName),closeSoftKeyboard());
-        onView(withId(R.id.detail_confirm_name)).perform(click());
-
-        onView(withId(R.id.detail_user_name)).check(matches(withText(newName)));
-
-        //change email
-        String newEmail = "new@email.ch";
-        onView(withId(R.id.detail_new_email)).perform(typeText(newEmail),closeSoftKeyboard());
-        onView(withId(R.id.detail_confirm_email)).perform(click());
-
-        onView(withId(R.id.detail_user_email)).check(matches(withText(newEmail)));
-
-    }
-    @Test
-    public void changeUserInfos_sameValues(){
-        //TODO check that toasts appear
-        //Try to change name with the same value
-        String sameName = user.getName();
-        String sameEmail = user.getEmail();
-
-        onView(withId(R.id.detail_new_name)).perform(typeText(sameName),closeSoftKeyboard());
-        onView(withId(R.id.detail_confirm_name)).perform(click());
-
-        onView(withId(R.id.detail_user_name)).check(matches(withText(sameName)));
-
-        //change email
-        String newEmail = "new@email.ch";
-        onView(withId(R.id.detail_new_email)).perform(typeText(sameEmail),closeSoftKeyboard());
-        onView(withId(R.id.detail_confirm_email)).perform(click());
-
-        onView(withId(R.id.detail_user_email)).check(matches(withText(sameEmail)));
-
-    }
-
-*/
 
 }

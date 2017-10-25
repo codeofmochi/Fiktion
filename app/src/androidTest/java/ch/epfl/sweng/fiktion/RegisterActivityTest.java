@@ -10,6 +10,7 @@ import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,8 +25,10 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.CoreMatchers.is;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RegisterActivityTest {
@@ -33,7 +36,7 @@ public class RegisterActivityTest {
     private final String TAG = "RegActivTest";
     private final String new_email = "new@email.com";
     private final String new_password = "123456";
-    private final String exist_email = "test@test.ch";
+    private final String exist_email = "default@test.ch";
     private final String exist_password = "testing";
 
     private RegisterActivity regActivity;
@@ -46,6 +49,7 @@ public class RegisterActivityTest {
     public void setUp() {
         //define authenticator as our local and not the firebase one
         Providers.auth = new LocalAuthProvider();
+        Providers.auth.signOut();
         //define context
         regActivity = regActivityRule.getActivity();
     }
@@ -54,26 +58,20 @@ public class RegisterActivityTest {
     public void end() {
         //we need to sign out everytime in case it fails
         Providers.auth.signOut();
-        regActivity.finish();
+        //regActivity.finish();
     }
 
-    //TODO: Implement tests that mcck data access to firebase
-    /*
     @Test
     public void newAccountTest() throws InterruptedException {
-        regAuth.signOut();
+        Providers.auth.signOut();
         //we type valid credentials and click on the register button
         onView(withId(R.id.register_email)).perform(typeText(new_email), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText(new_password), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.register_confirm_password)).perform(typeText(new_password), ViewActions.closeSoftKeyboard());
+
         onView(withId(R.id.register_click)).perform(click());
 
-        Thread.sleep(2000);
-
-        FirebaseUser user;
-        user = regAuth.getCurrentUser();
-        if (user != null) {
-            user.delete();
-        }
+        assertThat(Providers.auth.getCurrentUser().getEmail(), is(new_email));
     }
 
     @Test
@@ -81,12 +79,14 @@ public class RegisterActivityTest {
         //we type valid but existing credentials and click on the register button
         onView(withId(R.id.register_email)).perform(typeText(exist_email), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.register_confirm_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());
+
         onView(withId(R.id.register_click)).perform(click());
 
         //check that we stay in the same activity (we do not sign in to the new account)
         onView(withId(R.id.register_title));
     }
-*/
+
     @Test
     public void emptyCredentialsTest() {
         //we only click and expect that we stay in the same activity and errors appear
