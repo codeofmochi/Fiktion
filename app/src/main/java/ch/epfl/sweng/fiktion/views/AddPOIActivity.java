@@ -155,6 +155,7 @@ public class AddPOIActivity extends AppCompatActivity {
     }
 
     // check if a String is a number
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted") // Leaved as isNumeric to keep semantic
     private static boolean isNumeric(String str) {
         return str.matches("-?\\d+(\\.\\d+)?");
     }
