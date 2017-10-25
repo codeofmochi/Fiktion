@@ -25,4 +25,6 @@
     <string name="set_search_radius">Set your search Radius</string>
     <string name="use_selected_position">Use selected position</string>
     <string name="use_own_position">Use your own position</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>
