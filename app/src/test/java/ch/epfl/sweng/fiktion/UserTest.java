@@ -1,11 +1,8 @@
 package ch.epfl.sweng.fiktion;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.models.User;
-import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

@@ -1,6 +1,5 @@
 package ch.epfl.sweng.fiktion;
 
-import android.app.Activity;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
@@ -12,27 +11,21 @@ import org.junit.Test;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
-import ch.epfl.sweng.fiktion.views.SignInActivity;
 import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withInputType;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
-/**
+/**This activity will test the UI part of the User Details Activity
  * Created by Rodrigo on 22.10.2017.
  */
 
-@SuppressWarnings("DefaultFileTemplate")
+
 public class UserDetailsActivityTest {
 
     private User user;
-    private Activity mActivity;
     @Rule
     public final ActivityTestRule<UserDetailsActivity> userDetActivityRule =
             new ActivityTestRule<>(UserDetailsActivity.class);
@@ -45,7 +38,6 @@ public class UserDetailsActivityTest {
     @Before
     public void setVariables(){
         user = Providers.auth.getCurrentUser();
-        mActivity = userDetActivityRule.getActivity();
     }
 
     @After
@@ -58,9 +50,9 @@ public class UserDetailsActivityTest {
         onView(withId(R.id.detail_user_email)).check(matches(withText(user.getEmail())));
         onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
     }
-
+  
     //moving this to ProfileSettingsActivity
-    /*
+  /*
     @Test
     public void changeUserInfos_newValues(){
         //TODO check that toasts appear
@@ -83,18 +75,20 @@ public class UserDetailsActivityTest {
     public void changeUserInfos_sameValues(){
         //TODO check that toasts appear
         //Try to change name with the same value
+        String sameName = user.getName();
+        String sameEmail = user.getEmail();
 
-        onView(withId(R.id.detail_new_name)).perform(typeText(user.getName()),closeSoftKeyboard());
+        onView(withId(R.id.detail_new_name)).perform(typeText(sameName),closeSoftKeyboard());
         onView(withId(R.id.detail_confirm_name)).perform(click());
 
-        onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
+        onView(withId(R.id.detail_user_name)).check(matches(withText(sameName)));
 
         //change email
         String newEmail = "new@email.ch";
-        onView(withId(R.id.detail_new_email)).perform(typeText(user.getEmail()),closeSoftKeyboard());
+        onView(withId(R.id.detail_new_email)).perform(typeText(sameEmail),closeSoftKeyboard());
         onView(withId(R.id.detail_confirm_email)).perform(click());
 
-        onView(withId(R.id.detail_user_email)).check(matches(withText(user.getEmail())));
+        onView(withId(R.id.detail_user_email)).check(matches(withText(sameEmail)));
 
     }
 

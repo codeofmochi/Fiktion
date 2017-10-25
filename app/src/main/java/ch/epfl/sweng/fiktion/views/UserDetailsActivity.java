@@ -130,7 +130,119 @@ public class UserDetailsActivity extends AppCompatActivity {
 
 
     /**
+     * This method will delete the user's account if he is recently signed in, fail otherwise
+     */
+    private void deleteAccount() {
+
+        auth.deleteAccount(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(UserDetailsActivity.this,
+                        "Account deleted successfully", Toast.LENGTH_SHORT).show();
+                updateUI(UIMode.userSignedOut);
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(UserDetailsActivity.this,
+                        "You did not sign in recently, please re-authenticate and try again", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    /**
+     * This method will send a request to change the current user's username
+     */
+    private void confirmName() {
+        final String newName = user_newName.getText().toString();
+        findViewById(R.id.detail_confirm_name).setEnabled(false);
+
+        //validate name choice
+        if (!newName.isEmpty()
+                && !newName.equals(user.getName())
+                && newName.length() <= 15) {
+
+            user.changeName(newName, new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    user_name_view.setText(newName);
+                    recreate();
+                    Toast.makeText(UserDetailsActivity.this,
+                            "User's name is now : " + newName,
+                            Toast.LENGTH_LONG).show();
+                    user_newName.getText().clear();
+                }
+
+                @Override
+                public void onFailure() {
+                    findViewById(R.id.detail_confirm_name).setEnabled(true);
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Failed to update User's name.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            findViewById(R.id.detail_confirm_name).setEnabled(true);
+            Toast.makeText(this, "Please type a new username", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    /**
+     * This method will send a request to change the current user's email address.
+     * It will fail if the user has not signed in recently
+     */
+    private void confirmEmail() {
+        final String newEmail = user_newEmail.getText().toString();
+        findViewById(R.id.detail_confirm_email).setEnabled(false);
+
+        //validate name choice
+        if (!newEmail.isEmpty()
+                && !newEmail.equals(user.getEmail())) {
+
+            user.changeEmail(newEmail, new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    user_email_view.setText(newEmail);
+                    recreate();
+                    Toast.makeText(UserDetailsActivity.this,
+                            "User's email is now : " + newEmail,
+                            Toast.LENGTH_LONG).show();
+                    user_newEmail.getText().clear();
+                }
+
+                @Override
+                public void onFailure() {
+                    findViewById(R.id.detail_confirm_email).setEnabled(true);
+                    Toast.makeText(UserDetailsActivity.this,
+                            "Failed to update User's email. You may need to re-authenticate",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            findViewById(R.id.detail_confirm_email).setEnabled(true);
+            Toast.makeText(this, "Please type a new email", Toast.LENGTH_SHORT).show();
+        }
+        this.onRestart();
+
+    }
+
+    /**
+     * Starts the email verification request
+     *
+     * @param v button pressed
+     */
+    //Methods are called by android and we have no use for the View v argument -> ignore waring
+    //same for the other click*(View v) methods
+    public void clickSendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
+        Log.d(TAG, "Sending Email Verification");
+        sendEmailVerification();
+    }
+
+    /**
      * Starts the sign out request
+     *
      */
     public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Signing Out");
@@ -138,12 +250,11 @@ public class UserDetailsActivity extends AppCompatActivity {
     }
 
     /**
-     * Starts the edit account activity
+     * Starts and activity where the user can edit his profile
      */
     public void clickEditAccount(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Start Edit Account Activity");
         Intent editAccountActivity = new Intent(this, ProfileSettingsActivity.class);
         startActivity(editAccountActivity);
     }
-
 }
