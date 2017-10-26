@@ -120,23 +120,6 @@ public class ProfileSettingsActivityTest {
         });
     }
 
-    @Test
-    public void failDeleteAccount(){
-        Providers.auth.signOut();
-        onView(withId(R.id.update_delete_account)).perform(click());
-        //check that list of user that by default only has one user is now empty
-        Providers.auth.signIn(defaultUser.getEmail(), "testing", new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                assertThat(Providers.auth.getCurrentUser().getEmail(), is(defaultUser.getEmail()));
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
-    }
 
     @Test
     public void failNoUserSignedInDeleteAccount() {
@@ -158,7 +141,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void successSendEmailVerification(){
+    public void alreadyVerifiedSendEmailVerification(){
         onView(withId(R.id.update_email_verification)).perform(click());
         //should send an email verification since the user is already connected (default user)
 
@@ -170,6 +153,33 @@ public class ProfileSettingsActivityTest {
         onView(withText("User's email is verified"))
                 .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
                         .getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void notVerifiedSendEmailVerification(){
+
+        Providers.auth.createUserWithEmailAndPassword("new@email.ch", "testing", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                onView(withId(R.id.update_email_verification)).perform(click());
+                //should send an email verification since the user is already connected (default user)
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                onView(withText("Verification email sent"))
+                        .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
+                                .getDecorView())))).check(matches(isDisplayed()));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
     }
 
     @Test
