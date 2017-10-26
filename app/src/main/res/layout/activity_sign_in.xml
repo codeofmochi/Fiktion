@@ -55,7 +55,6 @@
             android:background="@android:color/holo_blue_dark"
             android:onClick="register"
             android:text="@string/register" />
-
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
