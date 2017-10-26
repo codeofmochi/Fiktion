@@ -12,10 +12,10 @@ import ch.epfl.sweng.fiktion.models.User;
 
 @SuppressWarnings("DefaultFileTemplate")
 public class LocalAuthProvider extends AuthProvider {
-
+    private final User defaultUser = new User("", "default@test.ch", "id", true);
     private final List<User> userList = new ArrayList<>
-            (Collections.singletonList(new User("", "default@test.ch", "id", true)));
-    private User currUser = new User("default","default@test.ch","id",true);
+            (Collections.singletonList(defaultUser));
+    private User currUser = defaultUser;
     private Boolean signedIn = true;
 
     /**
@@ -29,7 +29,8 @@ public class LocalAuthProvider extends AuthProvider {
     public void signIn(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        if (password.equals("testing")) {
+        if (userList.contains(defaultUser)
+                && password.equals("testing")) {
             currUser = new User("", email, "ID", false);
             signedIn = true;
             listener.onSuccess();
@@ -171,8 +172,12 @@ public class LocalAuthProvider extends AuthProvider {
 
     @Override
     public void deleteAccount(AuthListener listener) {
-        userList.remove(currUser);
-        currUser = null;
-        listener.onSuccess();
+        if(currUser!=null) {
+            userList.remove(currUser);
+            currUser = null;
+            listener.onSuccess();
+        }else{
+            listener.onFailure();
+        }
     }
 }
