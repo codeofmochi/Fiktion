@@ -14,6 +14,13 @@ public class User {
     private final String id;
     private boolean emailVerified;
 
+    /**
+     * Creates a new User with given paramaters
+     * @param input_name Username
+     * @param input_email Main user email
+     * @param input_id User id
+     * @param input_verified true if user has a verified email, false otherwise
+     */
     public User(String input_name, String input_email, String input_id, Boolean input_verified) {
         name = input_name;
         email = input_email;
@@ -21,6 +28,11 @@ public class User {
         emailVerified = input_verified;
     }
 
+    /**
+     * Changes this user's username
+     * @param newName New username value
+     * @param listener Handles what happens in case of success or failure of the changement
+     */
     public void changeName(final String newName, final AuthProvider.AuthListener listener) {
         Providers.auth.changeName(newName, new AuthProvider.AuthListener() {
             @Override
@@ -36,6 +48,11 @@ public class User {
         });
     }
 
+    /**
+     * Changes this user's email
+     * @param newEmail New email value
+     * @param listener What to do in case of success or failure of the changement
+     */
     public void changeEmail(final String newEmail, final AuthProvider.AuthListener listener) {
         Providers.auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
             @Override
@@ -87,6 +104,10 @@ public class User {
         return id;
     }
 
+    /**
+     * CHecks wether the user has a verified email or not
+     * @return true if he has a verified email, false otherwise
+     */
     public Boolean isEmailVerified() {
         return emailVerified;
     }
