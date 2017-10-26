@@ -172,16 +172,12 @@ public class LocalAuthProvider extends AuthProvider {
 
     @Override
     public void deleteAccount(AuthListener listener) {
-        if(getCurrentUser()!=null) {
+        if(currUser!=null) {
             userList.remove(currUser);
             currUser = null;
             listener.onSuccess();
         }else{
             listener.onFailure();
         }
-    }
-
-    public List<User> getUserList(){
-        return userList;
     }
 }
