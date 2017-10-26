@@ -77,9 +77,10 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void addUserById(User user, AddUserListener listener) {
+    public void addUser(User user, AddUserListener listener) {
         boolean contains = true;
         String id = user.getID();
+        // go through all the users and check if there is one with the same id as the user in parameter
         for (User u: users) {
             contains &= u.getID().equals(user.getID());
         }
@@ -89,5 +90,19 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             users.add(user);
             listener.onSuccess();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getUserById(String id, GetUserListener listener) {
+        for(User u: users) {
+            if (u.getID().equals(id)) {
+                listener.onSuccess(u);
+                return;
+            }
+        }
+        listener.onDoesntExist();
     }
 }

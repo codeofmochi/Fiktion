@@ -121,12 +121,39 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    public interface GetUserListener {
+
+        /**
+         * what to do if the retrieval succeeds
+         *
+         * @param user the retrieved user
+         */
+        void onSuccess(User user);
+
+        /**
+         * what to do if no mathing user id is found
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the retrieval failed
+         */
+        void onFailure();
+    }
+
     /**
      * add a user to the database, inform the listener of the result
      *
      * @param user     the user
      * @param listener the listener
      */
-    public abstract void addUserById(final User user, final AddUserListener listener);
+    public abstract void addUser(final User user, final AddUserListener listener);
 
+    /**
+     * get the user associated to the id, inform the listener of the result
+     *
+     * @param id the id
+     * @param listener the listener
+     */
+    public abstract void getUserById(String id, final GetUserListener listener);
 }

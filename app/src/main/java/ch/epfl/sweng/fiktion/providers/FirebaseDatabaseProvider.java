@@ -68,13 +68,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void getPoi(String poiName, final GetPoiListener listener) {
         // get the reference of the poi
-        final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
+        DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("mylogs", "getPoiDatachange");
                 if (dataSnapshot.exists()) {
-                    Log.d("mylogs", dataSnapshot.toString());
                     FirebasePointOfInterest fPoi = dataSnapshot.getValue(FirebasePointOfInterest.class);
                     if (fPoi == null) {
                         listener.onFailure();
@@ -82,9 +80,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         // inform the listener that we got the matching poi
                         listener.onSuccess(fPoi.toPoi());
                     }
-                    Log.d("mylogs", "getPoiDone");
                 } else {
-                    Log.d("mylogs", "getPoiDoesntExist");
                     // inform the listener that the poi doesn't exist
                     listener.onDoesntExist();
                 }
@@ -156,7 +152,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void addUserById(final User user, final AddUserListener listener) {
+    public void addUser(final User user, final AddUserListener listener) {
         // get/create the reference of the user
         final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
 
@@ -180,6 +176,39 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getUserById(String id, final GetUserListener listener) {
+        // get the reference of the user associated with the id
+        DatabaseReference userRef = dbRef.child("Users").child(id);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    FirebaseUser fUser = dataSnapshot.getValue(FirebaseUser.class);
+                    if (fUser == null) {
+                        // we found the id but conversion failed, error of data handling probably
+                        listener.onFailure();
+                    } else {
+                        // inform the listener that we got the matching user
+                        listener.onSuccess(fUser.toUser());
+                    }
+                } else {
+                    // inform the listener that the user (id) doesnt exist
+                    listener.onDoesntExist();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
                 listener.onFailure();
             }
         });
