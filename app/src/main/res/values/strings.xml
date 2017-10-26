@@ -32,6 +32,7 @@
     <string name="register">Register</string>
     <string name="edit_account">Edit Account</string>
     <string name="sign_out_button">Sign Out</string>
+    <string name="search">Search</string>
 
     <string name="request_poi_name">Please write the name of your Point of interest</string>
     <string name="invalid_characters">Those characters are not accepted: . $ # [ ] /</string>
