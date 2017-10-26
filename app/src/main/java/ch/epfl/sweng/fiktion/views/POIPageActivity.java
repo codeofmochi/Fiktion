@@ -65,12 +65,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
-        LatLng sydney = new LatLng(35.7022077, 139.7722703);
-        googleMap.addMarker(new MarkerOptions().position(sydney)
+        // Akihabara marker
+        LatLng mark = new LatLng(35.7022077, 139.7722703);
+        googleMap.addMarker(new MarkerOptions().position(mark)
                 .title("Akihabara"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(mark));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         map.onResume();
     }
