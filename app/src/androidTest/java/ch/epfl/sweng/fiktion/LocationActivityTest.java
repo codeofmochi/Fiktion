@@ -12,12 +12,12 @@ import org.junit.Test;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static ch.epfl.sweng.fiktion.providers.Providers.database;
-import static ch.epfl.sweng.fiktion.views.LocationActivity.gmaps;
 
 /**
  * Created by dialexo on 18.10.17.
@@ -55,7 +55,7 @@ public class LocationActivityTest {
         // busy wait until GPS is ready
         long t = System.currentTimeMillis();
         long end = t + 15000;
-        while (System.currentTimeMillis() < end && !gmaps.hasLocation()) ;
+        while (System.currentTimeMillis() < end && !mActivityRule.getActivity().gmaps.hasLocation()) ;
 
         // get marker when popped
         UiObject marker = device.findObject(new UiSelector().descriptionContains("My position"));
@@ -69,7 +69,7 @@ public class LocationActivityTest {
 
     @Test
     public void nearbyMarkerTest() {
-
+        GoogleMapsLocationProvider gmaps = mActivityRule.getActivity().gmaps;
         // busy wait until GPS is ready
         long t = System.currentTimeMillis();
         long end = t + 15000;
