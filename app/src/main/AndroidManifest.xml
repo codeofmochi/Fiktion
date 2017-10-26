@@ -54,6 +54,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.HomeActivity" />
         </activity>
+      
         <activity android:name=".views.SimpleAddPOIActivity" />
         <activity android:name=".views.FindNearestPoisActivity" />
         <activity android:name=".views.DisplayNearestPoisActivity" />
@@ -61,8 +62,16 @@
         <activity android:name=".views.UserDetailsActivity" />
         <activity android:name=".views.RegisterActivity" />
         <activity android:name=".views.AddPOIActivity" />
-        <activity android:name=".views.GetLocationFromMapActivity" />
+        <activity
+            android:name=".views.GetLocationFromMapActivity"
+            android:label="Click on the map...">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.AddPOIActivity" />
+        </activity>
         <activity android:name=".views.HomeActivity" />
+        <activity android:name=".views.ProfileSettingsActivity"></activity>
+
     </application>
 
 </manifest>
