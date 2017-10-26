@@ -27,6 +27,9 @@
     <string name="use_own_position">Use your own position</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
 
     <string name="request_poi_name">Please write the name of your Point of interest</string>
     <string name="invalid_characters">Those characters are not accepted: . $ # [ ] /</string>
@@ -45,4 +48,6 @@
     <string name="verify_email">Verify Email</string>
     <string name="reset_pw">Reset Password</string>
     <string name="delete_account">Delete Account</string>
+    <!-- RegisterActivity -->
+    <string name="confirm_pw">Confirm password</string>
 </resources>

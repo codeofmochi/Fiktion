@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Email"
+            android:hint="@string/email"
             android:inputType="textEmailAddress"
             android:textAlignment="center" />
 
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Password"
+            android:hint="@string/password"
             android:inputType="textPassword"
             android:textAlignment="center" />
 
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_bright"
             android:onClick="signIn"
-            android:text="Sign In" />
+            android:text="@string/singn_in_button" />
 
         <Button
             android:id="@+id/RegisterButton"
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_dark"
             android:onClick="register"
-            android:text="Sign Up" />
+            android:text="@string/register" />
 
     </LinearLayout>
 

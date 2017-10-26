@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
             android:ems="10"
-            android:hint="Email"
+            android:hint="@string/email"
             android:inputType="textEmailAddress"
             android:textAlignment="center"
             tools:ignore="HardcodedText" />
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
             android:ems="10"
-            android:hint="Password"
+            android:hint="@string/password"
             android:inputType="textPassword"
             android:textAlignment="center"
             tools:ignore="HardcodedText" />
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
             android:ems="10"
-            android:hint="Confirm password"
+            android:hint="@string/confirm_pw"
             android:inputType="textPassword"
             android:textAlignment="center"
             tools:ignore="HardcodedText" />
@@ -85,8 +85,7 @@
             android:layout_weight="0.05"
             android:background="@android:color/holo_blue_dark"
             android:onClick="register"
-            android:text="Register"
+            android:text="@string/register"
             tools:ignore="HardcodedText" />
-
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
