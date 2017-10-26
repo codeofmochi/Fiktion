@@ -213,4 +213,36 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             }
         });
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleterUserById(String id, final DeleteUserListener listener) {
+        // get the reference of the user associated with the id
+        final DatabaseReference userRef = dbRef.child("Users").child(id);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // if it exists, remove it by removing its value
+                    userRef.removeValue();
+
+                    // and inform the listener of the success of the deletion
+                    listener.onSuccess();
+                } else {
+                    // inform the listener that the user (id) doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+
 }

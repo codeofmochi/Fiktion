@@ -121,6 +121,9 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    /**
+     * Listener that listens the result of the retrieval of a user
+     */
     public interface GetUserListener {
 
         /**
@@ -142,6 +145,27 @@ public abstract class DatabaseProvider {
     }
 
     /**
+     * Listener that listens the result of the deletion of a user
+     */
+    public interface DeleteUserListener {
+
+        /**
+         * what to do if the deletion succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the user doesn't exist
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the deletion failed
+         */
+        void onFailure();
+    }
+
+    /**
      * add a user to the database, inform the listener of the result
      *
      * @param user     the user
@@ -156,4 +180,12 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void getUserById(String id, final GetUserListener listener);
+
+    /**
+     * delete the user associated to the id, inform the listener of the result
+     *
+     * @param id the id
+     * @param listener the listener
+     */
+    public abstract void deleterUserById(String id, final DeleteUserListener listener);
 }

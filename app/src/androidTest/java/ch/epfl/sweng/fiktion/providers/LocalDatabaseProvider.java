@@ -82,7 +82,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         String id = user.getID();
         // go through all the users and check if there is one with the same id as the user in parameter
         for (User u: users) {
-            contains &= u.getID().equals(user.getID());
+            contains &= u.getID().equals(id);
         }
         if (contains) {
             listener.onAlreadyExists();
@@ -100,6 +100,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         for(User u: users) {
             if (u.getID().equals(id)) {
                 listener.onSuccess(u);
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleterUserById(String id, DeleteUserListener listener) {
+        for (User u: users) {
+            if (u.getID().equals(id)) {
+                users.remove(u);
+                listener.onSuccess();
                 return;
             }
         }
