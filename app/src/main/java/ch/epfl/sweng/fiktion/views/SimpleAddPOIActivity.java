@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -40,18 +41,21 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
             // ask the database to add the poi
             Providers.database.addPoi(poi, new DatabaseProvider.AddPoiListener() {
                 @Override
+                @SuppressLint("SetTextI18n") // no reason to set a variable for added
                 public void onSuccess() {
-                    confirmText.setText(poiName + R.string.added);
+                    confirmText.setText(poiName + " added");
                 }
 
                 @Override
+                @SuppressLint("SetTextI18n") // no reason to set a variable for already exists
                 public void onAlreadyExists() {
-                    confirmText.setText(poiName + R.string.already_exist);
+                    confirmText.setText(poiName + " already exists");
                 }
 
                 @Override
+                @SuppressLint("SetTextI18n") // no reason to set a variable for failed to add
                 public void onFailure() {
-                    confirmText.setText(R.string.failed_to_add + poiName);
+                    confirmText.setText("failed to add " + poiName);
                 }
             });
             ((EditText) findViewById(R.id.poiName)).setText("");
