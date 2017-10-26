@@ -26,6 +26,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -56,11 +57,13 @@ public class ProfileSettingsActivityTest {
     @After
     public void resetAuth() {
         Providers.auth = new LocalAuthProvider();
+        //wait until all toasts disappear
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
     }
 
     @Test
@@ -101,10 +104,10 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void clickDeleteAccount() {
+    public void successDeleteAccount() {
         onView(withId(R.id.update_delete_account)).perform(click());
         //check that list of user that by default only has one user is now empty
-        Providers.auth.signIn(defaultUser.getName(), "testing", new AuthProvider.AuthListener() {
+        Providers.auth.signIn(defaultUser.getEmail(), "testing", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -118,7 +121,25 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void failNoUserSignedInDeleteAccount(){
+    public void failDeleteAccount(){
+        Providers.auth.signOut();
+        onView(withId(R.id.update_delete_account)).perform(click());
+        //check that list of user that by default only has one user is now empty
+        Providers.auth.signIn(defaultUser.getEmail(), "testing", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                assertThat(Providers.auth.getCurrentUser().getEmail(), is(defaultUser.getEmail()));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void failNoUserSignedInDeleteAccount() {
         Providers.auth.signOut();
         //we try to delete the same account with no user currently connected -> failure, toast should appear
         onView(withId(R.id.update_delete_account)).perform(click());
@@ -128,25 +149,76 @@ public class ProfileSettingsActivityTest {
             e.printStackTrace();
         }
 
+
+
         onView(withText("No user currently signed in"))
                 .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
                         .getDecorView())))).check(matches(isDisplayed()));
 
     }
+
     @Test
-    public void failRecentlySignedInDeleteAccount(){
-        onView(withId(R.id.update_delete_account)).perform(click());
+    public void successSendEmailVerification(){
+        onView(withId(R.id.update_email_verification)).perform(click());
+        //should send an email verification since the user is already connected (default user)
+
         try {
-            Thread.sleep(1500);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        onView(withId(R.id.update_delete_account)).perform(click());
-        //clicking once will delete the only account and make the currUser be null,
-        //on the second call it should fail
-
-        onView(withText("You did not sign in recently, please re-authenticate and try again"))
+        onView(withText("User's email is verified"))
                 .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
                         .getDecorView())))).check(matches(isDisplayed()));
     }
+
+    @Test
+    public void noUserSignedInSendEmailVerification(){
+        Providers.auth.signOut();
+        onView(withId(R.id.update_email_verification)).perform(click());
+        //should send an email verification since the user is already connected (default user)
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("Sign in state changed, signing out"))
+                .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
+                        .getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void successResetPassword(){
+
+        onView(withId(R.id.update_reset_password)).perform(click());
+        //should send an email verification since the user is already connected (default user)
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("Password reset email sent"))
+                .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
+                        .getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void failResetPassword(){
+        Providers.auth.signOut();
+        onView(withId(R.id.update_reset_password)).perform(click());
+        //should send an email verification since the user is already connected (default user)
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("No User currently signed in"))
+                .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
+                        .getDecorView())))).check(matches(isDisplayed()));
+    }
+
+
 }
