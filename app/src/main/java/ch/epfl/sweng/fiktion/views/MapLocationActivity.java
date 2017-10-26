@@ -1,14 +1,11 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 
-import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;

@@ -55,7 +55,8 @@ public class LocationActivityTest {
         // busy wait until GPS is ready
         long t = System.currentTimeMillis();
         long end = t + 15000;
-        while (System.currentTimeMillis() < end && !mActivityRule.getActivity().gmaps.hasLocation()) ;
+        while (System.currentTimeMillis() < end && !mActivityRule.getActivity().gmaps.hasLocation())
+            ;
 
         // get marker when popped
         UiObject marker = device.findObject(new UiSelector().descriptionContains("My position"));
