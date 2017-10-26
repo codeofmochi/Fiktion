@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -21,6 +21,8 @@ import ch.epfl.sweng.fiktion.providers.Providers;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
+    private MapView map;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // give layout to parent menu class
@@ -28,9 +30,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         super.onCreate(savedInstanceState);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        map = (MapView) findViewById(R.id.map);
+        map.onCreate(savedInstanceState);
+        map.getMapAsync(this);
 
         // get POI name
         Intent from = getIntent();
@@ -65,10 +67,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         // Add a marker in Sydney, Australia,
         // and move the map's camera to the same location.
-        LatLng sydney = new LatLng(-33.852, 151.211);
+        LatLng sydney = new LatLng(35.7022077, 139.7722703);
         googleMap.addMarker(new MarkerOptions().position(sydney)
-                .title("Marker in Sydney"));
+                .title("Akihabara"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+        map.onResume();
     }
 
 }
