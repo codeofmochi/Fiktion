@@ -28,10 +28,10 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
         final TextView confirmText = (TextView) findViewById(R.id.addConfirmationText);
         if (poiName.isEmpty()) {
             // warning message if no text was entered
-            confirmText.setText("Please write the name of your Point of interest");
+            confirmText.setText(R.string.request_poi_name);
         } else if (poiName.matches(".*[.$#/\\[\\]].*")) {
             // warning message if unaccepted characters are present
-            confirmText.setText("Those characters are not accepted: . $ # [ ] /");
+            confirmText.setText(R.string.invalid_characters);
         } else {
             // Random number generator to get random position values
             Random rand = new Random();
@@ -41,17 +41,17 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
             Providers.database.addPoi(poi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
-                    confirmText.setText(poiName + " added");
+                    confirmText.setText(poiName + R.string.added);
                 }
 
                 @Override
                 public void onAlreadyExists() {
-                    confirmText.setText(poiName + " already exists");
+                    confirmText.setText(poiName + R.string.already_exist);
                 }
 
                 @Override
                 public void onFailure() {
-                    confirmText.setText("failed to add " + poiName);
+                    confirmText.setText(R.string.failed_to_add + poiName);
                 }
             });
             ((EditText) findViewById(R.id.poiName)).setText("");
