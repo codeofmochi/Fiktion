@@ -145,7 +145,8 @@
             android:background="@android:color/white"
             android:elevation="5dp"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:onClick="startDisplayAkihabara">
 
             <TextView
                 android:id="@+id/itemTitle"

@@ -22,4 +22,14 @@ public class HomeActivity extends MenuDrawerActivity {
         Intent i = new Intent(this, LocationActivity.class);
         startActivity(i);
     }
+
+    /**
+     * Starts display akihabara activity
+     * @param view
+     */
+    public void startDisplayAkihabara(View view) {
+        Intent i = new Intent(this, POIPageActivity.class);
+        i.putExtra("POI_NAME", "Akihabara");
+        startActivity(i);
+    }
 }
