@@ -27,4 +27,10 @@
     <string name="use_own_position">Use your own position</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="request_poi_name">Please write the name of your Point of interest</string>
+    <string name="invalid_characters">Those characters are not accepted: . $ # [ ] /</string>
+
+    <string name="email_is_verified">Email is verified</string>
+    <string name="email_is_not_verified">Email is not verified</string>
 </resources>
