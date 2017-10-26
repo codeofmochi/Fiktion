@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 
 /**
  * Firebase database provider
@@ -30,8 +31,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void addPoi(final PointOfInterest poi, final AddPoiListener listener) {
         final String poiName = poi.name();
+
         // get/create the reference of the point of interest
         final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
+
         // add only if the reference doesn't exist
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -143,6 +146,39 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addUserById(final User user, final AddUserListener listener) {
+        // get/create the reference of the user
+        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+
+        // add only if the reference doesn't exist
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // inform the listener that the user already exists
+                    listener.onAlreadyExists();
+                } else {
+                    // add the user to the database
+                    FirebaseUser fUser = new FirebaseUser(user);
+                    userRef.setValue(fUser);
+
+                    //inform the listener that the operation succeeded
+                    listener.onSuccess();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
                 // inform the listener that the operation failed
                 listener.onFailure();
             }

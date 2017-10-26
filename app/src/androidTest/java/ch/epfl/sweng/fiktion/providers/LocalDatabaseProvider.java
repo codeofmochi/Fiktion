@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 
 
 /**
@@ -14,6 +15,7 @@ import ch.epfl.sweng.fiktion.models.Position;
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
     private final List<PointOfInterest> poiList = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
 
     /**
      * {@inheritDoc}
@@ -69,5 +71,23 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         double theta = long1 - long2;
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
         return 111.18957696 * Math.toDegrees(Math.acos(dist));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addUserById(User user, AddUserListener listener) {
+        boolean contains = true;
+        String id = user.getID();
+        for (User u: users) {
+            contains &= u.getID().equals(user.getID());
+        }
+        if (contains) {
+            listener.onAlreadyExists();
+        } else {
+            users.add(user);
+            listener.onSuccess();
+        }
     }
 }

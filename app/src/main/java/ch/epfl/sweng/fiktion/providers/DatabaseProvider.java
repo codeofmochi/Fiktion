@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion.providers;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 
 
 /**
@@ -15,6 +16,7 @@ public abstract class DatabaseProvider {
      * Listener that listens the result of the addition of a point of interest
      */
     public interface AddPoiListener {
+
         /**
          * what to do if the addition succeeded
          */
@@ -97,4 +99,34 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void findNearPois(Position pos, int radius, final FindNearPoisListener listener);
+
+    /**
+     * Listener that listens the result of the addition of a user
+     */
+    public interface AddUserListener {
+
+        /**
+         * what to do if the addition succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the poi already exists
+         */
+        void onAlreadyExists();
+
+        /**
+         * what to do if the addition failed
+         */
+        void onFailure();
+    }
+
+    /**
+     * add a user to the database, inform the listener of the result
+     *
+     * @param user     the user
+     * @param listener the listener
+     */
+    public abstract void addUserById(final User user, final AddUserListener listener);
+
 }
