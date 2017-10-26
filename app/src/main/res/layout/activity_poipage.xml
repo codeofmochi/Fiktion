@@ -65,7 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mainImage" />
 
-    <com.google.android.gms.maps.MapView
+    <ch.epfl.sweng.fiktion.views.ScrollableMapView
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="200dp"
