@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -28,10 +29,10 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
         final TextView confirmText = (TextView) findViewById(R.id.addConfirmationText);
         if (poiName.isEmpty()) {
             // warning message if no text was entered
-            confirmText.setText("Please write the name of your Point of interest");
+            confirmText.setText(R.string.request_poi_name);
         } else if (poiName.matches(".*[.$#/\\[\\]].*")) {
             // warning message if unaccepted characters are present
-            confirmText.setText("Those characters are not accepted: . $ # [ ] /");
+            confirmText.setText(R.string.invalid_characters);
         } else {
             // Random number generator to get random position values
             Random rand = new Random();
@@ -40,16 +41,19 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
             // ask the database to add the poi
             Providers.database.addPoi(poi, new DatabaseProvider.AddPoiListener() {
                 @Override
+                @SuppressLint("SetTextI18n") // no reason to set a variable for added
                 public void onSuccess() {
                     confirmText.setText(poiName + " added");
                 }
 
                 @Override
+                @SuppressLint("SetTextI18n") // no reason to set a variable for already exists
                 public void onAlreadyExists() {
                     confirmText.setText(poiName + " already exists");
                 }
 
                 @Override
+                @SuppressLint("SetTextI18n") // no reason to set a variable for failed to add
                 public void onFailure() {
                     confirmText.setText("failed to add " + poiName);
                 }
