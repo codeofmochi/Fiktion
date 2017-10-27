@@ -2,9 +2,13 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,7 +25,49 @@ import ch.epfl.sweng.fiktion.providers.Providers;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
+    public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
+        private String[] data;
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView text;
+            public ViewHolder(TextView v) {
+                super(v);
+                text = v;
+            }
+        }
+
+        public ReviewsAdapter(String[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public ReviewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            TextView v = (TextView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_card, parent, false);
+            ViewHolder vh = new ViewHolder(v);
+            return vh;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.text.setText(data[position]);
+        }
+
+        @Override
+        public int getItemCount() {
+            return data.length;
+        }
+    }
+
     private MapView map;
+    private RecyclerView reviewsView;
+    private RecyclerView.Adapter reviewsAdapter;
+    private RecyclerView.LayoutManager reviewsLayout;
+    private String[] reviewsData = {
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
+            "Review2",
+            "Review3",
+            "Review4",
+            "Review5"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +101,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             }
         });
+
+        // get recycler view for reviews
+        reviewsView = (RecyclerView) findViewById(R.id.reviews);
+        reviewsLayout = new LinearLayoutManager(this);
+        reviewsView.setLayoutManager(reviewsLayout);
+        reviewsAdapter = new ReviewsAdapter(reviewsData);
+        reviewsView.setAdapter(reviewsAdapter);
 
         // change text color
         TextView featured = (TextView) findViewById(R.id.featured);
