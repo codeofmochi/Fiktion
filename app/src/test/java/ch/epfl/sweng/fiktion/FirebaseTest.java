@@ -182,6 +182,8 @@ public class FirebaseTest {
         assertThat(result, is(FAILURE));
     }
 
+    /*
+
     GeoQueryEventListener gqel;
 
     private void setGqel(GeoQueryEventListener gqel) {
@@ -190,7 +192,6 @@ public class FirebaseTest {
 
     @Test
     public void findNearPoisTest() throws Exception {
-        /*
         GeoQuery geoquery = Mockito.mock(GeoQuery.class);
         when(geofire.queryAtLocation(Mockito.any(GeoLocation.class), Mockito.anyDouble())).thenReturn(geoquery);
         Mockito.doAnswer(new Answer() {
@@ -243,6 +244,8 @@ public class FirebaseTest {
         suppress(method(GeoFire.class, "setLocation", String.class, GeoLocation.class));
 
         database.findNearPois(poiTest.position(), 10, listener);
-        */
+
     }
+
+    */
 }
