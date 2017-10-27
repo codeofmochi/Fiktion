@@ -157,8 +157,10 @@
             android:elevation="5dp"
             android:orientation="vertical"
             android:padding="10dp"
+            android:onClick="startDisplayAkihabara">
             tools:ignore="UselessParent">
             <!-- background is used, but will be modified anyway -->
+
             <TextView
                 android:id="@+id/itemTitle"
                 android:layout_width="match_parent"
@@ -196,7 +198,7 @@
                     android:paddingStart="5dp"
                     app:srcCompat="@drawable/akiba"
                     tools:ignore="HardcodedText,NestedWeights" />
-                    <!-- the weight=1 will be modified, it will be modified -->
+                    <!-- the weight=1 will be modified -->
                 <ImageView
                     android:id="@+id/imageView2"
                     android:contentDescription="image_view2"
