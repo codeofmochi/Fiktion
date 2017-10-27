@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<!-- Image descriptions and titles are hard coded, no reason to put them in res -->
+<!-- lints created by colors for API more than 23 are suppressed, color is not a real problem -->
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,15 +16,17 @@
 
     <ImageView
         android:id="@+id/bg_img"
+        android:contentDescription="tokyo_bg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:adjustViewBounds="true"
         android:elevation="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/tokyo_bg" />
+        app:srcCompat="@drawable/tokyo_bg"
+        tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:id="@+id/centerBox"
@@ -51,31 +54,36 @@
             android:layout_weight="1"
             android:text="Where are we going?"
             android:textColor="@color/colorPrimary"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:id="@+id/placeText"
             android:layout_width="match_parent"
             android:layout_height="28dp"
             android:layout_weight="1"
-            android:drawableRight="@drawable/explore_icon"
+            android:drawableEnd="@drawable/explore_icon"
             android:drawableTint="@color/colorText"
             android:ems="10"
             android:hint="Place to visit"
             android:inputType="text"
-            android:textSize="17sp" />
+            android:textSize="17sp"
+            tools:targetApi="m"
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:id="@+id/fictionText"
             android:layout_width="match_parent"
             android:layout_height="28dp"
             android:layout_weight="1"
-            android:drawableRight="@drawable/movie_icon"
+            android:drawableEnd="@drawable/movie_icon"
             android:drawableTint="@color/colorText"
             android:ems="10"
             android:hint="Work of fiction"
             android:inputType="text"
-            android:textSize="17sp" />
+            android:textSize="17sp"
+            tools:targetApi="m"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/searchButton"
@@ -83,11 +91,12 @@
             android:layout_height="25dp"
             android:layout_weight="1"
             android:background="#BBB"
-            android:drawableRight="@drawable/search_icon"
+            android:drawableEnd="@drawable/search_icon"
             android:drawableTint="@android:color/white"
-            android:text="Search"
+            android:text="@string/search"
             android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:targetApi="m" />
 
         <Space
             android:layout_width="match_parent"
@@ -100,12 +109,14 @@
             android:layout_height="25dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:drawableRight="@drawable/location_icon"
+            android:drawableEnd="@drawable/location_icon"
             android:drawableTint="@android:color/white"
             android:onClick="startLocationActivity"
             android:text="Or use my GPS"
             android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:targetApi="m"
+            tools:ignore="HardcodedText" />
 
     </LinearLayout>
 
@@ -113,7 +124,6 @@
         android:id="@+id/trendingTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="30dp"
         android:layout_weight="1"
@@ -121,7 +131,8 @@
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/centerBox" />
+        app:layout_constraintTop_toBottomOf="@+id/centerBox"
+        tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:id="@+id/trendingLayout"
@@ -147,6 +158,8 @@
             android:orientation="vertical"
             android:padding="10dp"
             android:onClick="startDisplayAkihabara">
+            tools:ignore="UselessParent">
+            <!-- background is used, but will be modified anyway -->
 
             <TextView
                 android:id="@+id/itemTitle"
@@ -154,14 +167,17 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Akihabara, Tokyo"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/featured"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Featured in Steins;Gate, Love Live!, Oreimo, Shirobako, No Game No Life, The Idolm@ster, more »" />
+                android:text="Featured in Steins;Gate, Love Live!, Oreimo, Shirobako, No Game No Life, The Idolm@ster, more »"
+                android:textColor="@color/colorPrimary"
+                tools:ignore="HardcodedText" />
 
             <LinearLayout
                 android:id="@+id/itemPhotos"
@@ -173,22 +189,28 @@
 
                 <ImageView
                     android:id="@+id/imageView"
+                    android:contentDescription="image_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:adjustViewBounds="true"
-                    android:paddingRight="5dp"
-                    app:srcCompat="@drawable/akiba" />
-
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
+                    app:srcCompat="@drawable/akiba"
+                    tools:ignore="HardcodedText,NestedWeights" />
+                    <!-- the weight=1 will be modified -->
                 <ImageView
                     android:id="@+id/imageView2"
+                    android:contentDescription="image_view2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:adjustViewBounds="true"
                     android:cropToPadding="false"
-                    android:paddingLeft="5dp"
-                    app:srcCompat="@drawable/akibairl" />
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    app:srcCompat="@drawable/akibairl"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
 
         </LinearLayout>

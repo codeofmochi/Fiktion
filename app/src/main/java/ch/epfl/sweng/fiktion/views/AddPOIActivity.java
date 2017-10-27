@@ -1,8 +1,8 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -35,11 +35,13 @@ public class AddPOIActivity extends MenuDrawerActivity {
 
     // get the coordinates from the child GetLocationFromMapActivity
     @Override
+    @SuppressLint("SetTextI18n") // latitude and longitude are inputs, not hardcoded
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 Double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
                 Double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
+
 
                 ((EditText) findViewById(R.id.add_poi_latitude)).setText(latitude.toString());
                 ((EditText) findViewById(R.id.add_poi_longitude)).setText(longitude.toString());
@@ -155,6 +157,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
     }
 
     // check if a String is a number
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted") // Leaved as isNumeric to keep semantic
     private static boolean isNumeric(String str) {
         return str.matches("-?\\d+(\\.\\d+)?");
     }

@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -60,12 +61,15 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         emailVerification.setEnabled(false);
 
         // Send verification email only if user does not have a verified email
-        if (user.isEmailVerified()) {
-            Toast.makeText(this, "User's email is verified", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         if (auth.isConnected()) {
+            // Send verification email only if user does not have a verified email
+            user = auth.getCurrentUser();
+            if (user.isEmailVerified()) {
+                emailVerification.setEnabled(true);
+                Toast.makeText(this, "User's email is verified", Toast.LENGTH_SHORT).show();
+                return;
+            }
             auth.sendEmailVerification(new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
@@ -221,6 +225,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                     Toast.makeText(ProfileSettingsActivity.this,
                             "Account deleted successfully", Toast.LENGTH_SHORT).show();
                     deleteAccount.setEnabled(true);
+                    goHome();
                 }
 
                 @Override
@@ -239,6 +244,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         }
     }
 
+    private void goHome(){
+        Intent homeActivity = new Intent(this, HomeActivity.class);
+        startActivity(homeActivity);
+        finish();
+    }
     /**
      * Starts the email verification request
      */
