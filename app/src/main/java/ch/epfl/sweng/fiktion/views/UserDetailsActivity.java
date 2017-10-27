@@ -75,9 +75,9 @@ public class UserDetailsActivity extends AppCompatActivity {
             name = user.getName();
             email = user.getEmail();
             if (user.isEmailVerified()) {
-                user_verify_view.setText("Email is verified");
+                user_verify_view.setText(R.string.email_is_verified);
             } else {
-                user_verify_view.setText("Email is not verified");
+                user_verify_view.setText(R.string.email_is_not_verified);
             }
 
             //Uri photoUrl = user.getPhotoUrl();

@@ -30,7 +30,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup">
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <!-- Google Maps API Key -->
         <meta-data
@@ -54,7 +54,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.HomeActivity" />
         </activity>
-      
         <activity android:name=".views.SimpleAddPOIActivity" />
         <activity android:name=".views.FindNearestPoisActivity" />
         <activity android:name=".views.DisplayNearestPoisActivity" />
@@ -70,8 +69,8 @@
                 android:value="ch.epfl.sweng.fiktion.views.AddPOIActivity" />
         </activity>
         <activity android:name=".views.HomeActivity" />
-        <activity android:name=".views.ProfileSettingsActivity"></activity>
-
+        <activity android:name=".views.ProfileSettingsActivity" />
+        <activity android:name=".views.MapLocationActivity"></activity>
     </application>
 
 </manifest>
