@@ -94,7 +94,7 @@ public class LocalAuthProvider extends AuthProvider {
     public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        User newUser = new User("", email, "id", true);
+        User newUser = new User("", email, "id", false);
         if (userList.contains(newUser)) {
             listener.onFailure();
         } else {

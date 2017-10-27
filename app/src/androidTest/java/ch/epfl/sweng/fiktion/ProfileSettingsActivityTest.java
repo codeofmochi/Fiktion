@@ -158,7 +158,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void successSendEmailVerification(){
+    public void verifiedSendEmailVerification(){
         onView(withId(R.id.update_email_verification)).perform(click());
         //should send an email verification since the user is already connected (default user)
 
@@ -170,6 +170,49 @@ public class ProfileSettingsActivityTest {
         onView(withText("User's email is verified"))
                 .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
                         .getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void successSendEmailVerification(){
+        //in our local auth we have only one user with a verified account,
+        //we must delete this account and create a new one
+        //without a verified email
+        Providers.auth.deleteAccount(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Providers.auth.createUserWithEmailAndPassword("new@email", "newpassword", new AuthProvider.AuthListener() {
+                    @Override
+                    public void onSuccess() {
+                        //we try to send an email to a unverified account
+                        onView(withId(R.id.update_email_verification)).perform(click());
+
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        onView(withText("Verification email sent"))
+                                .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
+                                        .getDecorView())))).check(matches(isDisplayed()));
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        //should be able to create account with given paramaters
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                //should be able to delete current account because there is one connected by default
+                Assert.fail();
+            }
+        });
     }
 
     @Test
