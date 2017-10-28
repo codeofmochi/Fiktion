@@ -12,7 +12,7 @@ import ch.epfl.sweng.fiktion.models.User;
 
 @SuppressWarnings("DefaultFileTemplate")
 public class LocalAuthProvider extends AuthProvider {
-    private final User defaultUser = new User("", "default@test.ch", "id", true);
+    private final User defaultUser = new User("defaultUser", "default@test.ch", "id", true);
     private final List<User> userList = new ArrayList<>
             (Collections.singletonList(defaultUser));
     private User currUser = defaultUser;

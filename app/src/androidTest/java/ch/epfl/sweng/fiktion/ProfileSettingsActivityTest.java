@@ -93,13 +93,13 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_name)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getName(), is(newName));
+        assertThat(Providers.auth.getCurrentUser().getName(), is(user.getName()));
         //change email
-        String newEmail = "new@email.ch";
+        String newEmail = user.getEmail();
         onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_email)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getEmail(), is(newEmail));
+        assertThat(Providers.auth.getCurrentUser().getEmail(), is(user.getEmail()));
 
     }
 
