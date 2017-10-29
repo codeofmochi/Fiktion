@@ -1,6 +1,8 @@
 
 package ch.epfl.sweng.fiktion;
 
+import android.util.Log;
+
 import com.firebase.geofire.GeoFire;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,6 +46,8 @@ public class FirebaseAuthTest {
     Task<AuthResult> taskWithResult;
     @Mock
     AuthResult result;
+    @Mock
+    OnCompleteListener<AuthResult> onCompleteListener;
     @Captor
     private ArgumentCaptor<OnCompleteListener<AuthResult>> testOnCompleteListener;
 
@@ -55,10 +59,40 @@ public class FirebaseAuthTest {
     public void setUp() throws Exception{
         mockStatic(FirebaseAuth.class);
         Mockito.when(FirebaseAuth.getInstance()).thenReturn(fbAuth);
+
         auth = new FirebaseAuthProvider();
 
     }
 
+    private void setSucceedTask(){
+        Mockito.when(taskWithResult.isComplete()).thenReturn(true);
+        Mockito.when(taskWithResult.isSuccessful()).thenReturn(true);
+        Mockito.when(taskWithResult.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(taskWithResult);
+    }
+
+    @Test
+    public void succeedSignIn(){
+        setSucceedTask();
+        Mockito.when(fbAuth.signInWithEmailAndPassword("email","password")).thenReturn(taskWithResult);
+        Mockito.when(taskWithResult.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(taskWithResult);
+
+        auth.signIn("email", "password", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+
+
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+        testOnCompleteListener.getValue().onComplete(taskWithResult);
+        Mockito.verify(fbAuth.signInWithEmailAndPassword("email","password"));
+
+
+    }
     @Test
     public void testAuthSignOut(){
         Mockito.doNothing().when(fbAuth).signOut();
@@ -84,7 +118,6 @@ public class FirebaseAuthTest {
         Assert.assertEquals(auth.getCurrentUser().getName(), name);
         Assert.assertEquals(auth.getCurrentUser().getID(), id);
         Assert.assertFalse(auth.getCurrentUser().isEmailVerified());
-
     }
 
 
