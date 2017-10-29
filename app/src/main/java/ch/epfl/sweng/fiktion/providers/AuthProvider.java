@@ -2,11 +2,10 @@ package ch.epfl.sweng.fiktion.providers;
 
 import ch.epfl.sweng.fiktion.models.User;
 
-/**
+/** Authentication provider
  * Created by rodri on 17.10.2017.
  */
 
-@SuppressWarnings("DefaultFileTemplate")
 public abstract class AuthProvider {
 
     /**
