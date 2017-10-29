@@ -15,19 +15,18 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
-/**
+/**This class represents our application provider and uses FirebaseAuthentication
  * Created by Rodrigo on 17.10.2017.
  */
 
-@SuppressWarnings("DefaultFileTemplate")
-class FirebaseAuthProvider extends AuthProvider {
+public class FirebaseAuthProvider extends AuthProvider {
 
     //testing
     private final static String TAG = "FBAuthProv";
     // firebase authentification instance
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     // firebase user that we authenticate
-    private FirebaseUser user;
+    private FirebaseUser user = null;
     // firebase status
     private FirebaseAuth.AuthStateListener state;
 

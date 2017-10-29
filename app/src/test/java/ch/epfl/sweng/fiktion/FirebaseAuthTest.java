@@ -1,10 +1,12 @@
-/*
+
 package ch.epfl.sweng.fiktion;
 
 import com.firebase.geofire.GeoFire;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import junit.framework.Assert;
@@ -12,51 +14,83 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 
-import static org.powermock.api.mockito.PowerMockito.doNothing;
-import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.hamcrest.CoreMatchers.is;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class})
 public class FirebaseAuthTest {
+
+    private FirebaseAuthProvider auth;
     @Mock
-    private FirebaseAuth fbAuth;
+    FirebaseAuth fbAuth;
     @Mock
-    private FirebaseDatabase fbDatabase;
+    FirebaseDatabase fbDatabase;
     @Mock
-    private FirebaseUser fbUser;
+    FirebaseUser fbUser;
     @Mock
-    private GeoFire gf;
+    Task<AuthResult> taskWithResult;
     @Mock
-    FirebaseDatabase fb;
+    AuthResult result;
+    @Captor
+    private ArgumentCaptor<OnCompleteListener<AuthResult>> testOnCompleteListener;
+
+
     @Mock
-    DatabaseReference dbRef;
+    GeoFire geofire;
 
     @Before
-    public void setUp(){
+    public void setUp() throws Exception{
         mockStatic(FirebaseAuth.class);
-        mockStatic(FirebaseDatabase.class);
-        Mockito.when(FirebaseDatabase.getInstance()).thenReturn(fbDatabase);
         Mockito.when(FirebaseAuth.getInstance()).thenReturn(fbAuth);
-        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
-        Mockito.doNothing().when(fbAuth).signOut();
+        auth = new FirebaseAuthProvider();
+
     }
 
     @Test
     public void testAuthSignOut(){
-        Providers.auth.signOut();
-        Assert.assertNull(Providers.auth.getCurrentUser());
+        Mockito.doNothing().when(fbAuth).signOut();
+        auth.signOut();
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
+        Assert.assertNull(auth.getCurrentUser());
     }
 
 
+    @Test
+    public void getCurrentUser() {
+        String name = "default";
+        String email = "test@test.ch";
+        String id = "id";
+
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.getDisplayName()).thenReturn(name);
+        Mockito.when(fbUser.getEmail()).thenReturn(email);
+        Mockito.when(fbUser.getUid()).thenReturn(id);
+        Mockito.when(fbUser.isEmailVerified()).thenReturn(false);
+
+        Assert.assertEquals(auth.getCurrentUser().getEmail(), email);
+        Assert.assertEquals(auth.getCurrentUser().getName(), name);
+        Assert.assertEquals(auth.getCurrentUser().getID(), id);
+        Assert.assertFalse(auth.getCurrentUser().isEmailVerified());
+
+    }
+
+
+
+
+
+
+
 }
-*/
