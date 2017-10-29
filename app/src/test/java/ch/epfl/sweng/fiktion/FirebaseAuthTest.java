@@ -1,8 +1,6 @@
 
 package ch.epfl.sweng.fiktion;
 
-import android.util.Log;
-
 import com.firebase.geofire.GeoFire;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,7 +21,6 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 
@@ -36,6 +33,8 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 public class FirebaseAuthTest {
 
     private FirebaseAuthProvider auth;
+    private String email = "test@epfl.ch";
+    private String password = "testing";
     @Mock
     FirebaseAuth fbAuth;
     @Mock
@@ -43,13 +42,19 @@ public class FirebaseAuthTest {
     @Mock
     FirebaseUser fbUser;
     @Mock
-    Task<AuthResult> taskWithResult;
+    Task<AuthResult> taskAuthSucceedResult;
+    @Mock
+    Task<Void> taskVoidSucceedResult;
     @Mock
     AuthResult result;
     @Mock
-    OnCompleteListener<AuthResult> onCompleteListener;
+    OnCompleteListener<AuthResult> onCompleteAuthListener;
+    @Mock
+    OnCompleteListener<Void> onCompleteVoidListener;
     @Captor
-    private ArgumentCaptor<OnCompleteListener<AuthResult>> testOnCompleteListener;
+    private ArgumentCaptor<OnCompleteListener<AuthResult>> testOnCompleteAuthListener;
+    @Captor
+    private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
 
     @Mock
@@ -58,6 +63,8 @@ public class FirebaseAuthTest {
     @Before
     public void setUp() throws Exception{
         mockStatic(FirebaseAuth.class);
+        setSucceedTask();
+
         Mockito.when(FirebaseAuth.getInstance()).thenReturn(fbAuth);
 
         auth = new FirebaseAuthProvider();
@@ -65,22 +72,25 @@ public class FirebaseAuthTest {
     }
 
     private void setSucceedTask(){
-        Mockito.when(taskWithResult.isComplete()).thenReturn(true);
-        Mockito.when(taskWithResult.isSuccessful()).thenReturn(true);
-        Mockito.when(taskWithResult.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(taskWithResult);
+        Mockito.when(taskAuthSucceedResult.isComplete()).thenReturn(true);
+        Mockito.when(taskAuthSucceedResult.isSuccessful()).thenReturn(true);
+        Mockito.when(taskAuthSucceedResult.addOnCompleteListener(testOnCompleteAuthListener.capture())).
+                thenReturn(taskAuthSucceedResult);
+        Mockito.when(taskVoidSucceedResult.isComplete()).thenReturn(true);
+        Mockito.when(taskVoidSucceedResult.isSuccessful()).thenReturn(true);
+        Mockito.when(taskVoidSucceedResult.addOnCompleteListener(testOnCompleteVoidListener.capture())).
+                thenReturn(taskVoidSucceedResult);
     }
 
     @Test
-    public void succeedSignIn(){
-        setSucceedTask();
-        Mockito.when(fbAuth.signInWithEmailAndPassword("email","password")).thenReturn(taskWithResult);
-        Mockito.when(taskWithResult.addOnCompleteListener(testOnCompleteListener.capture())).thenReturn(taskWithResult);
-
-        auth.signIn("email", "password", new AuthProvider.AuthListener() {
+    public void succeedSendPasswordResetEmail(){
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.getEmail()).thenReturn(email);
+        Mockito.when(fbAuth.sendPasswordResetEmail(email)).thenReturn(taskVoidSucceedResult);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-
-
+                Mockito.verify(fbAuth.sendPasswordResetEmail(email));
             }
 
             @Override
@@ -88,8 +98,44 @@ public class FirebaseAuthTest {
                 Assert.fail();
             }
         });
-        testOnCompleteListener.getValue().onComplete(taskWithResult);
-        Mockito.verify(fbAuth.signInWithEmailAndPassword("email","password"));
+
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
+    }
+
+    @Test
+    public void succeedCreateUser(){
+        Mockito.when(fbAuth.createUserWithEmailAndPassword(email,password)).thenReturn(taskAuthSucceedResult);
+        auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Mockito.verify(fbAuth.createUserWithEmailAndPassword(email,password));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+        testOnCompleteAuthListener.getValue().onComplete(taskAuthSucceedResult);
+    }
+
+    @Test
+    public void succeedSignIn(){
+        setSucceedTask();
+        Mockito.when(fbAuth.signInWithEmailAndPassword(email,password)).thenReturn(taskAuthSucceedResult);
+
+        auth.signIn(email, password, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Mockito.verify(fbAuth.signInWithEmailAndPassword(email,password));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+        testOnCompleteAuthListener.getValue().onComplete(taskAuthSucceedResult);
 
 
     }

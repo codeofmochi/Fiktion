@@ -149,7 +149,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Account creation was successful
-                            Log.d(TAG, "accountCreation: success");
+                            //Log.d(TAG, "accountCreation: success");
                             listener.onSuccess();
                             user = auth.getCurrentUser();
                         } else {
@@ -168,8 +168,9 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void sendPasswordResetEmail(final AuthListener listener) {
-        String email = user.getEmail();
-        if (user != null) {
+        user = auth.getCurrentUser();
+        if ( user!= null) {
+            String email = user.getEmail();
             if (email != null) {
                 auth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -178,7 +179,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                                 if (task.isSuccessful()) {
                                     //reset textViews content
                                     // Password reset email sent successfully
-                                    Log.d(TAG, "TransmittingPasswordResetEmail: success");
+                                    //Log.d(TAG, "TransmittingPasswordResetEmail: success");
                                     listener.onSuccess();
                                 } else {
                                     // Password reset email failed to send
