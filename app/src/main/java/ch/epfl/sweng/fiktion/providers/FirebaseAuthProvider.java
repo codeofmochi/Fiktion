@@ -247,7 +247,8 @@ public class FirebaseAuthProvider extends AuthProvider {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(newName).build();
 
-        if (isConnected()) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null) {
             user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {

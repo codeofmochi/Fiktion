@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 
 import junit.framework.Assert;
@@ -18,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.exceptions.ExceptionIncludingMockitoWarnings;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -26,10 +28,11 @@ import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class})
+@PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class,FirebaseAuthProvider.class})
 public class FirebaseAuthTest {
 
     private FirebaseAuthProvider auth;
@@ -50,6 +53,10 @@ public class FirebaseAuthTest {
     @Mock
     OnCompleteListener<AuthResult> onCompleteAuthListener;
     @Mock
+    UserProfileChangeRequest.Builder updateProfileBuilder;
+    @Mock
+    UserProfileChangeRequest updateProfile;
+    @Mock
     OnCompleteListener<Void> onCompleteVoidListener;
     @Captor
     private ArgumentCaptor<OnCompleteListener<AuthResult>> testOnCompleteAuthListener;
@@ -57,8 +64,6 @@ public class FirebaseAuthTest {
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
 
-    @Mock
-    GeoFire geofire;
 
     @Before
     public void setUp() throws Exception{
@@ -137,6 +142,30 @@ public class FirebaseAuthTest {
 
         testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
     }
+
+    @Test
+    public void succeedUpdateProfile() throws Exception{
+        String newName = "new name";
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        whenNew(UserProfileChangeRequest.Builder.class).withAnyArguments().thenReturn(updateProfileBuilder);
+        Mockito.when(updateProfileBuilder.setDisplayName(newName)).thenReturn(updateProfileBuilder);
+        Mockito.when(updateProfileBuilder.build()).thenReturn(updateProfile);
+        Mockito.when(fbUser.updateProfile(updateProfile)).thenReturn(taskVoidSucceedResult);
+
+        auth.changeName(newName, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Mockito.verify(fbUser.updateProfile(updateProfile));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
+    }
+    
     @Test
     public void succedSendEmailVerification(){
 
