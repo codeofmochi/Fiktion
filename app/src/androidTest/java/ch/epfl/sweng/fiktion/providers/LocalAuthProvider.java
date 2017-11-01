@@ -7,16 +7,21 @@ import java.util.List;
 import ch.epfl.sweng.fiktion.models.User;
 
 /**
+ * This class defines a local auth provider for testing without actual contact with firebase
  * Created by Rodrigo on 18.10.2017.
  */
 
-@SuppressWarnings("DefaultFileTemplate")
 public class LocalAuthProvider extends AuthProvider {
-    private final User defaultUser = new User("defaultUser", "default@test.ch", "id", true);
+    private final User defaultUser = new User("", "defaultID");
+    private final String defaultEmail = "default@email.ch";
     private final List<User> userList = new ArrayList<>
             (Collections.singletonList(defaultUser));
+    private final List<String> mailList = new ArrayList<>
+            (Collections.singletonList(defaultEmail));
     private User currUser = defaultUser;
     private Boolean signedIn = true;
+    private String currentUserEmail = defaultEmail;
+    private Boolean emailVerified = true;
 
     /**
      * Signs in a user with an email, a password and what to do afterwards
@@ -29,11 +34,12 @@ public class LocalAuthProvider extends AuthProvider {
     public void signIn(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        if (userList.contains(defaultUser)
+        if (mailList.contains(email)
                 && password.equals("testing")) {
-            currUser = new User("", email, "ID", false);
-            signedIn = true;
             listener.onSuccess();
+            currUser = new User("", "defaultID");
+            signedIn = true;
+            currentUserEmail = email;
         } else {
             listener.onFailure();
         }
@@ -46,6 +52,7 @@ public class LocalAuthProvider extends AuthProvider {
     public void signOut() {
         //decide what happens when user signOut
         currUser = null;
+        currentUserEmail = null;
         signedIn = false;
     }
 
@@ -57,7 +64,7 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public String validateEmail(String email) {
-        String errMessage = "";
+        String errMessage = null;
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";
         }
@@ -72,7 +79,7 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public String validatePassword(String password) {
-        String errMessage = "";
+        String errMessage = null;
         if (password.isEmpty()) {
             errMessage = "Requires a valid password";
         } else {
@@ -92,15 +99,17 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
-        //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
-        //so we will focus on accounts with the same email
-        User newUser = new User("", email, "id", false);
-        if (userList.contains(newUser)) {
+
+        User newUser = new User("new", "newID");
+        if (mailList.contains(email)) {
             listener.onFailure();
         } else {
             userList.add(newUser);
+            mailList.add(email);
             currUser = newUser;
+            currentUserEmail = email;
             signedIn = true;
+            emailVerified = false;
             listener.onSuccess();
         }
     }
@@ -141,43 +150,70 @@ public class LocalAuthProvider extends AuthProvider {
         return signedIn;
     }
 
+    /**
+     * starts a request to database to have currently signed in User or null if there is not any
+     *
+     * @param listener handles what to do after the request
+     */
     @Override
-    public User getCurrentUser() {
-        return currUser;
-    }
-
-    @Override
-    public void changeName(String name, AuthListener listener) {
-        if(!currUser.getName().equals(name)) {
-            userList.remove(currUser);
-            currUser = new User(name, currUser.getEmail(), currUser.getID(), currUser.isEmailVerified());
-            userList.add(currUser);
-            listener.onSuccess();
-        }else{
+    public void getCurrentUser(DatabaseProvider.GetUserListener listener) {
+        if (isConnected()) {
+            listener.onSuccess(currUser);
+        } else {
             listener.onFailure();
         }
     }
+
 
     @Override
     public void changeEmail(String newEmail, AuthListener listener) {
-        if(!currUser.getEmail().equals(newEmail)) {
-            userList.remove(currUser);
-            currUser = new User(currUser.getName(), newEmail, currUser.getID(), currUser.isEmailVerified());
-            userList.add(currUser);
+        if (newEmail.equals("new@email.ch")) {
+            currentUserEmail = newEmail;
             listener.onSuccess();
-        } else{
+
+        } else {
             listener.onFailure();
         }
     }
 
+    /**
+     * Enables the user to delete his account if he has signed in recently
+     *
+     * @param listener    actions to be done in case of failure or success in firebase authentication
+     * @param delListener actions to be done in case of failure, sucess or inexistant in database
+     */
     @Override
-    public void deleteAccount(AuthListener listener) {
-        if(currUser!=null) {
+    public void deleteAccount(AuthListener listener, DatabaseProvider.DeleteUserListener delListener) {
+        if (isConnected()) {
+            mailList.remove(currentUserEmail);
             userList.remove(currUser);
+            currentUserEmail = null;
             currUser = null;
+            signedIn = false;
             listener.onSuccess();
-        }else{
+            delListener.onSuccess();
+
+        } else {
             listener.onFailure();
         }
+
     }
+
+    /**
+     * @return true if user is email verified, false otherwise
+     */
+    @Override
+    public Boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    /**
+     * @return email of the current signed in user, null if there is not any user connected
+     */
+    @Override
+    public String getEmail() {
+        return currentUserEmail;
+    }
+
+
 }

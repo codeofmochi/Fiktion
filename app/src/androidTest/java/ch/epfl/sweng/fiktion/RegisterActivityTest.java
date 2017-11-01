@@ -35,7 +35,7 @@ public class RegisterActivityTest {
 
     private final String TAG = "RegActivTest";
     private final String new_email = "new@email.com";
-    private final String new_password = "123456";
+    private final String new_password = "validpass";
     private final String exist_email = "default@test.ch";
     private final String exist_password = "testing";
 
@@ -62,8 +62,7 @@ public class RegisterActivityTest {
     }
 
     @Test
-    public void newAccountTest() throws InterruptedException {
-        Providers.auth.signOut();
+    public void newAccountTest(){
         //we type valid credentials and click on the register button
         onView(withId(R.id.register_email)).perform(typeText(new_email), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText(new_password), ViewActions.closeSoftKeyboard());
@@ -71,7 +70,8 @@ public class RegisterActivityTest {
 
         onView(withId(R.id.register_click)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getEmail(), is(new_email));
+        assertThat(Providers.auth.getEmail(), is(new_email));
+
     }
 
     @Test

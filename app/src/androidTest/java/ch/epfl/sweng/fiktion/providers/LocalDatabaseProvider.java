@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 
 
 /**
@@ -14,6 +15,7 @@ import ch.epfl.sweng.fiktion.models.Position;
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
     private final List<PointOfInterest> poiList = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
 
     /**
      * {@inheritDoc}
@@ -69,5 +71,53 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         double theta = long1 - long2;
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
         return 111.18957696 * Math.toDegrees(Math.acos(dist));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addUser(User user, AddUserListener listener) {
+        boolean contains = true;
+        String id = user.getID();
+        // go through all the users and check if there is one with the same id as the user in parameter
+        for (User u: users) {
+            contains &= u.getID().equals(id);
+        }
+        if (contains) {
+            listener.onAlreadyExists();
+        } else {
+            users.add(user);
+            listener.onSuccess();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getUserById(String id, GetUserListener listener) {
+        for(User u: users) {
+            if (u.getID().equals(id)) {
+                listener.onSuccess(u);
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleterUserById(String id, DeleteUserListener listener) {
+        for (User u: users) {
+            if (u.getID().equals(id)) {
+                users.remove(u);
+                listener.onSuccess();
+                return;
+            }
+        }
+        listener.onDoesntExist();
     }
 }
