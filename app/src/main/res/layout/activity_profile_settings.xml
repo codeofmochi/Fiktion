@@ -25,27 +25,26 @@
 
             <EditText
                 android:id="@+id/update_new_name"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="Change username"
+                android:hint="@string/change_username"
                 android:inputType="textPersonName"
                 android:maxLength="15"
                 android:visibility="visible"
                 tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="97dp" />
+                tools:layout_editor_absoluteY="97dp"
+                tools:ignore="NestedWeights" />
+                <!-- weight=1 needed for now, layout will be modified anyway-->
 
             <Button
                 android:id="@+id/update_confirm_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_blue_dark"
-                android:elevation="4dp"
                 android:onClick="clickConfirmNameChange"
-                android:text="Update"
+                android:text="@string/update"
                 android:visibility="visible"
                 tools:ignore="UnusedAttribute"
                 tools:layout_editor_absoluteX="8dp"
@@ -63,26 +62,24 @@
 
             <EditText
                 android:id="@+id/update_new_email"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="Change email"
+                android:hint="@string/change_mail"
                 android:inputType="textEmailAddress"
                 android:visibility="visible"
                 tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="97dp" />
-
+                tools:layout_editor_absoluteY="97dp"
+                tools:ignore="NestedWeights" />
+                <!-- weight=1 is needed for now, the layout will be modified anyway-->
             <Button
                 android:id="@+id/update_confirm_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_blue_dark"
-                android:elevation="4dp"
                 android:onClick="clickConfirmEmailChange"
-                android:text="Update"
+                android:text="@string/update"
                 android:visibility="visible"
                 tools:ignore="UnusedAttribute"
                 tools:layout_editor_absoluteX="8dp"
@@ -94,14 +91,10 @@
             android:id="@+id/update_email_verification"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
             android:layout_weight="1"
             android:background="@android:color/holo_blue_light"
-            android:elevation="4dp"
             android:onClick="clickSendEmailVerification"
-            android:text="Send Email Verification"
+            android:text="@string/verify_email"
             tools:ignore="UnusedAttribute" />
 
         <Button
@@ -110,9 +103,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/holo_blue_bright"
-            android:elevation="4dp"
             android:onClick="clickSendPasswordReset"
-            android:text="Reset Password"
+            android:text="@string/reset_pw"
             tools:ignore="UnusedAttribute" />
 
         <Button
@@ -121,9 +113,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="?android:attr/colorPressedHighlight"
-            android:elevation="4dp"
             android:onClick="clickDeleteAccount"
-            android:text="Delete Account"
+            android:text="@string/delete_account"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
