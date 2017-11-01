@@ -374,6 +374,23 @@ public class FirebaseAuthTest {
     }
 
     @Test
+    public void failSignIn() {
+        setTasks();
+        Mockito.when(fbAuth.signInWithEmailAndPassword(email, password)).thenReturn(taskAuthFailResult);
+
+        auth.signIn(email, password, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbAuth.signInWithEmailAndPassword(email, password));
+            }
+        });
+        testOnCompleteAuthListener.getValue().onComplete(taskAuthFailResult);
+    }
+    @Test
     public void testAuthSignOut() {
         Mockito.doNothing().when(fbAuth).signOut();
         auth.signOut();

@@ -77,12 +77,10 @@ public class FirebaseAuthProvider extends AuthProvider {
                 if (task.isSuccessful()) {
                     //reset textViews content
                     // Sign in success
-                    //Log.d(TAG, "signInWithEmail:success");
                     user = auth.getCurrentUser();
                     listener.onSuccess();
                 } else {
                     // Sign in fails
-                    Log.w(TAG, "signInWithEmail:failure", task.getException());
                     listener.onFailure();
                 }
             }
