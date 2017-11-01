@@ -28,6 +28,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     // firebase user that we authenticate
     private FirebaseUser user = null;
     // firebase status
+    /*
     private FirebaseAuth.AuthStateListener state;
 
     /**
@@ -35,6 +36,7 @@ public class FirebaseAuthProvider extends AuthProvider {
      *
      * @param act the current activity in which we want to detect an account change
      */
+    /*
     private void createStateListener(final Activity act) {
         state = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -59,7 +61,7 @@ public class FirebaseAuthProvider extends AuthProvider {
         };
         auth.addAuthStateListener(state);
     }
-
+*/
     /**
      * Signs in a user with an email, a password and what to do afterwards
      *
@@ -196,7 +198,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public void sendEmailVerification(final AuthListener listener) {
         user = auth.getCurrentUser();
-        if (auth.getCurrentUser() != null) {
+        if (user != null) {
             user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -228,7 +230,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public User getCurrentUser() {
         user = auth.getCurrentUser();
-        if (isConnected()) {
+        if (user != null) {
             //TODO get user ID or EMAIL and get it from our database
             //for now I just create a new mock user
             return new User(user.getDisplayName(), user.getEmail(), user.getUid(), user.isEmailVerified());
@@ -247,7 +249,7 @@ public class FirebaseAuthProvider extends AuthProvider {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(newName).build();
 
-        FirebaseUser user = auth.getCurrentUser();
+        user = auth.getCurrentUser();
         if (user != null) {
             user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -271,7 +273,8 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void changeEmail(String newEmail, final AuthListener listener) {
-        if (isConnected()) {
+        user = auth.getCurrentUser();
+        if (user!= null) {
             user.updateEmail(newEmail).
                     addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -295,7 +298,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public void deleteAccount(final AuthListener listener){
         //TODO delete application user in database after implementation of user storage in database
-        FirebaseUser user = auth.getCurrentUser();
+        user = auth.getCurrentUser();
         if(user!= null) {
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
