@@ -44,7 +44,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     FirebasePointOfInterest fPoi = new FirebasePointOfInterest(poi);
                     poiRef.setValue(fPoi);
                     Position pos = poi.position();
-                    geofire.setLocation(poiName, new GeoLocation(pos.latitude(), pos.longitude()));
+                    GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
+                    geofire.setLocation(poiName, geoLocation);
 
                     // inform the listener that the operation succeeded
                     listener.onSuccess();
@@ -69,9 +70,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("mylogs", "getPoiDatachange");
                 if (dataSnapshot.exists()) {
-                    Log.d("mylogs", dataSnapshot.toString());
                     FirebasePointOfInterest fPoi = dataSnapshot.getValue(FirebasePointOfInterest.class);
                     if (fPoi == null) {
                         listener.onFailure();
@@ -79,9 +78,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         // inform the listener that we got the matching poi
                         listener.onSuccess(fPoi.toPoi());
                     }
-                    Log.d("mylogs", "getPoiDone");
                 } else {
-                    Log.d("mylogs", "getPoiDoesntExist");
                     // inform the listener that the poi doesn't exist
                     listener.onDoesntExist();
                 }
