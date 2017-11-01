@@ -152,8 +152,6 @@ public class FirebaseAuthProvider extends AuthProvider {
                         if (task.isSuccessful()) {
                             // Account creation was successful in FirebaseAuthentication
                             //need to create user in our database
-                            Log.d(TAG, "FBaccountCreation: success");
-
                             Providers.database.addUser(new User("", auth.getUid()), new DatabaseProvider.AddUserListener() {
 
                                 /**
@@ -329,10 +327,8 @@ public class FirebaseAuthProvider extends AuthProvider {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Log.d(TAG, "Email was updated");
                                 listener.onSuccess();
                             } else {
-                                Log.e(TAG, "Email failed to update");
                                 listener.onFailure();
                             }
                         }

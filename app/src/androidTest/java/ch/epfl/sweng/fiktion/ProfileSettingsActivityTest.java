@@ -55,7 +55,7 @@ public class ProfileSettingsActivityTest {
         Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
-                user=currUser;
+                user = currUser;
             }
 
             @Override
@@ -89,7 +89,6 @@ public class ProfileSettingsActivityTest {
         final String newName = "new name";
         onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_name)).perform(click());
-
 
 
         //change email
@@ -195,7 +194,6 @@ public class ProfileSettingsActivityTest {
         }
 
 
-
         onView(withText("No user currently signed in"))
                 .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
                         .getDecorView())))).check(matches(isDisplayed()));
@@ -203,7 +201,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void alreadyVerifiedSendEmailVerification(){
+    public void alreadyVerifiedSendEmailVerification() {
 
         onView(withId(R.id.update_email_verification)).perform(click());
         //should send an email verification since the user is already connected (default user)
@@ -219,7 +217,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void successSendEmailVerification(){
+    public void successSendEmailVerification() {
         //in our local auth we have only one user with a verified account,
         //we must delete this account and create a new one
         //without a verified email
@@ -279,7 +277,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void noUserSignedInSendEmailVerification(){
+    public void noUserSignedInSendEmailVerification() {
         Providers.auth.signOut();
         onView(withId(R.id.update_email_verification)).perform(click());
         //should send an email verification since the user is already connected (default user)
@@ -295,7 +293,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void successResetPassword(){
+    public void successResetPassword() {
 
         onView(withId(R.id.update_reset_password)).perform(click());
         //should send an email verification since the user is already connected (default user)
@@ -311,7 +309,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void failResetPassword(){
+    public void failResetPassword() {
         Providers.auth.signOut();
         onView(withId(R.id.update_reset_password)).perform(click());
         //should send an email verification since the user is already connected (default user)
