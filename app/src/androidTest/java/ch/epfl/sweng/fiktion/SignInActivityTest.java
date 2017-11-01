@@ -74,7 +74,6 @@ public class SignInActivityTest {
         //this view is in other activity but no need to tell Espresso
         //check that we correctly advanced to the next activity
         onView(withId(R.id.detail_signout)).perform(click());
-
     }
 
 

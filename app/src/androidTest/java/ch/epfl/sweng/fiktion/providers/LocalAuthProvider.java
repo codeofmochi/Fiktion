@@ -36,10 +36,10 @@ public class LocalAuthProvider extends AuthProvider {
         //so we will focus on accounts with the same email
         if (mailList.contains(email)
                 && password.equals("testing")) {
+            listener.onSuccess();
             currUser = new User("", "defaultID");
             signedIn = true;
             currentUserEmail = email;
-            listener.onSuccess();
         } else {
             listener.onFailure();
         }
@@ -79,7 +79,7 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public String validatePassword(String password) {
-        String errMessage = "";
+        String errMessage = null;
         if (password.isEmpty()) {
             errMessage = "Requires a valid password";
         } else {
@@ -100,7 +100,7 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
 
-        User newUser = new User("", "newID");
+        User newUser = new User("new", "newID");
         if (mailList.contains(email)) {
             listener.onFailure();
         } else {
