@@ -11,6 +11,7 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
 /**
@@ -66,31 +67,39 @@ public class UserDetailsActivity extends AppCompatActivity {
         super.onStart();
         Log.d(TAG, "Started UserDetailsActivity");
 
-        //initialise user details and firebase authentication
+        //initialise user details
 
         if (auth.isConnected()) {
             Log.d(TAG, "User signed in");
             // Name, email address, and profile photo Url
-            User user = auth.getCurrentUser();
-            name = user.getName();
-            email = user.getEmail();
-            if (user.isEmailVerified()) {
-                user_verify_view.setText(R.string.email_is_verified);
-            } else {
-                user_verify_view.setText(R.string.email_is_not_verified);
-            }
+            auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+                @Override
+                public void onSuccess(User currUser) {
+                    name = currUser.getName();
+                    email = auth.getEmail();
+                    if (auth.isEmailVerified()) {
+                        user_verify_view.setText(R.string.email_is_verified);
+                    } else {
+                        user_verify_view.setText(R.string.email_is_not_verified);
+                    }
+                    updateUI(UIMode.defaultMode);
+                }
 
-            //Uri photoUrl = user.getPhotoUrl();
-            //String uid = user.getID();
-            // The user's ID, unique to the Firebase project. Do NOT use this value to
-            // authenticate with your backend server, if you have one. Use
-            // FirebaseUser.getToken() instead. [I will keep this advice for now]
-            updateUI(UIMode.defaultMode);
+                @Override
+                public void onDoesntExist() {
+
+                }
+
+                @Override
+                public void onFailure() {
+
+                }
+            });
+
+
         } else {
-            //this case will probably never happen
-            Log.d(TAG, "Could not initialise user details, user is not signed in");
+            Toast.makeText(this,"User signed out",Toast.LENGTH_SHORT).show();
         }
-
     }
 
     /**
@@ -132,7 +141,6 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     /**
      * Starts the sign out request
-     *
      */
     public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Signing Out");

@@ -9,9 +9,7 @@ import ch.epfl.sweng.fiktion.models.User;
  */
 public class FirebaseUser {
     public String name;
-    public String email;
     public String id;
-    public boolean emailVerified;
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebaseUser.class)
@@ -26,9 +24,7 @@ public class FirebaseUser {
      */
     public FirebaseUser(User user) {
         name = user.getName();
-        email = user.getEmail();
         id = user.getID();
-        emailVerified = user.isEmailVerified();
     }
 
     /**
@@ -37,6 +33,6 @@ public class FirebaseUser {
      * @return the user
      */
     public User toUser() {
-        return new User(name, email, id, emailVerified);
+        return new User(name, id);
     }
 }

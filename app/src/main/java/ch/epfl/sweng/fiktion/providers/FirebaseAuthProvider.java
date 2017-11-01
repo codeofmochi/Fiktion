@@ -10,16 +10,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
-/**
+/** This class represents our Authentication provider based on FirebaseAuthentication
  * Created by Rodrigo on 17.10.2017.
  */
 
-@SuppressWarnings("DefaultFileTemplate")
 class FirebaseAuthProvider extends AuthProvider {
 
     //testing
@@ -110,6 +108,8 @@ class FirebaseAuthProvider extends AuthProvider {
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";
             Log.d(TAG, "Email validation failed");
+        } else if (email.equals(user.getEmail())) {
+            errMessage = "Please type a new email";
         }
         return errMessage;
     }
@@ -144,15 +144,43 @@ class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void createUserWithEmailAndPassword(String email, String password, final AuthListener listener) {
+        //create user in FirebaseAuthentication
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Account creation was successful
-                            Log.d(TAG, "accountCreation: success");
-                            listener.onSuccess();
-                            user = auth.getCurrentUser();
+                            // Account creation was successful in FirebaseAuthentication
+                            //need to create user in our database
+                            Log.d(TAG, "FBaccountCreation: success");
+
+                            Providers.database.addUser(new User("", auth.getUid()), new DatabaseProvider.AddUserListener() {
+
+                                /**
+                                 * what to do if the addition succeeded
+                                 */
+                                @Override
+                                public void onSuccess() {
+                                    user = auth.getCurrentUser();
+                                    listener.onSuccess();
+                                }
+
+                                /**
+                                 * what to do if the poi already exists
+                                 */
+                                @Override
+                                public void onAlreadyExists() {
+                                    listener.onFailure();
+                                }
+
+                                /**
+                                 * what to do if the addition failed
+                                 */
+                                @Override
+                                public void onFailure() {
+                                    listener.onFailure();
+                                }
+                            });
                         } else {
                             // Account creation failed
                             Log.w(TAG, "accountCreation: failure", task.getException());
@@ -198,6 +226,7 @@ class FirebaseAuthProvider extends AuthProvider {
 
     /**
      * Sends an email verification to the current user connected
+     *
      * @param listener awaits the result and acts accordingly
      */
     @Override
@@ -221,6 +250,7 @@ class FirebaseAuthProvider extends AuthProvider {
 
     /**
      * Verifies if the user is currently connected or not
+     *
      * @return true if user is signed in, false otherwise
      */
     @Override
@@ -229,27 +259,39 @@ class FirebaseAuthProvider extends AuthProvider {
     }
 
     /**
-     *
-     * @return Currently signed in User or null if there is not any
+     * Starts request to retrieve currently signed in User or null if there is not any
      */
     @Override
-    public User getCurrentUser() {
+    public void getCurrentUser(final DatabaseProvider.GetUserListener listener) {
         user = auth.getCurrentUser();
-        if (isConnected()) {
+        if (user != null) {
             //TODO get user ID or EMAIL and get it from our database
             //for now I just create a new mock user
-            return new User(user.getDisplayName(), user.getEmail(), user.getUid(), user.isEmailVerified());
+            Providers.database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
+                @Override
+                public void onSuccess(User user) {
+                    listener.onSuccess(user);
+                }
+                @Override
+                public void onDoesntExist() {
+                    listener.onDoesntExist();
+                }
+                @Override
+                public void onFailure() {
+                    listener.onFailure();
+                }
+            });
         } else {
-            return null;
+            listener.onFailure();
         }
     }
 
-    /**
+    /*
      * Enables the user to change his username
      * @param newName new username provided by the user
      * @param listener actions to be done in case of failure or success
      */
-    @Override
+/*    @Override
     public void changeName(String newName, final AuthListener listener) {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(newName).build();
@@ -271,41 +313,47 @@ class FirebaseAuthProvider extends AuthProvider {
             listener.onFailure();
         }
     }
+*/
 
     /**
      * Enables the user to change his primary email
+     *
      * @param newEmail new email provided by the user
      * @param listener actions to be done in case of failure or success
      */
     @Override
     public void changeEmail(String newEmail, final AuthListener listener) {
-        if (isConnected()) {
+        user = auth.getCurrentUser();
+        if (user != null) {
             user.updateEmail(newEmail).
                     addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Email was updated");
-                        listener.onSuccess();
-                    } else {
-                        Log.e(TAG, "Email failed to update");
-                        listener.onFailure();
-                    }
-                }
-            });
-        }else{
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "Email was updated");
+                                listener.onSuccess();
+                            } else {
+                                Log.e(TAG, "Email failed to update");
+                                listener.onFailure();
+                            }
+                        }
+                    });
+        } else {
             listener.onFailure();
         }
     }
 
     /**
      * Enables the user to delete his account if he has signed in recently
+     *
      * @param listener actions to be done in case of failure or success
      */
     @Override
-    public void deleteAccount(final AuthListener listener){
+    public void deleteAccount(final AuthListener listener, final DatabaseProvider.DeleteUserListener delListener) {
         //TODO delete application user in database after implementation of user storage in database
-        if(user!= null) {
+        user = auth.getCurrentUser();
+        if (user != null) {
+            //delete user in FirebaseAuthentication
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -313,15 +361,42 @@ class FirebaseAuthProvider extends AuthProvider {
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Account deleted successfully on firebase");
                                 listener.onSuccess();
+                                //delete user in our database
+                                Providers.database.deleterUserById(user.getUid(), delListener);
                             } else {
                                 Log.d(TAG, "Failed to delete account on firebase");
                                 listener.onFailure();
                             }
                         }
                     });
-        } else{
+
+        } else {
             Log.d(TAG, "Failed to delete account on firebase, no user currently signed in");
             listener.onFailure();
         }
     }
+
+    /**
+     * @return true if user is email verified, false otherwise
+     */
+    @Override
+    public Boolean isEmailVerified() {
+        user = auth.getCurrentUser();
+        return user != null && user.isEmailVerified();
+    }
+
+    /**
+     * @return email of the current signed in user, null if there is not any user connected
+     */
+    @Override
+    public String getEmail() {
+        if (auth.getCurrentUser() != null) {
+            return user.getEmail();
+        } else {
+            return null;
+        }
+
+    }
+
+
 }

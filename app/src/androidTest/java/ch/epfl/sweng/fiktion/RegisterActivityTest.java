@@ -71,7 +71,7 @@ public class RegisterActivityTest {
 
         onView(withId(R.id.register_click)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getEmail(), is(new_email));
+        assertThat(Providers.auth.getEmail(), is(new_email));
     }
 
     @Test

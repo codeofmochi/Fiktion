@@ -31,7 +31,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SignInActivityTest {
 
-    private final String valid_email = "test@test.ch";
+    private final String valid_email = "default@email.ch";
     private final String invalid_email = "invalid";
     private final String invalid_password = "1234";
 

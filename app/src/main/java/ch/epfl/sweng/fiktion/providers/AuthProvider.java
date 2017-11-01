@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import ch.epfl.sweng.fiktion.models.User;
-
 /**
  * Created by rodri on 17.10.2017.
  */
@@ -70,18 +68,12 @@ public abstract class AuthProvider {
 
     /**
      *
-     * @return Currently signed in User or null if there is not any
+     * starts a request to database to have currently signed in User or null if there is not any
+     * @param listener handles what to do after the request
      */
-    public abstract User getCurrentUser();
+    public abstract void getCurrentUser(DatabaseProvider.GetUserListener listener);
 
-    /**
-     * Enables the user to change his username
-     * @param name new username provided by the user
-     * @param listener actions to be done in case of failure or success
-     */
-    public abstract void changeName(String name,final AuthListener listener);
-
-    /**
+    /*
      * Enables the user to change his primary email
      * @param email new email provided by the user
      * @param listener actions to be done in case of failure or success
@@ -90,7 +82,20 @@ public abstract class AuthProvider {
 
     /**
      * Enables the user to delete his account if he has signed in recently
-     * @param listener actions to be done in case of failure or success
+     * @param listener actions to be done in case of failure or success in firebase authentication
+     * @param delListener actions to be done in case of failure, sucess or inexistant in database
      */
-    public abstract void deleteAccount(AuthListener listener);
+    public abstract void deleteAccount(AuthListener listener, DatabaseProvider.DeleteUserListener delListener);
+
+    /**
+     *
+     * @return true if user is email verified, false otherwise
+     */
+    public abstract Boolean isEmailVerified();
+
+    /**
+     *
+     * @return email of the current signed in user, null if there is not any user connected
+     */
+    public abstract String getEmail();
     }
