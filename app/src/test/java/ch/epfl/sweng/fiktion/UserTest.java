@@ -6,12 +6,12 @@ import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.FirebaseUser;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /** This class tests methods of the class USER
@@ -36,7 +36,9 @@ public class UserTest {
 
         assertFalse(user.equals(null));
         assertFalse(user.equals(almostEqual));
+        assertFalse(user.equals(other));
         assertTrue(user.equals(same));
+        assertFalse(user.equals(new FirebaseUser()));
     }
 
     @Test
