@@ -70,13 +70,13 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void signIn(String email, String password, final AuthListener listener) {
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     //reset textViews content
                     // Sign in success
-                    //Log.d(TAG, "signInWithEmail:success");
                     user = auth.getCurrentUser();
                     listener.onSuccess();
                 } else {
@@ -105,13 +105,12 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public String validateEmail(String email) {
-        String errMessage = "";
+        String errMessage = null;
+        user = auth.getCurrentUser();
         //TODO elaborate email validation
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";
             Log.d(TAG, "Email validation failed");
-        } else if (email.equals(user.getEmail())) {
-            errMessage = "Please type a new email";
         }
         return errMessage;
     }
@@ -124,7 +123,7 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public String validatePassword(String password) {
-        String errMessage = "";
+        String errMessage = null;
         if (password.isEmpty()) {
             errMessage = "Requires a valid password";
         } else {
@@ -152,33 +151,30 @@ public class FirebaseAuthProvider extends AuthProvider {
                         if (task.isSuccessful()) {
                             // Account creation was successful in FirebaseAuthentication
                             //need to create user in our database
+
                             Providers.database.addUser(new User("", auth.getUid()), new DatabaseProvider.AddUserListener() {
 
-                                /**
-                                 * what to do if the addition succeeded
-                                 */
+
                                 @Override
                                 public void onSuccess() {
                                     user = auth.getCurrentUser();
                                     listener.onSuccess();
                                 }
 
-                                /**
-                                 * what to do if the poi already exists
-                                 */
+
                                 @Override
                                 public void onAlreadyExists() {
                                     listener.onFailure();
                                 }
 
-                                /**
-                                 * what to do if the addition failed
-                                 */
+
                                 @Override
                                 public void onFailure() {
                                     listener.onFailure();
                                 }
                             });
+
+                            listener.onSuccess();
                         } else {
                             // Account creation failed
                             listener.onFailure();
