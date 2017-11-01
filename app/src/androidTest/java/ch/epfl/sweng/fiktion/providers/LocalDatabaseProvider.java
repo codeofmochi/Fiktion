@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
@@ -14,8 +15,10 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
+    private final User defaultUser = new User("", "defaultID");
     private final List<PointOfInterest> poiList = new ArrayList<>();
-    private final List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>
+            (Collections.singletonList(defaultUser));
 
     /**
      * {@inheritDoc}
@@ -78,11 +81,11 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void addUser(User user, AddUserListener listener) {
-        boolean contains = true;
+        boolean contains = false;
         String id = user.getID();
         // go through all the users and check if there is one with the same id as the user in parameter
         for (User u: users) {
-            contains &= u.getID().equals(id);
+            contains |= u.getID().equals(id);
         }
         if (contains) {
             listener.onAlreadyExists();
@@ -137,7 +140,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
             @Override
             public void onFailure() {
-
+                listener.onFailure();
             }
         });
     }

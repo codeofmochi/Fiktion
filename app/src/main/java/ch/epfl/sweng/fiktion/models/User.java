@@ -1,6 +1,9 @@
 package ch.epfl.sweng.fiktion.models;
 
+import android.util.Log;
+
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
 /**This class represents the User in the application
@@ -29,9 +32,27 @@ public class User {
      */
     public void changeName(final String newName, final AuthProvider.AuthListener listener) {
         if(!newName.isEmpty() && !newName.equals(name) && newName.length()<=15){
-            name = newName;
-            listener.onSuccess();
+            Providers.database.modifyUser(new User(newName, id), new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    name = newName;
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    Log.d("User", "fails because does not exist "+id);
+                    listener.onFailure();
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.d("User", "fails because fails");
+                    listener.onFailure();
+                }
+            });
         } else{
+            Log.d("User", "fails because invalid credentials");
             listener.onFailure();
         }
     }
