@@ -19,20 +19,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.exceptions.ExceptionIncludingMockitoWarnings;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class,FirebaseAuthProvider.class})
+@PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class, FirebaseAuthProvider.class})
 public class FirebaseAuthTest {
 
     private FirebaseAuthProvider auth;
@@ -47,7 +45,11 @@ public class FirebaseAuthTest {
     @Mock
     Task<AuthResult> taskAuthSucceedResult;
     @Mock
+    Task<AuthResult> taskAuthFailResult;
+    @Mock
     Task<Void> taskVoidSucceedResult;
+    @Mock
+    Task<Void> taskVoidFailResult;
     @Mock
     AuthResult result;
     @Mock
@@ -64,11 +66,10 @@ public class FirebaseAuthTest {
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
 
-
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         mockStatic(FirebaseAuth.class);
-        setSucceedTask();
+        setTasks();
 
         Mockito.when(FirebaseAuth.getInstance()).thenReturn(fbAuth);
 
@@ -76,19 +77,27 @@ public class FirebaseAuthTest {
 
     }
 
-    private void setSucceedTask(){
+    private void setTasks() {
         Mockito.when(taskAuthSucceedResult.isComplete()).thenReturn(true);
         Mockito.when(taskAuthSucceedResult.isSuccessful()).thenReturn(true);
         Mockito.when(taskAuthSucceedResult.addOnCompleteListener(testOnCompleteAuthListener.capture())).
                 thenReturn(taskAuthSucceedResult);
+        Mockito.when(taskAuthFailResult.isComplete()).thenReturn(true);
+        Mockito.when(taskAuthFailResult.isSuccessful()).thenReturn(false);
+        Mockito.when(taskAuthFailResult.addOnCompleteListener(testOnCompleteAuthListener.capture())).
+                thenReturn(taskAuthFailResult);
         Mockito.when(taskVoidSucceedResult.isComplete()).thenReturn(true);
         Mockito.when(taskVoidSucceedResult.isSuccessful()).thenReturn(true);
         Mockito.when(taskVoidSucceedResult.addOnCompleteListener(testOnCompleteVoidListener.capture())).
                 thenReturn(taskVoidSucceedResult);
+        Mockito.when(taskVoidFailResult.isComplete()).thenReturn(true);
+        Mockito.when(taskVoidFailResult.isSuccessful()).thenReturn(false);
+        Mockito.when(taskVoidFailResult.addOnCompleteListener(testOnCompleteVoidListener.capture())).
+                thenReturn(taskVoidFailResult);
     }
 
     @Test
-    public void testSuccessfulDeleteAccount(){
+    public void testSuccessfulDeleteAccount() {
         //test successful
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
         Mockito.when(fbUser.delete()).thenReturn(taskVoidSucceedResult);
@@ -105,8 +114,28 @@ public class FirebaseAuthTest {
         });
         testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
     }
+
     @Test
-    public void testNotLoggedInDeleteAccount(){
+    public void testFailDeleteAccount() {
+        //test successful
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.delete()).thenReturn(taskVoidFailResult);
+        auth.deleteAccount(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbUser.delete());
+            }
+        });
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
+    }
+
+    @Test
+    public void testNotLoggedInDeleteAccount() {
         //test successful
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
         auth.deleteAccount(new AuthProvider.AuthListener() {
@@ -124,7 +153,7 @@ public class FirebaseAuthTest {
     }
 
     @Test
-    public void succeedSendPasswordResetEmail(){
+    public void succeedSendPasswordResetEmail() {
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
         Mockito.when(fbUser.getEmail()).thenReturn(email);
         Mockito.when(fbAuth.sendPasswordResetEmail(email)).thenReturn(taskVoidSucceedResult);
@@ -144,7 +173,27 @@ public class FirebaseAuthTest {
     }
 
     @Test
-    public void succeedUpdateProfile() throws Exception{
+    public void failSendPasswordResetEmail() {
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.getEmail()).thenReturn(email);
+        Mockito.when(fbAuth.sendPasswordResetEmail(email)).thenReturn(taskVoidFailResult);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbAuth.sendPasswordResetEmail(email));
+            }
+        });
+
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
+    }
+
+    @Test
+    public void succeedUpdateProfile() throws Exception {
         String newName = "new name";
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
         whenNew(UserProfileChangeRequest.Builder.class).withAnyArguments().thenReturn(updateProfileBuilder);
@@ -165,9 +214,72 @@ public class FirebaseAuthTest {
         });
         testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
     }
-    
+
     @Test
-    public void succedSendEmailVerification(){
+    public void failUpdateProfile() throws Exception {
+        String newName = "new name";
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        whenNew(UserProfileChangeRequest.Builder.class).withAnyArguments().thenReturn(updateProfileBuilder);
+        Mockito.when(updateProfileBuilder.setDisplayName(newName)).thenReturn(updateProfileBuilder);
+        Mockito.when(updateProfileBuilder.build()).thenReturn(updateProfile);
+        Mockito.when(fbUser.updateProfile(updateProfile)).thenReturn(taskVoidFailResult);
+
+        auth.changeName(newName, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbUser.updateProfile(updateProfile));
+            }
+        });
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
+    }
+
+    @Test
+    public void SuccedUpdateEmail() {
+        final String newEmail = "new@email.ch";
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.updateEmail(newEmail)).thenReturn(taskVoidSucceedResult);
+
+        auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Mockito.verify(fbUser.updateEmail(newEmail));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
+    }
+
+    @Test
+    public void failUpdateEmail() {
+        final String newEmail = "new@email.ch";
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.updateEmail(newEmail)).thenReturn(taskVoidFailResult);
+
+        auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbUser.updateEmail(newEmail));
+            }
+        });
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
+    }
+
+    @Test
+    public void succedSendEmailVerification() {
 
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
         Mockito.when(fbUser.sendEmailVerification()).thenReturn(taskVoidSucceedResult);
@@ -185,13 +297,36 @@ public class FirebaseAuthTest {
 
         testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
     }
+
     @Test
-    public void succeedCreateUser(){
-        Mockito.when(fbAuth.createUserWithEmailAndPassword(email,password)).thenReturn(taskAuthSucceedResult);
+    public void failSendEmailVerification() {
+
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.sendEmailVerification()).thenReturn(taskVoidFailResult);
+        auth.sendEmailVerification(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbUser.sendEmailVerification());
+            }
+
+
+        });
+
+        testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
+    }
+
+    @Test
+    public void succeedCreateUser() {
+        Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthSucceedResult);
         auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Mockito.verify(fbAuth.createUserWithEmailAndPassword(email,password));
+                Mockito.verify(fbAuth.createUserWithEmailAndPassword(email, password));
             }
 
             @Override
@@ -201,15 +336,33 @@ public class FirebaseAuthTest {
         });
         testOnCompleteAuthListener.getValue().onComplete(taskAuthSucceedResult);
     }
+
     @Test
-    public void succeedSignIn(){
-        setSucceedTask();
-        Mockito.when(fbAuth.signInWithEmailAndPassword(email,password)).thenReturn(taskAuthSucceedResult);
+    public void failCreateUser() {
+        Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthFailResult);
+        auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbAuth.createUserWithEmailAndPassword(email, password));
+            }
+        });
+        testOnCompleteAuthListener.getValue().onComplete(taskAuthFailResult);
+    }
+
+    @Test
+    public void succeedSignIn() {
+        setTasks();
+        Mockito.when(fbAuth.signInWithEmailAndPassword(email, password)).thenReturn(taskAuthSucceedResult);
 
         auth.signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Mockito.verify(fbAuth.signInWithEmailAndPassword(email,password));
+                Mockito.verify(fbAuth.signInWithEmailAndPassword(email, password));
             }
 
             @Override
@@ -219,13 +372,15 @@ public class FirebaseAuthTest {
         });
         testOnCompleteAuthListener.getValue().onComplete(taskAuthSucceedResult);
     }
+
     @Test
-    public void testAuthSignOut(){
+    public void testAuthSignOut() {
         Mockito.doNothing().when(fbAuth).signOut();
         auth.signOut();
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
         Assert.assertNull(auth.getCurrentUser());
     }
+
     @Test
     public void getCurrentUser() {
         String name = "default";
@@ -243,11 +398,6 @@ public class FirebaseAuthTest {
         Assert.assertEquals(auth.getCurrentUser().getID(), id);
         Assert.assertFalse(auth.getCurrentUser().isEmailVerified());
     }
-
-
-
-
-
 
 
 }
