@@ -147,7 +147,7 @@ public abstract class DatabaseProvider {
     /**
      * Listener that listens the result of the deletion of a user
      */
-    public interface DeleteUserListener {
+    public interface OperationOnExistingUserListener {
 
         /**
          * what to do if the deletion succeeded
@@ -164,6 +164,10 @@ public abstract class DatabaseProvider {
          */
         void onFailure();
     }
+
+    public interface DeleteUserListener extends OperationOnExistingUserListener{}
+
+    public interface ModifyUserListener extends OperationOnExistingUserListener{}
 
     /**
      * add a user to the database, inform the listener of the result
@@ -188,4 +192,12 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void deleterUserById(String id, final DeleteUserListener listener);
+
+    /**
+     * modify the user, inform the listener of the result of the modification
+     *
+     * @param user the user
+     * @param listener the listener
+     */
+    public abstract void modifyUser(User user, final ModifyUserListener listener);
 }

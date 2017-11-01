@@ -120,4 +120,25 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
         listener.onDoesntExist();
     }
+
+    @Override
+    public void modifyUser(final User user, final ModifyUserListener listener) {
+        deleterUserById(user.getID(), new DeleteUserListener() {
+            @Override
+            public void onSuccess() {
+                users.add(user);
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                listener.onDoesntExist();
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+    }
 }
