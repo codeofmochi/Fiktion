@@ -28,7 +28,7 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the changement
      */
     public void changeName(final String newName, final AuthProvider.AuthListener listener) {
-        if(newName!=null && !newName.equals(name) && newName.length()<=15){
+        if(!newName.isEmpty() && !newName.equals(name) && newName.length()<=15){
             name = newName;
             listener.onSuccess();
         } else{

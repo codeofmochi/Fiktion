@@ -36,8 +36,6 @@ public class RegisterActivityTest {
     private final String TAG = "RegActivTest";
     private final String new_email = "new@email.com";
     private final String new_password = "validpass";
-    private final String exist_email = "default@test.ch";
-    private final String exist_password = "testing";
 
     private RegisterActivity regActivity;
 
@@ -77,7 +75,9 @@ public class RegisterActivityTest {
     @Test
     public void existingAccountTest() {
         //we type valid but existing credentials and click on the register button
+        String exist_email = "default@test.ch";
         onView(withId(R.id.register_email)).perform(typeText(exist_email), ViewActions.closeSoftKeyboard());
+        String exist_password = "testing";
         onView(withId(R.id.register_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_confirm_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());
 
