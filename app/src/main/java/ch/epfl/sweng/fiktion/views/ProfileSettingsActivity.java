@@ -12,6 +12,7 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
 public class ProfileSettingsActivity extends AppCompatActivity {
@@ -45,12 +46,33 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         deleteAccount = (Button) findViewById(R.id.update_delete_account);
         emailVerification = (Button) findViewById(R.id.update_email_verification);
 
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        user = auth.getCurrentUser();
+        if(auth.isConnected()){
+            auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+                @Override
+                public void onSuccess(User currUser) {
+                    user = currUser;
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    user = null;
+                }
+
+                @Override
+                public void onFailure() {
+                    user = null;
+                }
+            });
+        }else{
+            Toast.makeText(this,"User sign in state changed", Toast.LENGTH_SHORT).show();
+            goHome();
+        }
     }
 
     /**
@@ -64,8 +86,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
 
         if (auth.isConnected()) {
             // Send verification email only if user does not have a verified email
-            user = auth.getCurrentUser();
-            if (user.isEmailVerified()) {
+            if (auth.isEmailVerified()) {
                 emailVerification.setEnabled(true);
                 Toast.makeText(this, "User's email is verified", Toast.LENGTH_SHORT).show();
                 return;
@@ -144,11 +165,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         final String newEmail = user_newEmail.getText().toString();
         findViewById(R.id.update_confirm_email).setEnabled(false);
 
-        //validate name choice
-        if (!newEmail.isEmpty()
-                && !newEmail.equals(user.getEmail())) {
+        String errMessage = auth.validateEmail(newEmail);
 
-            user.changeEmail(newEmail, new AuthProvider.AuthListener() {
+        //validate name choice
+        if (errMessage== null) {
+            auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
                     findViewById(R.id.update_confirm_email).setEnabled(true);
@@ -167,7 +188,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             });
         } else {
             findViewById(R.id.update_confirm_email).setEnabled(true);
-            Toast.makeText(this, "Please type a new email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, errMessage, Toast.LENGTH_SHORT).show();
         }
         this.onRestart();
 
@@ -207,8 +228,6 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             // Re-enable button
             pwReset.setEnabled(true);
         }
-
-
     }
 
     /**
@@ -222,10 +241,8 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             auth.deleteAccount(new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
-                    Toast.makeText(ProfileSettingsActivity.this,
-                            "Account deleted successfully", Toast.LENGTH_SHORT).show();
-                    deleteAccount.setEnabled(true);
-                    goHome();
+                    //we do not do anything,
+                    // we need to wait that the user is correctly deleted from database
                 }
 
                 @Override
@@ -234,13 +251,38 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                     Toast.makeText(ProfileSettingsActivity.this,
                             "You did not sign in recently, please re-authenticate and try again", Toast.LENGTH_LONG).show();
                 }
+            }, new DatabaseProvider.DeleteUserListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(ProfileSettingsActivity.this,
+                            "User account deleted successfully",
+                            Toast.LENGTH_SHORT).show();
+                    goHome();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    Toast.makeText(ProfileSettingsActivity.this,
+                            "User account deleted successfully",
+                            Toast.LENGTH_SHORT).show();
+                    goHome();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(ProfileSettingsActivity.this,
+                            "There was a problem deleting your account, signing you out",
+                            Toast.LENGTH_SHORT).show();
+                    auth.signOut();
+                    goHome();
+                }
             });
 
         } else {
             deleteAccount.setEnabled(true);
             Toast.makeText(ProfileSettingsActivity.this,
                     "No user currently signed in", Toast.LENGTH_LONG).show();
-            //TODO maybe start a signin activity
+            goHome();
         }
     }
 

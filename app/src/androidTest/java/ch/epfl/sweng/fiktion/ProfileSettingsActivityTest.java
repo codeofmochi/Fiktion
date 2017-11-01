@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
@@ -26,7 +27,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -38,7 +38,8 @@ import static org.hamcrest.core.IsNot.not;
 public class ProfileSettingsActivityTest {
 
     private User user;
-    private final User defaultUser = new User("", "default@test.ch", "id", true);
+    private final User defaultUser = new User("", "id");
+    private final String defaultEmail = "default@email.ch";
 
     @Rule
     public final ActivityTestRule<ProfileSettingsActivity> editProfileActivityRule =
@@ -51,7 +52,22 @@ public class ProfileSettingsActivityTest {
 
     @Before
     public void setVariables() {
-        user = Providers.auth.getCurrentUser();
+        Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User currUser) {
+                user = currUser;
+            }
+
+            @Override
+            public void onDoesntExist() {
+                user = null;
+            }
+
+            @Override
+            public void onFailure() {
+                user = null;
+            }
+        });
     }
 
     @After
@@ -70,18 +86,33 @@ public class ProfileSettingsActivityTest {
     public void changeUserInfos_newValues() {
         //TODO check that toasts appear
         //change name
-        String newName = "new name";
+        final String newName = "new name";
         onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_name)).perform(click());
 
 
-        assertThat(Providers.auth.getCurrentUser().getName(), is(newName));
         //change email
-        String newEmail = "new@email.ch";
+        final String newEmail = "new@email.ch";
         onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_email)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getEmail(), is(newEmail));
+        Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                assertThat(user.getName(), is(newName));
+                assertThat(Providers.auth.getEmail(), is(newEmail));
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
 
     }
 
@@ -89,25 +120,40 @@ public class ProfileSettingsActivityTest {
     public void changeUserInfos_sameValues() {
         //TODO check that toasts appear
         //change name
-        String newName = user.getName();
+        final String newName = user.getName();
         onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_name)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getName(), is(user.getName()));
         //change email
-        String newEmail = user.getEmail();
+        final String newEmail = Providers.auth.getEmail();
         onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_email)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getEmail(), is(user.getEmail()));
+        Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                assertThat(user.getName(), is(newName));
+                assertThat(Providers.auth.getEmail(), is(newEmail));
+            }
 
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
     }
 
     @Test
     public void successDeleteAccount() {
         onView(withId(R.id.update_delete_account)).perform(click());
         //check that list of user that by default only has one user is now empty
-        Providers.auth.signIn(defaultUser.getEmail(), "testing", new AuthProvider.AuthListener() {
+        Providers.auth.signIn(Providers.auth.getEmail(), "testing", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -115,28 +161,26 @@ public class ProfileSettingsActivityTest {
 
             @Override
             public void onFailure() {
-                Assert.assertNull(Providers.auth.getCurrentUser());
+                Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        //success
+                    }
+                });
             }
         });
     }
 
-    @Test
-    public void failDeleteAccount(){
-        Providers.auth.signOut();
-        onView(withId(R.id.update_delete_account)).perform(click());
-        //check that list of user that by default only has one user is now empty
-        Providers.auth.signIn(defaultUser.getEmail(), "testing", new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                assertThat(Providers.auth.getCurrentUser().getEmail(), is(defaultUser.getEmail()));
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
-    }
 
     @Test
     public void failNoUserSignedInDeleteAccount() {
@@ -150,7 +194,6 @@ public class ProfileSettingsActivityTest {
         }
 
 
-
         onView(withText("No user currently signed in"))
                 .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
                         .getDecorView())))).check(matches(isDisplayed()));
@@ -158,7 +201,8 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void verifiedSendEmailVerification(){
+    public void alreadyVerifiedSendEmailVerification() {
+
         onView(withId(R.id.update_email_verification)).perform(click());
         //should send an email verification since the user is already connected (default user)
 
@@ -173,17 +217,30 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void successSendEmailVerification(){
+    public void successSendEmailVerification() {
         //in our local auth we have only one user with a verified account,
         //we must delete this account and create a new one
         //without a verified email
         Providers.auth.deleteAccount(new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
+                //we succeeded in deleting in firebase
+            }
+
+            @Override
+            public void onFailure() {
+                //should be able to delete current account because there is one connected by default
+                Assert.fail();
+            }
+        }, new DatabaseProvider.DeleteUserListener() {
+            @Override
+            public void onSuccess() {
+                //we successfully deleted the account on the database
                 Providers.auth.createUserWithEmailAndPassword("new@email", "newpassword", new AuthProvider.AuthListener() {
                     @Override
                     public void onSuccess() {
-                        //we try to send an email to a unverified account
+                        //we try to send an email to a unverified account,
+                        //this account was just created successfully
                         onView(withId(R.id.update_email_verification)).perform(click());
 
                         try {
@@ -208,15 +265,19 @@ public class ProfileSettingsActivityTest {
             }
 
             @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
             public void onFailure() {
-                //should be able to delete current account because there is one connected by default
                 Assert.fail();
             }
         });
     }
 
     @Test
-    public void noUserSignedInSendEmailVerification(){
+    public void noUserSignedInSendEmailVerification() {
         Providers.auth.signOut();
         onView(withId(R.id.update_email_verification)).perform(click());
         //should send an email verification since the user is already connected (default user)
@@ -232,7 +293,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void successResetPassword(){
+    public void successResetPassword() {
 
         onView(withId(R.id.update_reset_password)).perform(click());
         //should send an email verification since the user is already connected (default user)
@@ -248,7 +309,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void failResetPassword(){
+    public void failResetPassword() {
         Providers.auth.signOut();
         onView(withId(R.id.update_reset_password)).perform(click());
         //should send an email verification since the user is already connected (default user)
