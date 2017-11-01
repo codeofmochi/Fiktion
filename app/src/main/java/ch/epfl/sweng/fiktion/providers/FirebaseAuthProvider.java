@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -12,21 +10,23 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import ch.epfl.sweng.fiktion.models.User;
-import ch.epfl.sweng.fiktion.views.SignInActivity;
 
-/** This class represents our Authentication provider based on FirebaseAuthentication
+
+/**
+ * This class represents our application provider and uses FirebaseAuthentication
  * Created by Rodrigo on 17.10.2017.
  */
 
-class FirebaseAuthProvider extends AuthProvider {
+public class FirebaseAuthProvider extends AuthProvider {
 
     //testing
     private final static String TAG = "FBAuthProv";
     // firebase authentification instance
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     // firebase user that we authenticate
-    private FirebaseUser user;
+    private FirebaseUser user = null;
     // firebase status
+    /*
     private FirebaseAuth.AuthStateListener state;
 
     /**
@@ -34,6 +34,7 @@ class FirebaseAuthProvider extends AuthProvider {
      *
      * @param act the current activity in which we want to detect an account change
      */
+    /*
     private void createStateListener(final Activity act) {
         state = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -58,6 +59,7 @@ class FirebaseAuthProvider extends AuthProvider {
         };
         auth.addAuthStateListener(state);
     }
+*/
 
     /**
      * Signs in a user with an email, a password and what to do afterwards
@@ -74,7 +76,7 @@ class FirebaseAuthProvider extends AuthProvider {
                 if (task.isSuccessful()) {
                     //reset textViews content
                     // Sign in success
-                    Log.d(TAG, "signInWithEmail:success");
+                    //Log.d(TAG, "signInWithEmail:success");
                     user = auth.getCurrentUser();
                     listener.onSuccess();
                 } else {
@@ -125,12 +127,10 @@ class FirebaseAuthProvider extends AuthProvider {
         String errMessage = "";
         if (password.isEmpty()) {
             errMessage = "Requires a valid password";
-            Log.d(TAG, "Password validation failed");
         } else {
             //TODO elaborate password validation
             if (password.length() < 6) {
                 errMessage = "Password must be at least 6 characters";
-                Log.d(TAG, "Password validation failed");
             }
         }
         return errMessage;
@@ -183,7 +183,6 @@ class FirebaseAuthProvider extends AuthProvider {
                             });
                         } else {
                             // Account creation failed
-                            Log.w(TAG, "accountCreation: failure", task.getException());
                             listener.onFailure();
                         }
                     }
@@ -197,8 +196,9 @@ class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void sendPasswordResetEmail(final AuthListener listener) {
-        String email = user.getEmail();
+        user = auth.getCurrentUser();
         if (user != null) {
+            String email = user.getEmail();
             if (email != null) {
                 auth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -207,11 +207,9 @@ class FirebaseAuthProvider extends AuthProvider {
                                 if (task.isSuccessful()) {
                                     //reset textViews content
                                     // Password reset email sent successfully
-                                    Log.d(TAG, "TransmittingPasswordResetEmail: success");
                                     listener.onSuccess();
                                 } else {
                                     // Password reset email failed to send
-                                    Log.w(TAG, "TransmittingPasswordResetEmail: failure", task.getException());
                                     listener.onFailure();
                                 }
                             }
@@ -232,7 +230,7 @@ class FirebaseAuthProvider extends AuthProvider {
     @Override
     public void sendEmailVerification(final AuthListener listener) {
         user = auth.getCurrentUser();
-        if (auth.getCurrentUser() != null) {
+        if (user != null) {
             user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -272,10 +270,12 @@ class FirebaseAuthProvider extends AuthProvider {
                 public void onSuccess(User user) {
                     listener.onSuccess(user);
                 }
+
                 @Override
                 public void onDoesntExist() {
                     listener.onDoesntExist();
                 }
+
                 @Override
                 public void onFailure() {
                     listener.onFailure();
@@ -296,15 +296,14 @@ class FirebaseAuthProvider extends AuthProvider {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(newName).build();
 
-        if (isConnected()) {
+        user = auth.getCurrentUser();
+        if (user != null) {
             user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        Log.d(TAG, "DisplayName was updated");
                         listener.onSuccess();
                     } else {
-                        Log.e(TAG, "DisplayName failed to update");
                         listener.onFailure();
                     }
                 }
@@ -352,26 +351,23 @@ class FirebaseAuthProvider extends AuthProvider {
     public void deleteAccount(final AuthListener listener, final DatabaseProvider.DeleteUserListener delListener) {
         //TODO delete application user in database after implementation of user storage in database
         user = auth.getCurrentUser();
+
         if (user != null) {
-            //delete user in FirebaseAuthentication
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Log.d(TAG, "Account deleted successfully on firebase");
                                 listener.onSuccess();
                                 //delete user in our database
                                 Providers.database.deleterUserById(user.getUid(), delListener);
                             } else {
-                                Log.d(TAG, "Failed to delete account on firebase");
                                 listener.onFailure();
                             }
                         }
                     });
 
         } else {
-            Log.d(TAG, "Failed to delete account on firebase, no user currently signed in");
             listener.onFailure();
         }
     }

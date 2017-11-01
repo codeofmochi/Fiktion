@@ -125,8 +125,6 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_name)).perform(click());
 
-
-
         //change email
         final String newEmail = Providers.auth.getEmail();
         onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
@@ -143,6 +141,7 @@ public class ProfileSettingsActivityTest {
             public void onDoesntExist() {
                 Assert.fail();
             }
+
 
             @Override
             public void onFailure() {
@@ -205,6 +204,7 @@ public class ProfileSettingsActivityTest {
 
     @Test
     public void alreadyVerifiedSendEmailVerification(){
+
         onView(withId(R.id.update_email_verification)).perform(click());
         //should send an email verification since the user is already connected (default user)
 
@@ -219,22 +219,56 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void notVerifiedSendEmailVerification(){
-
-        Providers.auth.createUserWithEmailAndPassword("new@email.ch", "testing", new AuthProvider.AuthListener() {
+    public void successSendEmailVerification(){
+        //in our local auth we have only one user with a verified account,
+        //we must delete this account and create a new one
+        //without a verified email
+        Providers.auth.deleteAccount(new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                onView(withId(R.id.update_email_verification)).perform(click());
-                //should send an email verification since the user is already connected (default user)
+                //we succeeded in deleting in firebase
+            }
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                onView(withText("Verification email sent"))
-                        .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
-                                .getDecorView())))).check(matches(isDisplayed()));
+            @Override
+            public void onFailure() {
+                //should be able to delete current account because there is one connected by default
+                Assert.fail();
+            }
+        }, new DatabaseProvider.DeleteUserListener() {
+            @Override
+            public void onSuccess() {
+                //we successfully deleted the account on the database
+                Providers.auth.createUserWithEmailAndPassword("new@email", "newpassword", new AuthProvider.AuthListener() {
+                    @Override
+                    public void onSuccess() {
+                        //we try to send an email to a unverified account,
+                        //this account was just created successfully
+                        onView(withId(R.id.update_email_verification)).perform(click());
+
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        onView(withText("Verification email sent"))
+                                .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow()
+                                        .getDecorView())))).check(matches(isDisplayed()));
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        //should be able to create account with given paramaters
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
             }
 
             @Override
@@ -242,7 +276,6 @@ public class ProfileSettingsActivityTest {
                 Assert.fail();
             }
         });
-
     }
 
     @Test

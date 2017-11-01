@@ -6,7 +6,8 @@ import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.User;
 
-/** This class defines a local auth provider for testing without actual contact with firebase
+/**
+ * This class defines a local auth provider for testing without actual contact with firebase
  * Created by Rodrigo on 18.10.2017.
  */
 
@@ -19,7 +20,7 @@ public class LocalAuthProvider extends AuthProvider {
             (Collections.singletonList(defaultEmail));
     private User currUser = defaultUser;
     private Boolean signedIn = true;
-    private String currentUserEmail = defaultEmail ;
+    private String currentUserEmail = defaultEmail;
     private Boolean emailVerified = true;
 
     /**
@@ -156,9 +157,9 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public void getCurrentUser(DatabaseProvider.GetUserListener listener) {
-        if(isConnected()) {
+        if (isConnected()) {
             listener.onSuccess(currUser);
-        } else{
+        } else {
             listener.onFailure();
         }
     }
@@ -183,7 +184,7 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public void deleteAccount(AuthListener listener, DatabaseProvider.DeleteUserListener delListener) {
-        if(isConnected()){
+        if (isConnected()) {
             mailList.remove(currentUserEmail);
             userList.remove(currUser);
             currentUserEmail = null;
@@ -192,7 +193,7 @@ public class LocalAuthProvider extends AuthProvider {
             listener.onSuccess();
             delListener.onSuccess();
 
-        } else{
+        } else {
             listener.onFailure();
         }
 
@@ -213,7 +214,6 @@ public class LocalAuthProvider extends AuthProvider {
     public String getEmail() {
         return currentUserEmail;
     }
-
 
 
 }

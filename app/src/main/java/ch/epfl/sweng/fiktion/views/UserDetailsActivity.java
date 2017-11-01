@@ -98,7 +98,13 @@ public class UserDetailsActivity extends AppCompatActivity {
 
 
         } else {
-            Toast.makeText(this,"User signed out",Toast.LENGTH_SHORT).show();
+
+            //this case will probably never happen
+            Log.d(TAG, "Could not initialise user details, user is not signed in");
+            Toast.makeText(this,"User signed out unexpectedly",Toast.LENGTH_SHORT).show();
+            Intent homeActivity = new Intent(this,HomeActivity.class);
+            startActivity(homeActivity);
+            finish();
         }
     }
 

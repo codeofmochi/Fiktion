@@ -47,7 +47,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     FirebasePointOfInterest fPoi = new FirebasePointOfInterest(poi);
                     poiRef.setValue(fPoi);
                     Position pos = poi.position();
-                    geofire.setLocation(poiName, new GeoLocation(pos.latitude(), pos.longitude()));
+                    GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
+                    geofire.setLocation(poiName, geoLocation);
 
                     // inform the listener that the operation succeeded
                     listener.onSuccess();
