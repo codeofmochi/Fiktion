@@ -41,19 +41,6 @@ public class UserTest {
         assertFalse(user.equals(new FirebaseUser()));
     }
 
-    @Test
-    public void changeNameTest(){
-        user.changeName("", new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                Assert.fail();
-            }
 
-            @Override
-            public void onFailure() {
-                assertEquals("Should not change name to empty string",user.getName(), "new user");
-            }
-        });
-    }
 
 }

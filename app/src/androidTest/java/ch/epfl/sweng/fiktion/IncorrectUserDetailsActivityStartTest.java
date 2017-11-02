@@ -2,7 +2,6 @@ package ch.epfl.sweng.fiktion;
 
 import android.support.test.rule.ActivityTestRule;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,12 +12,8 @@ import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsNot.not;
 
 /** tests an incorrect instanciation of the user profile
  * Created by Rodrigo on 27.10.2017.

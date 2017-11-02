@@ -6,8 +6,10 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
-/**This class represents the User in the application
- *@author Rodrigo
+/**
+ * This class represents the User in the application
+ *
+ * @author Rodrigo
  */
 
 public class User {
@@ -17,8 +19,9 @@ public class User {
 
     /**
      * Creates a new User with given paramaters
+     *
      * @param input_name Username
-     * @param input_id User id
+     * @param input_id   User id
      */
     public User(String input_name, String input_id) {
         name = input_name;
@@ -27,33 +30,31 @@ public class User {
 
     /**
      * Changes this user's username
-     * @param newName New username value
+     *
+     * @param newName  New username value
      * @param listener Handles what happens in case of success or failure of the changement
      */
     public void changeName(final String newName, final AuthProvider.AuthListener listener) {
-        if(!newName.isEmpty() && !newName.equals(name) && newName.length()<=15){
-            Providers.database.modifyUser(new User(newName, id), new DatabaseProvider.ModifyUserListener() {
-                @Override
-                public void onSuccess() {
-                    name = newName;
-                    listener.onSuccess();
-                }
+        //verification is done in the activity
+        Providers.database.modifyUser(new User(newName, id), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                name = newName;
+                listener.onSuccess();
+            }
 
-                @Override
-                public void onDoesntExist() {
-                    listener.onFailure();
-                }
+            @Override
+            public void onDoesntExist() {
+                listener.onFailure();
+            }
 
-                @Override
-                public void onFailure() {
-                    listener.onFailure();
-                }
-            });
-        } else{
-            listener.onFailure();
-        }
+            @Override
+            public void onFailure() {
+                listener.onFailure();
+            }
+        });
+
     }
-
 
 
     @Override
@@ -81,7 +82,6 @@ public class User {
     public String getID() {
         return id;
     }
-
 
 
 }

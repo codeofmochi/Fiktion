@@ -10,7 +10,6 @@ import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +32,6 @@ import static org.hamcrest.CoreMatchers.is;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RegisterActivityTest {
 
-    private final String TAG = "RegActivTest";
     private final String new_email = "new@email.com";
     private final String new_password = "validpass";
 
