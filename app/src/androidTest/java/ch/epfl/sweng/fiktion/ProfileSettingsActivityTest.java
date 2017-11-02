@@ -124,6 +124,61 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
+    public void changeUserEmail_invalid(){
+        String newEmail = "";
+        onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
+        onView(withId(R.id.update_confirm_email)).perform(click());
+
+        Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                //assert that we can only write 15 characters
+                assertThat(Providers.auth.getEmail(), is("default@email.ch"));
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+    }
+    @Test
+    public void changeUserName_invalid(){
+        String newName = "";
+        onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
+        onView(withId(R.id.update_confirm_name)).perform(click());
+        newName = "thishasmorethan15characters";
+        onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
+        onView(withId(R.id.update_confirm_name)).perform(click());
+
+        Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                //assert that we can only write 15 characters
+                assertThat(user.getName(), is("thishasmorethan"));
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+    }
+    @Test
     public void changeUserInfos_sameValues() {
         //TODO check that toasts appear
         //change name
