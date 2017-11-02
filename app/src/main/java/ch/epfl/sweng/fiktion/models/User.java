@@ -41,18 +41,15 @@ public class User {
 
                 @Override
                 public void onDoesntExist() {
-                    Log.d("User", "fails because does not exist "+id);
                     listener.onFailure();
                 }
 
                 @Override
                 public void onFailure() {
-                    Log.d("User", "fails because fails");
                     listener.onFailure();
                 }
             });
         } else{
-            Log.d("User", "fails because invalid credentials");
             listener.onFailure();
         }
     }
