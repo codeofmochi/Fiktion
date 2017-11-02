@@ -257,8 +257,6 @@ public class FirebaseAuthProvider extends AuthProvider {
     public void getCurrentUser(final DatabaseProvider.GetUserListener listener) {
         user = auth.getCurrentUser();
         if (user != null) {
-            //TODO get user ID or EMAIL and get it from our database
-            //for now I just create a new mock user
             Providers.database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {

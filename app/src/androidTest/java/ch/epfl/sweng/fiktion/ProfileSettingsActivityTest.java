@@ -40,8 +40,6 @@ public class ProfileSettingsActivityTest {
 
 
     private User user;
-    private final User defaultUser = new User("", "defaultID");
-    private final String defaultEmail = "default@email.ch";
 
     @Rule
     public final ActivityTestRule<ProfileSettingsActivity> editProfileActivityRule =

@@ -9,7 +9,6 @@ import org.junit.Test;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
-import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;

@@ -58,7 +58,6 @@ public class UserDetailsActivity extends AppCompatActivity {
         user_verify_view = (TextView) findViewById(R.id.detail_user_verify);
 
 
-
         //initialise button
 
     }
@@ -71,7 +70,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         //initialise user details
 
         if (auth.isConnected()) {
-            Log.d(TAG, "User signed in");
+            Log.d(TAG, "Request for the currently  signed in user signed in");
             // Name, email address, and profile photo Url
             auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
                 @Override
@@ -102,8 +101,8 @@ public class UserDetailsActivity extends AppCompatActivity {
 
             //this case will probably never happen
             Log.d(TAG, "Could not initialise user details, user is not signed in");
-            Toast.makeText(this,"User signed out unexpectedly",Toast.LENGTH_SHORT).show();
-            Intent homeActivity = new Intent(this,HomeActivity.class);
+            Toast.makeText(this, "User signed out unexpectedly", Toast.LENGTH_SHORT).show();
+            Intent homeActivity = new Intent(this, HomeActivity.class);
             startActivity(homeActivity);
             finish();
         }
@@ -113,14 +112,9 @@ public class UserDetailsActivity extends AppCompatActivity {
      * This method signs the user out from Fiktion
      */
     private void signOut() {
-
-        if (auth.isConnected()) {
-            auth.signOut();
-            //firebase authentication listener will see
-            // that user signed out and call onAuthStateChanged
-            updateUI(UIMode.userSignedOut);
-            Log.d(TAG, "User is signed out");
-        }
+        auth.signOut();
+        updateUI(UIMode.userSignedOut);
+        Log.d(TAG, "User is signed out");
     }
 
 
