@@ -58,6 +58,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         user_verify_view = (TextView) findViewById(R.id.detail_user_verify);
 
 
+
         //initialise button
 
     }

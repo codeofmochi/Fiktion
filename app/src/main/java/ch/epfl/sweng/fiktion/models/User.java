@@ -1,6 +1,9 @@
 package ch.epfl.sweng.fiktion.models;
 
+import android.util.Log;
+
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 
 /**This class represents the User in the application
@@ -28,9 +31,24 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the changement
      */
     public void changeName(final String newName, final AuthProvider.AuthListener listener) {
-        if(newName!=null && !newName.equals(name) && newName.length()<=15){
-            name = newName;
-            listener.onSuccess();
+        if(!newName.isEmpty() && !newName.equals(name) && newName.length()<=15){
+            Providers.database.modifyUser(new User(newName, id), new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    name = newName;
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    listener.onFailure();
+                }
+
+                @Override
+                public void onFailure() {
+                    listener.onFailure();
+                }
+            });
         } else{
             listener.onFailure();
         }

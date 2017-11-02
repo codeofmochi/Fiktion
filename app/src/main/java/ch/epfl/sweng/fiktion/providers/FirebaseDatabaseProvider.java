@@ -245,5 +245,36 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void modifyUser(final User user, final ModifyUserListener listener) {
+        // get the reference of the user
+        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // if it exists, replace its value
+                    FirebaseUser fUser = new FirebaseUser(user);
+                    userRef.setValue(fUser);
+
+                    // and inform the listener of the success of the modification
+                    listener.onSuccess();
+                } else {
+                    // inform the listener that the user doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
 
 }

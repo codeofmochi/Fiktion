@@ -14,6 +14,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
 
@@ -37,8 +38,9 @@ import static org.hamcrest.core.IsNot.not;
 
 public class ProfileSettingsActivityTest {
 
+
     private User user;
-    private final User defaultUser = new User("", "id");
+    private final User defaultUser = new User("", "defaultID");
     private final String defaultEmail = "default@email.ch";
 
     @Rule
@@ -48,6 +50,7 @@ public class ProfileSettingsActivityTest {
     @BeforeClass
     public static void setAuth() {
         Providers.auth = new LocalAuthProvider();
+        Providers.database = new LocalDatabaseProvider();
     }
 
     @Before
@@ -73,6 +76,7 @@ public class ProfileSettingsActivityTest {
     @After
     public void resetAuth() {
         Providers.auth = new LocalAuthProvider();
+        Providers.database = new LocalDatabaseProvider();
         //wait until all toasts disappear
         try {
             Thread.sleep(5000);
@@ -86,9 +90,13 @@ public class ProfileSettingsActivityTest {
     public void changeUserInfos_newValues() {
         //TODO check that toasts appear
         //change name
+
+
         final String newName = "new name";
         onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_name)).perform(click());
+
+        assertThat(user.getName(), is("new name"));
 
 
         //change email
@@ -99,7 +107,6 @@ public class ProfileSettingsActivityTest {
         Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
-                assertThat(user.getName(), is(newName));
                 assertThat(Providers.auth.getEmail(), is(newEmail));
             }
 
