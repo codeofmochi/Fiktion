@@ -64,7 +64,7 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public String validateEmail(String email) {
-        String errMessage = null;
+        String errMessage = "";
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";
         }
@@ -79,7 +79,7 @@ public class LocalAuthProvider extends AuthProvider {
      */
     @Override
     public String validatePassword(String password) {
-        String errMessage = null;
+        String errMessage = "";
         if (password.isEmpty()) {
             errMessage = "Requires a valid password";
         } else {
