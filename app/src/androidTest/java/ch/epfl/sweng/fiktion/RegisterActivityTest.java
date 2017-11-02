@@ -10,7 +10,6 @@ import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,11 +32,8 @@ import static org.hamcrest.CoreMatchers.is;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RegisterActivityTest {
 
-    private final String TAG = "RegActivTest";
     private final String new_email = "new@email.com";
-    private final String new_password = "123456";
-    private final String exist_email = "default@test.ch";
-    private final String exist_password = "testing";
+    private final String new_password = "validpass";
 
     private RegisterActivity regActivity;
 
@@ -62,8 +58,7 @@ public class RegisterActivityTest {
     }
 
     @Test
-    public void newAccountTest() throws InterruptedException {
-        Providers.auth.signOut();
+    public void newAccountTest(){
         //we type valid credentials and click on the register button
         onView(withId(R.id.register_email)).perform(typeText(new_email), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText(new_password), ViewActions.closeSoftKeyboard());
@@ -71,13 +66,16 @@ public class RegisterActivityTest {
 
         onView(withId(R.id.register_click)).perform(click());
 
-        assertThat(Providers.auth.getCurrentUser().getEmail(), is(new_email));
+        assertThat(Providers.auth.getEmail(), is(new_email));
+
     }
 
     @Test
     public void existingAccountTest() {
         //we type valid but existing credentials and click on the register button
+        String exist_email = "default@test.ch";
         onView(withId(R.id.register_email)).perform(typeText(exist_email), ViewActions.closeSoftKeyboard());
+        String exist_password = "testing";
         onView(withId(R.id.register_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_confirm_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());
 

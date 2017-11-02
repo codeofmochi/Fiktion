@@ -5,8 +5,10 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
-    android:elevation="5dp"
+    android:elevation="1dp"
     android:padding="10dp"
+    android:layout_margin="5dp"
+    android:background="#FFF"
     android:orientation="vertical"
     android:text="Some text"
     android:textColor="#A0A0A0" />

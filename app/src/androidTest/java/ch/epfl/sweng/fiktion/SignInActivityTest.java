@@ -31,7 +31,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SignInActivityTest {
 
-    private final String valid_email = "test@test.ch";
+    private final String valid_email = "default@email.ch";
     private final String invalid_email = "invalid";
     private final String invalid_password = "1234";
 
@@ -74,7 +74,6 @@ public class SignInActivityTest {
         //this view is in other activity but no need to tell Espresso
         //check that we correctly advanced to the next activity
         onView(withId(R.id.detail_signout)).perform(click());
-
     }
 
 
