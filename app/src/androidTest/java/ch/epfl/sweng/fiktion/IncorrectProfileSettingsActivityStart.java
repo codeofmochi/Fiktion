@@ -8,22 +8,21 @@ import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
-import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
+import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-/** tests an incorrect instanciation of the user profile
- * Created by Rodrigo on 27.10.2017.
+/** Tests an incorrect start of the user profile editing
+ * Created by Rodrigo on 02.11.2017.
  */
 
-public class IncorrectUserDetailsActivityStartTest {
-
+public class IncorrectProfileSettingsActivityStart {
     @Rule
-    public final ActivityTestRule<UserDetailsActivity> userDetActivityRule =
-            new ActivityTestRule<>(UserDetailsActivity.class);
+    public final ActivityTestRule<ProfileSettingsActivity> userDetActivityRule =
+            new ActivityTestRule<>(ProfileSettingsActivity.class);
     @BeforeClass
     public static void setAuth(){
         Providers.auth = new LocalAuthProvider();

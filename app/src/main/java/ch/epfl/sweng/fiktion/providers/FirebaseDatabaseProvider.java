@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 
 /**
  * Firebase database provider
@@ -30,8 +31,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void addPoi(final PointOfInterest poi, final AddPoiListener listener) {
         final String poiName = poi.name();
+
         // get/create the reference of the point of interest
         final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
+
         // add only if the reference doesn't exist
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -66,7 +69,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void getPoi(String poiName, final GetPoiListener listener) {
         // get the reference of the poi
-        final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
+        DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -145,4 +148,133 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             }
         });
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addUser(final User user, final AddUserListener listener) {
+        // get/create the reference of the user
+        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+
+        // add only if the reference doesn't exist
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // inform the listener that the user already exists
+                    listener.onAlreadyExists();
+                } else {
+                    // add the user to the database
+                    FirebaseUser fUser = new FirebaseUser(user);
+                    userRef.setValue(fUser);
+
+                    //inform the listener that the operation succeeded
+                    listener.onSuccess();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getUserById(String id, final GetUserListener listener) {
+        // get the reference of the user associated with the id
+        DatabaseReference userRef = dbRef.child("Users").child(id);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    FirebaseUser fUser = dataSnapshot.getValue(FirebaseUser.class);
+                    if (fUser == null) {
+                        // we found the id but conversion failed, error of data handling probably
+                        listener.onFailure();
+                    } else {
+                        // inform the listener that we got the matching user
+                        listener.onSuccess(fUser.toUser());
+                    }
+                } else {
+                    // inform the listener that the user (id) doesnt exist
+                    listener.onDoesntExist();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleterUserById(String id, final DeleteUserListener listener) {
+        // get the reference of the user associated with the id
+        final DatabaseReference userRef = dbRef.child("Users").child(id);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // if it exists, remove it by removing its value
+                    userRef.removeValue();
+
+                    // and inform the listener of the success of the deletion
+                    listener.onSuccess();
+                } else {
+                    // inform the listener that the user (id) doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void modifyUser(final User user, final ModifyUserListener listener) {
+        // get the reference of the user
+        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // if it exists, replace its value
+                    FirebaseUser fUser = new FirebaseUser(user);
+                    userRef.setValue(fUser);
+
+                    // and inform the listener of the success of the modification
+                    listener.onSuccess();
+                } else {
+                    // inform the listener that the user doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+
 }

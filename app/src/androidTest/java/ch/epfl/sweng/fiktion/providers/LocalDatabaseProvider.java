@@ -1,10 +1,12 @@
 package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 
 
 /**
@@ -13,7 +15,10 @@ import ch.epfl.sweng.fiktion.models.Position;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
+    private final User defaultUser = new User("default", "defaultID");
     private final List<PointOfInterest> poiList = new ArrayList<>();
+    private final List<User> users = new ArrayList<>
+            (Collections.singletonList(defaultUser));
 
     /**
      * {@inheritDoc}
@@ -69,5 +74,74 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         double theta = long1 - long2;
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
         return 111.18957696 * Math.toDegrees(Math.acos(dist));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addUser(User user, AddUserListener listener) {
+        boolean contains = false;
+        String id = user.getID();
+        // go through all the users and check if there is one with the same id as the user in parameter
+        for (User u: users) {
+            contains |= u.getID().equals(id);
+        }
+        if (contains) {
+            listener.onAlreadyExists();
+        } else {
+            users.add(user);
+            listener.onSuccess();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getUserById(String id, GetUserListener listener) {
+        for(User u: users) {
+            if (u.getID().equals(id)) {
+                listener.onSuccess(u);
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleterUserById(String id, DeleteUserListener listener) {
+        for (User u: users) {
+            if (u.getID().equals(id)) {
+                users.remove(u);
+                listener.onSuccess();
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    @Override
+    public void modifyUser(final User user, final ModifyUserListener listener) {
+        deleterUserById(user.getID(), new DeleteUserListener() {
+            @Override
+            public void onSuccess() {
+                users.add(user);
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                listener.onDoesntExist();
+            }
+
+            @Override
+            public void onFailure() {
+                listener.onFailure();
+            }
+        });
     }
 }
