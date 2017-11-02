@@ -15,7 +15,7 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
-    private final User defaultUser = new User("", "defaultID");
+    private final User defaultUser = new User("default", "defaultID");
     private final List<PointOfInterest> poiList = new ArrayList<>();
     private final List<User> users = new ArrayList<>
             (Collections.singletonList(defaultUser));

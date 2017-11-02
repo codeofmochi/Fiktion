@@ -130,8 +130,8 @@ public class ProfileSettingsActivity extends AppCompatActivity {
 
         //validate name choice
         if (!newName.isEmpty()
-                && !newName.equals(user.getName())
-                && newName.length() <= 15) {
+                && !newName.equals(user.getName()))
+                {
 
             user.changeName(newName, new AuthProvider.AuthListener() {
                 @Override
@@ -152,7 +152,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             });
         } else {
             findViewById(R.id.update_confirm_name).setEnabled(true);
-            Toast.makeText(this, "Please type a new username", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please type a new and valid username", Toast.LENGTH_SHORT).show();
         }
 
     }
