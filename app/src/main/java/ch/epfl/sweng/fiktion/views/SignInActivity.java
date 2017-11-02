@@ -48,8 +48,8 @@ public class SignInActivity extends AppCompatActivity{
      * @param email    provided by the user
      * @param password provided by te user
      */
-    private void signIn(String email, String password) {
-        Log.d(TAG, "signIn:" + email);
+    public void signIn(String email, String password) {
+        //Log.d(TAG, "signIn:" + email);
         //we need to check if the credentials are valid before attempting to sign in
         //first we check if the email is valid, do not proceed if it is not valid
         String emailErr = Providers.auth.validateEmail(email);
@@ -68,9 +68,10 @@ public class SignInActivity extends AppCompatActivity{
             UserPassword.setError(passwordErr);
             return;
         }
+        /*
         Log.d(TAG, "Credentials are valid");
         Log.d(TAG, "signIn:" + email);
-
+        */
         Providers.auth.signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
