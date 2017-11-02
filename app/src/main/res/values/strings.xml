@@ -14,6 +14,9 @@
     <string name="add_poi_name">Name of the point</string>
     <string name="add_poi_fiction">Add a new Fiction</string>
     <string name="add_poi_position_wiki">Add from Wiki link</string>
+    <string name="enter_wikipedia_link">Enter a link to a Wikipedia article that contains coordinates :</string>
+    <string name="wikipedia_link">Enter a Wikipedia link…</string>
+    <string name="get_coordinates">Get coordinates</string>
     <string name="add">Add</string>
     <string name="add_poi_position">Add a Position</string>
     <string name="latitude">latitude</string>
