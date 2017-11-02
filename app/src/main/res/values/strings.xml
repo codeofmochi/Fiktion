@@ -13,6 +13,7 @@
     <string name="add_poi_title">Add a Point of Interest</string>
     <string name="add_poi_name">Name of the point</string>
     <string name="add_poi_fiction">Add a new Fiction</string>
+    <string name="add_poi_position_wiki">Add from Wiki link</string>
     <string name="add">Add</string>
     <string name="add_poi_position">Add a Position</string>
     <string name="latitude">latitude</string>
