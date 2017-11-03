@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.android.AndroidPolicies;
 
 public class GetLocationFromWikipediaActivity extends AppCompatActivity {
     public static final String NEW_POI_LATITUDE = "ch.epfl.sweng.fiktion.GetLocationFromMapActivity.newLatitude";
@@ -26,12 +27,7 @@ public class GetLocationFromWikipediaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_get_location_from_wikipedia);
 
         // Change policy to allow networking on main thread
-        int SDK_INT = android.os.Build.VERSION.SDK_INT;
-        if (SDK_INT > 8) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
+        AndroidPolicies.setAllowNetworkingOnMainThread();
     }
 
     /*
