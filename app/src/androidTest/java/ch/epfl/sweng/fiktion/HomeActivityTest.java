@@ -8,9 +8,13 @@ import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
 import android.support.test.rule.ActivityTestRule;
 
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -40,6 +44,12 @@ public class HomeActivityTest {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_RIGHT, GeneralLocation.CENTER_LEFT, Press.FINGER);
     }
 
+    @BeforeClass
+    public static void resetProviders() {
+        Providers.auth = new LocalAuthProvider();
+        Providers.database = new LocalDatabaseProvider();
+    }
+
     @Test
     public void menuDrawerOpensAndClosesOnSwipe() {
         closeSoftKeyboard();
@@ -51,6 +61,7 @@ public class HomeActivityTest {
     @Test
     public void homeToHomeWhenHomeClicked() {
         closeSoftKeyboard();
+
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(0).perform(click());
         menuDrawer.check(matches(not(isDisplayed())));
