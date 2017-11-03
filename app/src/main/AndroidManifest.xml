@@ -4,7 +4,7 @@
     package="ch.epfl.sweng.fiktion">
 
     <!-- Permissions -->
-
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <!-- Google Maps -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
