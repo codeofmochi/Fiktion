@@ -165,6 +165,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     //photo and gallery
 
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
+
+    // string to pass to onRequestPerm to know if camera or gallery was chosen
     String userChoice;
 
     @Override
@@ -184,7 +186,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
 
-
+    //method to open a pop up window
     private void selectImage() {
 
         final CharSequence[] choice = {"Camera", "Gallery", "Cancel"};
@@ -213,14 +215,18 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 }
             });
             builder.show();
-
         }
+
     }
+
+    //camera intent
     private void intentCamera(){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
+
+    //gallery intent
     private void intentGallery(){
         Intent gallery = new Intent();
         gallery.setType("image/*");
@@ -260,6 +266,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
+
+        //need to create the image file from the camera
         File destination = new File(Environment.getExternalStorageDirectory(),
                 System.currentTimeMillis() + ".jpg");
 
