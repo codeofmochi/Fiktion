@@ -24,7 +24,6 @@ public class UserDetailsActivity extends AppCompatActivity {
     //constants
     //LOGCAT
     private static final String TAG = "UserDetails";
-
     //UI modes
     private enum UIMode {
         defaultMode,
@@ -87,12 +86,10 @@ public class UserDetailsActivity extends AppCompatActivity {
 
                 @Override
                 public void onDoesntExist() {
-
                 }
 
                 @Override
                 public void onFailure() {
-
                 }
             });
 
