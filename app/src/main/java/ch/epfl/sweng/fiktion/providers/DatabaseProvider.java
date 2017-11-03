@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion.providers;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 
 
 /**
@@ -15,6 +16,7 @@ public abstract class DatabaseProvider {
      * Listener that listens the result of the addition of a point of interest
      */
     public interface AddPoiListener {
+
         /**
          * what to do if the addition succeeded
          */
@@ -120,4 +122,105 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void findNearPois(Position pos, int radius, final FindNearPoisListener listener);
+
+    /**
+     * Listener that listens the result of the addition of a user
+     */
+    public interface AddUserListener {
+
+        /**
+         * what to do if the addition succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the poi already exists
+         */
+        void onAlreadyExists();
+
+        /**
+         * what to do if the addition failed
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the result of the retrieval of a user
+     */
+    public interface GetUserListener {
+
+        /**
+         * what to do if the retrieval succeeds
+         *
+         * @param user the retrieved user
+         */
+        void onSuccess(User user);
+
+        /**
+         * what to do if no mathing user id is found
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the retrieval failed
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the result of the deletion of a user
+     */
+    public interface OperationOnExistingUserListener {
+
+        /**
+         * what to do if the deletion succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the user doesn't exist
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the deletion failed
+         */
+        void onFailure();
+    }
+
+    public interface DeleteUserListener extends OperationOnExistingUserListener{}
+
+    public interface ModifyUserListener extends OperationOnExistingUserListener{}
+
+    /**
+     * add a user to the database, inform the listener of the result
+     *
+     * @param user     the user
+     * @param listener the listener
+     */
+    public abstract void addUser(final User user, final AddUserListener listener);
+
+    /**
+     * get the user associated to the id, inform the listener of the result
+     *
+     * @param id the id
+     * @param listener the listener
+     */
+    public abstract void getUserById(String id, final GetUserListener listener);
+
+    /**
+     * delete the user associated to the id, inform the listener of the result
+     *
+     * @param id the id
+     * @param listener the listener
+     */
+    public abstract void deleterUserById(String id, final DeleteUserListener listener);
+
+    /**
+     * modify the user, inform the listener of the result of the modification
+     *
+     * @param user the user
+     * @param listener the listener
+     */
+    public abstract void modifyUser(User user, final ModifyUserListener listener);
 }

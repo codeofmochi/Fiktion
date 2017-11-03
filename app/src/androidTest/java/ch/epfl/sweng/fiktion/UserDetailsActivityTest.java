@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
@@ -39,8 +40,22 @@ public class UserDetailsActivityTest {
 
     @Before
     public void setVariables(){
-        user = Providers.auth.getCurrentUser();
-    }
+        Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User currUser) {
+                user=currUser;
+            }
+
+            @Override
+            public void onDoesntExist() {
+                user = null;
+            }
+
+            @Override
+            public void onFailure() {
+                user = null;
+            }
+        });    }
 
     @After
     public void resetAuth(){
@@ -49,7 +64,7 @@ public class UserDetailsActivityTest {
 
     @Test
     public void seeDefaultUserInformations(){
-        onView(withId(R.id.detail_user_email)).check(matches(withText(user.getEmail())));
+        onView(withId(R.id.detail_user_email)).check(matches(withText(Providers.auth.getEmail())));
         onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
     }
 
