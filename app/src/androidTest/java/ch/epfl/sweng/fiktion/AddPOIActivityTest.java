@@ -74,6 +74,9 @@ public class AddPOIActivityTest {
     private final ViewInteraction addPoiFictionButton = onView(withId(R.id.add_poi_fiction_button));
     private final ViewInteraction addPoiFictionList = onView(withId(R.id.add_poi_fiction_list));
     private final ViewInteraction addPoiScroll = onView(withId(R.id.add_poi_scroll));
+    private final ViewInteraction addWikiButton = onView(withId(R.id.position_wiki));
+    private final ViewInteraction wikiURL = onView(withId(R.id.wikipedia_url));
+    private final ViewInteraction wikiGetButton = onView(withId(R.id.get_coordinates));
 
     private void doesToastMatch(String s) {
         onView(withText(s)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
@@ -334,5 +337,58 @@ public class AddPOIActivityTest {
         closeSoftKeyboard();
         addPoiFictionButton.perform(click());
         addPoiFictionList.check(matches(withText("hello test, my fiction")));
+    }
+
+    /* Wikipedia tests */
+
+    @Test
+    public void getCoordFromWikipediaAkihabara() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org/wiki/Akihabara"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        addPoiLatitude.check(matches(withText("35.69836")));
+        addPoiLongitude.check(matches(withText("139.77313")));
+    }
+
+    @Test
+    public void notWikipediaURL() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("notwiki.net"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        wikiURL.check(matches(hasErrorText("Link must be from wikipedia.org")));
+    }
+
+    @Test
+    public void wrongFormatURL() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        wikiURL.check(matches(hasErrorText("Wrong link format : must follow wikipedia.org/wiki/Article")));
+    }
+
+    @Test
+    public void invalidArticle() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org/wiki/notavalidarticle"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        doesToastMatch("No article found");
+    }
+
+    @Test
+    public void noCoordArticle() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org/wiki/Main_Page"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        doesToastMatch("No coordinates found in article");
     }
 }
