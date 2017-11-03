@@ -4,11 +4,9 @@ package ch.epfl.sweng.fiktion;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.rule.ActivityTestRule;
 
-
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-
 
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
@@ -18,7 +16,6 @@ import ch.epfl.sweng.fiktion.views.POIPageActivity;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -37,12 +34,13 @@ public class POIPageActivityTest {
             new ActivityTestRule<>(POIPageActivity.class);
 
     @BeforeClass
-    public static void setProviders(){
+    public static void setProviders() {
         Providers.auth = new LocalAuthProvider();
         Providers.database = new LocalDatabaseProvider();
     }
+
     @Test
-    public void buttonTest(){
+    public void buttonTest() {
         onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
         try {
             Thread.sleep(10);

@@ -10,9 +10,7 @@ import android.location.LocationManager;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 
-import ch.epfl.sweng.fiktion.Manifest;
 import ch.epfl.sweng.fiktion.R;
-import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 /**
  * Helper statics for android services enable
@@ -77,18 +75,17 @@ public final class AndroidServices {
         }
 
 
-
         if (!camera_enabled) {
             // notify user
             AlertDialog.Builder dialog = new AlertDialog.Builder(context);
             dialog.setMessage("Camera is disabled");
             dialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions((Activity) context, new String[]{android.Manifest.permission.CAMERA}, MY_PERMISSIONS_CAMERA);
-                }
-            }
-        );
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions((Activity) context, new String[]{android.Manifest.permission.CAMERA}, MY_PERMISSIONS_CAMERA);
+                        }
+                    }
+            );
             dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
 
                 @Override

@@ -47,8 +47,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
         private String[] data;
+
         public class ViewHolder extends RecyclerView.ViewHolder {
             public TextView text;
+
             public ViewHolder(TextView v) {
                 super(v);
                 text = v;
@@ -106,7 +108,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
         //result of picture in thumbnail
         image1 = (ImageView) findViewById(R.id.image1);
-
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -175,9 +176,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             case AndroidPermissions.MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     AndroidServices.promptCameraEnable(this);
-                    if(userChoice.equals("Camera"))
+                    if (userChoice.equals("Camera"))
                         intentCamera();
-                    else if(userChoice.equals("Gallery"))
+                    else if (userChoice.equals("Gallery"))
                         intentGallery();
                 } else {
                     // permission denied
@@ -220,14 +221,14 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     //camera intent
-    private void intentCamera(){
+    private void intentCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
 
     //gallery intent
-    private void intentGallery(){
+    private void intentGallery() {
         Intent gallery = new Intent();
         gallery.setType("image/*");
         gallery.setAction(Intent.ACTION_GET_CONTENT);
@@ -246,7 +247,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
-    private void onGalleryResult(Intent data){
+    private void onGalleryResult(Intent data) {
         Bitmap image = null;
         if (data != null) {
             try {
@@ -260,8 +261,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
 
-
-    private void onCameraResult(Intent data){
+    private void onCameraResult(Intent data) {
         Bitmap image = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
