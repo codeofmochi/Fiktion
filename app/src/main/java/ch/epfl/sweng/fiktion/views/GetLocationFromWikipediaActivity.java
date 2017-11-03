@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,8 @@ import java.util.Scanner;
 import ch.epfl.sweng.fiktion.R;
 
 public class GetLocationFromWikipediaActivity extends AppCompatActivity {
+    public static final String NEW_POI_LATITUDE = "ch.epfl.sweng.fiktion.GetLocationFromMapActivity.newLatitude";
+    public static final String NEW_POI_LONGITUDE = "ch.epfl.sweng.fiktion.GetLocationFromMapActivity.newLongitude";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +90,15 @@ public class GetLocationFromWikipediaActivity extends AppCompatActivity {
                     else {
                         lat = page.getJSONArray("coordinates").getJSONObject(0).getDouble("lat");
                         lon = page.getJSONArray("coordinates").getJSONObject(0).getDouble("lon");
-                        Toast.makeText(this, lat + " " + lon, Toast.LENGTH_SHORT).show();
+
+                        // return values to caller activity
+                        Intent retrieveCoordsIntent = new Intent();
+                        retrieveCoordsIntent.putExtra(NEW_POI_LATITUDE, lat);
+                        retrieveCoordsIntent.putExtra(NEW_POI_LONGITUDE, lon);
+                        // send the intent to the parent
+                        setResult(RESULT_OK, retrieveCoordsIntent);
+                        // close this activity
+                        finish();
                     }
                 }
             } catch (Exception e) {
