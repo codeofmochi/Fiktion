@@ -17,17 +17,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    /* Starts the map location activity */
-    public void startNearbyActivity(View view) {
-        Intent mapIntent = new Intent(this, LocationActivity.class);
-        startActivity(mapIntent);
-    }
-
-    public void startAddPOIActivity(View view) {
-        Intent addPoiIntent = new Intent(this, AddPOIActivity.class);
-        startActivity(addPoiIntent);
-    }
-
     public void startFindNearestPoisActivity(View view) {
         Intent findPoiIntent = new Intent(this, FindNearestPoisActivity.class);
         startActivity(findPoiIntent);
