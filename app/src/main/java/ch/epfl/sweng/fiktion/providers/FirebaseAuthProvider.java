@@ -81,7 +81,6 @@ public class FirebaseAuthProvider extends AuthProvider {
                     listener.onSuccess();
                 } else {
                     // Sign in fails
-                    Log.w(TAG, "signInWithEmail:failure", task.getException());
                     listener.onFailure();
                 }
             }
