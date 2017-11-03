@@ -73,6 +73,29 @@ public abstract class DatabaseProvider {
     }
 
     /**
+     * Listener that listens the results of searching by text from user
+     */
+    public interface PoiSearchByTextListener {
+
+        /**
+         * what to do if the retrieval failed
+         * what to do if the retrieval succeeds
+         *
+         * @param poi the retrieved point of interest
+         */
+        void onSuccess(PointOfInterest poi);
+
+        /**
+         * what to do if no mathing point of interest is found
+         */
+        void onDoesntExist();
+
+        /**
+         */
+        void onFailure();
+    }
+
+    /**
      * add a point of interest to the database, inform the listener of the result
      *
      * @param poi      the point of interest

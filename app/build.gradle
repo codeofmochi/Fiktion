@@ -34,7 +34,9 @@ dependencies {
     // required if you want to use Mockito for Android tests
     //firebase authentication API
     //firebase analytics
+    //algolia for enabling full text search for poi's
     testCompile 'junit:junit:4.12'
+    compile 'com.algolia:algoliasearch-android:3.10.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services-maps:11.4.2'

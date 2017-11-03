@@ -70,4 +70,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
         return 111.18957696 * Math.toDegrees(Math.acos(dist));
     }
+
+    /**
+     *
+     * @param name     the name for the Poi to be searched
+     * @param listener the listener
+     */
+    @Override
+    public void poiSearchByText(String name, PoiSearchByTextListener listener) {
+        //TODO implement search by text for testing
+    }
 }
