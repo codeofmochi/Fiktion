@@ -168,7 +168,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         String errMessage = auth.validateEmail(newEmail);
 
         //validate name choice
-        if (errMessage== null) {
+        if (errMessage.isEmpty()) {
             auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
