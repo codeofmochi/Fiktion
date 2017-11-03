@@ -86,20 +86,10 @@ public class UserDetailsActivity extends AppCompatActivity {
 
                 @Override
                 public void onDoesntExist() {
-                    name = "Does not exist in database";
-                    email = auth.getEmail();
-                    user_verify_view.setText("");
-                    updateUI(UIMode.defaultMode);
-
                 }
 
                 @Override
                 public void onFailure() {
-                    name = "Failed to fetch in database";
-                    email = auth.getEmail();
-                    user_verify_view.setText("");
-                    updateUI(UIMode.defaultMode);
-
                 }
             });
 
