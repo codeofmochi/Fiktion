@@ -221,6 +221,20 @@ public class FirebaseAuthTest {
         });
 
         testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
+
+        //try to send an email verification while no user is connected
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                //sucess
+            }
+        });
     }
 
     @Test
@@ -243,6 +257,36 @@ public class FirebaseAuthTest {
         testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
     }
 
+    @Test
+    public void testNoUserSendPasswordResetEmail() {
+        //try to send a password reset email while the user is not connected
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbAuth).getCurrentUser();
+            }
+        });
+        //try to send a password reset email without a correct email
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.getEmail()).thenReturn(null);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbUser).getEmail();
+            }
+        });
+    }
 
     @Test
     public void SuccedUpdateEmail() {
@@ -326,24 +370,6 @@ public class FirebaseAuthTest {
         testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
     }
 
-    /*
-    @Test
-    public void succeedCreateUser() {
-        Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthSucceedResult);
-        auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                Mockito.verify(fbAuth.createUserWithEmailAndPassword(email, password));
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
-        testOnCompleteAuthListener.getValue().onComplete(taskAuthSucceedResult);
-    }
-*/
     @Test
     public void failCreateUser() {
         Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthFailResult);
