@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import junit.framework.Assert;
 
@@ -20,29 +19,25 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
+import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class, FirebaseAuthProvider.class})
+@RunWith(MockitoJUnitRunner.class)
 public class FirebaseAuthTest {
 
-    private FirebaseAuthProvider auth;
     private String email = "test@epfl.ch";
     private String password = "testing";
     @Mock
     FirebaseAuth fbAuth;
-    @Mock
-    FirebaseDatabase fbDatabase;
     @Mock
     DatabaseReference dbRef;
     @Mock
@@ -72,22 +67,14 @@ public class FirebaseAuthTest {
     @Captor
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
+    private FirebaseAuthProvider auth;
+    private FirebaseDatabaseProvider database = new FirebaseDatabaseProvider(dbRef,geofire);
 
     @Before
-    public void setUp() throws Exception {
-
-        mockStatic(FirebaseAuth.class);
-        mockStatic(FirebaseDatabase.class);
-
-        Mockito.when(FirebaseDatabase.getInstance()).thenReturn(fbDatabase);
-        Mockito.when(fbDatabase.getReference()).thenReturn(dbRef);
-        whenNew(GeoFire.class).withAnyArguments().thenReturn(geofire);
-        Mockito.when(FirebaseAuth.getInstance()).thenReturn(fbAuth);
-        Mockito.when(FirebaseDatabase.getInstance()).thenReturn(fbDatabase);
-
+    public void setUp() {
+        auth = new FirebaseAuthProvider(fbAuth);
+        //Providers.database = database;
         setTasks();
-
-        auth = new FirebaseAuthProvider();
 
     }
 
@@ -109,46 +96,48 @@ public class FirebaseAuthTest {
         Mockito.when(taskVoidFailResult.addOnCompleteListener(testOnCompleteVoidListener.capture())).
                 thenReturn(taskVoidFailResult);
     }
-/*
+
+    /*
+        @Test
+        public void testSuccessfulDeleteAccount() {
+            //test successful
+            Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+            Mockito.when(fbUser.delete()).thenReturn(taskVoidSucceedResult);
+            Mockito.when()
+            auth.deleteAccount(new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    //successfully deleted in firebase
+                    Mockito.verify(fbUser.delete());
+                }
+
+                @Override
+                public void onFailure() {
+                    Assert.fail();
+                }
+            }, new DatabaseProvider.DeleteUserListener() {
+                @Override
+                public void onSuccess() {
+                    //successfully deleted in the database
+                    Mockito.verify(fbUser.delete());
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    Assert.fail();
+                }
+
+                @Override
+                public void onFailure() {
+                    Assert.fail();
+                }
+            });
+            testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
+        }
+    */
+
     @Test
-    public void testSuccessfulDeleteAccount() {
-        //test successful
-        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
-        Mockito.when(fbUser.delete()).thenReturn(taskVoidSucceedResult);
-        Mockito.when()
-        auth.deleteAccount(new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                //successfully deleted in firebase
-                Mockito.verify(fbUser.delete());
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        }, new DatabaseProvider.DeleteUserListener() {
-            @Override
-            public void onSuccess() {
-                //successfully deleted in the database
-                Mockito.verify(fbUser.delete());
-            }
-
-            @Override
-            public void onDoesntExist() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
-        testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
-    }
-*/
-    @Test
-    public void testFailDeleteAccount() {
+    public void testDoesntExistDeleteAccount() {
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
         Mockito.when(fbUser.delete()).thenReturn(taskVoidFailResult);
         auth.deleteAccount(new AuthProvider.AuthListener() {
@@ -159,7 +148,7 @@ public class FirebaseAuthTest {
 
             @Override
             public void onFailure() {
-                Mockito.verify(fbUser.delete());
+                Mockito.verify(fbUser.delete()).addOnCompleteListener(testOnCompleteVoidListener.capture());
             }
         }, new DatabaseProvider.DeleteUserListener() {
             @Override
@@ -169,12 +158,12 @@ public class FirebaseAuthTest {
 
             @Override
             public void onDoesntExist() {
-                Mockito.verify(fbUser.delete());
+                Assert.fail();
             }
 
             @Override
             public void onFailure() {
-                Mockito.verify(fbUser.delete());
+                Assert.fail();
             }
         });
         testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
@@ -222,7 +211,7 @@ public class FirebaseAuthTest {
         auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Mockito.verify(fbAuth.sendPasswordResetEmail(email));
+                Mockito.verify(fbAuth.sendPasswordResetEmail(email)).addOnCompleteListener(testOnCompleteVoidListener.capture());
             }
 
             @Override
@@ -232,6 +221,20 @@ public class FirebaseAuthTest {
         });
 
         testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
+
+        //try to send an email verification while no user is connected
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                //sucess
+            }
+        });
     }
 
     @Test
@@ -247,15 +250,43 @@ public class FirebaseAuthTest {
 
             @Override
             public void onFailure() {
-                Mockito.verify(fbAuth.sendPasswordResetEmail(email));
+                Mockito.verify(fbAuth.sendPasswordResetEmail(email)).addOnCompleteListener(testOnCompleteVoidListener.capture());
             }
         });
 
         testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
     }
 
+    @Test
+    public void testNoUserSendPasswordResetEmail() {
+        //try to send a password reset email while the user is not connected
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
 
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbAuth).getCurrentUser();
+            }
+        });
+        //try to send a password reset email without a correct email
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.getEmail()).thenReturn(null);
+        auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
 
+            @Override
+            public void onFailure() {
+                Mockito.verify(fbUser).getEmail();
+            }
+        });
+    }
 
     @Test
     public void SuccedUpdateEmail() {
@@ -266,7 +297,7 @@ public class FirebaseAuthTest {
         auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Mockito.verify(fbUser.updateEmail(newEmail));
+                Mockito.verify(fbUser.updateEmail(newEmail)).addOnCompleteListener(testOnCompleteVoidListener.capture());
             }
 
             @Override
@@ -291,7 +322,7 @@ public class FirebaseAuthTest {
 
             @Override
             public void onFailure() {
-                Mockito.verify(fbUser.updateEmail(newEmail));
+                Mockito.verify(fbUser.updateEmail(newEmail)).addOnCompleteListener(testOnCompleteVoidListener.capture());
             }
         });
         testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
@@ -305,7 +336,7 @@ public class FirebaseAuthTest {
         auth.sendEmailVerification(new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Mockito.verify(fbUser.sendEmailVerification());
+                Mockito.verify(fbUser.sendEmailVerification()).addOnCompleteListener(testOnCompleteVoidListener.capture());
             }
 
             @Override
@@ -330,7 +361,7 @@ public class FirebaseAuthTest {
 
             @Override
             public void onFailure() {
-                Mockito.verify(fbUser.sendEmailVerification());
+                Mockito.verify(fbUser.sendEmailVerification()).addOnCompleteListener(testOnCompleteVoidListener.capture());
             }
 
 
@@ -339,24 +370,6 @@ public class FirebaseAuthTest {
         testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
     }
 
-    /*
-    @Test
-    public void succeedCreateUser() {
-        Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthSucceedResult);
-        auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                Mockito.verify(fbAuth.createUserWithEmailAndPassword(email, password));
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
-        testOnCompleteAuthListener.getValue().onComplete(taskAuthSucceedResult);
-    }
-*/
     @Test
     public void failCreateUser() {
         Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthFailResult);
@@ -368,7 +381,7 @@ public class FirebaseAuthTest {
 
             @Override
             public void onFailure() {
-                Mockito.verify(fbAuth.createUserWithEmailAndPassword(email, password));
+                Mockito.verify(fbAuth).createUserWithEmailAndPassword(email, password);
             }
         });
         testOnCompleteAuthListener.getValue().onComplete(taskAuthFailResult);
@@ -382,7 +395,7 @@ public class FirebaseAuthTest {
         auth.signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Mockito.verify(fbAuth.signInWithEmailAndPassword(email, password));
+                Mockito.verify(fbAuth.signInWithEmailAndPassword(email, password)).addOnCompleteListener(testOnCompleteAuthListener.capture());
             }
 
             @Override
@@ -401,15 +414,17 @@ public class FirebaseAuthTest {
         auth.signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Assert.fail();            }
+                Assert.fail();
+            }
 
             @Override
             public void onFailure() {
-                Mockito.verify(fbAuth.signInWithEmailAndPassword(email, password));
+                Mockito.verify(fbAuth.signInWithEmailAndPassword(email, password)).addOnCompleteListener(testOnCompleteAuthListener.capture());
             }
         });
         testOnCompleteAuthListener.getValue().onComplete(taskAuthFailResult);
     }
+
     @Test
     public void testAuthSignOut() {
         Mockito.doNothing().when(fbAuth).signOut();
@@ -433,38 +448,37 @@ public class FirebaseAuthTest {
         });
     }
 
-  /*  @Test
-    public void getCurrentUser() {
-        final String name = "default";
+    @Test
+    public void testGetters() {
         final String email = "test@test.ch";
-        final String id = "id";
 
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
-        Mockito.when(fbUser.getDisplayName()).thenReturn(name);
         Mockito.when(fbUser.getEmail()).thenReturn(email);
-        Mockito.when(fbUser.getUid()).thenReturn(id);
+        Mockito.when(fbUser.isEmailVerified()).thenReturn(true);
+        assertThat(auth.isConnected(), is(true));
+        assertThat(auth.getEmail(), is(email));
+        assertThat(auth.isEmailVerified(), is(true));
         Mockito.when(fbUser.isEmailVerified()).thenReturn(false);
+        assertThat(auth.isEmailVerified(), is(false));
+
+        //null user return
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
+        assertThat(auth.isConnected(), is(false));
+        assertThat(auth.getEmail(), is(""));
+        assertThat(auth.isEmailVerified(), is(false));
 
 
-        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User user) {
-                Assert.assertEquals(auth.getEmail(), email);
-                Assert.assertEquals(user.getName(), name);
-
-            }
-
-            @Override
-            public void onDoesntExist() {
-
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-        });
     }
-*/
+
+    @Test
+    public void testValidaters(){
+        //validate email
+        assertThat(auth.validateEmail(email), is(""));
+        assertThat(auth.validateEmail("invalidemail"), is("Requires a valid email"));
+        //validate password
+        assertThat(auth.validatePassword(password), is(""));
+        assertThat(auth.validatePassword(""), is("Requires a valid password"));
+        assertThat(auth.validatePassword("1234"), is("Password must be at least 6 characters"));
+    }
 
 }

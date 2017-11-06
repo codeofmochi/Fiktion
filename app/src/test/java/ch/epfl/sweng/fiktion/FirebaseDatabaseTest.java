@@ -14,9 +14,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
@@ -37,17 +36,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by pedro on 23/10/17.
  */
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({FirebaseDatabase.class, FirebaseDatabaseProvider.class, GeoLocation.class})
+@RunWith(MockitoJUnitRunner.class)
 public class FirebaseDatabaseTest {
 
     FirebaseDatabaseProvider database;
@@ -65,9 +61,6 @@ public class FirebaseDatabaseTest {
     @Mock
     DataSnapshot snapshot;
 
-    @Mock
-    GeoLocation geoLocation;
-
     private Result result;
 
     public enum Result {SUCCESS, ALREADYEXISTS, DOESNTEXIST, FAILURE, NOTHING}
@@ -82,18 +75,12 @@ public class FirebaseDatabaseTest {
 
     @Before
     public void initializers() throws Exception {
-        mockStatic(FirebaseDatabase.class);
-        FirebaseDatabase fb = mock(FirebaseDatabase.class);
-        when(FirebaseDatabase.getInstance()).thenReturn(fb);
-        when(fb.getReference()).thenReturn(dbRef);
-        whenNew(GeoFire.class).withAnyArguments().thenReturn(geofire);
-        database = new FirebaseDatabaseProvider();
+        database = new FirebaseDatabaseProvider(dbRef, geofire);
         result = NOTHING;
     }
 
     @Test
-    public void addPoiTest() throws Exception {
-
+    public void addPoiTest() {
         when(dbRef.child("Points of interest")).thenReturn(poisRef);
         when(poisRef.child(anyString())).thenReturn(poiRef);
         doAnswer(new Answer() {
@@ -121,7 +108,6 @@ public class FirebaseDatabaseTest {
             }
         };
         when(poiRef.setValue(any(FirebasePointOfInterest.class))).thenReturn(null);
-        whenNew(GeoLocation.class).withAnyArguments().thenReturn(geoLocation);
         doNothing().when(geofire).setLocation(anyString(), any(GeoLocation.class));
 
         when(snapshot.exists()).thenReturn(false, true);
@@ -235,7 +221,7 @@ public class FirebaseDatabaseTest {
         }).when(databaseSpy).getPoi(anyString(), any(DatabaseProvider.GetPoiListener.class));
 
         databaseSpy.findNearPois(poiTest.position(), 10, findPoiListener);
-        geoQueryEventListener.onKeyEntered("key", geoLocation);
+        geoQueryEventListener.onKeyEntered("key", null);
         getPoiListener.onSuccess(poiTest);
         assertThat(keyCount, is(1));
         getPoiListener.onSuccess(poiTest);
@@ -246,7 +232,7 @@ public class FirebaseDatabaseTest {
         getPoiListener.onDoesntExist();
         getPoiListener.onFailure();
         geoQueryEventListener.onKeyExited("key");
-        geoQueryEventListener.onKeyMoved("key", geoLocation);
+        geoQueryEventListener.onKeyMoved("key", null);
         geoQueryEventListener.onGeoQueryReady();
         geoQueryEventListener.onGeoQueryError(null);
         assertThat(result, is(FAILURE));

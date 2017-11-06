@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -22,9 +23,9 @@ public class FirebaseAuthProvider extends AuthProvider {
     //testing
     private final static String TAG = "FBAuthProv";
     // firebase authentification instance
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final FirebaseAuth auth;
     // firebase user that we authenticate
-    private FirebaseUser user = null;
+    private FirebaseUser user ;
     // firebase status
     /*
     private FirebaseAuth.AuthStateListener state;
@@ -60,6 +61,14 @@ public class FirebaseAuthProvider extends AuthProvider {
         auth.addAuthStateListener(state);
     }
 */
+
+    public FirebaseAuthProvider(){
+        auth = FirebaseAuth.getInstance();
+    }
+
+    public FirebaseAuthProvider(FirebaseAuth fbAuth){
+        auth = fbAuth;
+    }
 
     /**
      * Signs in a user with an email, a password and what to do afterwards
@@ -109,7 +118,6 @@ public class FirebaseAuthProvider extends AuthProvider {
         //TODO elaborate email validation
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";
-            Log.d(TAG, "Email validation failed");
         }
         return errMessage;
     }
@@ -277,34 +285,6 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
-    /*
-     * Enables the user to change his username
-     * @param newName new username provided by the user
-     * @param listener actions to be done in case of failure or success
-     */
-/*    @Override
-    public void changeName(String newName, final AuthListener listener) {
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(newName).build();
-
-        user = auth.getCurrentUser();
-        if (user != null) {
-            user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        listener.onSuccess();
-                    } else {
-                        listener.onFailure();
-                    }
-                }
-            });
-        }else{
-            listener.onFailure();
-        }
-    }
-*/
-
     /**
      * Enables the user to change his primary email
      *
@@ -338,10 +318,10 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void deleteAccount(final AuthListener listener, final DatabaseProvider.DeleteUserListener delListener) {
-        //TODO delete application user in database after implementation of user storage in database
         user = auth.getCurrentUser();
 
         if (user != null) {
+            System.out.println("Wain");
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -375,10 +355,11 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public String getEmail() {
-        if (auth.getCurrentUser() != null) {
+        user = auth.getCurrentUser();
+        if (auth.getCurrentUser() != null && user.getEmail()!= null) {
             return user.getEmail();
         } else {
-            return null;
+            return "";
         }
 
     }
