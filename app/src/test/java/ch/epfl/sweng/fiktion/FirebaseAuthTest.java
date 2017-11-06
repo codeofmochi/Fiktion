@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import junit.framework.Assert;
 
@@ -27,7 +26,6 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,8 +35,6 @@ public class FirebaseAuthTest {
     private String password = "testing";
     @Mock
     FirebaseAuth fbAuth;
-    @Mock
-    FirebaseDatabase fbDatabase;
     @Mock
     DatabaseReference dbRef;
     @Mock
@@ -69,11 +65,11 @@ public class FirebaseAuthTest {
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
     private FirebaseAuthProvider auth = new FirebaseAuthProvider(fbAuth);
-    private FirebaseDatabaseProvider databse = new FirebaseAuthProvider(fbDatabase);
+    private FirebaseDatabaseProvider database = new FirebaseDatabaseProvider(dbRef, geofire);
 
 
     @Before
-    public void setUp()  {
+    public void setUp() {
         setTasks();
     }
 
@@ -134,8 +130,15 @@ public class FirebaseAuthTest {
             testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
         }
     */
+
     @Test
     public void testFailDeleteAccount() {
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.delete()).thenReturn(taskVoidSucceedResult);
+    }
+
+    @Test
+    public void testDoesntExistDeleteAccount() {
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
         Mockito.when(fbUser.delete()).thenReturn(taskVoidFailResult);
         auth.deleteAccount(new AuthProvider.AuthListener() {
@@ -156,7 +159,7 @@ public class FirebaseAuthTest {
 
             @Override
             public void onDoesntExist() {
-                Mockito.verify(fbUser.delete());
+                Assert.fail();
             }
 
             @Override

@@ -16,22 +16,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
+import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /** tests of tests
  * Created by Rodrigo on 02.11.2017.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class, FirebaseAuthProvider.class})
+@RunWith(MockitoJUnitRunner.class)
 public class SignInTest {
 
     SignInActivity siAct;
@@ -41,11 +38,9 @@ public class SignInTest {
     @Mock
     FirebaseAuthProvider fbAuthProv;
     @Mock
-    FirebaseDatabase fbDatabase;
-    @Mock
     DatabaseReference dbRef;
     @Mock
-    GeoFire gf;
+    GeoFire geofire;
     @Captor
     private ArgumentCaptor<OnCompleteListener<AuthResult>> testOnCompleteAuthListener;
     @Mock
@@ -57,18 +52,14 @@ public class SignInTest {
     @Captor
     private ArgumentCaptor<AuthProvider.AuthListener> testAuthListener;
 
+    private FirebaseAuthProvider auth = new FirebaseAuthProvider(fbAuth);
+    private FirebaseDatabaseProvider database = new FirebaseDatabaseProvider(dbRef, geofire);
 
     @Before
     public void setUp() throws Exception {
-        mockStatic(FirebaseAuth.class);
-        mockStatic(FirebaseDatabase.class);
-        mockStatic(GeoFire.class);
+
         setTasks();
         Mockito.when(FirebaseAuth.getInstance()).thenReturn(fbAuth);
-        Mockito.when(FirebaseDatabase.getInstance()).thenReturn(fbDatabase);
-        Mockito.when(fbDatabase.getReference()).thenReturn(dbRef);
-        whenNew(GeoFire.class).withAnyArguments().thenReturn(gf);
-        whenNew(FirebaseAuthProvider.class).withAnyArguments().thenReturn(fbAuthProv);
         Providers.auth = new FirebaseAuthProvider();
         siAct = new SignInActivity();
 
