@@ -118,7 +118,6 @@ public class FirebaseAuthProvider extends AuthProvider {
         //TODO elaborate email validation
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";
-            Log.d(TAG, "Email validation failed");
         }
         return errMessage;
     }
@@ -384,6 +383,7 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public String getEmail() {
+        user = auth.getCurrentUser();
         if (auth.getCurrentUser() != null) {
             return user.getEmail();
         } else {

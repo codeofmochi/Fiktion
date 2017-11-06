@@ -26,6 +26,9 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class FirebaseAuthTest {
@@ -63,7 +66,7 @@ public class FirebaseAuthTest {
     @Captor
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
-    private FirebaseAuthProvider auth = new FirebaseAuthProvider(fbAuth);
+    private FirebaseAuthProvider auth;
 
 
     @Before
@@ -417,38 +420,27 @@ public class FirebaseAuthTest {
         });
     }
 
-  /*  @Test
-    public void getCurrentUser() {
-        final String name = "default";
+    @Test
+    public void testGetters() {
         final String email = "test@test.ch";
-        final String id = "id";
 
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
-        Mockito.when(fbUser.getDisplayName()).thenReturn(name);
         Mockito.when(fbUser.getEmail()).thenReturn(email);
-        Mockito.when(fbUser.getUid()).thenReturn(id);
-        Mockito.when(fbUser.isEmailVerified()).thenReturn(false);
-
-
-        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User user) {
-                Assert.assertEquals(auth.getEmail(), email);
-                Assert.assertEquals(user.getName(), name);
-
-            }
-
-            @Override
-            public void onDoesntExist() {
-
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-        });
+        Mockito.when(fbUser.isEmailVerified()).thenReturn(true);
+        assertThat(auth.isConnected(), is(true));
+        assertThat(auth.getEmail(), is(email));
+        assertThat(auth.isEmailVerified(), is(true));
     }
-*/
+
+    @Test
+    public void testValidaters(){
+        //validate email
+        assertThat(auth.validateEmail(email), is(""));
+        assertThat(auth.validateEmail("invalidemail"), is("Requires a valid email"));
+        //validate password
+        assertThat(auth.validatePassword(password), is(""));
+        assertThat(auth.validatePassword(""), is("Requires a valid password"));
+        assertThat(auth.validatePassword("1234"), is("Password must be at least 6 characters"));
+    }
 
 }
