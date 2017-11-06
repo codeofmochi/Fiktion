@@ -285,34 +285,6 @@ public class FirebaseAuthProvider extends AuthProvider {
         }
     }
 
-    /*
-     * Enables the user to change his username
-     * @param newName new username provided by the user
-     * @param listener actions to be done in case of failure or success
-     */
-/*    @Override
-    public void changeName(String newName, final AuthListener listener) {
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(newName).build();
-
-        user = auth.getCurrentUser();
-        if (user != null) {
-            user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        listener.onSuccess();
-                    } else {
-                        listener.onFailure();
-                    }
-                }
-            });
-        }else{
-            listener.onFailure();
-        }
-    }
-*/
-
     /**
      * Enables the user to change his primary email
      *
@@ -384,7 +356,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public String getEmail() {
         user = auth.getCurrentUser();
-        if (auth.getCurrentUser() != null) {
+        if (auth.getCurrentUser() != null && user.getEmail()!= null) {
             return user.getEmail();
         } else {
             return "";
