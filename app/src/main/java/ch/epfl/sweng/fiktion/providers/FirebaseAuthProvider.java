@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -24,7 +25,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     // firebase authentification instance
     private final FirebaseAuth auth;
     // firebase user that we authenticate
-    private FirebaseUser user = null;
+    private FirebaseUser user ;
     // firebase status
     /*
     private FirebaseAuth.AuthStateListener state;
@@ -346,10 +347,10 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void deleteAccount(final AuthListener listener, final DatabaseProvider.DeleteUserListener delListener) {
-        //TODO delete application user in database after implementation of user storage in database
         user = auth.getCurrentUser();
 
         if (user != null) {
+            System.out.println("Wain");
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
