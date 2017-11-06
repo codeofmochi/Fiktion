@@ -6,7 +6,6 @@ import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.junit.Before;
@@ -23,11 +22,11 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebasePointOfInterest;
 
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.ALREADYEXISTS;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.DOESNTEXIST;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.FAILURE;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.NOTHING;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.SUCCESS;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.ALREADYEXISTS;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.DOESNTEXIST;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.FAILURE;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.NOTHING;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.SUCCESS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,7 +43,7 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class FirebaseDatabaseTest {
+public class FirebaseDatabasePOITest {
 
     FirebaseDatabaseProvider database;
 
@@ -74,7 +73,7 @@ public class FirebaseDatabaseTest {
     }
 
     @Before
-    public void initializers() throws Exception {
+    public void initializers() {
         database = new FirebaseDatabaseProvider(dbRef, geofire);
         result = NOTHING;
     }
@@ -110,7 +109,7 @@ public class FirebaseDatabaseTest {
         when(poiRef.setValue(any(FirebasePointOfInterest.class))).thenReturn(null);
         doNothing().when(geofire).setLocation(anyString(), any(GeoLocation.class));
 
-        when(snapshot.exists()).thenReturn(false, true);
+        when(snapshot.exists()).thenReturn(false);
         database.addPoi(poiTest, listener);
         vel.onDataChange(snapshot);
         assertThat(result, is(SUCCESS));
@@ -151,9 +150,10 @@ public class FirebaseDatabaseTest {
             }
         };
 
+        database.getPoi(poiTest.name(), listener);
+
         when(snapshot.exists()).thenReturn(true);
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(new FirebasePointOfInterest(poiTest));
-        database.getPoi(poiTest.name(), listener);
         vel.onDataChange(snapshot);
         assertThat(result, is(SUCCESS));
 
@@ -188,7 +188,7 @@ public class FirebaseDatabaseTest {
     }
 
     @Test
-    public void findNearPoisTest() throws Exception {
+    public void findNearPoisTest() {
         GeoQuery geoQuery = mock(GeoQuery.class);
         when(geofire.queryAtLocation(any(GeoLocation.class), anyDouble())).thenReturn(geoQuery);
         doAnswer(new Answer() {
