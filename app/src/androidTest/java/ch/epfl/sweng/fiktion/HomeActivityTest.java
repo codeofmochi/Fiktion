@@ -127,6 +127,11 @@ public class HomeActivityTest {
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         closeSoftKeyboard();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         menuDrawer.check(matches(not(isDisplayed())));
