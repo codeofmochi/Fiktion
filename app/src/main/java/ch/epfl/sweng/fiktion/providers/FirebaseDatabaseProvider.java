@@ -22,8 +22,18 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author pedro
  */
 public class FirebaseDatabaseProvider extends DatabaseProvider {
-    private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-    private final GeoFire geofire = new GeoFire(dbRef.child("geofire"));
+    private DatabaseReference dbRef;
+    private GeoFire geofire = new GeoFire(dbRef.child("geofire"));
+
+    public FirebaseDatabaseProvider() {
+        dbRef = FirebaseDatabase.getInstance().getReference();
+        geofire = new GeoFire(dbRef.child("geofire"));
+    }
+
+    public FirebaseDatabaseProvider(DatabaseReference dbRef, GeoFire geofire) {
+        this.dbRef = dbRef;
+        this.geofire = geofire;
+    }
 
     /**
      * {@inheritDoc}
