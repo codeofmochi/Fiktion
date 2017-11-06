@@ -189,9 +189,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //method to open a pop up window
     private void selectImage() {
-
+        //pop up box to chose how to take picture
         final CharSequence[] choice = {"Camera", "Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(POIPageActivity.this);
+
+
 
         if (ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -262,8 +264,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
 
     private void onCameraResult(Intent data) {
+
         Bitmap image = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        //(format, quality, outstream)
         image.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
 
