@@ -61,9 +61,6 @@ public class FirebaseDatabaseTest {
     @Mock
     DataSnapshot snapshot;
 
-    @Mock
-    GeoLocation geoLocation;
-
     private Result result;
 
     public enum Result {SUCCESS, ALREADYEXISTS, DOESNTEXIST, FAILURE, NOTHING}
@@ -225,7 +222,7 @@ public class FirebaseDatabaseTest {
         }).when(databaseSpy).getPoi(anyString(), any(DatabaseProvider.GetPoiListener.class));
 
         databaseSpy.findNearPois(poiTest.position(), 10, findPoiListener);
-        geoQueryEventListener.onKeyEntered("key", geoLocation);
+        geoQueryEventListener.onKeyEntered("key", null);
         getPoiListener.onSuccess(poiTest);
         assertThat(keyCount, is(1));
         getPoiListener.onSuccess(poiTest);
@@ -236,7 +233,7 @@ public class FirebaseDatabaseTest {
         getPoiListener.onDoesntExist();
         getPoiListener.onFailure();
         geoQueryEventListener.onKeyExited("key");
-        geoQueryEventListener.onKeyMoved("key", geoLocation);
+        geoQueryEventListener.onKeyMoved("key", null);
         geoQueryEventListener.onGeoQueryReady();
         geoQueryEventListener.onGeoQueryError(null);
         assertThat(result, is(FAILURE));
