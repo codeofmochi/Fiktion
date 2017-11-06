@@ -22,7 +22,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     //testing
     private final static String TAG = "FBAuthProv";
     // firebase authentification instance
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final FirebaseAuth auth;
     // firebase user that we authenticate
     private FirebaseUser user = null;
     // firebase status
@@ -60,6 +60,14 @@ public class FirebaseAuthProvider extends AuthProvider {
         auth.addAuthStateListener(state);
     }
 */
+
+    public FirebaseAuthProvider(){
+        auth = FirebaseAuth.getInstance();
+    }
+
+    public FirebaseAuthProvider(FirebaseAuth fbAuth){
+        auth = fbAuth;
+    }
 
     /**
      * Signs in a user with an email, a password and what to do afterwards

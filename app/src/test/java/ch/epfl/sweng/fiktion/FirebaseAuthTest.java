@@ -20,23 +20,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
+import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.Providers;
 
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({FirebaseDatabase.class, FirebaseAuth.class, GeoFire.class, FirebaseAuthProvider.class})
+@RunWith(MockitoJUnitRunner.class)
 public class FirebaseAuthTest {
 
-    private FirebaseAuthProvider auth;
     private String email = "test@epfl.ch";
     private String password = "testing";
     @Mock
@@ -72,23 +68,13 @@ public class FirebaseAuthTest {
     @Captor
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
+    private FirebaseAuthProvider auth = new FirebaseAuthProvider(fbAuth);
+    private FirebaseDatabaseProvider databse = new FirebaseAuthProvider(fbDatabase);
+
 
     @Before
-    public void setUp() throws Exception {
-
-        mockStatic(FirebaseAuth.class);
-        mockStatic(FirebaseDatabase.class);
-
-        Mockito.when(FirebaseDatabase.getInstance()).thenReturn(fbDatabase);
-        Mockito.when(fbDatabase.getReference()).thenReturn(dbRef);
-        whenNew(GeoFire.class).withAnyArguments().thenReturn(geofire);
-        Mockito.when(FirebaseAuth.getInstance()).thenReturn(fbAuth);
-        Mockito.when(FirebaseDatabase.getInstance()).thenReturn(fbDatabase);
-
+    public void setUp()  {
         setTasks();
-
-        auth = new FirebaseAuthProvider();
-
     }
 
     private void setTasks() {
@@ -109,44 +95,45 @@ public class FirebaseAuthTest {
         Mockito.when(taskVoidFailResult.addOnCompleteListener(testOnCompleteVoidListener.capture())).
                 thenReturn(taskVoidFailResult);
     }
-/*
-    @Test
-    public void testSuccessfulDeleteAccount() {
-        //test successful
-        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
-        Mockito.when(fbUser.delete()).thenReturn(taskVoidSucceedResult);
-        Mockito.when()
-        auth.deleteAccount(new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                //successfully deleted in firebase
-                Mockito.verify(fbUser.delete());
-            }
 
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        }, new DatabaseProvider.DeleteUserListener() {
-            @Override
-            public void onSuccess() {
-                //successfully deleted in the database
-                Mockito.verify(fbUser.delete());
-            }
+    /*
+        @Test
+        public void testSuccessfulDeleteAccount() {
+            //test successful
+            Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+            Mockito.when(fbUser.delete()).thenReturn(taskVoidSucceedResult);
+            Mockito.when()
+            auth.deleteAccount(new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    //successfully deleted in firebase
+                    Mockito.verify(fbUser.delete());
+                }
 
-            @Override
-            public void onDoesntExist() {
-                Assert.fail();
-            }
+                @Override
+                public void onFailure() {
+                    Assert.fail();
+                }
+            }, new DatabaseProvider.DeleteUserListener() {
+                @Override
+                public void onSuccess() {
+                    //successfully deleted in the database
+                    Mockito.verify(fbUser.delete());
+                }
 
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
-        testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
-    }
-*/
+                @Override
+                public void onDoesntExist() {
+                    Assert.fail();
+                }
+
+                @Override
+                public void onFailure() {
+                    Assert.fail();
+                }
+            });
+            testOnCompleteVoidListener.getValue().onComplete(taskVoidSucceedResult);
+        }
+    */
     @Test
     public void testFailDeleteAccount() {
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
@@ -253,8 +240,6 @@ public class FirebaseAuthTest {
 
         testOnCompleteVoidListener.getValue().onComplete(taskVoidFailResult);
     }
-
-
 
 
     @Test
@@ -401,7 +386,8 @@ public class FirebaseAuthTest {
         auth.signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                Assert.fail();            }
+                Assert.fail();
+            }
 
             @Override
             public void onFailure() {
@@ -410,6 +396,7 @@ public class FirebaseAuthTest {
         });
         testOnCompleteAuthListener.getValue().onComplete(taskAuthFailResult);
     }
+
     @Test
     public void testAuthSignOut() {
         Mockito.doNothing().when(fbAuth).signOut();
