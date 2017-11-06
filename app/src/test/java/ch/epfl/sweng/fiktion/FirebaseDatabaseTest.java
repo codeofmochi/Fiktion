@@ -36,6 +36,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by pedro on 23/10/17.
@@ -76,17 +78,12 @@ public class FirebaseDatabaseTest {
 
     @Before
     public void initializers() throws Exception {
-        mockStatic(FirebaseDatabase.class);
-        FirebaseDatabase fb = mock(FirebaseDatabase.class);
-        when(FirebaseDatabase.getInstance()).thenReturn(fb);
-        when(fb.getReference()).thenReturn(dbRef);
-        whenNew(GeoFire.class).withAnyArguments().thenReturn(geofire);
-        database = new FirebaseDatabaseProvider();
+        database = new FirebaseDatabaseProvider(dbRef, geofire);
         result = NOTHING;
     }
 
     @Test
-    public void addPoiTest() throws Exception {
+    public void addPoiTest() {
 
         when(dbRef.child("Points of interest")).thenReturn(poisRef);
         when(poisRef.child(anyString())).thenReturn(poiRef);
@@ -115,7 +112,6 @@ public class FirebaseDatabaseTest {
             }
         };
         when(poiRef.setValue(any(FirebasePointOfInterest.class))).thenReturn(null);
-        whenNew(GeoLocation.class).withAnyArguments().thenReturn(geoLocation);
         doNothing().when(geofire).setLocation(anyString(), any(GeoLocation.class));
 
         when(snapshot.exists()).thenReturn(false, true);
