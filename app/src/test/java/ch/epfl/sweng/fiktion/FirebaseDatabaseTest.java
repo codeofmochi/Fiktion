@@ -81,7 +81,6 @@ public class FirebaseDatabaseTest {
 
     @Test
     public void addPoiTest() {
-
         when(dbRef.child("Points of interest")).thenReturn(poisRef);
         when(poisRef.child(anyString())).thenReturn(poiRef);
         doAnswer(new Answer() {
