@@ -95,21 +95,21 @@ public class FindAndDisplayNearestPoisActivityTest {
     @Test
     public void setTo10Shows1Test() {
         onView(withId(R.id.searchRadius)).perform(setProgress(10));
-        onView(withId(R.id.findNearPois)).perform(click());
+        onView(withId(R.id._findNearPois)).perform(click());
         onView(withId(R.id.displayResultPois)).check(countMatches(1));
     }
 
     @Test
     public void setTo10Shows2Test() {
         onView(withId(R.id.searchRadius)).perform(setProgress(50));
-        onView(withId(R.id.findNearPois)).perform(click());
+        onView(withId(R.id._findNearPois)).perform(click());
         onView(withId(R.id.displayResultPois)).check(countMatches(2));
     }
 
     @Test
     public void setTo10Shows3Test() {
         onView(withId(R.id.searchRadius)).perform(setProgress(100));
-        onView(withId(R.id.findNearPois)).perform(click());
+        onView(withId(R.id._findNearPois)).perform(click());
         onView(withId(R.id.displayResultPois)).check(countMatches(3));
     }
 }

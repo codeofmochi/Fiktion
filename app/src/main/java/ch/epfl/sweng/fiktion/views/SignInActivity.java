@@ -54,6 +54,7 @@ public class SignInActivity extends AppCompatActivity{
         //first we check if the email is valid, do not proceed if it is not valid
         String emailErr = Providers.auth.validateEmail(email);
         if (!emailErr.isEmpty()) {
+
             //Log.d(TAG, "Email is not valid");
             //we set an error corresponding to the failure
             UserEmail.setError(emailErr);
@@ -63,6 +64,7 @@ public class SignInActivity extends AppCompatActivity{
         //after making sure the email is valid we check if the password is valid and if not we do not proceed
         String passwordErr = Providers.auth.validatePassword(password);
         if (!passwordErr.isEmpty()) {
+
             //Log.d(TAG, "Password is not valid");
             //we set an error corresponding to the failure
             UserPassword.setError(passwordErr);
