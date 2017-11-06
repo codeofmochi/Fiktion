@@ -105,6 +105,9 @@ public class FirebaseDatabaseUserTest {
         when(snapshot.exists()).thenReturn(false);
         vel.onDataChange(snapshot);
         assertThat(result, is(SUCCESS));
+
+        vel.onCancelled(null);
+        assertThat(result, is(FAILURE));
     }
 
     @Test
