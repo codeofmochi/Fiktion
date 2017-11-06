@@ -387,7 +387,7 @@ public class FirebaseAuthProvider extends AuthProvider {
         if (auth.getCurrentUser() != null) {
             return user.getEmail();
         } else {
-            return null;
+            return "";
         }
 
     }

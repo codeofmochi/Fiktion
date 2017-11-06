@@ -25,6 +25,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
+import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -67,11 +68,12 @@ public class FirebaseAuthTest {
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
     private FirebaseAuthProvider auth;
-
+    private FirebaseDatabaseProvider database = new FirebaseDatabaseProvider(dbRef,geofire);
 
     @Before
     public void setUp() {
         auth = new FirebaseAuthProvider(fbAuth);
+        //Providers.database = database;
         setTasks();
 
     }
@@ -430,6 +432,16 @@ public class FirebaseAuthTest {
         assertThat(auth.isConnected(), is(true));
         assertThat(auth.getEmail(), is(email));
         assertThat(auth.isEmailVerified(), is(true));
+        Mockito.when(fbUser.isEmailVerified()).thenReturn(false);
+        assertThat(auth.isEmailVerified(), is(false));
+
+        //null user return
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
+        assertThat(auth.isConnected(), is(false));
+        assertThat(auth.getEmail(), is(""));
+        assertThat(auth.isEmailVerified(), is(false));
+
+
     }
 
     @Test
