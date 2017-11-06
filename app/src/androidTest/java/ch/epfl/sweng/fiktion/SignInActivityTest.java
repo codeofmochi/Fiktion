@@ -34,9 +34,7 @@ public class SignInActivityTest {
     private final String valid_email = "default@email.ch";
     private final String invalid_email = "invalid";
     private final String invalid_password = "1234";
-
     private SignInActivity mActivity;
-
 
     @Rule
     public final ActivityTestRule<SignInActivity> sinActivityRule =

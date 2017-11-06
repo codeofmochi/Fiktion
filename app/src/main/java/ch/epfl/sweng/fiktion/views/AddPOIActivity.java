@@ -27,6 +27,9 @@ public class AddPOIActivity extends MenuDrawerActivity {
     // Displayed fiction list (as a big string)
     private String fictionListText = "";
 
+    // intent result codes
+    private static final int LOCATION_RESULT = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         includeLayout = R.layout.activity_add_poi;
@@ -37,7 +40,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
     @Override
     @SuppressLint("SetTextI18n") // latitude and longitude are inputs, not hardcoded
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
+        if (requestCode == LOCATION_RESULT) {
             if (resultCode == RESULT_OK) {
                 Double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
                 Double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
@@ -50,8 +53,13 @@ public class AddPOIActivity extends MenuDrawerActivity {
     }
 
     public void startGetLocationFromMapActivity(View view) {
-        Intent getLocationFromMapIntent = new Intent(this, GetLocationFromMapActivity.class);
-        startActivityForResult(getLocationFromMapIntent, 1);
+        Intent i = new Intent(this, GetLocationFromMapActivity.class);
+        startActivityForResult(i, LOCATION_RESULT);
+    }
+
+    public void startGetLocationFromWikipedia(View view) {
+        Intent i = new Intent(this, GetLocationFromWikipediaActivity.class);
+        startActivityForResult(i, LOCATION_RESULT);
     }
 
     // Adds fictions to the fictions list and display them in a view, checks some bad inputs (empty, etc...)
