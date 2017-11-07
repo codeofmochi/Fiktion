@@ -2,10 +2,9 @@ package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 
 /**
  * A point of interest implementation for Firebase
@@ -13,13 +12,13 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
  * @author pedro
  */
 public class FirebasePointOfInterest {
-    public String name;
-    public FirebasePosition position;
-    public List<String> fictions;
-    public String description;
-    public int rating;
-    public String country;
-    public String city;
+    public String name = "";
+    public FirebasePosition position = new FirebasePosition(new Position(0, 0));
+    public List<String> fictions = new ArrayList<>();
+    public String description = "";
+    public int rating = 0;
+    public String country = "";
+    public String city = "";
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebasePointOfInterest.class)
