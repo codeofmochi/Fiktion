@@ -61,7 +61,7 @@ public class PointOfInterest {
      * @return a list of the fictions
      */
     public List<String> fictions() {
-        return new ArrayList<>(Collections.unmodifiableList(fictions));
+        return Collections.unmodifiableList(new ArrayList<>(fictions));
     }
 
     /**
