@@ -3,6 +3,7 @@ package ch.epfl.sweng.fiktion.views;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -87,6 +88,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         final String name = ((EditText) findViewById(R.id.add_poi_name)).getText().toString();
         final String longitudeString = ((EditText) findViewById(R.id.add_poi_longitude)).getText().toString();
         final String latitudeString = ((EditText) findViewById(R.id.add_poi_latitude)).getText().toString();
+        final String description = ((EditText) findViewById(R.id.add_poi_description)).getText().toString();
         double longitude = 0.0;
         double latitude = 0.0;
 
@@ -132,9 +134,9 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 isCorrect = false;
             }
         }
-
-        if (isCorrect && fictionListText.isEmpty()) {
-            database.addPoi(new PointOfInterest(name, new Position(latitude, longitude)), new DatabaseProvider.AddPoiListener() {
+        if (isCorrect) {
+            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionList, description, 0, "", "");
+            database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
                     showToast("The Point of Interest " + name + " was added !");

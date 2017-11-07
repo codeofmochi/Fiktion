@@ -15,6 +15,8 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -56,9 +58,9 @@ public class FindAndDisplayNearestPoisActivityTest {
     @BeforeClass
     public static void setup() {
         database = new LocalDatabaseProvider();
-        database.addPoi(new PointOfInterest("p1", new Position(0.05, 0.05)), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(0.3, 0.3)), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(0.6, 0.6)), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p1", new Position(0.05, 0.05), new ArrayList<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p2", new Position(0.3, 0.3), new ArrayList<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p3", new Position(0.6, 0.6), new ArrayList<String>(), "", 0, "", ""), emptyAddPoiListener);
     }
 
     private ViewAction setProgress(final int progress) {
