@@ -96,14 +96,15 @@ public class HomeActivityTest {
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(0).perform(click());
         homeMainLayout.check(matches(isDisplayed()));
     }
-    /*
+
+    @Test
     public void showMapWhenNearbyClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(1).perform(click());
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
-    */
+
     // Will be modified when linked
     @Test
     public void CloseDrawerWhenProfileClicked() {
@@ -143,5 +144,12 @@ public class HomeActivityTest {
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
         homeMainLayout.check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void UseGpsButtonOpenMap() {
+        closeSoftKeyboard();
+        onView(withId(R.id.useGPSButton)).perform(click());
+        onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 }
