@@ -45,24 +45,24 @@ public class HomeActivityTest {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_RIGHT, GeneralLocation.CENTER_LEFT, Press.FINGER);
     }
 
-    @BeforeClass
-    public static void resetProviders() {
-        Providers.auth = new LocalAuthProvider();
-        Providers.database = new LocalDatabaseProvider();
+    private static void waitSomeTime(int ms) {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(ms);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+    @BeforeClass
+    public static void resetProviders() {
+        Providers.auth = new LocalAuthProvider();
+        Providers.database = new LocalDatabaseProvider();
+        waitSomeTime(2000);
+    }
+
     @After
     public void reset(){
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitSomeTime(500);
     }
 
     @Test
@@ -76,9 +76,9 @@ public class HomeActivityTest {
     @Test
     public void homeToHomeWhenHomeClicked() {
         closeSoftKeyboard();
-
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(0).perform(click());
+        waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
     }
     @Test
@@ -87,11 +87,7 @@ public class HomeActivityTest {
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         closeSoftKeyboard();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(0).perform(click());
         homeMainLayout.check(matches(isDisplayed()));
@@ -128,11 +124,7 @@ public class HomeActivityTest {
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         closeSoftKeyboard();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         menuDrawer.check(matches(not(isDisplayed())));
