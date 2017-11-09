@@ -90,6 +90,7 @@ public class HomeActivityTest {
         waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(0).perform(click());
+        waitSomeTime(1000);
         homeMainLayout.check(matches(isDisplayed()));
     }
 
@@ -98,6 +99,7 @@ public class HomeActivityTest {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(1).perform(click());
+        waitSomeTime(1000);
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 
@@ -107,6 +109,7 @@ public class HomeActivityTest {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(2).perform(click());
+        waitSomeTime(1000);
         homeMainLayout.check(matches(isDisplayed()));
     }
     // Will be modified when linked
@@ -115,6 +118,7 @@ public class HomeActivityTest {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(3).perform(click());
+        waitSomeTime(1000);
         homeMainLayout.check(matches(isDisplayed()));
     }
 
@@ -127,6 +131,7 @@ public class HomeActivityTest {
         waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
+        waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
     }
     // Will be modified when linked
@@ -135,6 +140,7 @@ public class HomeActivityTest {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
+        waitSomeTime(1000);
         homeMainLayout.check(matches(isDisplayed()));
     }
 
