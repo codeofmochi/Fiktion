@@ -3,14 +3,13 @@ package ch.epfl.sweng.fiktion.views;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
@@ -24,7 +23,7 @@ import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LON
 public class AddPOIActivity extends MenuDrawerActivity {
 
     // List of the fictions name
-    private final List<String> fictionList = new ArrayList<>();
+    private final Set<String> fictionSet = new TreeSet<>();
     // Displayed fiction list (as a big string)
     private String fictionListText = "";
 
@@ -73,14 +72,16 @@ public class AddPOIActivity extends MenuDrawerActivity {
             // warning message if unaccepted characters are present
             ((EditText) findViewById(R.id.add_poi_fiction)).setError("Those characters are not accepted: . $ # [ ] /");
         } else {
-            fictionList.add(fiction);
-            if (fictionListText.isEmpty()) {
-                fictionListText = fictionListText.concat(fiction);
-            } else {
-                fictionListText = fictionListText.concat(", " + fiction);
+            if (!fictionSet.contains(fiction)) {
+                fictionSet.add(fiction);
+                if (fictionListText.isEmpty()) {
+                    fictionListText = fictionListText.concat(fiction);
+                } else {
+                    fictionListText = fictionListText.concat(", " + fiction);
+                }
+                ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
+                ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
             }
-            ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
-            ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
         }
     }
 
@@ -135,7 +136,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
             }
         }
         if (isCorrect) {
-            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionList, description, 0, "", "");
+            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, "", "");
             database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
@@ -146,6 +147,8 @@ public class AddPOIActivity extends MenuDrawerActivity {
                     ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
                     ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
                     ((EditText) findViewById(R.id.add_poi_description)).setText("");
+                    fictionSet.clear();
+                    fictionListText = "";
                 }
 
                 @Override
