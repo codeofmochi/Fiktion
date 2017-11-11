@@ -16,7 +16,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
-import java.util.ArrayList;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
@@ -49,7 +49,7 @@ public class FirebaseDatabasePOITest {
 
     FirebaseDatabaseProvider database;
 
-    PointOfInterest poiTest = new PointOfInterest("poiName", new Position(10, 12), new ArrayList<String>(), "", 0, "", "");
+    PointOfInterest poiTest = new PointOfInterest("poiName", new Position(10, 12), new TreeSet<String>(), "", 0, "", "");
 
     ValueEventListener vel;
 

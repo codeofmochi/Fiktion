@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
@@ -63,9 +63,9 @@ public class AddPOIActivityTest {
     @BeforeClass
     public static void setup() {
         database = new LocalDatabaseProvider();
-        database.addPoi(new PointOfInterest("p1", new Position(0, 1), new ArrayList<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(1, 2), new ArrayList<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(2, 3), new ArrayList<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p1", new Position(0, 1), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p2", new Position(1, 2), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p3", new Position(2, 3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
     }
 
     private final ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
