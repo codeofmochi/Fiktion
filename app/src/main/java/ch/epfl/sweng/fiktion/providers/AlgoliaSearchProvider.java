@@ -31,7 +31,7 @@ public class AlgoliaSearchProvider extends SearchProvider{
 
     // Constructor
     // Initializes Algolia connection and pre-build the search query
-    public AlgoliaSearchProvider(){
+    AlgoliaSearchProvider(){
         this.client = new Client(applicationID, apiKey);
         this.index =  client.getIndex(indexName);
         this.query = new Query();
@@ -40,9 +40,9 @@ public class AlgoliaSearchProvider extends SearchProvider{
     }
 
     // Creates POI object from a JSON representation
-    public class PoiJsonParser
+    private class PoiJsonParser
     {
-        public PointOfInterest parse(JSONObject jsonObject)
+        PointOfInterest parse(JSONObject jsonObject)
         {
             if (jsonObject == null)
                 return null;
@@ -56,10 +56,10 @@ public class AlgoliaSearchProvider extends SearchProvider{
     }
 
     // Deserialize POI's from their JSON representations on result array
-    public class SearchResultsJsonParser
+    private class SearchResultsJsonParser
     {
         private PoiJsonParser poiParser = new PoiJsonParser();
-        public List<PointOfInterest> parseResults(JSONObject jsonObject)
+        List<PointOfInterest> parseResults(JSONObject jsonObject)
         {
             if (jsonObject == null)
                 return null;

@@ -22,7 +22,7 @@ public abstract class SearchProvider {
     /**
      *
      * @param name query POI's that contains parameter in their names
-     * @return list of search results
+     * @param listener listens to search process
      */
     public abstract void searchByText(String name, final DatabaseProvider.PoiSearchByTextListener listener);
 

@@ -53,4 +53,5 @@
     <string name="delete_account">Delete Account</string>
     <!-- RegisterActivity -->
     <string name="confirm_pw">Confirm password</string>
+    <string name="title_activity_search_by_text">SearchByTextActivity</string>
 </resources>
