@@ -64,4 +64,12 @@
     <string name="profile">Profile</string>
     <string name="email_verified">Verified</string>
     <string name="send">Send</string>
+    <string name="background_image">Background image</string>
+    <string name="upvote">Vote +1</string>
+    <string name="pictures">Pictures</string>
+    <string name="add_a_picture">Add a picture</string>
+    <string name="photo">photo</string>
+    <string name="user_reviews">User reviews</string>
+    <string name="add_a_review">Add a review</string>
+    <string name="nearby">Nearby</string>
 </resources>
