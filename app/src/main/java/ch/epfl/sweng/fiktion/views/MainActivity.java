@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.tests.FindNearestPoisActivity;
 
 public class MainActivity extends AppCompatActivity {
 

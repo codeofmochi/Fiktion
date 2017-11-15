@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.tests;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,9 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.views.HomeActivity;
+import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
+import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 /**
  * This activity displays the user's information and allows him to apply changes to its profile
