@@ -20,8 +20,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/text_border_bottom"
-            android:padding="10dp"
+            android:padding="15dp"
             android:text="Account"
+            android:textStyle="bold"
             tools:layout_editor_absoluteX="7dp"
             tools:layout_editor_absoluteY="16dp" />
 
@@ -31,10 +32,47 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/text_border_bottom"
-            android:padding="10dp"
+            android:padding="15dp"
             android:text="Search"
+            android:textStyle="bold"
             tools:layout_editor_absoluteX="7dp"
             tools:layout_editor_absoluteY="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/searchRadiusText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Search radius" />
+
+                <TextView
+                    android:id="@+id/searchRadiusNum"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="00 km" />
+
+                <SeekBar
+                    android:id="@+id/searchRadiusSlider"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/profileSettingsLink"
@@ -42,8 +80,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/text_border_bottom"
-            android:padding="10dp"
+            android:padding="15dp"
             android:text="Profile"
+            android:textStyle="bold"
             tools:layout_editor_absoluteX="7dp"
             tools:layout_editor_absoluteY="16dp" />
     </LinearLayout>

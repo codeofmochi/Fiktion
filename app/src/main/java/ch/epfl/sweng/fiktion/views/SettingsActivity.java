@@ -8,7 +8,8 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // pass layout to parent for menu
+        includeLayout = R.layout.activity_settings;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
     }
 }

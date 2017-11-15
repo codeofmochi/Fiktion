@@ -3,6 +3,7 @@ package ch.epfl.sweng.fiktion.views;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -86,6 +87,14 @@ public class MenuDrawerActivity extends AppCompatActivity {
             }
             case 5:
                 // settings activity
+                if (this.getClass().equals(SettingsActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    Intent i = new Intent(this, SettingsActivity.class);
+                    // clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
                 break;
             default:
                 break;
