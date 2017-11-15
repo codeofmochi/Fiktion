@@ -4,57 +4,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/tokyo_sun"
     tools:context="ch.epfl.sweng.fiktion.views.SignInActivity">
 
+    <ImageView
+        android:id="@+id/fiktionLogo"
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/fiktion_logo"
+        android:contentDescription="@string/fiktion_app_logo" />
+
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/linearLayout"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
+        android:layout_marginBottom="90dp"
+        android:background="@color/white"
+        android:elevation="20dp"
+        android:orientation="vertical"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_constraintBottom_creator="1"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1">
 
         <EditText
             android:id="@+id/User_Email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/person_icon_24"
+            android:drawableTint="@color/darkGray"
             android:ems="10"
             android:hint="@string/email"
             android:inputType="textEmailAddress"
-            android:textAlignment="center" />
+            android:textAlignment="textStart"
+            android:textColor="@color/colorText"
+            tools:targetApi="m" />
 
         <EditText
             android:id="@+id/User_Password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/lock_icon_24"
+            android:drawableTint="@color/darkGray"
             android:ems="10"
+            android:fontFamily="sans-serif"
             android:hint="@string/password"
             android:inputType="textPassword"
-            android:textAlignment="center" />
+            android:textAlignment="textStart"
+            android:textColor="@color/colorText"
+            tools:targetApi="m" />
 
         <Button
             android:id="@+id/SignInButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_bright"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:background="@color/colorPrimary"
             android:onClick="signIn"
-            android:text="@string/singn_in_button" />
+            android:text="@string/singn_in_button"
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/RegisterButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_dark"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:background="@color/darkGray"
             android:onClick="register"
-            android:text="@string/register" />
+            android:text="@string/register"
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

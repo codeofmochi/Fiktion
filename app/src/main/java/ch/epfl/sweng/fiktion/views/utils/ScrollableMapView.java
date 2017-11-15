@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.utils;
 
 import android.content.Context;
 import android.util.AttributeSet;

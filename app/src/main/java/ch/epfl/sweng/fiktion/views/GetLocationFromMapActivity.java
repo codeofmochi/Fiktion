@@ -11,6 +11,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
+import ch.epfl.sweng.fiktion.views.parents.MapLocationActivity;
 
 public class GetLocationFromMapActivity extends MapLocationActivity {
     public static final String NEW_POI_LATITUDE = "ch.epfl.sweng.fiktion.GetLocationFromMapActivity.newLatitude";

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.epfl.sweng.fiktion.views.UserDetailsActivity">
+    tools:context="ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity">
 
     <FrameLayout
         android:id="@+id/frameLayout"

@@ -21,7 +21,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
-import ch.epfl.sweng.fiktion.views.FindNearestPoisActivity;
+import ch.epfl.sweng.fiktion.views.tests.FindNearestPoisActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;

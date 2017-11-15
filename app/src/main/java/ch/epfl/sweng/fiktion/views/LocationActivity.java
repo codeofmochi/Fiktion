@@ -6,6 +6,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.parents.MapLocationActivity;
 
 public class LocationActivity extends MapLocationActivity {
 

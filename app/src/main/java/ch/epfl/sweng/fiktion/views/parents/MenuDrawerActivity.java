@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.parents;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -16,13 +16,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.AddPOIActivity;
+import ch.epfl.sweng.fiktion.views.HomeActivity;
+import ch.epfl.sweng.fiktion.views.LocationActivity;
+import ch.epfl.sweng.fiktion.views.SettingsActivity;
 
 /**
  * A parent class for activities that implement the left menu drawer
  * Created by dialexo on 26.10.17.
  */
 
-public class MenuDrawerActivity extends AppCompatActivity {
+public abstract class MenuDrawerActivity extends AppCompatActivity {
 
     // menu drawer properties
     private String[] menuItems = {"Home", "Nearby", "Profile", "Discover", "Contribute", "Settings"};
