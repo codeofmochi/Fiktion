@@ -11,6 +11,7 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
 /**This activity prompts a sign in or sign up if the user is not already connected
  * //TODO Describe what happens when the user is already signed in

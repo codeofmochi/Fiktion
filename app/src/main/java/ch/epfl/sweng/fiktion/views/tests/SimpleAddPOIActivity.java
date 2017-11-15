@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.tests;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
