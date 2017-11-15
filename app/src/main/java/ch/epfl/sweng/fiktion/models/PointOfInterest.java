@@ -1,8 +1,8 @@
 package ch.epfl.sweng.fiktion.models;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A point of interest
@@ -12,7 +12,7 @@ import java.util.List;
 public class PointOfInterest {
     private final String name;
     private final Position position;
-    private final List<String> fictions;
+    private final Set<String> fictions;
     private final String description;
     private final int rating;
     private final String country;
@@ -27,7 +27,7 @@ public class PointOfInterest {
      * @param description a description of the point of interest
      * @param rating      the rating score of the point of interest
      */
-    public PointOfInterest(String name, Position position, List<String> fictions, String description, int rating, String country, String city) {
+    public PointOfInterest(String name, Position position, Set<String> fictions, String description, int rating, String country, String city) {
         this.name = name;
         this.position = position;
         this.fictions = fictions;
@@ -58,10 +58,10 @@ public class PointOfInterest {
     /**
      * Returns the fictions associated to the point of interest
      *
-     * @return a list of the fictions
+     * @return a set of the fictions
      */
-    public List<String> fictions() {
-        return Collections.unmodifiableList(new ArrayList<>(fictions));
+    public Set<String> fictions() {
+        return Collections.unmodifiableSet(new TreeSet<>(fictions));
     }
 
     /**

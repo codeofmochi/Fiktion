@@ -9,7 +9,7 @@ import android.support.test.uiautomator.UiSelector;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
@@ -86,9 +86,9 @@ public class LocationActivityTest {
             Position pos2 = new Position(myLocation.latitude() + 0.04, myLocation.longitude() - 0.04);
             Position pos3 = new Position(myLocation.latitude() + 1, myLocation.longitude() + 1);
             //pois
-            PointOfInterest p1 = new PointOfInterest("p1", pos1, new ArrayList<String>(), "", 0, "", "");
-            PointOfInterest p2 = new PointOfInterest("p2", pos2, new ArrayList<String>(), "", 0, "", "");
-            PointOfInterest p3 = new PointOfInterest("p3", pos3, new ArrayList<String>(), "", 0, "", "");
+            PointOfInterest p1 = new PointOfInterest("p1", pos1, new TreeSet<String>(), "", 0, "", "");
+            PointOfInterest p2 = new PointOfInterest("p2", pos2, new TreeSet<String>(), "", 0, "", "");
+            PointOfInterest p3 = new PointOfInterest("p3", pos3, new TreeSet<String>(), "", 0, "", "");
 
             //pois are put into the database
             database = new LocalDatabaseProvider();
