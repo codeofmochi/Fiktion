@@ -158,9 +158,8 @@
             android:elevation="5dp"
             android:orientation="vertical"
             android:padding="10dp"
-            android:onClick="startDisplayAkihabara">
-            tools:ignore="UselessParent">
-            <!-- background is used, but will be modified anyway -->
+            android:onClick="startDisplayAkihabara"
+            tools:ignore="UselessParent"><!-- background is used, but will be modified anyway -->
 
             <TextView
                 android:id="@+id/itemTitle"

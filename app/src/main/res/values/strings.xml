@@ -3,13 +3,10 @@
     <string name="title_activity_location">Nearby</string>
     <string name="invalid_email_error">Requires a valid email</string>
     <string name="invalid_password_error">Password must be at least 6 characters</string>
-    <string name="required_password_error">Password is required</string>
     <string name="toast_authentication_failed">Authentication Failed</string>
     <string name="gps_network_not_enabled">GPS location is not enabled.</string>
     <string name="open_location_settings">Settings</string>
     <string name="Cancel">Cancel</string>
-    <string name="gps_permission">GPS location is required to find nearby places</string>
-    <string name="OK">OK</string>
     <string name="add_poi_title">Add a Point of Interest</string>
     <string name="add_poi_name">Name of the point</string>
     <string name="add_poi_fiction">Add a new Fiction</string>
@@ -46,7 +43,6 @@
     <!-- MainActivity -->
     <string name="singn_in_button">SignIn</string>
     <string name="find_near_poi">Find Nearby POIs</string>
-    <string name="use_gps">Use GPS</string>
     <string name="view_home">View Home</string>
     <!-- ProfileSettingsActivity-->
     <string name="change_username">Change username</string>
@@ -72,7 +68,6 @@
     <string name="user_reviews">User reviews</string>
     <string name="add_a_review">Add a review</string>
     <string name="nearby">Nearby</string>
-    <string name="change_password">Change password</string>
     <string name="delete">Delete</string>
     <string name="notifications">Notifications</string>
     <string name="some_annoying_notifications">Some annoying notifications</string>

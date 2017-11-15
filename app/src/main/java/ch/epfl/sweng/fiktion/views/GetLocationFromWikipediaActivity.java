@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.net.URL;
+import java.util.Locale;
 import java.util.Scanner;
 
 import ch.epfl.sweng.fiktion.R;
@@ -45,12 +46,12 @@ public class GetLocationFromWikipediaActivity extends AppCompatActivity {
             urlInput.setError("Please provide a link");
         }
         // check if is wikipedia link
-        else if (!wikiURL.toLowerCase().contains("wikipedia.org")) {
+        else if (!wikiURL.toLowerCase(Locale.ENGLISH).contains("wikipedia.org")) {
             String err = "Link must be from wikipedia.org";
             urlInput.setError(err);
         }
         // check if correct article link
-        else if (!wikiURL.toLowerCase().matches(".*(wikipedia.org\\/wiki\\/.+)")) {
+        else if (!wikiURL.toLowerCase(Locale.ENGLISH).matches(".*(wikipedia.org\\/wiki\\/.+)")) {
             String err = "Wrong link format : must follow wikipedia.org/wiki/Article";
             urlInput.setError(err);
         } else {
