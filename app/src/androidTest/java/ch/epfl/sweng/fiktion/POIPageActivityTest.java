@@ -37,6 +37,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
 /**
+ * Tests for POIPageActivity
  * Created by Justinas on 03/11/2017.
  */
 
