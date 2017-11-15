@@ -57,4 +57,11 @@
     <string name="delete_account">Delete Account</string>
     <!-- RegisterActivity -->
     <string name="confirm_pw">Confirm password</string>
+    <string name="account">Account</string>
+    <string name="username">Username</string>
+    <string name="e_mail">E-mail</string>
+    <string name="search_radius">Search radius</string>
+    <string name="profile">Profile</string>
+    <string name="email_verified">Verified</string>
+    <string name="send">Send</string>
 </resources>
