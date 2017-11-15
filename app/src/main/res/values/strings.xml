@@ -54,7 +54,7 @@
     <string name="change_mail">Change email</string>
     <string name="verify_email">Verify Email</string>
     <string name="reset_pw">Reset Password</string>
-    <string name="delete_account">Delete Account</string>
+    <string name="delete_account">Delete account</string>
     <!-- RegisterActivity -->
     <string name="confirm_pw">Confirm password</string>
     <string name="account">Account</string>
@@ -72,4 +72,6 @@
     <string name="user_reviews">User reviews</string>
     <string name="add_a_review">Add a review</string>
     <string name="nearby">Nearby</string>
+    <string name="change_password">Change password</string>
+    <string name="delete">Delete</string>
 </resources>

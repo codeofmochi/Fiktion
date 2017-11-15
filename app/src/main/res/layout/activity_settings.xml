@@ -100,6 +100,35 @@
                 tools:ignore="NestedWeights">
 
                 <TextView
+                    android:id="@+id/passwordText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/passwordEdit"
+                    android:text="@string/password" />
+
+                <EditText
+                    android:id="@+id/passwordEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:fontFamily="sans-serif"
+                    android:hint="New password"
+                    android:inputType="textPassword"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights">
+
+                <TextView
                     android:id="@+id/verifiedText"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
@@ -120,6 +149,35 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/send_email" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:paddingBottom="5dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="4dp"
+                tools:ignore="NestedWeights,RtlSymmetry">
+
+                <TextView
+                    android:id="@+id/deleteAccountText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/delete_account" />
+
+                <Button
+                    android:id="@+id/deleteAccountButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:background="@color/red"
+                    android:text="@string/delete"
+                    android:textColor="@color/white" /> <!-- text is dynamically updated -->
 
             </LinearLayout>
 
