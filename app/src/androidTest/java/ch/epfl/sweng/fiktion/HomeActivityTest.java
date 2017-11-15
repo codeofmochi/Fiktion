@@ -142,6 +142,6 @@ public class HomeActivityTest {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
-        homeMainLayout.check(matches(isDisplayed()));
+        onView(withId(R.id.accountSettings)).check(matches(isDisplayed()));
     }
 }
