@@ -13,11 +13,11 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
-/**This activity prompts a sign in or sign up if the user is not already connected
- * //TODO Describe what happens when the user is already signed in
+/**
+ * This activity prompts a sign in or sign up if the user is not already connected
  * @author Rodrigo
  */
-public class SignInActivity extends AppCompatActivity{
+public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "SignInLog";
     private EditText UserEmail;
