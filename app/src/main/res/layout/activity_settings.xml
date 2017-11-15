@@ -97,6 +97,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:paddingBottom="7dp"
+                android:clipToPadding="false"
                 android:orientation="horizontal"
                 tools:ignore="NestedWeights">
 
@@ -108,17 +110,13 @@
                     android:labelFor="@+id/passwordEdit"
                     android:text="@string/password" />
 
-                <EditText
+                <Button
                     android:id="@+id/passwordEdit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="45dp"
+                    android:layout_height="36dp"
+                    android:background="@color/lightGray"
                     android:layout_weight="1"
-                    android:ems="10"
-                    android:fontFamily="sans-serif"
-                    android:hint="New password"
-                    android:inputType="textPassword"
-                    android:textSize="14sp"
-                    tools:ignore="HardcodedText" />
+                    android:text="@string/change" /> <!-- text is dynamically updated -->
 
             </LinearLayout>
 
@@ -126,6 +124,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:paddingBottom="7dp"
+                android:clipToPadding="false"
                 android:orientation="horizontal"
                 tools:ignore="NestedWeights">
 
@@ -136,18 +136,11 @@
                     android:layout_weight="1"
                     android:text="@string/email_verified" />
 
-                <TextView
-                    android:id="@+id/verifiedValue"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="$no$"
-                    tools:ignore="HardcodedText" />
-
                 <Button
                     android:id="@+id/verifiedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="45dp"
+                    android:layout_height="36dp"
+                    android:background="@color/lightGray"
                     android:layout_weight="1"
                     android:text="@string/send_email" /> <!-- text is dynamically updated -->
 
@@ -159,9 +152,7 @@
                 android:layout_weight="1"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
-                android:paddingBottom="5dp"
-                android:paddingEnd="4dp"
-                android:paddingTop="2dp"
+                android:paddingBottom="7dp"
                 tools:ignore="NestedWeights,RtlSymmetry">
 
                 <TextView

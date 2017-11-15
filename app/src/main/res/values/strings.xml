@@ -58,7 +58,7 @@
     <string name="e_mail">E-mail</string>
     <string name="search_radius">Search radius</string>
     <string name="profile">Profile</string>
-    <string name="email_verified">Verified</string>
+    <string name="email_verified">Verified e-mail</string>
     <string name="send_email">Send E-mail</string>
     <string name="background_image">Background image</string>
     <string name="upvote">Vote +1</string>
@@ -73,4 +73,6 @@
     <string name="some_annoying_notifications">Some annoying notifications</string>
     <string name="profile_is_public">Profile is public</string>
     <string name="save_account_settings">Save account settings</string>
+    <string name="fiktion_app_logo">Fiktion app logo</string>
+    <string name="change">Change</string>
 </resources>
