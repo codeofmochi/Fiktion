@@ -39,9 +39,9 @@ public class FirebaseAuthTest {
     @Mock
     FirebaseAuth fbAuth;
     @Mock
-    DatabaseReference dbRef;
-    @Mock
     FirebaseUser fbUser;
+    @Mock
+    DatabaseReference dbRef;
     @Mock
     GeoFire geofire;
     @Mock

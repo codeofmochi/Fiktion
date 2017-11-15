@@ -12,6 +12,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.util.TreeSet;
+
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
@@ -37,7 +39,7 @@ import static org.mockito.Mockito.when;
 public class FirebaseDatabaseUserTest {
 
     private FirebaseDatabaseProvider database;
-    private User user = new User("testName", "id");
+    private User user = new User("testName", "id", new TreeSet<String>());
 
     @Mock
     DatabaseReference dbRef, usersRef, userRef;
