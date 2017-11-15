@@ -63,7 +63,7 @@
     <string name="search_radius">Search radius</string>
     <string name="profile">Profile</string>
     <string name="email_verified">Verified</string>
-    <string name="send">Send</string>
+    <string name="send_email">Send E-mail</string>
     <string name="background_image">Background image</string>
     <string name="upvote">Vote +1</string>
     <string name="pictures">Pictures</string>
