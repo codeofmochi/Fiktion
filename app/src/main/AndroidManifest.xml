@@ -85,10 +85,9 @@
         <activity android:name=".views.HomeActivity" />
         <activity android:name=".views.ProfileSettingsActivity" />
         <activity android:name=".views.POIPageActivity" />
-        <activity android:name=".views.parents.MapLocationActivity" />
         <activity
             android:name=".views.SettingsActivity"
-            android:label="Settings"></activity>
+            android:label="Settings" />
     </application>
 
 </manifest>
