@@ -156,11 +156,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="horizontal"
                 android:clipToPadding="false"
+                android:orientation="horizontal"
                 android:paddingBottom="5dp"
-                android:paddingTop="2dp"
                 android:paddingEnd="4dp"
+                android:paddingTop="2dp"
                 tools:ignore="NestedWeights,RtlSymmetry">
 
                 <TextView
@@ -244,6 +244,51 @@
             android:textStyle="bold"
             tools:layout_editor_absoluteX="7dp"
             tools:layout_editor_absoluteY="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <Switch
+                android:id="@+id/publicProfileSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/profile_is_public"
+                android:textColor="@color/colorText"
+                tools:ignore="NestedWeights" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/notificationSettingsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/text_border_bottom"
+            android:padding="15dp"
+            android:text="@string/notifications"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <Switch
+                android:id="@+id/someNotificationSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/some_annoying_notifications"
+                android:textColor="@color/colorText" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

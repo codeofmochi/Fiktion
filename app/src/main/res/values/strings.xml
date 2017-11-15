@@ -74,4 +74,7 @@
     <string name="nearby">Nearby</string>
     <string name="change_password">Change password</string>
     <string name="delete">Delete</string>
+    <string name="notifications">Notifications</string>
+    <string name="some_annoying_notifications">Some annoying notifications</string>
+    <string name="profile_is_public">Profile is public</string>
 </resources>
