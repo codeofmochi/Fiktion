@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,7 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
@@ -86,6 +89,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     private PointOfInterest poi;
+    private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
     private MapView map;
     private RecyclerView reviewsView;
@@ -114,12 +118,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain the SupportMapFragment
         map = (MapView) findViewById(R.id.map);
         map.onCreate(savedInstanceState);
-        map.getMapAsync(this);
 
         imageLayout = (LinearLayout) findViewById(R.id.imageLayout);
+        uploadProgressBar = (ProgressBar) findViewById(R.id.uploadProgressBar);
 
         // get POI name
         Intent from = getIntent();
@@ -134,12 +138,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             @Override
             public void onDoesntExist() {
-
             }
 
             @Override
             public void onFailure() {
-
             }
         });
 
@@ -159,15 +161,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void setPoiInformation(PointOfInterest poi) {
         this.poi = poi;
+
+        // download the photos of the poi
         photoProvider.downloadPOIBitmaps(poi.name(), new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
+                // create a new ImageView which will hold the photo
                 ImageView imgView = new ImageView(getApplicationContext());
+
+                // set the content and the parameters
                 imgView.setImageBitmap(b);
                 imgView.setAdjustViewBounds(true);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
                 params.setMarginEnd(20);
                 imgView.setLayoutParams(params);
+
+                // add the ImageView to the pictures
                 imageLayout.addView(imgView);
             }
 
@@ -176,15 +185,20 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             }
         });
-        ;
+
+        // get notified when the map is ready to be used
+        map.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // Akihabara marker
-        LatLng mark = new LatLng(35.7022077, 139.7722703);
+        // add a marker to the poi position
+        Position pos = poi.position();
+        LatLng mark = new LatLng(pos.latitude(), pos.longitude());
         googleMap.addMarker(new MarkerOptions().position(mark)
-                .title("Akihabara"));
+                .title(poi.name()));
+
+        // move to the position and zoom
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(mark));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         map.onResume();
@@ -288,28 +302,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             try {
                 image = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
             } catch (IOException e) {
-
+                return;
             }
         }
 
-        photoProvider.uploadPOIBitmap(image, poi.name(), new PhotoProvider.UploadPhotoListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-
-            @Override
-            public void updateProgress(double progress) {
-
-            }
-        });
+        upload(image);
     }
-
 
     private void onCameraResult(Intent data) {
 
@@ -335,24 +333,32 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             e.printStackTrace();
         }
 
-        photoProvider.uploadPOIBitmap(image, poi.name(), new PhotoProvider.UploadPhotoListener() {
+        upload(image);
+    }
+
+    private void upload(Bitmap bitmap) {
+        // upload the photo to the cloud
+        // show the progress with the progressbar
+        uploadProgressBar.setVisibility(View.VISIBLE);
+        photoProvider.uploadPOIBitmap(bitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
-
+                uploadProgressBar.setVisibility(View.INVISIBLE);
+                uploadProgressBar.setProgress(0);
             }
 
             @Override
             public void onFailure() {
-
+                uploadProgressBar.setVisibility(View.INVISIBLE);
+                uploadProgressBar.setProgress(0);
             }
 
             @Override
             public void updateProgress(double progress) {
-
+                uploadProgressBar.setProgress((int) progress);
             }
         });
     }
-
 
 }
 

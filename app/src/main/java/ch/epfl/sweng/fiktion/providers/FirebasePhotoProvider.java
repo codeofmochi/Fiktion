@@ -52,15 +52,15 @@ public class FirebasePhotoProvider extends PhotoProvider {
     public void uploadPOIBitmap(Bitmap bitmap, final String poiName, final UploadPhotoListener listener) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        // if the number of bytes exceeds MAXIMUM_SIZE, abort the upload
-        if (bitmap.getByteCount() > MAXIMUM_SIZE) {
-            listener.onFailure();
-            return;
-        }
-
         // fill the outputStream with the bitmap data and convert it into a byte array
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         byte[] data = outputStream.toByteArray();
+
+        // if the number of bytes exceeds MAXIMUM_SIZE, abort the upload
+        if (data.length > MAXIMUM_SIZE) {
+            listener.onFailure();
+            return;
+        }
 
         // create a hash of the data, it will be the name of the photo
         String photoName = "";

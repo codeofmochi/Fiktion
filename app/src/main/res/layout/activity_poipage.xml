@@ -185,6 +185,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/reviews" />
 
+        <ProgressBar
+            android:id="@+id/uploadProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:progress="0"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/imgSlider"
+            app:layout_constraintEnd_toStartOf="@+id/addPictureButton"
+            app:layout_constraintStart_toEndOf="@+id/photoTitle"
+            app:layout_constraintTop_toBottomOf="@+id/map" />
+
     </android.support.constraint.ConstraintLayout>
 
 </ScrollView>
