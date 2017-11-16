@@ -2,22 +2,126 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#EFEFEF"
     tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity">
 
-    <ScrollView
-        android:id="@+id/profileMain"
+    <ImageView
+        android:id="@+id/userBanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/user_banner"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/dialexo_banner" />
+
+    <ImageView
+        android:id="@+id/userProfilePicture"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="90dp"
+        android:adjustViewBounds="true"
+        android:background="@color/white"
+        android:contentDescription="@string/user_profile_picture"
+        android:cropToPadding="true"
+        android:elevation="10dp"
+        android:padding="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/dialexo_user_picture" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userBanner">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/username"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test"/>
+            android:text="dialexo"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" /><!-- text will change dynamically -->
 
-    </ScrollView>
+        <TextView
+            android:id="@+id/userRealInfos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alexandre Chau, 21"
+            tools:ignore="HardcodedText" /><!-- text will change dynamically -->
+
+        <TextView
+            android:id="@+id/userCountry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Switzerland"
+            tools:ignore="HardcodedText" /><!-- text will change dynamically -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#DDDDDD"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+        <TextView
+            android:id="@+id/visitedCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:text="126 visited"
+            android:textAlignment="center"
+            android:drawableStart="@drawable/location_icon"
+            android:drawableTint="@color/darkGray"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" /><!-- text will change dynamically -->
+
+        <TextView
+            android:id="@+id/savedCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:text="213 saved"
+            android:textAlignment="center"
+            android:drawableStart="@drawable/star_icon_24"
+            android:drawableTint="@color/darkGray"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" /><!-- text will change dynamically -->
+
+        <TextView
+            android:id="@+id/photosCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:text="319 pictures"
+            android:textAlignment="center"
+            android:drawableStart="@drawable/camera_icon"
+            android:drawableTint="@color/darkGray"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" /><!-- text will change dynamically -->
+    </LinearLayout>
+
 
 </android.support.constraint.ConstraintLayout>
