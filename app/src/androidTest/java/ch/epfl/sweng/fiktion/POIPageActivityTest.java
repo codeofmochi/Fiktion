@@ -3,14 +3,12 @@ package ch.epfl.sweng.fiktion;
 
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.app.assist.AssistContent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.rule.ActivityTestRule;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -21,14 +19,11 @@ import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
-import static android.R.attr.data;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.isInternal;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -93,12 +88,12 @@ public class POIPageActivityTest {
             e.printStackTrace();
         }
 
+        /*
         if (onView(withId(R.id.image1)) == null) {
             assert true;
         }
-
+        */
     }
-
 
 
 }

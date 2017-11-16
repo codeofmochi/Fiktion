@@ -21,7 +21,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,8 +43,11 @@ import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+
+import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
@@ -80,12 +85,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
+    private PointOfInterest poi;
+    private LinearLayout imageLayout;
     private MapView map;
     private RecyclerView reviewsView;
     private RecyclerView.Adapter reviewsAdapter;
     private RecyclerView.LayoutManager reviewsLayout;
     private Button addPictureButton;
-    private ImageView image1;
     private String[] reviewsData = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
             "Curabitur condimentum ligula eu diam maximus porttitor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse metus urna, tincidunt sed augue ac, consectetur congue felis. Pellentesque efficitur enim et ultrices pellentesque.",
@@ -107,14 +113,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 selectImage();
             }
         });
-        //result of picture in thumbnail
-        image1 = (ImageView) findViewById(R.id.image1);
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         map = (MapView) findViewById(R.id.map);
         map.onCreate(savedInstanceState);
         map.getMapAsync(this);
+
+        imageLayout = (LinearLayout) findViewById(R.id.imageLayout);
 
         // get POI name
         Intent from = getIntent();
@@ -124,7 +129,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         Providers.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
-
+                setPoiInformation(poi);
             }
 
             @Override
@@ -150,6 +155,28 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         Spannable span = new SpannableString(featured.getText());
         span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary)), 12, featured.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         featured.setText(span);
+    }
+
+    private void setPoiInformation(PointOfInterest poi) {
+        this.poi = poi;
+        photoProvider.downloadPOIBitmaps(poi.name(), new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onNewPhoto(Bitmap b) {
+                ImageView imgView = new ImageView(getApplicationContext());
+                imgView.setImageBitmap(b);
+                imgView.setAdjustViewBounds(true);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                params.setMarginEnd(20);
+                imgView.setLayoutParams(params);
+                imageLayout.addView(imgView);
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+        ;
     }
 
     @Override
@@ -190,10 +217,15 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //method to open a pop up window
     private void selectImage() {
+
+        if (poi == null) {
+            Toast.makeText(this, "Point of interest information isn't loaded", Toast.LENGTH_SHORT);
+            return;
+        }
+
         //pop up box to chose how to take picture
         final CharSequence[] choice = {"Camera", "Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(POIPageActivity.this);
-
 
 
         if (ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
@@ -256,11 +288,26 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             try {
                 image = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
             } catch (IOException e) {
-                e.printStackTrace();
+
             }
         }
 
-        image1.setImageBitmap(image);
+        photoProvider.uploadPOIBitmap(image, poi.name(), new PhotoProvider.UploadPhotoListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+
+            }
+        });
     }
 
 
@@ -269,7 +316,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         Bitmap image = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         //(format, quality, outstream)
-        image.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        image.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
 
         //need to create the image file from the camera
@@ -288,7 +335,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             e.printStackTrace();
         }
 
-        image1.setImageBitmap(image);
+        photoProvider.uploadPOIBitmap(image, poi.name(), new PhotoProvider.UploadPhotoListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+
+            }
+        });
     }
 
 
