@@ -13,9 +13,10 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -45,24 +46,24 @@ public class HomeActivityTest {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_RIGHT, GeneralLocation.CENTER_LEFT, Press.FINGER);
     }
 
-    @BeforeClass
-    public static void resetProviders() {
-        Providers.auth = new LocalAuthProvider();
-        Providers.database = new LocalDatabaseProvider();
+    private static void waitSomeTime(int ms) {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(ms);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+    @BeforeClass
+    public static void resetProviders() {
+        AuthSingleton.auth = new LocalAuthProvider();
+        DatabaseSingleton.database = new LocalDatabaseProvider();
+        waitSomeTime(2000);
+    }
+
     @After
     public void reset(){
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitSomeTime(500);
     }
 
     @Test
@@ -76,9 +77,9 @@ public class HomeActivityTest {
     @Test
     public void homeToHomeWhenHomeClicked() {
         closeSoftKeyboard();
-
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(0).perform(click());
+        waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
     }
     @Test
@@ -87,37 +88,37 @@ public class HomeActivityTest {
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         closeSoftKeyboard();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(0).perform(click());
+        waitSomeTime(1000);
         homeMainLayout.check(matches(isDisplayed()));
     }
-    /*
+
+    @Test
     public void showMapWhenNearbyClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(1).perform(click());
+        waitSomeTime(1000);
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
-    */
-    // Will be modified when linked
+
     @Test
     public void CloseDrawerWhenProfileClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(2).perform(click());
-        homeMainLayout.check(matches(isDisplayed()));
+        onView(withId(R.id.profileMain)).check(matches(isDisplayed()));
     }
+
     // Will be modified when linked
     @Test
     public void CloseDrawerWhenDiscoverClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(3).perform(click());
+        waitSomeTime(1000);
         homeMainLayout.check(matches(isDisplayed()));
     }
 
@@ -127,21 +128,25 @@ public class HomeActivityTest {
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         closeSoftKeyboard();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
+        waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
     }
-    // Will be modified when linked
+
     @Test
     public void CloseDrawerWhenSettingsClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
         onView(withId(R.id.accountSettings)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void UseGpsButtonOpenMap() {
+        closeSoftKeyboard();
+        onView(withId(R.id.useGPSButton)).perform(click());
+        onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 }

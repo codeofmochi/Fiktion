@@ -48,7 +48,6 @@
     <string name="change_username">Change username</string>
     <string name="update">Update</string>
     <string name="change_mail">Change email</string>
-    <string name="verify_email">Verify Email</string>
     <string name="reset_pw">Reset Password</string>
     <string name="delete_account">Delete account</string>
     <!-- RegisterActivity -->
@@ -58,7 +57,7 @@
     <string name="e_mail">E-mail</string>
     <string name="search_radius">Search radius</string>
     <string name="profile">Profile</string>
-    <string name="email_verified">Verified e-mail</string>
+    <string name="verify_email">Verify e-mail</string>
     <string name="send_email">Send E-mail</string>
     <string name="background_image">Background image</string>
     <string name="upvote">Vote +1</string>
@@ -75,4 +74,8 @@
     <string name="save_account_settings">Save account settings</string>
     <string name="fiktion_app_logo">Fiktion app logo</string>
     <string name="change">Change</string>
+    <string name="user_banner">User banner</string>
+    <string name="user_profile_picture">User profile picture</string>
+    <string name="location_post_photo">Location post photo</string>
+    <string name="user_content_picture">User content picture</string>
 </resources>
