@@ -5,87 +5,112 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/kyoto_night"
     tools:context="ch.epfl.sweng.fiktion.views.RegisterActivity">
 
-    <TextView
-        android:id="@+id/register_title"
-        android:layout_width="0dp"
+    <ImageView
+        android:id="@+id/fiktionLogo2"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
-        android:text="Create Account"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="80dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="47dp"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="70dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/fiktion_app_logo"
+        android:cropToPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="80dp"
-        android:layout_marginRight="80dp"
-        tools:ignore="HardcodedText" />
+        app:srcCompat="@drawable/fiktion_logo" />
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@+id/register_title"
+        android:layout_height="249dp"
         android:layout_centerHorizontal="true"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
+        android:layout_marginBottom="70dp"
+        android:background="@color/white"
+        android:elevation="20dp"
+        android:orientation="vertical"
+        android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_constraintBottom_creator="1"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="222dp"
-        app:layout_constraintLeft_toLeftOf="parent">
+        tools:layout_constraintRight_creator="1">
+
+        <TextView
+            android:id="@+id/register_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:text="Create account"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_editor_absoluteX="80dp"
+            tools:layout_editor_absoluteY="47dp" />
 
         <EditText
             android:id="@+id/register_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
+            android:drawableEnd="@drawable/person_icon_24"
+            android:drawableTint="@color/darkGray"
             android:ems="10"
             android:hint="@string/email"
             android:inputType="textEmailAddress"
-            android:textAlignment="center"
-            tools:ignore="HardcodedText" />
+            android:textAlignment="textStart"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" />
 
         <EditText
             android:id="@+id/register_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
+            android:drawableEnd="@drawable/lock_icon_24"
+            android:drawableTint="@color/darkGray"
             android:ems="10"
+            android:fontFamily="sans-serif"
             android:hint="@string/password"
             android:inputType="textPassword"
-            android:textAlignment="center"
-            tools:ignore="HardcodedText" />
+            android:textAlignment="textStart"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" />
 
         <EditText
             android:id="@+id/register_confirm_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.05"
+            android:drawableEnd="@drawable/lock_icon_24"
+            android:drawableTint="@color/darkGray"
             android:ems="10"
+            android:fontFamily="sans-serif"
             android:hint="@string/confirm_pw"
             android:inputType="textPassword"
-            android:textAlignment="center"
-            tools:ignore="HardcodedText" />
+            android:textAlignment="textStart"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" />
 
         <Button
             android:id="@+id/register_click"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="0.05"
-            android:background="@android:color/holo_blue_dark"
+            android:background="@color/colorPrimary"
             android:onClick="register"
             android:text="@string/register"
+            android:textColor="@color/white"
             tools:ignore="HardcodedText" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

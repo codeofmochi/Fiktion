@@ -76,7 +76,7 @@
             app:layout_constraintTop_toBottomOf="@+id/mainImage"
             tools:targetApi="m" />
 
-        <ch.epfl.sweng.fiktion.views.ScrollableMapView
+        <ch.epfl.sweng.fiktion.views.utils.ScrollableMapView
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="200dp"

@@ -42,6 +42,7 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 

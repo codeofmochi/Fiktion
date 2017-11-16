@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.tests;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.tests.DisplayNearestPoisActivity;
 
 public class FindNearestPoisActivity extends AppCompatActivity {
     public static final String RADIUS_KEY = "ch.epfl.sweng.fiktion.radius";
