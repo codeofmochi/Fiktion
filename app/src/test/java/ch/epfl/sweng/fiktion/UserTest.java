@@ -198,6 +198,53 @@ public class UserTest {
     }
 
     @Test
+    public void testDatabaseInteractionsChangeName() {
+
+        prepareDatabaseModifyMock();
+
+        AuthProvider.AuthListener authListener = new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                setResult(SUCCESS);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(FAILURE);
+            }
+        };
+
+        user.changeName(database,"new", authListener);
+
+        when(snapshot.exists()).thenReturn(true);
+        vel.onDataChange(snapshot);
+        assertThat(result, is(SUCCESS));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.onDataChange(snapshot);
+        assertThat(result, is(FAILURE));
+
+        vel.onCancelled(null);
+        assertThat(result, is(FAILURE));
+
+        TreeSet<String> set = new TreeSet<>();
+        set.add("new POI");
+        new User("", "", set).removeFavourite(database, "new POI", authListener);
+
+        when(snapshot.exists()).thenReturn(true);
+        vel.onDataChange(snapshot);
+        assertThat(result, is(SUCCESS));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.onDataChange(snapshot);
+        assertThat(result, is(FAILURE));
+
+        vel.onCancelled(null);
+        assertThat(result, is(FAILURE));
+
+    }
+
+    @Test
     public void testAddFavouriteLogic(){
         //change to Local database to test addFavourite logic
 

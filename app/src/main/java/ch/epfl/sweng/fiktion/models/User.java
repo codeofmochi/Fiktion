@@ -104,10 +104,9 @@ public class User {
      * @param newName  New username value
      * @param listener Handles what happens in case of success or failure of the changement
      */
-    public void changeName(final String newName, final AuthProvider.AuthListener listener) {
+    public void changeName(DatabaseProvider database, final String newName, final AuthProvider.AuthListener listener) {
         //verification is done in the activity
-        //TODO: make this immutable -> retrieve new user
-        Providers.database.modifyUser(new User(newName, id, favourites), new DatabaseProvider.ModifyUserListener() {
+        database.modifyUser(new User(newName, id, favourites), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 name = newName;

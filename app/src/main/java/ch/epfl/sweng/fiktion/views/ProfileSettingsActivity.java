@@ -133,7 +133,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 && !newName.equals(user.getName()))
                 {
 
-            user.changeName(newName, new AuthProvider.AuthListener() {
+            user.changeName(Providers.database, newName, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
                     findViewById(R.id.update_confirm_name).setEnabled(true);
