@@ -14,9 +14,10 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -45,8 +46,8 @@ public class POIPageActivityTest {
 
     @BeforeClass
     public static void setProviders() {
-        Providers.auth = new LocalAuthProvider();
-        Providers.database = new LocalDatabaseProvider();
+        AuthSingleton.auth = new LocalAuthProvider();
+        DatabaseSingleton.database = new LocalDatabaseProvider();
     }
 
     @Test

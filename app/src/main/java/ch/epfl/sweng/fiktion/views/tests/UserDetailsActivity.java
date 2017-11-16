@@ -11,8 +11,8 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
@@ -35,7 +35,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     //Authenticator initiation
 
-    private final AuthProvider auth = Providers.auth;
+    private final AuthProvider auth = AuthSingleton.auth;
 
     //views
     private TextView user_name_view;

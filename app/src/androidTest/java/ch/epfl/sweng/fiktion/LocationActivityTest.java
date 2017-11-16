@@ -19,7 +19,7 @@ import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static ch.epfl.sweng.fiktion.providers.Providers.database;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 
 /**
  * Created by dialexo on 18.10.17.
