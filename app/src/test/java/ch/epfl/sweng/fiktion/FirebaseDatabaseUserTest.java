@@ -31,15 +31,15 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by pedro on 06/11/17.
+/** This class tests the firebase database proxy concerning User interactions
+ * @author Pedro
  */
 
 @RunWith(MockitoJUnitRunner.class)
 public class FirebaseDatabaseUserTest {
 
     private FirebaseDatabaseProvider database;
-    private User user = new User("testName", "id", new TreeSet<String>());
+    private User user = new User("testName", "id", new TreeSet<String>(), new TreeSet<String>());
 
     @Mock
     DatabaseReference dbRef, usersRef, userRef;
@@ -55,7 +55,7 @@ public class FirebaseDatabaseUserTest {
         this.result = result;
     }
 
-    ValueEventListener vel;
+    private ValueEventListener vel;
 
     private void setVel(ValueEventListener vel) {
         this.vel = vel;

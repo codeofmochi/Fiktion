@@ -13,6 +13,7 @@ public class FirebaseUser {
     public String name;
     public String id;
     public Set<String> favourites;
+    public Set<String> wishlist;
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebaseUser.class)
@@ -29,6 +30,7 @@ public class FirebaseUser {
         name = user.getName();
         id = user.getID();
         favourites = user.getFavourites();
+        wishlist = user.getWishlist();
     }
 
     /**
@@ -37,6 +39,6 @@ public class FirebaseUser {
      * @return the user
      */
     public User toUser() {
-        return new User(name, id, favourites);
+        return new User(name, id, favourites, wishlist);
     }
 }
