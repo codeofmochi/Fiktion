@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/profileMain"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#EFEFEF"
+    android:paddingBottom="20dp"
     tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity">
 
     <ImageView
@@ -20,10 +21,10 @@
 
     <ImageView
         android:id="@+id/userProfilePicture"
-        android:layout_width="140dp"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="100dp"
         android:adjustViewBounds="true"
         android:background="@color/white"
         android:contentDescription="@string/user_profile_picture"
@@ -38,7 +39,7 @@
         android:id="@+id/userInfos"
         android:layout_width="225dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="200dp"
+        android:layout_marginStart="160dp"
         android:layout_marginTop="10dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="dialexo"
-            android:textSize="26sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             tools:ignore="HardcodedText" /><!-- text will change dynamically -->
 
@@ -72,7 +73,7 @@
         android:id="@+id/stats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:background="#DDDDDD"
         android:orientation="horizontal"
         android:padding="10dp"
@@ -130,7 +131,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_weight="1"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -141,17 +142,24 @@
             android:id="@+id/locationPost"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="10dp"
             android:background="@color/white"
-            android:padding="10dp"
-            android:orientation="vertical">
+            android:elevation="2dp"
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <TextView
                 android:id="@+id/locationPostComment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="dialexo visited this place :"
                 android:drawableStart="@drawable/location_icon"
                 android:drawableTint="@color/darkGray"
+                android:text="dialexo visited this place :"
                 tools:ignore="HardcodedText"
                 tools:targetApi="m" /><!-- text will change dynamically -->
 
@@ -168,16 +176,15 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:adjustViewBounds="true"
+                    android:contentDescription="@string/location_post_photo"
                     android:cropToPadding="true"
-                    app:srcCompat="@drawable/akibairl2"
-                    android:contentDescription="@string/location_post_photo" />
+                    app:srcCompat="@drawable/akibairl2" />
 
                 <LinearLayout
                     android:id="@+id/locationPostInfos"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:clipToPadding="false"
                     android:orientation="vertical"
                     android:padding="10dp">
 
@@ -201,7 +208,7 @@
                         android:id="@+id/locationPostFeatured"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Featured in 12 fictions"
+                        android:text="In 26 fictions"
                         tools:ignore="HardcodedText" />
 
                     <TextView
@@ -218,8 +225,103 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="12 Aug 2017, 12:17"
-                tools:ignore="HardcodedText"/><!-- text will change dynamically -->
+                android:textColor="@color/colorText"
+                android:textSize="13sp"
+                tools:ignore="HardcodedText" /><!-- text will change dynamically -->
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/reviewPost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            android:elevation="2dp"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/reviewPostComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/rate_review_icon"
+                android:drawableTint="@color/darkGray"
+                android:text=" dialexo wrote a review for Shinjuku, Tokyo :"
+                tools:ignore="HardcodedText"
+                tools:targetApi="m" /><!-- text will change dynamically -->
+
+            <TextView
+                android:id="@+id/reviewPostContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                android:textColor="@color/colorText"
+                android:textSize="13sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/reviewPostDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="09 Aug 2017, 15:46"
+                android:textColor="@color/colorText"
+                android:textSize="13sp"
+                tools:ignore="HardcodedText" />
+
+            <!-- text will change dynamically -->
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/photoPost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            android:elevation="2dp"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/photoPostComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/camera_icon"
+                android:drawableTint="@color/darkGray"
+                android:text=" dialexo took a picture in Akihabara, Tokyo :"
+                tools:ignore="HardcodedText"
+                tools:targetApi="m" /><!-- text will change dynamically -->
+
+            <ImageView
+                android:id="@+id/photoPostPic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/user_content_picture"
+                android:cropToPadding="true"
+                android:padding="10dp"
+                app:srcCompat="@drawable/akibairl" />
+
+            <TextView
+                android:id="@+id/photoPostDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="11 Aug 2017, 09:55"
+                android:textColor="@color/colorText"
+                android:textSize="13sp"
+                tools:ignore="HardcodedText" /><!-- text will change dynamically -->
+        </LinearLayout>
+
     </LinearLayout>
 
 
