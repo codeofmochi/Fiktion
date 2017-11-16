@@ -138,6 +138,9 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess() {
                     findViewById(R.id.update_confirm_name).setEnabled(true);
+                    Toast.makeText(ProfileSettingsActivity.this,
+                            "Username updated to : "+newName,
+                            Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
