@@ -17,8 +17,8 @@ public class User {
     private String name;
     //we could use same id as firebase id or create our own id system
     private final String id;
-    private Set<String> favourites;
-    private Set<String> wishlist;
+    private TreeSet<String> favourites;
+    private TreeSet<String> wishlist;
     //private Set<String> rated;
 
     /**
@@ -27,7 +27,7 @@ public class User {
      * @param input_name Username
      * @param input_id   User id
      */
-    public User(String input_name, String input_id, Set<String> favs, Set<String> wishes) {
+    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes) {
         name = input_name;
         id = input_id;
         favourites = favs;

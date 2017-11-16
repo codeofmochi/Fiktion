@@ -47,6 +47,6 @@ public class FirebaseUser {
      * @return the user
      */
     public User toUser() {
-        return new User(name, id, favourites.keySet(), wishlist.keySet());
+        return new User(name, id, new TreeSet<>(favourites.keySet()), new TreeSet<>(wishlist.keySet()));
     }
 }
