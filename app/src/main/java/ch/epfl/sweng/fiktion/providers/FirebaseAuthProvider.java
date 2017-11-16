@@ -158,7 +158,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             // Account creation was successful in FirebaseAuthentication
                             //need to create user in our database
 
-                            Providers.database
+                            DatabaseSingleton.database
                                     .addUser(new User("", auth.getUid(), new TreeSet<String>()),
                                             new DatabaseProvider.AddUserListener() {
                                                 @Override
@@ -263,7 +263,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     public void getCurrentUser(final DatabaseProvider.GetUserListener listener) {
         user = auth.getCurrentUser();
         if (user != null) {
-            Providers.database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
+            DatabaseSingleton.database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     listener.onSuccess(user);
@@ -328,7 +328,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             if (task.isSuccessful()) {
                                 listener.onSuccess();
                                 //delete user in our database
-                                Providers.database.deleterUserById(user.getUid(), delListener);
+                                DatabaseSingleton.database.deleterUserById(user.getUid(), delListener);
                             } else {
                                 listener.onFailure();
                             }

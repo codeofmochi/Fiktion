@@ -1,14 +1,11 @@
 package ch.epfl.sweng.fiktion.models;
 
-import android.provider.ContactsContract;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 
 /**
  * This class represents the User in the application

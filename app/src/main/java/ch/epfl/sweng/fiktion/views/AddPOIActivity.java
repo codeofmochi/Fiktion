@@ -17,7 +17,7 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
-import static ch.epfl.sweng.fiktion.providers.Providers.database;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LONGITUDE;
 
