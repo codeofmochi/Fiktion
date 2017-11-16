@@ -320,7 +320,6 @@ public class FirebaseAuthProvider extends AuthProvider {
         user = auth.getCurrentUser();
 
         if (user != null) {
-            System.out.println("Wain");
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

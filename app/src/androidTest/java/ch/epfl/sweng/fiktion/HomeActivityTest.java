@@ -104,15 +104,14 @@ public class HomeActivityTest {
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 
-    // Will be modified when linked
     @Test
     public void CloseDrawerWhenProfileClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(2).perform(click());
-        waitSomeTime(1000);
-        homeMainLayout.check(matches(isDisplayed()));
+        onView(withId(R.id.profileMain)).check(matches(isDisplayed()));
     }
+
     // Will be modified when linked
     @Test
     public void CloseDrawerWhenDiscoverClicked() {
@@ -135,7 +134,7 @@ public class HomeActivityTest {
         waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
     }
-    // Will be modified when linked
+
     @Test
     public void CloseDrawerWhenSettingsClicked() {
         closeSoftKeyboard();
