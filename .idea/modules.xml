@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/52-home-test.iml" filepath="$PROJECT_DIR$/52-home-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mock-firebase.iml" filepath="$PROJECT_DIR$/mock-firebase.iml" />
-      <module fileurl="file://$PROJECT_DIR$/team-fake.iml" filepath="$PROJECT_DIR$/team-fake.iml" />
     </modules>
   </component>
 </project>

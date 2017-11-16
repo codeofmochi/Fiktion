@@ -15,11 +15,13 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.TreeSet;
+
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
-import ch.epfl.sweng.fiktion.views.FindNearestPoisActivity;
+import ch.epfl.sweng.fiktion.views.tests.FindNearestPoisActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -56,9 +58,9 @@ public class FindAndDisplayNearestPoisActivityTest {
     @BeforeClass
     public static void setup() {
         database = new LocalDatabaseProvider();
-        database.addPoi(new PointOfInterest("p1", new Position(0.05, 0.05)), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(0.3, 0.3)), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(0.6, 0.6)), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p1", new Position(0.05, 0.05), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p2", new Position(0.3, 0.3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p3", new Position(0.6, 0.6), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
     }
 
     private ViewAction setProgress(final int progress) {
@@ -95,21 +97,21 @@ public class FindAndDisplayNearestPoisActivityTest {
     @Test
     public void setTo10Shows1Test() {
         onView(withId(R.id.searchRadius)).perform(setProgress(10));
-        onView(withId(R.id.findNearPois)).perform(click());
+        onView(withId(R.id._findNearPois)).perform(click());
         onView(withId(R.id.displayResultPois)).check(countMatches(1));
     }
 
     @Test
     public void setTo10Shows2Test() {
         onView(withId(R.id.searchRadius)).perform(setProgress(50));
-        onView(withId(R.id.findNearPois)).perform(click());
+        onView(withId(R.id._findNearPois)).perform(click());
         onView(withId(R.id.displayResultPois)).check(countMatches(2));
     }
 
     @Test
     public void setTo10Shows3Test() {
         onView(withId(R.id.searchRadius)).perform(setProgress(100));
-        onView(withId(R.id.findNearPois)).perform(click());
+        onView(withId(R.id._findNearPois)).perform(click());
         onView(withId(R.id.displayResultPois)).check(countMatches(3));
     }
 }

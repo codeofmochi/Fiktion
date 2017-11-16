@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 public class HomeActivity extends MenuDrawerActivity {
 

@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.tests;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Random;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
@@ -37,7 +38,7 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
             // Random number generator to get random position values
             Random rand = new Random();
             Position pos = new Position(rand.nextDouble(), rand.nextDouble());
-            PointOfInterest poi = new PointOfInterest(poiName, pos);
+            PointOfInterest poi = new PointOfInterest(poiName, pos, new TreeSet<String>(), "", 0, "", "");
             // ask the database to add the poi
             Providers.database.addPoi(poi, new DatabaseProvider.AddPoiListener() {
                 @Override

@@ -6,7 +6,6 @@ import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.junit.Before;
@@ -14,9 +13,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
@@ -24,11 +24,11 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebasePointOfInterest;
 
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.ALREADYEXISTS;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.DOESNTEXIST;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.FAILURE;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.NOTHING;
-import static ch.epfl.sweng.fiktion.FirebaseDatabaseTest.Result.SUCCESS;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.ALREADYEXISTS;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.DOESNTEXIST;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.FAILURE;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.NOTHING;
+import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.SUCCESS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,22 +37,19 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by pedro on 23/10/17.
  */
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({FirebaseDatabase.class, FirebaseDatabaseProvider.class, GeoLocation.class})
-public class FirebaseDatabaseTest {
+@RunWith(MockitoJUnitRunner.class)
+public class FirebaseDatabasePOITest {
 
     FirebaseDatabaseProvider database;
 
-    PointOfInterest poiTest = new PointOfInterest("poiName", new Position(10, 12));
+    PointOfInterest poiTest = new PointOfInterest("poiName", new Position(10, 12), new TreeSet<String>(), "", 0, "", "");
 
     ValueEventListener vel;
 
@@ -64,9 +61,6 @@ public class FirebaseDatabaseTest {
 
     @Mock
     DataSnapshot snapshot;
-
-    @Mock
-    GeoLocation geoLocation;
 
     private Result result;
 
@@ -81,19 +75,13 @@ public class FirebaseDatabaseTest {
     }
 
     @Before
-    public void initializers() throws Exception {
-        mockStatic(FirebaseDatabase.class);
-        FirebaseDatabase fb = mock(FirebaseDatabase.class);
-        when(FirebaseDatabase.getInstance()).thenReturn(fb);
-        when(fb.getReference()).thenReturn(dbRef);
-        whenNew(GeoFire.class).withAnyArguments().thenReturn(geofire);
-        database = new FirebaseDatabaseProvider();
+    public void initializers() {
+        database = new FirebaseDatabaseProvider(dbRef, geofire);
         result = NOTHING;
     }
 
     @Test
-    public void addPoiTest() throws Exception {
-
+    public void addPoiTest() {
         when(dbRef.child("Points of interest")).thenReturn(poisRef);
         when(poisRef.child(anyString())).thenReturn(poiRef);
         doAnswer(new Answer() {
@@ -121,10 +109,9 @@ public class FirebaseDatabaseTest {
             }
         };
         when(poiRef.setValue(any(FirebasePointOfInterest.class))).thenReturn(null);
-        whenNew(GeoLocation.class).withAnyArguments().thenReturn(geoLocation);
         doNothing().when(geofire).setLocation(anyString(), any(GeoLocation.class));
 
-        when(snapshot.exists()).thenReturn(false, true);
+        when(snapshot.exists()).thenReturn(false);
         database.addPoi(poiTest, listener);
         vel.onDataChange(snapshot);
         assertThat(result, is(SUCCESS));
@@ -165,9 +152,10 @@ public class FirebaseDatabaseTest {
             }
         };
 
+        database.getPoi(poiTest.name(), listener);
+
         when(snapshot.exists()).thenReturn(true);
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(new FirebasePointOfInterest(poiTest));
-        database.getPoi(poiTest.name(), listener);
         vel.onDataChange(snapshot);
         assertThat(result, is(SUCCESS));
 
@@ -202,7 +190,7 @@ public class FirebaseDatabaseTest {
     }
 
     @Test
-    public void findNearPoisTest() throws Exception {
+    public void findNearPoisTest() {
         GeoQuery geoQuery = mock(GeoQuery.class);
         when(geofire.queryAtLocation(any(GeoLocation.class), anyDouble())).thenReturn(geoQuery);
         doAnswer(new Answer() {
@@ -235,7 +223,7 @@ public class FirebaseDatabaseTest {
         }).when(databaseSpy).getPoi(anyString(), any(DatabaseProvider.GetPoiListener.class));
 
         databaseSpy.findNearPois(poiTest.position(), 10, findPoiListener);
-        geoQueryEventListener.onKeyEntered("key", geoLocation);
+        geoQueryEventListener.onKeyEntered("key", null);
         getPoiListener.onSuccess(poiTest);
         assertThat(keyCount, is(1));
         getPoiListener.onSuccess(poiTest);
@@ -246,7 +234,7 @@ public class FirebaseDatabaseTest {
         getPoiListener.onDoesntExist();
         getPoiListener.onFailure();
         geoQueryEventListener.onKeyExited("key");
-        geoQueryEventListener.onKeyMoved("key", geoLocation);
+        geoQueryEventListener.onKeyMoved("key", null);
         geoQueryEventListener.onGeoQueryReady();
         geoQueryEventListener.onGeoQueryError(null);
         assertThat(result, is(FAILURE));
