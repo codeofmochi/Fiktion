@@ -76,4 +76,5 @@
     <string name="change">Change</string>
     <string name="user_banner">User banner</string>
     <string name="user_profile_picture">User profile picture</string>
+    <string name="location_post_photo">Location post photo</string>
 </resources>

@@ -35,7 +35,7 @@
         app:srcCompat="@drawable/dialexo_user_picture" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/userInfos"
         android:layout_width="225dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="200dp"
@@ -78,19 +78,19 @@
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+        app:layout_constraintTop_toBottomOf="@+id/userInfos">
 
         <TextView
             android:id="@+id/visitedCount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:text="126 visited"
-            android:textAlignment="center"
             android:drawableStart="@drawable/location_icon"
             android:drawableTint="@color/darkGray"
+            android:text="126 visited"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold"
             tools:ignore="HardcodedText"
             tools:targetApi="m" /><!-- text will change dynamically -->
 
@@ -99,12 +99,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:text="213 saved"
-            android:textAlignment="center"
             android:drawableStart="@drawable/star_icon_24"
             android:drawableTint="@color/darkGray"
+            android:text="213 saved"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold"
             tools:ignore="HardcodedText"
             tools:targetApi="m" /><!-- text will change dynamically -->
 
@@ -113,14 +113,113 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:text="319 pictures"
-            android:textAlignment="center"
             android:drawableStart="@drawable/camera_icon"
             android:drawableTint="@color/darkGray"
+            android:text="319 pictures"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold"
             tools:ignore="HardcodedText"
             tools:targetApi="m" /><!-- text will change dynamically -->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/posts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stats">
+
+        <LinearLayout
+            android:id="@+id/locationPost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/locationPostComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="dialexo visited this place :"
+                android:drawableStart="@drawable/location_icon"
+                android:drawableTint="@color/darkGray"
+                tools:ignore="HardcodedText"
+                tools:targetApi="m" /><!-- text will change dynamically -->
+
+            <LinearLayout
+                android:id="@+id/locationPostDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <ImageView
+                    android:id="@+id/locationPostPicture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="true"
+                    app:srcCompat="@drawable/akibairl2"
+                    android:contentDescription="@string/location_post_photo" />
+
+                <LinearLayout
+                    android:id="@+id/locationPostInfos"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/locationPostTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Akihabara"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:ignore="HardcodedText" /><!-- text will change dynamically -->
+
+                    <TextView
+                        android:id="@+id/locationPostPlace"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tokyo, Japan"
+                        tools:ignore="HardcodedText" /><!-- text will change dynamically -->
+
+                    <TextView
+                        android:id="@+id/locationPostFeatured"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Featured in 12 fictions"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
+                        android:id="@+id/locationPostVotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="13543 upvotes"
+                        tools:ignore="HardcodedText" /><!-- text will change dynamically -->
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/locationPostDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="12 Aug 2017, 12:17"
+                tools:ignore="HardcodedText"/><!-- text will change dynamically -->
+        </LinearLayout>
     </LinearLayout>
 
 
