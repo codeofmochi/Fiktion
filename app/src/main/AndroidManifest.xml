@@ -72,6 +72,7 @@
         <activity android:name=".views.ProfileSettingsActivity" />
         <activity android:name=".views.POIPageActivity" />
         <activity android:name=".views.MapLocationActivity" />
+        <activity android:name=".views.SearchByTextActivity"></activity>
     </application>
 
 </manifest>

@@ -96,7 +96,4 @@ public class SignInTest {
         Mockito.when(fbAuthProv.validatePassword(valid_password)).thenReturn("");
         siAct.signIn(valid_email,valid_password);
     }
-
-
-
 }
