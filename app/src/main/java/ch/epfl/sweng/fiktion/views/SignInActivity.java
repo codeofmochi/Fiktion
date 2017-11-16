@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
 /**
@@ -34,7 +34,7 @@ public class SignInActivity extends AppCompatActivity {
         UserEmail = (EditText) findViewById(R.id.User_Email);
         UserPassword = (EditText) findViewById(R.id.User_Password);
         // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
-        updateUI(Providers.auth.isConnected());
+        updateUI(AuthSingleton.auth.isConnected());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SignInActivity extends AppCompatActivity {
     public void signIn(String email, String password) {
         //we need to check if the credentials are valid before attempting to sign in
         //first we check if the email is valid, do not proceed if it is not valid
-        String emailErr = Providers.auth.validateEmail(email);
+        String emailErr = AuthSingleton.auth.validateEmail(email);
         if (!emailErr.isEmpty()) {
 
             //Log.d(TAG, "Email is not valid");
@@ -63,7 +63,7 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         //after making sure the email is valid we check if the password is valid and if not we do not proceed
-        String passwordErr = Providers.auth.validatePassword(password);
+        String passwordErr = AuthSingleton.auth.validatePassword(password);
         if (!passwordErr.isEmpty()) {
 
             //Log.d(TAG, "Password is not valid");
@@ -75,7 +75,7 @@ public class SignInActivity extends AppCompatActivity {
         Log.d(TAG, "Credentials are valid");
         Log.d(TAG, "signIn:" + email);
         */
-        Providers.auth.signIn(email, password, new AuthProvider.AuthListener() {
+        AuthSingleton.auth.signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 //sign in was successful
