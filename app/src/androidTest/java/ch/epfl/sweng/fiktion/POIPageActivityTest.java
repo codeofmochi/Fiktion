@@ -7,17 +7,29 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.LocalPhotoProvider;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -26,9 +38,13 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.isInternal;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
+import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
+import static ch.epfl.sweng.fiktion.providers.AuthSingleton.auth;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -41,17 +57,31 @@ public class POIPageActivityTest {
 
     @Rule
     public final IntentsTestRule<POIPageActivity> toastRule =
-            new IntentsTestRule<POIPageActivity>(POIPageActivity.class);
+            new IntentsTestRule<POIPageActivity>(POIPageActivity.class, false, false);
 
 
     @BeforeClass
     public static void setProviders() {
-        AuthSingleton.auth = new LocalAuthProvider();
-        DatabaseSingleton.database = new LocalDatabaseProvider();
+        auth = new LocalAuthProvider();
+        database = new LocalDatabaseProvider();
+        photoProvider = new LocalPhotoProvider();
+        DatabaseSingleton.database.addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
+            @Override
+            public void onSuccess() {}
+
+            @Override
+            public void onAlreadyExists() {}
+
+            @Override
+            public void onFailure() {}
+        });
     }
 
     @Test
     public void buttonTest() {
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
         onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
         try {
             Thread.sleep(10);
@@ -67,6 +97,9 @@ public class POIPageActivityTest {
 
     @Test
     public void cameraTest() {
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
 
         onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
         Bitmap icon = BitmapFactory.decodeResource(
@@ -84,17 +117,72 @@ public class POIPageActivityTest {
         onView(withText("Camera")).perform(click());
 
         try {
-            Thread.sleep(10);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        /*
-        if (onView(withId(R.id.image1)) == null) {
-            assert true;
-        }
-        */
+        final List<Bitmap> bitmaps = new ArrayList<>();
+
+        photoProvider.downloadPOIBitmaps("poiTest", new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onNewPhoto(Bitmap b) {
+                bitmaps.add(b);
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+
+        assertThat(bitmaps.size(), is(1));
     }
 
+    @Test
+    public void loadPhotosTest() {
+        photoProvider = new LocalPhotoProvider();
+        Bitmap b = BitmapFactory.decodeResource(
+                InstrumentationRegistry.getTargetContext().getResources(),
+                R.mipmap.ic_launcher);
+        photoProvider.uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+            }
+        });
+
+        b = BitmapFactory.decodeResource(InstrumentationRegistry.getTargetContext().getResources(), R.mipmap.ic_launcher_round);
+        photoProvider.uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+            }
+        });
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.imageLayout)).check(new ViewAssertion() {
+            @Override
+            public void check(View view, NoMatchingViewException noViewFoundException) {
+                assertThat(((LinearLayout)view).getChildCount(), is(2));
+            }
+        });
+    }
 
 }
