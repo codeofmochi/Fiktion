@@ -3,7 +3,6 @@ package ch.epfl.sweng.fiktion;
 import com.firebase.geofire.GeoFire;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import junit.framework.Assert;
 
@@ -20,11 +19,9 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseUser;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 
-import static ch.epfl.sweng.fiktion.UserTest.Result.DOESNTEXIST;
 import static ch.epfl.sweng.fiktion.UserTest.Result.FAILURE;
 import static ch.epfl.sweng.fiktion.UserTest.Result.NOTHING;
 import static ch.epfl.sweng.fiktion.UserTest.Result.SUCCESS;
@@ -33,9 +30,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 /**
  * This class tests methods of the class USER
@@ -46,22 +41,29 @@ import static org.mockito.Mockito.when;
 public class UserTest {
 
     private final User user = new User("default", "defaultID", new TreeSet<String>());
-    FirebaseDatabaseProvider database;
-    DatabaseProvider localDB = new LocalDatabaseProvider();
+    private DatabaseProvider localDB = new LocalDatabaseProvider();
     private DatabaseProvider.ModifyUserListener dbListener;
 
     private void setDBList(DatabaseProvider.ModifyUserListener listener) {
         dbListener = listener;
     }
 
-    ValueEventListener vel;
+    private AuthProvider.AuthListener authListener = new AuthProvider.AuthListener() {
+        @Override
+        public void onSuccess() {
+            setResult(SUCCESS);
+        }
 
-    private void setVel(ValueEventListener vel) {
-        this.vel = vel;
-    }
+        @Override
+        public void onFailure() {
+            setResult(FAILURE);
+        }
+    };
 
     @Mock
     DatabaseReference dbRef, usersRef, userRef;
+    @Mock
+    DatabaseProvider dbp;
 
     @Mock
     GeoFire geofire;
@@ -69,66 +71,28 @@ public class UserTest {
     @Mock
     DataSnapshot snapshot;
 
-    public enum Result {SUCCESS, ALREADYEXISTS, DOESNTEXIST, FAILURE, NOTHING}
+    public enum Result {SUCCESS, FAILURE, NOTHING}
 
     private UserTest.Result result;
-
-
     private void setResult(UserTest.Result result) {
         this.result = result;
     }
 
     @Before
-    public void setDatabase() {
-        database = new FirebaseDatabaseProvider(dbRef, geofire);
+    public void setUp() {
         localDB = new LocalDatabaseProvider();
         result = NOTHING;
-    }
 
-
-    public void prepareDatabaseModifyMock() {
-        when(dbRef.child("Users")).thenReturn(usersRef);
-        when(usersRef.child(anyString())).thenReturn(userRef);
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                setVel((ValueEventListener) invocation.getArguments()[0]);
+                setDBList((DatabaseProvider.ModifyUserListener) invocation.getArgument(1));
                 return null;
             }
-        }).when(userRef).addListenerForSingleValueEvent(any(ValueEventListener.class));
-
-        DatabaseProvider.ModifyUserListener listener = new DatabaseProvider.ModifyUserListener() {
-            @Override
-            public void onSuccess() {
-                setResult(SUCCESS);
-            }
-
-            @Override
-            public void onDoesntExist() {
-                setResult(DOESNTEXIST);
-            }
-
-            @Override
-            public void onFailure() {
-                setResult(FAILURE);
-            }
-        };
-
-        when(userRef.setValue(any(FirebaseUser.class))).thenReturn(null);
-
-        AuthProvider.AuthListener authListener = new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                setResult(SUCCESS);
-            }
-
-            @Override
-            public void onFailure() {
-                setResult(FAILURE);
-            }
-        };
+        }).when(dbp).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
 
     }
+
 
     @Test
     public void correctlyCreatesUser() {
@@ -153,46 +117,28 @@ public class UserTest {
     @Test
     public void testDatabaseInteractionsFavourites() {
 
-        prepareDatabaseModifyMock();
+        user.addFavourite(dbp, "new POI", authListener);
 
-        AuthProvider.AuthListener authListener = new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                setResult(SUCCESS);
-            }
-
-            @Override
-            public void onFailure() {
-                setResult(FAILURE);
-            }
-        };
-
-        user.addFavourite(database, "new POI", authListener);
-
-        when(snapshot.exists()).thenReturn(true);
-        vel.onDataChange(snapshot);
+        dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        when(snapshot.exists()).thenReturn(false);
-        vel.onDataChange(snapshot);
+        dbListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        vel.onCancelled(null);
+        dbListener.onFailure();
         assertThat(result, is(FAILURE));
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
-        new User("", "", set).removeFavourite(database, "new POI", authListener);
+        new User("", "", set).removeFavourite(dbp, "new POI", authListener);
 
-        when(snapshot.exists()).thenReturn(true);
-        vel.onDataChange(snapshot);
+        dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        when(snapshot.exists()).thenReturn(false);
-        vel.onDataChange(snapshot);
+        dbListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        vel.onCancelled(null);
+        dbListener.onFailure();
         assertThat(result, is(FAILURE));
 
     }
@@ -200,52 +146,27 @@ public class UserTest {
     @Test
     public void testDatabaseInteractionsChangeName() {
 
-        prepareDatabaseModifyMock();
-
-        AuthProvider.AuthListener authListener = new AuthProvider.AuthListener() {
+        doAnswer(new Answer() {
             @Override
-            public void onSuccess() {
-                setResult(SUCCESS);
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                setDBList((DatabaseProvider.ModifyUserListener) invocation.getArgument(1));
+                return null;
             }
+        }).when(dbp).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
 
-            @Override
-            public void onFailure() {
-                setResult(FAILURE);
-            }
-        };
 
-        user.changeName(database,"new", authListener);
-
-        when(snapshot.exists()).thenReturn(true);
-        vel.onDataChange(snapshot);
+        user.changeName(dbp,"new", authListener);
+        dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
-
-        when(snapshot.exists()).thenReturn(false);
-        vel.onDataChange(snapshot);
+        dbListener.onDoesntExist();
         assertThat(result, is(FAILURE));
-
-        vel.onCancelled(null);
-        assertThat(result, is(FAILURE));
-
-        TreeSet<String> set = new TreeSet<>();
-        set.add("new POI");
-        new User("", "", set).removeFavourite(database, "new POI", authListener);
-
-        when(snapshot.exists()).thenReturn(true);
-        vel.onDataChange(snapshot);
-        assertThat(result, is(SUCCESS));
-
-        when(snapshot.exists()).thenReturn(false);
-        vel.onDataChange(snapshot);
-        assertThat(result, is(FAILURE));
-
-        vel.onCancelled(null);
+        dbListener.onFailure();
         assertThat(result, is(FAILURE));
 
     }
 
     @Test
-    public void testAddFavouriteLogic(){
+    public void testAddFavouriteLogic() {
         //change to Local database to test addFavourite logic
 
         user.addFavourite(localDB, "new POI", new AuthProvider.AuthListener() {
@@ -274,7 +195,7 @@ public class UserTest {
     }
 
     @Test
-    public void testRemoveFavouriteLogic(){
+    public void testRemoveFavouriteLogic() {
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
@@ -302,5 +223,4 @@ public class UserTest {
             }
         });
     }
-
 }

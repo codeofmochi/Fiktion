@@ -26,7 +26,7 @@ import ch.epfl.sweng.fiktion.views.tests.FindNearestPoisActivity;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static ch.epfl.sweng.fiktion.providers.Providers.database;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 

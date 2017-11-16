@@ -73,7 +73,7 @@ public class FirebaseAuthTest {
     @Before
     public void setUp() {
         auth = new FirebaseAuthProvider(fbAuth);
-        //Providers.database = database;
+        //DatabaseSingleton.database = database;
         setTasks();
 
     }
