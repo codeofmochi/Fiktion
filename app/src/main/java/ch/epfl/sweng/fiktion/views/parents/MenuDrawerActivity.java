@@ -19,6 +19,7 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
+import ch.epfl.sweng.fiktion.views.ProfileActivity;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
 
 /**
@@ -73,6 +74,14 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
             }
             case 2:
                 // profile activity
+                if (this.getClass().equals(ProfileActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    Intent i = new Intent(this, ProfileActivity.class);
+                    // clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
                 break;
             case 3:
                 // discover activity
