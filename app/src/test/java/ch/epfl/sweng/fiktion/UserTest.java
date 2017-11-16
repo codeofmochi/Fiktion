@@ -72,6 +72,7 @@ public class UserTest {
     DataSnapshot snapshot;
 
     public enum Result {SUCCESS, FAILURE, NOTHING}
+
     private UserTest.Result result;
     private void setResult(UserTest.Result result) {
         this.result = result;
