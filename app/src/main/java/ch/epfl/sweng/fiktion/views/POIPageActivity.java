@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,9 +37,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
@@ -46,8 +47,8 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
@@ -124,6 +125,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         Intent from = getIntent();
         String poiName = from.getStringExtra("POI_NAME");
 
+        ((TextView) findViewById(R.id.title)).setText(poiName);
+
         // get POI from database
         DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
@@ -146,16 +149,36 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         reviewsView.setLayoutManager(reviewsLayout);
         RecyclerView.Adapter reviewsAdapter = new ReviewsAdapter(reviewsData);
         reviewsView.setAdapter(reviewsAdapter);
-
-        // change text color
-        TextView featured = (TextView) findViewById(R.id.featured);
-        Spannable span = new SpannableString(featured.getText());
-        span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary)), 12, featured.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        featured.setText(span);
     }
 
     private void setPoiInformation(PointOfInterest poi) {
         this.poi = poi;
+
+        // show the fictions the poi appears in
+        Set<String> fictions = poi.fictions();
+        TextView featured = (TextView) findViewById(R.id.featured);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Featured in ");
+        if (fictions.isEmpty())
+            sb.append("nothing");
+        else {
+            for (String fiction: fictions) {
+                sb.append(fiction + ", ");
+            }
+            sb.delete(sb.length()-2, sb.length());
+        }
+        featured.setText(sb.toString());
+
+        // change text color
+        Spannable span = new SpannableString(featured.getText());
+        span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary)), 12, featured.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        featured.setText(span);
+
+        TextView description = (TextView) findViewById(R.id.description);
+        description.setText(poi.description());
+
+        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
+        final boolean emptyMainImage = true;
 
         // download the photos of the poi
         photoProvider.downloadPOIBitmaps(poi.name(), new PhotoProvider.DownloadBitmapListener() {
@@ -173,6 +196,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
                 // add the ImageView to the pictures
                 imageLayout.addView(imgView);
+
+                if (mainImage.getHeight()< 1) {
+                    mainImage.setImageBitmap(b);
+                    Log.d("mylogs", "onNewPhoto: ");
+                }
             }
 
             @Override
