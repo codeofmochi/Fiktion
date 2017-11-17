@@ -57,7 +57,7 @@ public class POIPageActivityTest {
 
     @Rule
     public final IntentsTestRule<POIPageActivity> toastRule =
-            new IntentsTestRule<>(POIPageActivity.class, false, false);
+            new IntentsTestRule<>(POIPageActivity.class, true, false);
 
 
     @BeforeClass
