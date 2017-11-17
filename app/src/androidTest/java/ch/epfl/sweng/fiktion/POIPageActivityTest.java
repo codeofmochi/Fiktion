@@ -115,15 +115,8 @@ public class POIPageActivityTest {
         // Build a result to return from the Camera app
         // this tells Espresso to respond with this instead of camera
         intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
-
-
+        
         onView(withText("Camera")).perform(click());
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
