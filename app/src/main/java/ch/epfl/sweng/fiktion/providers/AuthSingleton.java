@@ -7,7 +7,5 @@ package ch.epfl.sweng.fiktion.providers;
 public class AuthSingleton {
     public static AuthProvider auth = new FirebaseAuthProvider();
 
-    private AuthSingleton(){
-
-    }
+    private AuthSingleton(){}
 }
