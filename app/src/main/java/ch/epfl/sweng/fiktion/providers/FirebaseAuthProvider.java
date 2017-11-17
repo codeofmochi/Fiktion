@@ -159,7 +159,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             //need to create user in our database
 
                             DatabaseSingleton.database
-                                    .addUser(new User("", auth.getUid(), new TreeSet<String>()),
+                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(), new TreeSet<String>()),
                                             new DatabaseProvider.AddUserListener() {
                                                 @Override
                                                 public void onSuccess() {

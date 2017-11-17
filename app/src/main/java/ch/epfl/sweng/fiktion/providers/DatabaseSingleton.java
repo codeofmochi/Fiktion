@@ -8,8 +8,5 @@ package ch.epfl.sweng.fiktion.providers;
  */
 public class DatabaseSingleton {
     public static DatabaseProvider database = new FirebaseDatabaseProvider();
-
-    private DatabaseSingleton(){
-
-    }
+    private DatabaseSingleton(){}
 }
