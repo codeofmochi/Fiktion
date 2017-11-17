@@ -73,8 +73,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         @Override
         public ReviewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             TextView v = (TextView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_card, parent, false);
-            ViewHolder vh = new ViewHolder(v);
-            return vh;
+            return new ViewHolder(v);
         }
 
         @Override
@@ -92,10 +91,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
     private MapView map;
-    private RecyclerView reviewsView;
-    private RecyclerView.Adapter reviewsAdapter;
-    private RecyclerView.LayoutManager reviewsLayout;
-    private Button addPictureButton;
     private String[] reviewsData = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
             "Curabitur condimentum ligula eu diam maximus porttitor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse metus urna, tincidunt sed augue ac, consectetur congue felis. Pellentesque efficitur enim et ultrices pellentesque.",
@@ -110,7 +105,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         super.onCreate(savedInstanceState);
 
         //picture button
-        addPictureButton = (Button) findViewById(R.id.addPictureButton);
+        Button addPictureButton = (Button) findViewById(R.id.addPictureButton);
         addPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,10 +141,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // get recycler view for reviews
-        reviewsView = (RecyclerView) findViewById(R.id.reviews);
-        reviewsLayout = new LinearLayoutManager(this);
+        RecyclerView reviewsView = (RecyclerView) findViewById(R.id.reviews);
+        RecyclerView.LayoutManager reviewsLayout = new LinearLayoutManager(this);
         reviewsView.setLayoutManager(reviewsLayout);
-        reviewsAdapter = new ReviewsAdapter(reviewsData);
+        RecyclerView.Adapter reviewsAdapter = new ReviewsAdapter(reviewsData);
         reviewsView.setAdapter(reviewsAdapter);
 
         // change text color
@@ -233,7 +228,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private void selectImage() {
 
         if (poi == null) {
-            Toast.makeText(this, "Point of interest information isn't loaded", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Point of interest information isn't loaded", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -312,6 +307,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private void onCameraResult(Intent data) {
 
         Bitmap image = (Bitmap) data.getExtras().get("data");
+        if (image == null) {
+            return;
+        }
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         //(format, quality, outstream)
         image.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -327,8 +325,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             outstream = new FileOutputStream(destination);
             outstream.write(bytes.toByteArray());
             outstream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

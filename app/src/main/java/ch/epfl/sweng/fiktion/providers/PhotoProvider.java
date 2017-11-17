@@ -41,7 +41,7 @@ public abstract class PhotoProvider {
         /**
          * what to do with a new downloaded bitmap
          *
-         * @param b
+         * @param b the downloaded bitmap
          */
         void onNewPhoto(Bitmap b);
 

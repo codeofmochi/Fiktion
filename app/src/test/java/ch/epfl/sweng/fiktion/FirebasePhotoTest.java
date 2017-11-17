@@ -153,7 +153,7 @@ public class FirebasePhotoTest {
 
         photoProvider.uploadPOIBitmap(bitmap, "poiTest", listener);
         UploadTask.TaskSnapshot snapshot = mock(UploadTask.TaskSnapshot.class);
-        failureListener.onFailure(null);
+        failureListener.onFailure(new Exception());
         assertThat(result, is(Result.FAILURE));
         successListener.onSuccess(snapshot);
         assertThat(result, is(Result.SUCCESS));
@@ -220,7 +220,7 @@ public class FirebasePhotoTest {
         cel.onCancelled(null);
         assertThat(result, is(Result.FAILURE));
         cel.onChildAdded(snapshot, "");
-        failureListener.onFailure(null);
+        failureListener.onFailure(new Exception());
         setResult(Result.NOTHING);
     }
 }
