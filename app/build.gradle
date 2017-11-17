@@ -34,7 +34,7 @@ dependencies {
     // required if you want to use Mockito for Android tests
     //firebase authentication API
     //firebase analytics
-
+    compile 'com.algolia:algoliasearch-android:3.+'
     compile 'com.android.support:appcompat-v7:25.4.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services-maps:11.4.2'
@@ -45,6 +45,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.4.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.11.0'
+    testCompile 'org.json:json:20140107'
     androidTestCompile 'com.android.support:support-annotations:25.4.0'
     androidTestCompile 'com.android.support.test:runner:1.0.1'
     androidTestCompile 'com.android.support.test:rules:1.0.1'
