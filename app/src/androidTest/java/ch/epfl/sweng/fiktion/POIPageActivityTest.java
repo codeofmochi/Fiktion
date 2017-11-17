@@ -42,9 +42,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.providers.AuthSingleton.auth;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
+import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -67,13 +67,16 @@ public class POIPageActivityTest {
         photoProvider = new LocalPhotoProvider();
         DatabaseSingleton.database.addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
             @Override
-            public void onSuccess() {}
+            public void onSuccess() {
+            }
 
             @Override
-            public void onAlreadyExists() {}
+            public void onAlreadyExists() {
+            }
 
             @Override
-            public void onFailure() {}
+            public void onFailure() {
+            }
         });
     }
 
@@ -180,7 +183,7 @@ public class POIPageActivityTest {
         onView(withId(R.id.imageLayout)).check(new ViewAssertion() {
             @Override
             public void check(View view, NoMatchingViewException noViewFoundException) {
-                assertThat(((LinearLayout)view).getChildCount(), is(2));
+                assertThat(((LinearLayout) view).getChildCount(), is(2));
             }
         });
     }

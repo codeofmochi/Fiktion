@@ -26,9 +26,19 @@ import java.security.NoSuchAlgorithmException;
  * @author pedro
  */
 public class FirebasePhotoProvider extends PhotoProvider {
-    private StorageReference stRef = FirebaseStorage.getInstance().getReference();
-    private DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private StorageReference stRef;
+    private DatabaseReference dbRef;
     final private long MAXIMUM_SIZE = 10 * 1024 * 1024; // 10MB
+
+    public FirebasePhotoProvider() {
+        stRef = FirebaseStorage.getInstance().getReference();
+        dbRef = FirebaseDatabase.getInstance().getReference();
+    }
+
+    public FirebasePhotoProvider(StorageReference stRef, DatabaseReference dbRef) {
+        this.stRef = stRef;
+        this.dbRef = dbRef;
+    }
 
     /**
      * converts an array of bytes into a string, each byte is converted with its hexadecimal
