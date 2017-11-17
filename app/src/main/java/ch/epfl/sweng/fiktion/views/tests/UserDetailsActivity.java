@@ -94,6 +94,14 @@ public class UserDetailsActivity extends AppCompatActivity {
         new_favourite_input = (EditText) findViewById(R.id.user_detail_addFav_text);
         new_wish_input = (EditText) findViewById(R.id.user_details_addWish_text);
 
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "Started UserDetailsActivity");
+
         //initalize lists
 
         favAdapter = new ArrayAdapter<>(this.getApplicationContext(), android.R.layout.simple_list_item_1);
@@ -103,13 +111,6 @@ public class UserDetailsActivity extends AppCompatActivity {
         wishListView = (ListView) findViewById(R.id.user_details_wishlist_list);
         favouritesListView.setAdapter(favAdapter);
         wishListView.setAdapter(wishAdapter);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d(TAG, "Started UserDetailsActivity");
-
         //initialise user details
 
         if (auth.isConnected()) {
