@@ -85,13 +85,13 @@
         <activity android:name=".views.HomeActivity" />
         <activity android:name=".views.ProfileSettingsActivity" />
         <activity android:name=".views.POIPageActivity" />
-
         <activity
             android:name=".views.SettingsActivity"
             android:label="Settings" />
         <activity
             android:name=".views.ProfileActivity"
             android:label="Profile" />
+        <activity android:name=".views.TextSearchActivity"></activity>
     </application>
 
 </manifest>
