@@ -159,14 +159,15 @@ public class FirebaseAuthProvider extends AuthProvider {
                             // Account creation was successful in FirebaseAuthentication
                             //need to create user in our database
 
-                            database.addUser(new User("", auth.getUid(), new TreeSet<String>()),
+
+                            database
+                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(), new TreeSet<String>()),
                                             new DatabaseProvider.AddUserListener() {
                                                 @Override
                                                 public void onSuccess() {
                                                     user = auth.getCurrentUser();
                                                     listener.onSuccess();
                                                 }
-
 
                                                 @Override
                                                 public void onAlreadyExists() {

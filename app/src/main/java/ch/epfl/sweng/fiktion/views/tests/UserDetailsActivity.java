@@ -1,14 +1,22 @@
 package ch.epfl.sweng.fiktion.views.tests;
 
 import android.content.Intent;
+import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
@@ -28,12 +36,17 @@ public class UserDetailsActivity extends AppCompatActivity {
     //constants
     //LOGCAT
     private static final String TAG = "UserDetails";
+
     //UI modes
     private enum UIMode {
         defaultMode,
-        userSignedOut
+        userSignedOut,
+        poiDoesNotExist,
+        databasefailure,
+        failure
     }
 
+    private User currUser;
     //Authenticator initiation
 
     private final AuthProvider auth = AuthSingleton.auth;
@@ -43,10 +56,29 @@ public class UserDetailsActivity extends AppCompatActivity {
     private TextView user_email_view;
     private TextView user_verify_view;
 
+    private EditText new_favourite_input;
+    private EditText new_wish_input;
+
     //Buttons
     //Strings
     private String email;
     private String name;
+
+    //lists information
+    private TreeSet<String> favourites;
+    private TreeSet<String> wishlist;
+
+    ArrayAdapter<String> favAdapter;
+    ArrayAdapter<String> wishAdapter;
+
+    // Creates a new ListView and adapter to display the research results
+    ListView favouritesListView;
+    ListView wishListView;
+
+
+    private void setUser(User user) {
+        currUser = user;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +91,18 @@ public class UserDetailsActivity extends AppCompatActivity {
         user_name_view = (TextView) findViewById(R.id.detail_user_name);
         user_email_view = (TextView) findViewById(R.id.detail_user_email);
         user_verify_view = (TextView) findViewById(R.id.detail_user_verify);
+        new_favourite_input = (EditText) findViewById(R.id.user_detail_addFav_text);
+        new_wish_input = (EditText) findViewById(R.id.user_details_addWish_text);
 
+        //initalize lists
 
-        //initialise button
+        favAdapter = new ArrayAdapter<>(this.getApplicationContext(), android.R.layout.simple_list_item_1);
+        wishAdapter = new ArrayAdapter<>(this.getApplicationContext(), android.R.layout.simple_list_item_1);
 
+        favouritesListView = (ListView) findViewById(R.id.user_details_favourites_list);
+        wishListView = (ListView) findViewById(R.id.user_details_wishlist_list);
+        favouritesListView.setAdapter(favAdapter);
+        wishListView.setAdapter(wishAdapter);
     }
 
     @Override
@@ -85,7 +125,10 @@ public class UserDetailsActivity extends AppCompatActivity {
                     } else {
                         user_verify_view.setText(R.string.email_is_not_verified);
                     }
+                    favourites = new TreeSet<>(currUser.getFavourites());
+                    wishlist = new TreeSet<>(currUser.getWishlist());
                     updateUI(UIMode.defaultMode);
+                    setUser(currUser);
                 }
 
                 @Override
@@ -132,11 +175,23 @@ public class UserDetailsActivity extends AppCompatActivity {
             //initialise views and buttons
             user_name_view.setText(name);
             user_email_view.setText(email);
+            for (String fav : favourites) {
+                favAdapter.add(fav);
+            }
+            for (String wish : wishlist) {
+                wishAdapter.add(wish);
+            }
         } else if (mode.equals(UIMode.userSignedOut)) {
             Log.d(TAG, "Return to signIn activity");
             Intent login = new Intent(this, SignInActivity.class);
             finish();
             startActivity(login);
+        } else if (mode.equals(UIMode.databasefailure)) {
+            Toast.makeText(this, "Database failed to load data", Toast.LENGTH_SHORT).show();
+        } else if (mode.equals(UIMode.poiDoesNotExist)) {
+            Toast.makeText(this, "Position of Interest does not exist", Toast.LENGTH_SHORT).show();
+        } else if (mode.equals((UIMode.failure))) {
+            Toast.makeText(this, "Failed to perform given operation", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -156,5 +211,83 @@ public class UserDetailsActivity extends AppCompatActivity {
         Log.d(TAG, "Start Edit Account Activity");
         Intent editAccountActivity = new Intent(this, ProfileSettingsActivity.class);
         startActivity(editAccountActivity);
+    }
+
+    /**
+     * Add new favourite point of interest to the current user profile
+     */
+    public void clickAddFavourite(@SuppressWarnings("UnusedParameters") View v) {
+        final String poiName = new_favourite_input.getText().toString();
+        if(!poiName.isEmpty() ) {
+            DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+                @Override
+                public void onSuccess(final PointOfInterest poi) {
+
+                    currUser.addFavourite(DatabaseSingleton.database, poiName, new AuthProvider.AuthListener() {
+                        @Override
+                        public void onSuccess() {
+                            favAdapter.add(poi.name());
+                            recreate();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            updateUI(UIMode.failure);
+                        }
+                    });
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    updateUI(UIMode.poiDoesNotExist);
+                }
+
+                @Override
+                public void onFailure() {
+                    updateUI(UIMode.databasefailure);
+                }
+            });
+        } else {
+            Toast.makeText(this, "Please type a known position of interest", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Add new point of interest to the wishlist of the current user profile
+     */
+    public void clickAddToWishlist(@SuppressWarnings("UnusedParameters") View v) {
+        final String poiName = new_wish_input.getText().toString();
+        if(!poiName.isEmpty()) {
+            DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+                @Override
+                public void onSuccess(final PointOfInterest poi) {
+
+                    currUser.addToWishlist(DatabaseSingleton.database, poiName, new AuthProvider.AuthListener() {
+                        @Override
+                        public void onSuccess() {
+                            wishAdapter.add(poi.name());
+                            recreate();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            updateUI(UIMode.failure);
+                        }
+                    });
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    updateUI(UIMode.poiDoesNotExist);
+                }
+
+                @Override
+                public void onFailure() {
+                    updateUI(UIMode.databasefailure);
+                }
+            });
+        }else{
+            Toast.makeText(this, "Please type a known position of interest", Toast.LENGTH_SHORT).show();
+        }
     }
 }

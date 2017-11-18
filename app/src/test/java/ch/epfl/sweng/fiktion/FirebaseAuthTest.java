@@ -551,7 +551,7 @@ public class FirebaseAuthTest {
         Mockito.when(fbUser.getUid()).thenReturn("id");
         auth.getCurrentUser(database, testListener );
 
-        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>()));
+        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>(), new TreeSet<String>()));
         assertThat(opResult, is(Result.SUCCESS));
         getUserDatabaseListener.onDoesntExist();
         assertThat(opResult, is(Result.DOESNOTEXIST));
