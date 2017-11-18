@@ -16,6 +16,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 public class TextSearchActivity extends MenuDrawerActivity {
 
@@ -71,28 +72,10 @@ public class TextSearchActivity extends MenuDrawerActivity {
         DatabaseSingleton.database.searchByText(text, new DatabaseProvider.SearchPOIByTextListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
-                // create new view for this POI
-                TextView tv = new TextView(ctx, null);
-
-                /* styles */
-                // background color
-                tv.setBackgroundColor(getResources().getColor(R.color.white));
-                // margin
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(2, 10, 2, 2);
-                tv.setLayoutParams(params);
-                // padding
-                tv.setPadding(10, 10, 10, 10);
-                // shadow
-                tv.setElevation(2);
-                // text size
-                tv.setTextSize(14);
-
-                // set attributes
-                tv.setText(poi.name());
+                View pv = POIDisplayer.createPoiCard(poi, ctx);
 
                 // add it to the results list
-                resultsList.addView(tv);
+                resultsList.addView(pv);
 
                 // we found a POI so update no results message
                 if (noResults.getVisibility() == View.VISIBLE)
