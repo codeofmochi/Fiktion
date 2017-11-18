@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.views.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 /**
  * Utility class for creating POI UI that can be reused anywhere
@@ -34,7 +36,7 @@ public class POIDisplayer {
      * @param ctx The context of the call, the activity where we want to include the card
      * @return A view of a POI that can be added in any layout
      */
-    public static View createPoiCard(PointOfInterest poi, Context ctx) {
+    public static View createPoiCard(final PointOfInterest poi, final Context ctx) {
         // create new view for this POI
         LinearLayout v = new LinearLayout(ctx);
         v.setOrientation(LinearLayout.HORIZONTAL);
@@ -116,7 +118,10 @@ public class POIDisplayer {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // open the correct POI page on click
+                Intent i = new Intent(ctx, POIPageActivity.class);
+                i.putExtra("POI_NAME", poi.name());
+                ctx.startActivity(i);
             }
         });
 
@@ -126,14 +131,15 @@ public class POIDisplayer {
 
     /**
      * Scales a bitmap given its min(width, length)
-     * @param b The bitmap to scale
+     *
+     * @param b         The bitmap to scale
      * @param imageSize The length of the shortest size min(width, height)
      * @return a bitmap which shortest side is scaled to imageSize
      */
     public static Bitmap scaleBitmap(Bitmap b, int imageSize) {
         int min = Math.min(b.getWidth(), b.getHeight());
-        int x = (min == b.getWidth()) ? imageSize : b.getWidth()*imageSize/b.getHeight();
-        int y = (min == b.getHeight()) ? imageSize : b.getHeight()*imageSize/b.getWidth();
+        int x = (min == b.getWidth()) ? imageSize : b.getWidth() * imageSize / b.getHeight();
+        int y = (min == b.getHeight()) ? imageSize : b.getHeight() * imageSize / b.getWidth();
         return Bitmap.createScaledBitmap(b, x, y, false);
     }
 
