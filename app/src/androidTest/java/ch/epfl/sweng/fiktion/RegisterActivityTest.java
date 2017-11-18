@@ -15,8 +15,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.RegisterActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -44,8 +44,8 @@ public class RegisterActivityTest {
     @Before
     public void setUp() {
         //define authenticator as our local and not the firebase one
-        Providers.auth = new LocalAuthProvider();
-        Providers.auth.signOut();
+        AuthSingleton.auth = new LocalAuthProvider();
+        AuthSingleton.auth.signOut();
         //define context
         regActivity = regActivityRule.getActivity();
     }
@@ -53,7 +53,7 @@ public class RegisterActivityTest {
     @After
     public void end() {
         //we need to sign out everytime in case it fails
-        Providers.auth.signOut();
+        AuthSingleton.auth.signOut();
         //regActivity.finish();
     }
 
@@ -66,7 +66,7 @@ public class RegisterActivityTest {
 
         onView(withId(R.id.register_click)).perform(click());
 
-        assertThat(Providers.auth.getEmail(), is(new_email));
+        assertThat(AuthSingleton.auth.getEmail(), is(new_email));
 
     }
 

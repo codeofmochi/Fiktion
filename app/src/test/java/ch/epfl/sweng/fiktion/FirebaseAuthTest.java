@@ -39,9 +39,9 @@ public class FirebaseAuthTest {
     @Mock
     FirebaseAuth fbAuth;
     @Mock
-    DatabaseReference dbRef;
-    @Mock
     FirebaseUser fbUser;
+    @Mock
+    DatabaseReference dbRef;
     @Mock
     GeoFire geofire;
     @Mock
@@ -73,7 +73,7 @@ public class FirebaseAuthTest {
     @Before
     public void setUp() {
         auth = new FirebaseAuthProvider(fbAuth);
-        //Providers.database = database;
+        //DatabaseSingleton.database = database;
         setTasks();
 
     }

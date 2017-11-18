@@ -77,8 +77,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         return 111.18957696 * Math.toDegrees(Math.acos(dist));
     }
 
-	
-	/**
+    /**
      * {@inheritDoc}
      */
     @Override

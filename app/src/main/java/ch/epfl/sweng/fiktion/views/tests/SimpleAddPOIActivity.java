@@ -14,7 +14,7 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 
 public class SimpleAddPOIActivity extends AppCompatActivity {
 
@@ -40,7 +40,7 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
             Position pos = new Position(rand.nextDouble(), rand.nextDouble());
             PointOfInterest poi = new PointOfInterest(poiName, pos, new TreeSet<String>(), "", 0, "", "");
             // ask the database to add the poi
-            Providers.database.addPoi(poi, new DatabaseProvider.AddPoiListener() {
+            DatabaseSingleton.database.addPoi(poi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 @SuppressLint("SetTextI18n") // no reason to set a variable for added
                 public void onSuccess() {

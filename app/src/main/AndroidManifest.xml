@@ -89,6 +89,9 @@
         <activity
             android:name=".views.SettingsActivity"
             android:label="Settings" />
+        <activity
+            android:name=".views.ProfileActivity"
+            android:label="Profile" />
     </application>
 
 </manifest>

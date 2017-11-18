@@ -13,9 +13,10 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -55,8 +56,8 @@ public class HomeActivityTest {
 
     @BeforeClass
     public static void resetProviders() {
-        Providers.auth = new LocalAuthProvider();
-        Providers.database = new LocalDatabaseProvider();
+        AuthSingleton.auth = new LocalAuthProvider();
+        DatabaseSingleton.database = new LocalDatabaseProvider();
         waitSomeTime(2000);
     }
 
@@ -103,15 +104,14 @@ public class HomeActivityTest {
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 
-    // Will be modified when linked
     @Test
     public void CloseDrawerWhenProfileClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(2).perform(click());
-        waitSomeTime(1000);
-        homeMainLayout.check(matches(isDisplayed()));
+        onView(withId(R.id.profileMain)).check(matches(isDisplayed()));
     }
+
     // Will be modified when linked
     @Test
     public void CloseDrawerWhenDiscoverClicked() {
@@ -134,7 +134,7 @@ public class HomeActivityTest {
         waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
     }
-    // Will be modified when linked
+
     @Test
     public void CloseDrawerWhenSettingsClicked() {
         closeSoftKeyboard();
