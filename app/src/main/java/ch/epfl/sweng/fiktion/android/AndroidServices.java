@@ -1,11 +1,14 @@
 package ch.epfl.sweng.fiktion.android;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.camera2.CameraManager;
 import android.location.LocationManager;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 
 import ch.epfl.sweng.fiktion.R;
 
@@ -15,6 +18,8 @@ import ch.epfl.sweng.fiktion.R;
  */
 
 public final class AndroidServices {
+
+    public static final int MY_PERMISSIONS_CAMERA = 1;
 
     /**
      * Prompts enable location dialog if GPS is disabled
@@ -47,6 +52,40 @@ public final class AndroidServices {
                     //get gps
                 }
             });
+            dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
+            dialog.show();
+        }
+    }
+
+
+    public static void promptCameraEnable(final Context context) {
+        CameraManager cm = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        boolean camera_enabled = false;
+
+        try {
+            camera_enabled = (cm.getCameraIdList().length != 0);
+        } catch (Exception ex) {
+        }
+
+
+        if (!camera_enabled) {
+            // notify user
+            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            dialog.setMessage("Camera is disabled");
+            dialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions((Activity) context, new String[]{android.Manifest.permission.CAMERA}, MY_PERMISSIONS_CAMERA);
+                        }
+                    }
+            );
             dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
 
                 @Override

@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.epfl.sweng.fiktion.views.SettingsActivity">
+
+    <LinearLayout
+        android:id="@+id/optionsList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/accountSettingsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/text_border_bottom"
+            android:padding="15dp"
+            android:text="@string/account"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <LinearLayout
+            android:id="@+id/accountSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights">
+
+                <TextView
+                    android:id="@+id/usernameText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/usernameEdit"
+                    android:text="@string/username" />
+
+                <EditText
+                    android:id="@+id/usernameEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:text="$userName$"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/emailText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/emailEdit"
+                    android:text="@string/e_mail" />
+
+                <EditText
+                    android:id="@+id/emailEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textEmailAddress"
+                    android:text="$email$"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingBottom="7dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights">
+
+                <TextView
+                    android:id="@+id/passwordText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/passwordEdit"
+                    android:text="@string/password" />
+
+                <Button
+                    android:id="@+id/passwordEdit"
+                    android:layout_width="45dp"
+                    android:layout_height="36dp"
+                    android:background="@color/lightGray"
+                    android:layout_weight="1"
+                    android:text="@string/change" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingBottom="7dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights">
+
+                <TextView
+                    android:id="@+id/verifiedText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/verify_email" />
+
+                <Button
+                    android:id="@+id/verifiedButton"
+                    android:layout_width="45dp"
+                    android:layout_height="36dp"
+                    android:background="@color/lightGray"
+                    android:layout_weight="1"
+                    android:text="@string/send_email" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingBottom="7dp"
+                tools:ignore="NestedWeights,RtlSymmetry">
+
+                <TextView
+                    android:id="@+id/deleteAccountText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/delete_account" />
+
+                <Button
+                    android:id="@+id/deleteAccountButton"
+                    android:layout_width="45dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:background="@color/red"
+                    android:text="@string/delete"
+                    android:textColor="@color/white" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/saveAccountSettingsButton"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                android:text="@string/save_account_settings" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/searchSettingsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/text_border_bottom"
+            android:padding="15dp"
+            android:text="@string/search"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <LinearLayout
+            android:id="@+id/searchSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights,UselessParent">
+                <!-- UselessParent : Will get populated  with more children -->
+
+                <TextView
+                    android:id="@+id/searchRadiusText"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/search_radius" />
+
+                <TextView
+                    android:id="@+id/searchRadiusNum"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="$00 km$"
+                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+
+                <SeekBar
+                    android:id="@+id/searchRadiusSlider"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/profileSettingsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/text_border_bottom"
+            android:padding="15dp"
+            android:text="@string/profile"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <LinearLayout
+            android:id="@+id/profileSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <Switch
+                android:id="@+id/publicProfileSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/profile_is_public"
+                android:textColor="@color/colorText"
+                tools:ignore="NestedWeights" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/notificationSettingsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/text_border_bottom"
+            android:padding="15dp"
+            android:text="@string/notifications"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <LinearLayout
+            android:id="@+id/notificationSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <Switch
+                android:id="@+id/someNotificationSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/some_annoying_notifications"
+                android:textColor="@color/colorText" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

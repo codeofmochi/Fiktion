@@ -12,15 +12,16 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 
 public class ProfileSettingsActivity extends AppCompatActivity {
 
     private final String TAG = "UpdateProfile";
 
     //auth
-    private final AuthProvider auth = Providers.auth;
+    private final AuthProvider auth = AuthSingleton.auth;
     private User user;
 
     //TextViews
@@ -133,13 +134,13 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 && !newName.equals(user.getName()))
                 {
 
-            user.changeName(newName, new AuthProvider.AuthListener() {
+            user.changeName(DatabaseSingleton.database, newName, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
                     findViewById(R.id.update_confirm_name).setEnabled(true);
                     Toast.makeText(ProfileSettingsActivity.this,
-                            "User's name is now : " + newName,
-                            Toast.LENGTH_LONG).show();
+                            "Username updated to : "+newName,
+                            Toast.LENGTH_SHORT).show();
                 }
 
                 @Override

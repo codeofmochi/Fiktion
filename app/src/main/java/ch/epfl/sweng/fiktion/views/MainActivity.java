@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.tests.FindNearestPoisActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,17 +16,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-
-    /* Starts the map location activity */
-    public void startNearbyActivity(View view) {
-        Intent mapIntent = new Intent(this, LocationActivity.class);
-        startActivity(mapIntent);
-    }
-
-    public void startAddPOIActivity(View view) {
-        Intent addPoiIntent = new Intent(this, AddPOIActivity.class);
-        startActivity(addPoiIntent);
     }
 
     public void startFindNearestPoisActivity(View view) {

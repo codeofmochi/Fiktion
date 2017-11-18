@@ -9,10 +9,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
-import ch.epfl.sweng.fiktion.providers.Providers;
-import ch.epfl.sweng.fiktion.views.UserDetailsActivity;
+import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -35,12 +35,12 @@ public class UserDetailsActivityTest {
 
     @BeforeClass
     public static void setAuth(){
-        Providers.auth = new LocalAuthProvider();
+        AuthSingleton.auth = new LocalAuthProvider();
     }
 
     @Before
     public void setVariables(){
-        Providers.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
                 user=currUser;
@@ -59,12 +59,12 @@ public class UserDetailsActivityTest {
 
     @After
     public void resetAuth(){
-        Providers.auth = new LocalAuthProvider();
+        AuthSingleton.auth = new LocalAuthProvider();
     }
 
     @Test
     public void seeDefaultUserInformations(){
-        onView(withId(R.id.detail_user_email)).check(matches(withText(Providers.auth.getEmail())));
+        onView(withId(R.id.detail_user_email)).check(matches(withText(AuthSingleton.auth.getEmail())));
         onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
     }
 

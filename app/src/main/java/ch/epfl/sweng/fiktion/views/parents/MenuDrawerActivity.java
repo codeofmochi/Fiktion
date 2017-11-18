@@ -1,8 +1,9 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.parents;
 
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,13 +16,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.AddPOIActivity;
+import ch.epfl.sweng.fiktion.views.HomeActivity;
+import ch.epfl.sweng.fiktion.views.LocationActivity;
+import ch.epfl.sweng.fiktion.views.ProfileActivity;
+import ch.epfl.sweng.fiktion.views.SettingsActivity;
 
 /**
  * A parent class for activities that implement the left menu drawer
  * Created by dialexo on 26.10.17.
  */
 
-public class MenuDrawerActivity extends AppCompatActivity {
+public abstract class MenuDrawerActivity extends AppCompatActivity {
 
     // menu drawer properties
     private String[] menuItems = {"Home", "Nearby", "Profile", "Discover", "Contribute", "Settings"};
@@ -68,6 +74,14 @@ public class MenuDrawerActivity extends AppCompatActivity {
             }
             case 2:
                 // profile activity
+                if (this.getClass().equals(ProfileActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    Intent i = new Intent(this, ProfileActivity.class);
+                    // clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
                 break;
             case 3:
                 // discover activity
@@ -86,6 +100,14 @@ public class MenuDrawerActivity extends AppCompatActivity {
             }
             case 5:
                 // settings activity
+                if (this.getClass().equals(SettingsActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    Intent i = new Intent(this, SettingsActivity.class);
+                    // clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
                 break;
             default:
                 break;

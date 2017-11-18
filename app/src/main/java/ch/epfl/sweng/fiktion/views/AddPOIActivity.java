@@ -8,24 +8,28 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
-import static ch.epfl.sweng.fiktion.providers.Providers.database;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LONGITUDE;
 
 public class AddPOIActivity extends MenuDrawerActivity {
 
     // List of the fictions name
-    private final List<String> fictionList = new ArrayList<>();
+    private final Set<String> fictionSet = new TreeSet<>();
     // Displayed fiction list (as a big string)
     private String fictionListText = "";
+
+    // intent result codes
+    private static final int LOCATION_RESULT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +41,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
     @Override
     @SuppressLint("SetTextI18n") // latitude and longitude are inputs, not hardcoded
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
+        if (requestCode == LOCATION_RESULT) {
             if (resultCode == RESULT_OK) {
                 Double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
                 Double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
@@ -50,8 +54,13 @@ public class AddPOIActivity extends MenuDrawerActivity {
     }
 
     public void startGetLocationFromMapActivity(View view) {
-        Intent getLocationFromMapIntent = new Intent(this, GetLocationFromMapActivity.class);
-        startActivityForResult(getLocationFromMapIntent, 1);
+        Intent i = new Intent(this, GetLocationFromMapActivity.class);
+        startActivityForResult(i, LOCATION_RESULT);
+    }
+
+    public void startGetLocationFromWikipedia(View view) {
+        Intent i = new Intent(this, GetLocationFromWikipediaActivity.class);
+        startActivityForResult(i, LOCATION_RESULT);
     }
 
     // Adds fictions to the fictions list and display them in a view, checks some bad inputs (empty, etc...)
@@ -64,14 +73,16 @@ public class AddPOIActivity extends MenuDrawerActivity {
             // warning message if unaccepted characters are present
             ((EditText) findViewById(R.id.add_poi_fiction)).setError("Those characters are not accepted: . $ # [ ] /");
         } else {
-            fictionList.add(fiction);
-            if (fictionListText.isEmpty()) {
-                fictionListText = fictionListText.concat(fiction);
-            } else {
-                fictionListText = fictionListText.concat(", " + fiction);
+            if (!fictionSet.contains(fiction)) {
+                fictionSet.add(fiction);
+                if (fictionListText.isEmpty()) {
+                    fictionListText = fictionListText.concat(fiction);
+                } else {
+                    fictionListText = fictionListText.concat(", " + fiction);
+                }
+                ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
+                ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
             }
-            ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
-            ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
         }
     }
 
@@ -79,6 +90,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         final String name = ((EditText) findViewById(R.id.add_poi_name)).getText().toString();
         final String longitudeString = ((EditText) findViewById(R.id.add_poi_longitude)).getText().toString();
         final String latitudeString = ((EditText) findViewById(R.id.add_poi_latitude)).getText().toString();
+        final String description = ((EditText) findViewById(R.id.add_poi_description)).getText().toString();
         double longitude = 0.0;
         double latitude = 0.0;
 
@@ -124,9 +136,9 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 isCorrect = false;
             }
         }
-
-        if (isCorrect && fictionListText.isEmpty()) {
-            database.addPoi(new PointOfInterest(name, new Position(latitude, longitude)), new DatabaseProvider.AddPoiListener() {
+        if (isCorrect) {
+            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, "", "");
+            database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
                     showToast("The Point of Interest " + name + " was added !");
@@ -136,6 +148,8 @@ public class AddPOIActivity extends MenuDrawerActivity {
                     ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
                     ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
                     ((EditText) findViewById(R.id.add_poi_description)).setText("");
+                    fictionSet.clear();
+                    fictionListText = "";
                 }
 
                 @Override

@@ -1,13 +1,14 @@
 package ch.epfl.sweng.fiktion.providers;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.User;
 
@@ -19,12 +20,10 @@ import ch.epfl.sweng.fiktion.models.User;
 
 public class FirebaseAuthProvider extends AuthProvider {
 
-    //testing
-    private final static String TAG = "FBAuthProv";
     // firebase authentification instance
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final FirebaseAuth auth;
     // firebase user that we authenticate
-    private FirebaseUser user = null;
+    private FirebaseUser user;
     // firebase status
     /*
     private FirebaseAuth.AuthStateListener state;
@@ -61,6 +60,14 @@ public class FirebaseAuthProvider extends AuthProvider {
     }
 */
 
+    public FirebaseAuthProvider() {
+        auth = FirebaseAuth.getInstance();
+    }
+
+    public FirebaseAuthProvider(FirebaseAuth fbAuth) {
+        auth = fbAuth;
+    }
+
     /**
      * Signs in a user with an email, a password and what to do afterwards
      *
@@ -72,19 +79,19 @@ public class FirebaseAuthProvider extends AuthProvider {
     public void signIn(String email, String password, final AuthListener listener) {
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    //reset textViews content
-                    // Sign in success
-                    user = auth.getCurrentUser();
-                    listener.onSuccess();
-                } else {
-                    // Sign in fails
-                    listener.onFailure();
-                }
-            }
-        });
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            //reset textViews content
+                            // Sign in success
+                            user = auth.getCurrentUser();
+                            listener.onSuccess();
+                        } else {
+                            // Sign in fails
+                            listener.onFailure();
+                        }
+                    }
+                });
     }
 
     /**
@@ -109,7 +116,6 @@ public class FirebaseAuthProvider extends AuthProvider {
         //TODO elaborate email validation
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";
-            Log.d(TAG, "Email validation failed");
         }
         return errMessage;
     }
@@ -141,7 +147,8 @@ public class FirebaseAuthProvider extends AuthProvider {
      * @param password used to create the account
      */
     @Override
-    public void createUserWithEmailAndPassword(String email, String password, final AuthListener listener) {
+    public void createUserWithEmailAndPassword(
+            String email, String password, final AuthListener listener) {
         //create user in FirebaseAuthentication
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -151,27 +158,27 @@ public class FirebaseAuthProvider extends AuthProvider {
                             // Account creation was successful in FirebaseAuthentication
                             //need to create user in our database
 
-                            Providers.database.addUser(new User("", auth.getUid()), new DatabaseProvider.AddUserListener() {
+                            DatabaseSingleton.database
+                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(), new TreeSet<String>()),
+                                            new DatabaseProvider.AddUserListener() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    user = auth.getCurrentUser();
+                                                    listener.onSuccess();
+                                                }
 
 
-                                @Override
-                                public void onSuccess() {
-                                    user = auth.getCurrentUser();
-                                    listener.onSuccess();
-                                }
+                                                @Override
+                                                public void onAlreadyExists() {
+                                                    listener.onFailure();
+                                                }
 
 
-                                @Override
-                                public void onAlreadyExists() {
-                                    listener.onFailure();
-                                }
-
-
-                                @Override
-                                public void onFailure() {
-                                    listener.onFailure();
-                                }
-                            });
+                                                @Override
+                                                public void onFailure() {
+                                                    listener.onFailure();
+                                                }
+                                            });
 
                             listener.onSuccess();
                         } else {
@@ -256,7 +263,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     public void getCurrentUser(final DatabaseProvider.GetUserListener listener) {
         user = auth.getCurrentUser();
         if (user != null) {
-            Providers.database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
+            DatabaseSingleton.database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     listener.onSuccess(user);
@@ -276,34 +283,6 @@ public class FirebaseAuthProvider extends AuthProvider {
             listener.onFailure();
         }
     }
-
-    /*
-     * Enables the user to change his username
-     * @param newName new username provided by the user
-     * @param listener actions to be done in case of failure or success
-     */
-/*    @Override
-    public void changeName(String newName, final AuthListener listener) {
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(newName).build();
-
-        user = auth.getCurrentUser();
-        if (user != null) {
-            user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        listener.onSuccess();
-                    } else {
-                        listener.onFailure();
-                    }
-                }
-            });
-        }else{
-            listener.onFailure();
-        }
-    }
-*/
 
     /**
      * Enables the user to change his primary email
@@ -338,7 +317,6 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void deleteAccount(final AuthListener listener, final DatabaseProvider.DeleteUserListener delListener) {
-        //TODO delete application user in database after implementation of user storage in database
         user = auth.getCurrentUser();
 
         if (user != null) {
@@ -349,7 +327,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             if (task.isSuccessful()) {
                                 listener.onSuccess();
                                 //delete user in our database
-                                Providers.database.deleterUserById(user.getUid(), delListener);
+                                DatabaseSingleton.database.deleterUserById(user.getUid(), delListener);
                             } else {
                                 listener.onFailure();
                             }
@@ -375,10 +353,11 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public String getEmail() {
-        if (auth.getCurrentUser() != null) {
+        user = auth.getCurrentUser();
+        if (auth.getCurrentUser() != null && user.getEmail() != null) {
             return user.getEmail();
         } else {
-            return null;
+            return "";
         }
 
     }

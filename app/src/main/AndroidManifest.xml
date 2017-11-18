@@ -6,6 +6,11 @@
     <!-- Permissions -->
 
 
+    <!-- Camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera2" />
+
     <!-- Google Maps -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -54,13 +59,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.HomeActivity" />
         </activity>
-        <activity android:name=".views.SimpleAddPOIActivity" />
-        <activity android:name=".views.FindNearestPoisActivity" />
-        <activity android:name=".views.DisplayNearestPoisActivity" />
+        <activity android:name=".views.tests.SimpleAddPOIActivity" />
+        <activity android:name=".views.tests.FindNearestPoisActivity" />
+        <activity android:name=".views.tests.DisplayNearestPoisActivity" />
         <activity android:name=".views.SignInActivity" />
-        <activity android:name=".views.UserDetailsActivity" />
+        <activity android:name=".views.tests.UserDetailsActivity" />
         <activity android:name=".views.RegisterActivity" />
-        <activity android:name=".views.AddPOIActivity" />
+        <activity
+            android:name=".views.AddPOIActivity"
+            android:label="Add a place" />
         <activity
             android:name=".views.GetLocationFromMapActivity"
             android:label="Click on the map...">
@@ -68,10 +75,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.AddPOIActivity" />
         </activity>
+        <activity
+            android:name=".views.GetLocationFromWikipediaActivity"
+            android:label="Wikipedia link">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.AddPOIActivity" />
+        </activity>
         <activity android:name=".views.HomeActivity" />
         <activity android:name=".views.ProfileSettingsActivity" />
-        <activity android:name=".views.POIPageActivity"></activity>
-        <activity android:name=".views.MapLocationActivity"></activity>
+        <activity android:name=".views.POIPageActivity" />
+        <activity
+            android:name=".views.SettingsActivity"
+            android:label="Settings" />
+        <activity
+            android:name=".views.ProfileActivity"
+            android:label="Profile" />
     </application>
 
 </manifest>

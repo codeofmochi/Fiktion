@@ -6,8 +6,7 @@ package ch.epfl.sweng.fiktion.providers;
  *
  * @author pedro
  */
-public class Providers {
-    public static AuthProvider auth = new FirebaseAuthProvider();
-    public static AlgoliaSearchProvider algoliaSearchProvider = new AlgoliaSearchProvider();
+public class DatabaseSingleton {
     public static DatabaseProvider database = new FirebaseDatabaseProvider();
+    private DatabaseSingleton(){}
 }

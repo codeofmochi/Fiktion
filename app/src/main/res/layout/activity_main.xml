@@ -21,35 +21,15 @@
             android:layout_marginTop="44dp"
             android:onClick="startSignInActivity"
             android:text="@string/singn_in_button"
-            app:layout_constraintTop_toBottomOf="@+id/findNearPois"
+            app:layout_constraintTop_toBottomOf="@+id/_findNearPois"
             tools:layout_editor_absoluteX="148dp" />
 
         <Button
-            android:id="@+id/findNearPois"
+            android:id="@+id/main_findNearPois"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="startFindNearestPoisActivity"
             android:text="@string/find_near_poi"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="0dp" />
-
-        <Button
-            android:id="@+id/goToAddPOIButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="33dp"
-            android:onClick="startAddPOIActivity"
-            android:text="@string/add_poi_title"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/StartNearbyButton" />
-
-        <Button
-            android:id="@+id/StartNearbyButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="startNearbyActivity"
-            android:text="@string/use_gps"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />
 

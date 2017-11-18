@@ -12,6 +12,8 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.TreeSet;
+
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -29,7 +31,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.fiktion.providers.Providers.database;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
@@ -61,9 +63,9 @@ public class AddPOIActivityTest {
     @BeforeClass
     public static void setup() {
         database = new LocalDatabaseProvider();
-        database.addPoi(new PointOfInterest("p1", new Position(0, 1)), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(1, 2)), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(2, 3)), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p1", new Position(0, 1), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p2", new Position(1, 2), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        database.addPoi(new PointOfInterest("p3", new Position(2, 3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
     }
 
     private final ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
@@ -74,6 +76,9 @@ public class AddPOIActivityTest {
     private final ViewInteraction addPoiFictionButton = onView(withId(R.id.add_poi_fiction_button));
     private final ViewInteraction addPoiFictionList = onView(withId(R.id.add_poi_fiction_list));
     private final ViewInteraction addPoiScroll = onView(withId(R.id.add_poi_scroll));
+    private final ViewInteraction addWikiButton = onView(withId(R.id.position_wiki));
+    private final ViewInteraction wikiURL = onView(withId(R.id.wikipedia_url));
+    private final ViewInteraction wikiGetButton = onView(withId(R.id.get_coordinates));
 
     private void doesToastMatch(String s) {
         onView(withText(s)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
@@ -96,66 +101,48 @@ public class AddPOIActivityTest {
     }
 
     @Test
-    public void failsOnNoTextTest() {
+    public void failsWithWrongInputNameTest() {
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("You can't enter an empty point of interest name")));
-    }
+        addPoiName.perform(clearText());
 
-    @Test
-    public void failsWithDotTest() {
-        closeSoftKeyboard();
         addPoiName.perform(typeText("."));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-    }
+        addPoiName.perform(clearText());
 
-    @Test
-    public void failsWithDollarTest() {
-        closeSoftKeyboard();
         addPoiName.perform(typeText("$"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-    }
+        addPoiName.perform(clearText());
 
-    @Test
-    public void failsWithHashTest() {
-        closeSoftKeyboard();
         addPoiName.perform(typeText("#"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-    }
+        addPoiName.perform(clearText());
 
-    @Test
-    public void failsWithOpenBracketTest() {
-        closeSoftKeyboard();
         addPoiName.perform(typeText("["));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-    }
+        addPoiName.perform(clearText());
 
-    @Test
-    public void failsWithCloseBracketTest() {
-        closeSoftKeyboard();
         addPoiName.perform(typeText("]"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-    }
+        addPoiName.perform(clearText());
 
-    @Test
-    public void failsWithSlashTest() {
-        closeSoftKeyboard();
         addPoiName.perform(typeText("/"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
@@ -164,7 +151,7 @@ public class AddPOIActivityTest {
     }
 
     @Test
-    public void failsWIthEmptyLatitudeOrLongitudeTest() {
+    public void failsWithEmptyLatitudeOrLongitudeTest() {
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
@@ -334,5 +321,58 @@ public class AddPOIActivityTest {
         closeSoftKeyboard();
         addPoiFictionButton.perform(click());
         addPoiFictionList.check(matches(withText("hello test, my fiction")));
+    }
+
+    /* Wikipedia tests */
+
+    @Test
+    public void getCoordFromWikipediaAkihabara() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org/wiki/Akihabara"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        addPoiLatitude.check(matches(withText("35.69836")));
+        addPoiLongitude.check(matches(withText("139.77313")));
+    }
+
+    @Test
+    public void notWikipediaURL() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("notwiki.net"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        wikiURL.check(matches(hasErrorText("Link must be from wikipedia.org")));
+    }
+
+    @Test
+    public void wrongFormatURL() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        wikiURL.check(matches(hasErrorText("Wrong link format : must follow wikipedia.org/wiki/Article")));
+    }
+
+    @Test
+    public void invalidArticle() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org/wiki/notavalidarticle"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        doesToastMatch("No article found");
+    }
+
+    @Test
+    public void noCoordArticle() {
+        closeSoftKeyboard();
+        addWikiButton.perform(click());
+        wikiURL.perform(typeText("wikipedia.org/wiki/Main_Page"));
+        wikiGetButton.perform(click());
+        waitASecond();
+        doesToastMatch("No coordinates found in article");
     }
 }

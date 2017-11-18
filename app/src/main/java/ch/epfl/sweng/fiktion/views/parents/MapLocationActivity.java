@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.views;
+package ch.epfl.sweng.fiktion.views.parents;
 
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +10,7 @@ import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
 
-public class MapLocationActivity extends AppCompatActivity implements OnMapReadyCallback {
+public abstract class MapLocationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     // Maps and location provider for this and children activities
     public GoogleMapsLocationProvider gmaps = new GoogleMapsLocationProvider();
