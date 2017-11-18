@@ -4,11 +4,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Iterator;
+import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
@@ -45,13 +51,12 @@ public class POIDisplayer {
         // shadow
         v.setElevation(2);
 
-
         /* add picture */
 
         ImageView img = new ImageView(ctx);
         // Get the image here
         Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.akibairl2);
-        // Recrop to a centered square, computed from the min(width, height) of the image
+        // crop to a centered square, computed from the min(width, height) of the image
         b = POIDisplayer.cropBitmapToSquare(b);
         img.setImageBitmap(b);
         // Define size
@@ -65,8 +70,10 @@ public class POIDisplayer {
 
         /* set attributes */
         LinearLayout texts = new LinearLayout(ctx);
+        texts.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams textsParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         textsParams.setMarginStart(20);
+        texts.setLayoutParams(textsParams);
 
         // Title text
         TextView title = new TextView(ctx);
@@ -76,9 +83,41 @@ public class POIDisplayer {
         // add title to texts
         texts.addView(title);
 
+        // City and country text
+        TextView cityCountry = new TextView(ctx);
+        cityCountry.setTextSize(14);
+        cityCountry.setText(poi.city() + ", " + poi.country());
+        texts.addView(cityCountry);
+
+        // List of fictions
+        TextView fictions = new TextView(ctx);
+        fictions.setTextSize(13);
+        fictions.setPadding(0, 10, 0, 10);
+        // make a string of up to 5 fictions
+        Spannable f = POIDisplayer.makeFictionsString(poi.fictions(), 5, ctx);
+        fictions.setText(f);
+        texts.addView(fictions);
+
+        // Rating
+        TextView rating = new TextView(ctx);
+        rating.setTextSize(13);
+        rating.setPadding(0, 10, 0, 10);
+        String r = poi.rating() + " upvotes";
+        rating.setText(r);
+        texts.addView(rating);
+
         // put texts in horizontal layout
         v.addView(texts);
 
+        // register onclick event
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        // finally return the whole view
         return v;
     }
 
@@ -96,5 +135,28 @@ public class POIDisplayer {
         int startY = (length == b.getHeight()) ? 0 : ((b.getHeight() - length) / 2);
         // crop the bitmap
         return Bitmap.createBitmap(b, startX, startY, length, length);
+    }
+
+    /**
+     * Makes a string from a set of fictions, up to a max qty
+     *
+     * @param fictions A set of fictions
+     * @param max      Max number of fictions to display in string
+     * @return a string of up to max fictions
+     */
+    public static Spannable makeFictionsString(Set<String> fictions, int max, Context ctx) {
+        // iterate on set and add to string if we haven't reached max yet
+        StringBuilder s = new StringBuilder("Featured in ");
+        int count = 0;
+        Iterator it = fictions.iterator();
+        while (it.hasNext() && count < max) {
+            if (count != 0) s.append(", ");
+            s.append(it.next());
+            count++;
+        }
+        // get some colors in there
+        Spannable span = new SpannableString(s);
+        span.setSpan(new ForegroundColorSpan(ctx.getResources().getColor(R.color.colorPrimary)), 12, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return span;
     }
 }
