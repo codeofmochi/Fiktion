@@ -77,15 +77,6 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         return 111.18957696 * Math.toDegrees(Math.acos(dist));
     }
 
-    /**
-     *
-     * @param name     the name for the Poi to be searched
-     * @param listener the listener
-     */
-    @Override
-    public void poiSearchByText(String name, PoiSearchByTextListener listener) {
-        //TODO implement search by text for testing
-	}
 	
 	/**
      * {@inheritDoc}

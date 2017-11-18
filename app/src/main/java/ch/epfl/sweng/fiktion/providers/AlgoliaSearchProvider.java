@@ -14,17 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
-import ch.epfl.sweng.fiktion.models.Position;
 
 /**
  * Created by serdar on 10/27/2017.
+ * Enables search by text
  */
 
 public class AlgoliaSearchProvider extends SearchProvider{
-    private final String applicationID = "2CQXZ238JH";
-    private final String apiKey = "1617c6689ddda8643dddbad6496479ed";
-    private final String indexName = "pointsofinterest";
-    private Client client;
     private Index index;
     private Query query;
     private SearchResultsJsonParser resultsJsonParser;
@@ -32,52 +28,14 @@ public class AlgoliaSearchProvider extends SearchProvider{
     // Constructor
     // Initializes Algolia connection and pre-build the search query
     public AlgoliaSearchProvider(){
-        this.client = new Client(applicationID, apiKey);
+        String applicationID = "2CQXZ238JH";
+        String apiKey = "1617c6689ddda8643dddbad6496479ed";
+        Client client = new Client(applicationID, apiKey);
+        String indexName = "pointsofinterest";
         this.index =  client.getIndex(indexName);
         this.query = new Query();
         this.query.setAttributesToRetrieve("name", "latitude", "longitude");
         this.resultsJsonParser = new SearchResultsJsonParser();
-    }
-
-    // Creates POI object from a JSON representation
-    public class PoiJsonParser
-    {
-        public PointOfInterest parse(JSONObject jsonObject)
-        {
-            if (jsonObject == null)
-                return null;
-            String name = jsonObject.optString("name");
-            double latitude = jsonObject.optDouble("latitude");
-            double longitude = jsonObject.optDouble("longitude");
-            if (name != null  && latitude < 180 && latitude > -180 && longitude < 180 && longitude > -180)
-                return new PointOfInterest(name, new Position(latitude, longitude));
-            return null;
-        }
-    }
-
-    // Deserialize POI's from their JSON representations on result array
-    public class SearchResultsJsonParser
-    {
-        private PoiJsonParser poiParser = new PoiJsonParser();
-        public List<PointOfInterest> parseResults(JSONObject jsonObject)
-        {
-            if (jsonObject == null)
-                return null;
-            List<PointOfInterest> results = new ArrayList<>();
-            JSONArray hits = jsonObject.optJSONArray("hits");
-            if (hits == null)
-                return null;
-            for (int i = 0; i < hits.length(); ++i) {
-                JSONObject hit = hits.optJSONObject(i);
-                if (hit == null)
-                    continue;
-                PointOfInterest pointOfInterest = poiParser.parse(hit);
-                if (pointOfInterest == null)
-                    continue;
-                results.add(pointOfInterest);
-            }
-            return results;
-        }
     }
 
     /**
@@ -85,7 +43,7 @@ public class AlgoliaSearchProvider extends SearchProvider{
      */
     @Override
     public void addPoi(PointOfInterest pointOfInterest, final DatabaseProvider.AddPoiListener listener) {
-        List<JSONObject> array = new ArrayList<JSONObject>();
+        List<JSONObject> array = new ArrayList<>();
         try {
             // try to serialize input POI object into JSON message and add it to previously
             // specified Algolia index

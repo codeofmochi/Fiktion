@@ -85,6 +85,7 @@
         <activity android:name=".views.HomeActivity" />
         <activity android:name=".views.ProfileSettingsActivity" />
         <activity android:name=".views.POIPageActivity" />
+
         <activity
             android:name=".views.SettingsActivity"
             android:label="Settings" />
