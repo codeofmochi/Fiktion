@@ -80,4 +80,6 @@
     <string name="location_post_photo">Location post photo</string>
     <string name="user_content_picture">User content picture</string>
     <string name="search_hint">Search a place, movie, city, ...</string>
+    <string name="empty_search">Search field is empty</string>
+    <string name="no_results_found">No results found</string>
 </resources>
