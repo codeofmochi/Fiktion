@@ -79,6 +79,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         public void onFailure() {
                             poiRef.removeValue();
                             geofire.removeLocation(poiName);
+                            listener.onFailure();
                         }
                     });
                 }
