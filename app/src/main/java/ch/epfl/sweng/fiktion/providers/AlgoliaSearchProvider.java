@@ -20,22 +20,20 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
  * Enables search by text
  */
 
-public class AlgoliaSearchProvider extends SearchProvider{
+public class AlgoliaSearchProvider extends SearchProvider {
     private Index index;
     private Query query;
-    private SearchResultsJsonParser resultsJsonParser;
 
     // Constructor
     // Initializes Algolia connection and pre-build the search query
-    public AlgoliaSearchProvider(){
+    public AlgoliaSearchProvider() {
         String applicationID = "2CQXZ238JH";
         String apiKey = "1617c6689ddda8643dddbad6496479ed";
         Client client = new Client(applicationID, apiKey);
         String indexName = "pointsofinterest";
-        this.index =  client.getIndex(indexName);
+        this.index = client.getIndex(indexName);
         this.query = new Query();
         this.query.setAttributesToRetrieve("name", "latitude", "longitude");
-        this.resultsJsonParser = new SearchResultsJsonParser();
     }
 
     /**
@@ -51,8 +49,7 @@ public class AlgoliaSearchProvider extends SearchProvider{
                     .put("longitude", pointOfInterest.position().longitude()));
             index.addObjectsAsync(new JSONArray(array), null);
 
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             // Notify when adding the POI fails
             listener.onFailure();
         }
@@ -75,18 +72,61 @@ public class AlgoliaSearchProvider extends SearchProvider{
                 // to calling method
                 if (jsonObject != null && e == null) {
                     //results = resultsJsonParser.parseResults(jsonObject);
-                    List<PointOfInterest> results = resultsJsonParser.parseResults(jsonObject);
-                    for (int i=0; i < results.size(); i++) {
+                    List<PointOfInterest> results = parseResults(jsonObject);
+                    for (int i = 0; i < results.size(); i++) {
                         listener.onSuccess(results.get(i));
                     }
                 }
                 // When there is an exception
-                else if ( e != null)
+                else if (e != null)
                     listener.onFailure();
-                // When no POI with matching name is found in Algolia
+                    // When no POI with matching name is found in Algolia
                 else
                     listener.onDoesntExist();
             }
         });
+    }
+
+    /**
+     * Serialize a POI into a JSON object
+     *
+     * @param poi A Point of Interest to serialize
+     * @return the POI in JSON object
+     */
+    private JSONObject serializePOI(PointOfInterest poi) {
+        assert (poi != null);
+
+        JSONObject obj = new JSONObject();
+
+        return obj;
+    }
+
+    /**
+     * Parse Algolia's results to a list of POI IDs
+     *
+     * @param jsonObject A JSON array which is the result of Algolia's search
+     * @return a list of POIs IDs as Strings
+     */
+    private List<String> parseResults(JSONObject jsonObject) {
+        assert (jsonObject != null);
+
+        List<String> results = new ArrayList<>();
+        JSONArray hits = jsonObject.optJSONArray("hits");
+
+        // list is empty
+        if (hits == null) return new ArrayList<>();
+
+        // iterate on JSON array and find POI name
+        for (int i = 0; i < hits.length(); ++i) {
+            JSONObject hit = hits.optJSONObject(i);
+            if (hit != null) {
+                String poi = hit.optString("name");
+                if (poi != null) {
+                    results.add(poi);
+                }
+            }
+        }
+
+        return results;
     }
 }
