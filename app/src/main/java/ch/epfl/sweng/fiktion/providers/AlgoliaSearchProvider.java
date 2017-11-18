@@ -33,24 +33,27 @@ public class AlgoliaSearchProvider extends SearchProvider {
         String indexName = "pointsofinterest";
         this.index = client.getIndex(indexName);
         this.query = new Query();
-        this.query.setAttributesToRetrieve("name", "latitude", "longitude");
+        this.query.setAttributesToRetrieve("name");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void addPoi(PointOfInterest pointOfInterest, final DatabaseProvider.AddPoiListener listener) {
-        List<JSONObject> array = new ArrayList<>();
+    public void addPoi(PointOfInterest poi, final DatabaseProvider.AddPoiListener listener) {
         try {
-            // try to serialize input POI object into JSON message and add it to previously
-            // specified Algolia index
-            array.add(new JSONObject().put("name", pointOfInterest.name()).put("latitude", pointOfInterest.position().latitude())
-                    .put("longitude", pointOfInterest.position().longitude()));
-            index.addObjectsAsync(new JSONArray(array), null);
-
-        } catch (JSONException e) {
-            // Notify when adding the POI fails
+            // add POI to Algolia asynchronously
+            index.addObjectAsync(
+                    serializePOI(poi),
+                    new CompletionHandler() {
+                        @Override
+                        public void requestCompleted(JSONObject jsonObject, AlgoliaException e) {
+                            listener.onSuccess();
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            // something went wrong
             listener.onFailure();
         }
     }
@@ -72,17 +75,11 @@ public class AlgoliaSearchProvider extends SearchProvider {
                 // to calling method
                 if (jsonObject != null && e == null) {
                     //results = resultsJsonParser.parseResults(jsonObject);
-                    List<PointOfInterest> results = parseResults(jsonObject);
-                    for (int i = 0; i < results.size(); i++) {
-                        listener.onSuccess(results.get(i));
-                    }
+                    List<String> results = parseResults(jsonObject);
+                    listener.onSuccess(results);
                 }
                 // When there is an exception
-                else if (e != null)
-                    listener.onFailure();
-                    // When no POI with matching name is found in Algolia
-                else
-                    listener.onDoesntExist();
+                else if (e != null) listener.onFailure();
             }
         });
     }
@@ -93,10 +90,19 @@ public class AlgoliaSearchProvider extends SearchProvider {
      * @param poi A Point of Interest to serialize
      * @return the POI in JSON object
      */
-    private JSONObject serializePOI(PointOfInterest poi) {
+    private JSONObject serializePOI(PointOfInterest poi) throws JSONException {
         assert (poi != null);
 
         JSONObject obj = new JSONObject();
+
+        obj.put("name", poi.name())
+                .put("latitude", poi.position().latitude())
+                .put("longitude", poi.position().longitude())
+                .put("fictions", new JSONArray(poi.fictions()))
+                .put("description", poi.description())
+                .put("rating", poi.rating())
+                .put("country", poi.country())
+                .put("city", poi.city());
 
         return obj;
     }

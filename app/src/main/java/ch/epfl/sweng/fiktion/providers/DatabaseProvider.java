@@ -1,5 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import java.util.List;
+
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -80,19 +82,14 @@ public abstract class DatabaseProvider {
     public interface PoiSearchByTextListener {
 
         /**
-         * what to do if the retrieval failed
          * what to do if the retrieval succeeds
          *
-         * @param poi the retrieved point of interest
+         * @param poiIDs the retrieved points of interest
          */
-        void onSuccess(PointOfInterest poi);
+        void onSuccess(List<String> poiIDs);
 
         /**
-         * what to do if no mathing point of interest is found
-         */
-        void onDoesntExist();
-
-        /**
+         * what to do if the retrieval fails
          */
         void onFailure();
     }
@@ -188,9 +185,11 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
-    public interface DeleteUserListener extends OperationOnExistingUserListener{}
+    public interface DeleteUserListener extends OperationOnExistingUserListener {
+    }
 
-    public interface ModifyUserListener extends OperationOnExistingUserListener{}
+    public interface ModifyUserListener extends OperationOnExistingUserListener {
+    }
 
     /**
      * add a user to the database, inform the listener of the result
@@ -203,7 +202,7 @@ public abstract class DatabaseProvider {
     /**
      * get the user associated to the id, inform the listener of the result
      *
-     * @param id the id
+     * @param id       the id
      * @param listener the listener
      */
     public abstract void getUserById(String id, final GetUserListener listener);
@@ -211,7 +210,7 @@ public abstract class DatabaseProvider {
     /**
      * delete the user associated to the id, inform the listener of the result
      *
-     * @param id the id
+     * @param id       the id
      * @param listener the listener
      */
     public abstract void deleterUserById(String id, final DeleteUserListener listener);
@@ -219,7 +218,7 @@ public abstract class DatabaseProvider {
     /**
      * modify the user, inform the listener of the result of the modification
      *
-     * @param user the user
+     * @param user     the user
      * @param listener the listener
      */
     public abstract void modifyUser(User user, final ModifyUserListener listener);
