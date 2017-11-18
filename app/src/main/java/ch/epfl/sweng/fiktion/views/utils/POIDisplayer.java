@@ -25,6 +25,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
  */
 
 public class POIDisplayer {
+    private static int IMAGE_SIZE = 250;
 
     /**
      * Creates a card view of a POI that can be dynamically added in any layout
@@ -56,12 +57,14 @@ public class POIDisplayer {
         ImageView img = new ImageView(ctx);
         // Get the image here
         Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.akibairl2);
+        // Scale it to avoid heavy computations
+        b = POIDisplayer.scaleBitmap(b, IMAGE_SIZE);
         // crop to a centered square, computed from the min(width, height) of the image
         b = POIDisplayer.cropBitmapToSquare(b);
         img.setImageBitmap(b);
         // Define size
-        img.setMaxHeight(250);
-        img.setMaxWidth(250);
+        img.setMaxHeight(IMAGE_SIZE);
+        img.setMaxWidth(IMAGE_SIZE);
         img.setAdjustViewBounds(true);
         img.setCropToPadding(false);
         // finally add to horizontal layout
@@ -119,6 +122,19 @@ public class POIDisplayer {
 
         // finally return the whole view
         return v;
+    }
+
+    /**
+     * Scales a bitmap given its min(width, length)
+     * @param b The bitmap to scale
+     * @param imageSize The length of the shortest size min(width, height)
+     * @return a bitmap which shortest side is scaled to imageSize
+     */
+    public static Bitmap scaleBitmap(Bitmap b, int imageSize) {
+        int min = Math.min(b.getWidth(), b.getHeight());
+        int x = (min == b.getWidth()) ? imageSize : b.getWidth()*imageSize/b.getHeight();
+        int y = (min == b.getHeight()) ? imageSize : b.getHeight()*imageSize/b.getWidth();
+        return Bitmap.createScaledBitmap(b, x, y, false);
     }
 
     /**
