@@ -18,7 +18,6 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 
 
-import static ch.epfl.sweng.fiktion.providers.Providers.algoliaSearchProvider;
 import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
