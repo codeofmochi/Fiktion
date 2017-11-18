@@ -54,7 +54,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         if(auth.isConnected()){
-            auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            auth.getCurrentUser(DatabaseSingleton.database,new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User currUser) {
                     user = currUser;

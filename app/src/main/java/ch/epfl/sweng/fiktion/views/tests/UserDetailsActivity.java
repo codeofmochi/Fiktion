@@ -13,6 +13,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
@@ -74,7 +75,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         if (auth.isConnected()) {
             Log.d(TAG, "Request for the currently  signed in user signed in");
             // Name, email address, and profile photo Url
-            auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User currUser) {
                     name = currUser.getName();

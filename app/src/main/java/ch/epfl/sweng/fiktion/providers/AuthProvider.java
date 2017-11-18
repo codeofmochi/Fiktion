@@ -48,10 +48,10 @@ public abstract class AuthProvider {
 
     /**
      * Creates a new account using the provided informations
-     *
+     * @param database where the user data is stored
      * @param password used to create the account
      */
-    public abstract void createUserWithEmailAndPassword(String email, String password, final AuthListener listener);
+    public abstract void createUserWithEmailAndPassword(DatabaseProvider database,String email, String password, final AuthListener listener);
 
     /**
      * Sends a password reset mail, defines what to do afterwards
@@ -76,10 +76,10 @@ public abstract class AuthProvider {
 
     /**
      * starts a request to database to have currently signed in User or null if there is not any
-     *
+     * @param database where the user data is stored
      * @param listener handles what to do after the request
      */
-    public abstract void getCurrentUser(DatabaseProvider.GetUserListener listener);
+    public abstract void getCurrentUser(DatabaseProvider database, DatabaseProvider.GetUserListener listener);
 
     /*
      * Enables the user to change his primary email
