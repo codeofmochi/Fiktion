@@ -63,7 +63,7 @@ public class FirebaseDatabaseUserTest {
 
     @Before
     public void setup() {
-        database = new FirebaseDatabaseProvider(dbRef, null);
+        database = new FirebaseDatabaseProvider(dbRef, null, null);
         result = NOTHING;
     }
 

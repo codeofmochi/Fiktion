@@ -76,7 +76,7 @@ public class FirebaseDatabasePOITest {
 
     @Before
     public void initializers() {
-        database = new FirebaseDatabaseProvider(dbRef, geofire);
+        database = new FirebaseDatabaseProvider(dbRef, geofire, null);
         result = NOTHING;
     }
 

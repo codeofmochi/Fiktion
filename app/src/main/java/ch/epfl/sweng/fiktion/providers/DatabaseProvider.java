@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import java.util.List;
-
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -58,10 +56,11 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+
     /**
-     * Listener that listens the results of searching near points of interest
+     * parent listener for searching points of interest
      */
-    public interface FindNearPoisListener {
+    public interface SearchPOIsListener {
 
         /**
          * what to do when we get a new near point of interest
@@ -77,21 +76,15 @@ public abstract class DatabaseProvider {
     }
 
     /**
-     * Listener that listens the results of searching by text from user
+     * Listener that listens the results of searching near points of interest
      */
-    public interface PoiSearchByTextListener {
+    public interface FindNearPoisListener extends SearchPOIsListener {
+    }
 
-        /**
-         * what to do if the retrieval succeeds
-         *
-         * @param poiIDs the retrieved points of interest
-         */
-        void onSuccess(List<String> poiIDs);
-
-        /**
-         * what to do if the retrieval fails
-         */
-        void onFailure();
+    /**
+     * Listener that  listens the results of searching points of interest by text
+     */
+    public interface SearchPOIByTextListener extends SearchPOIsListener {
     }
 
     /**
@@ -119,6 +112,15 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void findNearPois(Position pos, int radius, final FindNearPoisListener listener);
+
+    /**
+     * seach the points of interest that contain a text in one of their fields and "send" them to
+     * the listener
+     *
+     * @param text     the text we search
+     * @param listener the listener
+     */
+    public abstract void searchByText(String text, SearchPOIByTextListener listener);
 
     /**
      * Listener that listens the result of the addition of a user
@@ -164,9 +166,6 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
-    /**
-     * Listener that listens the result of the deletion of a user
-     */
     public interface OperationOnExistingUserListener {
 
         /**
@@ -185,9 +184,15 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    /**
+     * Listener that listens the result of the deletion of a user
+     */
     public interface DeleteUserListener extends OperationOnExistingUserListener {
     }
 
+    /**
+     * Listener that listens the result of the modification of a user
+     */
     public interface ModifyUserListener extends OperationOnExistingUserListener {
     }
 

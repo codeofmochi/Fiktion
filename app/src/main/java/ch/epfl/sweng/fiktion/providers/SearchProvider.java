@@ -14,16 +14,35 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 public abstract class SearchProvider {
 
     /**
-     * Adds a PointOfInterest object to searchable list
-     * @param pointOfInterest POI to add
+     * Listener that listens the results of searching by text from user
      */
-    public abstract void addPoi(PointOfInterest pointOfInterest, final DatabaseProvider.AddPoiListener listener);
+    public interface SearchPOIsByTextListener {
+
+        /**
+         * what to do if the retrieval succeeds
+         *
+         * @param poiIDs the retrieved points of interest
+         */
+        void onSuccess(List<String> poiIDs);
+
+        /**
+         * what to do if the retrieval fails
+         */
+        void onFailure();
+    }
 
     /**
+     * Adds a PointOfInterest object to searchable list
      *
-     * @param name query POI's that contains parameter in their names
+     * @param poi      POI to add
+     * @param listener listens the add result
+     */
+    public abstract void addPoi(PointOfInterest poi, DatabaseProvider.AddPoiListener listener);
+
+    /**
+     * @param text     query POI's that contains parameter in their names
      * @param listener listens to search process
      */
-    public abstract void searchByText(String name, final DatabaseProvider.PoiSearchByTextListener listener);
+    public abstract void searchByText(String text, SearchPOIsByTextListener listener);
 
 }

@@ -63,6 +63,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void searchByText(String text, SearchPOIByTextListener listener) {
+        for (PointOfInterest poi : poiList) {
+            if (poi.name().contains(text) ||
+                    poi.description().contains(text) ||
+                    poi.city().contains(text) ||
+                    poi.country().contains(text)) {
+                listener.onNewValue(poi);
+            }
+        }
+    }
+
+    /**
      * Returns the distance between two points with their latitude and longitude coordinates
      *
      * @param lat1  latitude of the first position
