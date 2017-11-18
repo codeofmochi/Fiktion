@@ -247,5 +247,4 @@ public class FirebaseDatabaseUserTest {
         vel.onCancelled(null);
         assertThat(result, is(FAILURE));
     }
-
 }
