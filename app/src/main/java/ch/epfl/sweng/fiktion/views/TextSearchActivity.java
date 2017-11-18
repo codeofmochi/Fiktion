@@ -1,15 +1,20 @@
 package ch.epfl.sweng.fiktion.views;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
-public class TextSearchActivity extends AppCompatActivity {
+public class TextSearchActivity extends MenuDrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        includeLayout = R.layout.activity_text_search;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_text_search);
+
+        // get search text
+        Intent i = getIntent();
+        String searchText = i.getStringExtra("SEARCH_TEXT");
     }
 }

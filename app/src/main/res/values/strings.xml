@@ -79,4 +79,5 @@
     <string name="user_profile_picture">User profile picture</string>
     <string name="location_post_photo">Location post photo</string>
     <string name="user_content_picture">User content picture</string>
+    <string name="search_hint">Search a place, movie, city, ...</string>
 </resources>

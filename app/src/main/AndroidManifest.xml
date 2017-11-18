@@ -91,7 +91,9 @@
         <activity
             android:name=".views.ProfileActivity"
             android:label="Profile" />
-        <activity android:name=".views.TextSearchActivity"></activity>
+        <activity
+            android:name=".views.TextSearchActivity"
+            android:label="Search" />
     </application>
 
 </manifest>
