@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,9 +23,11 @@ public class TextSearchActivity extends MenuDrawerActivity {
 
     private EditText searchField;
     private LinearLayout resultsList;
+    private ImageButton searchButton;
     private Context ctx = this;
     private TextView noResults;
     private final int SEARCH_TIMEOUT = 3000;
+    private final int BUTTON_TIMEOUT = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,9 @@ public class TextSearchActivity extends MenuDrawerActivity {
         // find no results text
         noResults = (TextView) findViewById(R.id.noResults);
 
+        // find search button
+        searchButton = (ImageButton) findViewById(R.id.searchButton);
+
         // search
         search(searchText);
     }
@@ -59,6 +65,18 @@ public class TextSearchActivity extends MenuDrawerActivity {
      * @param text the text to search POIs for
      */
     private void search(String text) {
+        // disable button for a short while to prevent spamming
+        searchButton.setEnabled(false);
+        new Handler().postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        searchButton.setEnabled(true);
+                    }
+                },
+                BUTTON_TIMEOUT
+        );
+
         // clear previous results
         if (resultsList.getChildCount() > 0) resultsList.removeAllViews();
         // check and alert if search field is empty
