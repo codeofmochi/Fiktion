@@ -36,6 +36,11 @@ public class AlgoliaSearchProvider extends SearchProvider {
         this.query.setAttributesToRetrieve("name");
     }
 
+    public AlgoliaSearchProvider(Index index) {
+        this.index = index;
+        this.query = new Query();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -62,9 +67,9 @@ public class AlgoliaSearchProvider extends SearchProvider {
      * {@inheritDoc}
      */
     @Override
-    public void searchByText(String name, final DatabaseProvider.PoiSearchByTextListener listener) {
+    public void searchByText(String text, final SearchPOIsByTextListener listener) {
         // Set query to input
-        query.setQuery(name);
+        query.setQuery(text);
 
         // Execute query on Algolia index
         index.searchAsync(query, new CompletionHandler() {

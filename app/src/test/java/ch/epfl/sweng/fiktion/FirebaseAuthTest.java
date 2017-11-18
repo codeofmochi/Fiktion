@@ -68,7 +68,7 @@ public class FirebaseAuthTest {
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
     private FirebaseAuthProvider auth;
-    private FirebaseDatabaseProvider database = new FirebaseDatabaseProvider(dbRef,geofire);
+    private FirebaseDatabaseProvider database = new FirebaseDatabaseProvider(dbRef, geofire, null);
 
     @Before
     public void setUp() {
@@ -96,7 +96,6 @@ public class FirebaseAuthTest {
         Mockito.when(taskVoidFailResult.addOnCompleteListener(testOnCompleteVoidListener.capture())).
                 thenReturn(taskVoidFailResult);
     }
-
 
 
     @Test
@@ -448,11 +447,10 @@ public class FirebaseAuthTest {
         assertThat(auth.isEmailVerified(), is(false));
 
 
-
     }
 
     @Test
-    public void testValidaters(){
+    public void testValidaters() {
         //validate email
         assertThat(auth.validateEmail(email), is(""));
         assertThat(auth.validateEmail("invalidemail"), is("Requires a valid email"));

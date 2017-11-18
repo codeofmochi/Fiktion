@@ -10,6 +10,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -22,15 +24,18 @@ import ch.epfl.sweng.fiktion.models.User;
 public class FirebaseDatabaseProvider extends DatabaseProvider {
     private DatabaseReference dbRef;
     private GeoFire geofire;
+    private SearchProvider searchProvider;
 
     public FirebaseDatabaseProvider() {
         dbRef = FirebaseDatabase.getInstance().getReference();
         geofire = new GeoFire(dbRef.child("geofire"));
+        searchProvider = new AlgoliaSearchProvider();
     }
 
-    public FirebaseDatabaseProvider(DatabaseReference dbRef, GeoFire geofire) {
+    public FirebaseDatabaseProvider(DatabaseReference dbRef, GeoFire geofire, SearchProvider searchProvider) {
         this.dbRef = dbRef;
         this.geofire = geofire;
+        this.searchProvider = searchProvider;
     }
 
     /**
@@ -55,11 +60,27 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     FirebasePointOfInterest fPoi = new FirebasePointOfInterest(poi);
                     poiRef.setValue(fPoi);
                     Position pos = poi.position();
-                    GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
+                    final GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
                     geofire.setLocation(poiName, geoLocation);
 
-                    // inform the listener that the operation succeeded
-                    listener.onSuccess();
+                    // add the poi also to the search provider
+                    searchProvider.addPoi(poi, new AddPoiListener() {
+                        @Override
+                        public void onSuccess() {
+                            listener.onSuccess();
+                        }
+
+                        @Override
+                        public void onAlreadyExists() {
+
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            poiRef.removeValue();
+                            geofire.removeLocation(poiName);
+                        }
+                    });
                 }
             }
 
@@ -152,6 +173,40 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onGeoQueryError(DatabaseError error) {
                 // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public void searchByText(String text, final SearchPOIByTextListener listener) {
+        // ask the search provider to retrieve the pois
+        searchProvider.searchByText(text, new SearchProvider.SearchPOIsByTextListener() {
+            @Override
+            public void onSuccess(List<String> poiIDs) {
+                for (String poiID : poiIDs) {
+                    getPoi(poiID, new GetPoiListener() {
+                        @Override
+                        public void onSuccess(PointOfInterest poi) {
+                            listener.onNewValue(poi);
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                        }
+
+                        @Override
+                        public void onFailure() {
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure() {
                 listener.onFailure();
             }
         });
