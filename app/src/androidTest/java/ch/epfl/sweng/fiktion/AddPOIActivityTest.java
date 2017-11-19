@@ -160,12 +160,14 @@ public class AddPOIActivityTest {
         addPoiLatitude.perform(typeText("15"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You can't enter an empty longitude")));
         addPoiLatitude.perform(clearText());
         addPoiLongitude.perform(typeText("30"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLatitude.check(matches(hasErrorText("You can't enter an empty latitude")));
     }
@@ -180,6 +182,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("220"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("The longitude must be in range [-180;180]")));
         addPoiLatitude.perform(clearText());
@@ -189,6 +192,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("60"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLatitude.check(matches(hasErrorText("The latitude must be in range [-90;90]")));
         addPoiLatitude.perform(clearText());
@@ -198,6 +202,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("60"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLatitude.check(matches(hasErrorText("The latitude must be in range [-90;90]")));
         addPoiLatitude.perform(clearText());
@@ -207,6 +212,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("-200"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("The longitude must be in range [-180;180]")));
     }
@@ -221,6 +227,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("1:2"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
         addPoiLatitude.check(matches(hasErrorText("You need to enter a number")));
@@ -231,6 +238,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("56!2"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
     }
@@ -245,6 +253,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         waitASecond();
         doesToastMatch("The Point of Interest poiTest4 was added !");
@@ -260,6 +269,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         waitASecond();
         doesToastMatch("The Point of Interest poiTest5 was added !");
@@ -271,6 +281,7 @@ public class AddPOIActivityTest {
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
         addPoiFinish.perform(click());
         waitASecond();
         doesToastMatch("The Point of Interest poiTest5 already exists !");
