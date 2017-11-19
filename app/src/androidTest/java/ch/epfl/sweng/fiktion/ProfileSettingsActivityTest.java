@@ -19,6 +19,7 @@ import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
 
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -54,7 +55,7 @@ public class ProfileSettingsActivityTest {
 
     @Before
     public void setVariables() {
-        AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database,new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
@@ -103,7 +104,7 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_email)).perform(click());
 
-        AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 assertThat(AuthSingleton.auth.getEmail(), is(newEmail));
@@ -128,7 +129,7 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_email)).perform(click());
 
-        AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 //assert that we can only write 15 characters
@@ -157,7 +158,7 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.update_new_name)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_name)).perform(click());
 
-        AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 //assert that we can only write 15 characters
@@ -190,7 +191,7 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.update_new_email)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.update_confirm_email)).perform(click());
 
-        AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 assertThat(user.getName(), is(newName));
@@ -222,7 +223,7 @@ public class ProfileSettingsActivityTest {
 
             @Override
             public void onFailure() {
-                AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+                AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
                     @Override
                     public void onSuccess(User user) {
                         Assert.fail();
@@ -297,7 +298,7 @@ public class ProfileSettingsActivityTest {
             @Override
             public void onSuccess() {
                 //we successfully deleted the account on the database
-                AuthSingleton.auth.createUserWithEmailAndPassword("new@email", "newpassword", new AuthProvider.AuthListener() {
+                AuthSingleton.auth.createUserWithEmailAndPassword(DatabaseSingleton.database, "new@email", "newpassword", new AuthProvider.AuthListener() {
                     @Override
                     public void onSuccess() {
                         //we try to send an email to a unverified account,

@@ -19,7 +19,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+
+import java.util.LinkedList;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
@@ -29,6 +34,9 @@ import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -68,14 +76,31 @@ public class FirebaseAuthTest {
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
     private FirebaseAuthProvider auth;
-    private FirebaseDatabaseProvider database = new FirebaseDatabaseProvider(dbRef,geofire);
+    @Mock
+    private FirebaseDatabaseProvider database;
+
+    private DatabaseProvider.AddUserListener addDatabaseListener;
+    private void setDBList(DatabaseProvider.AddUserListener listener) {
+        addDatabaseListener = listener;
+    }
+    private DatabaseProvider.GetUserListener getUserDatabaseListener;
+    private void setGetUserListener(DatabaseProvider.GetUserListener listener) {
+        getUserDatabaseListener = listener;
+    }
+
+    private enum Result {SUCCESS, FAILURE, DOESNOTEXIST, NOTHING}
+    private Result opResult;
+    private void setResult(Result result) {
+        opResult = result;
+    }
+
+
 
     @Before
     public void setUp() {
         auth = new FirebaseAuthProvider(fbAuth);
-        //DatabaseSingleton.database = database;
         setTasks();
-
+        opResult = Result.NOTHING;
     }
 
     private void setTasks() {
@@ -96,8 +121,6 @@ public class FirebaseAuthTest {
         Mockito.when(taskVoidFailResult.addOnCompleteListener(testOnCompleteVoidListener.capture())).
                 thenReturn(taskVoidFailResult);
     }
-
-
 
     @Test
     public void testDoesntExistDeleteAccount() {
@@ -350,7 +373,7 @@ public class FirebaseAuthTest {
     @Test
     public void failCreateUser() {
         Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthFailResult);
-        auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
+        auth.createUserWithEmailAndPassword(database, email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -407,7 +430,7 @@ public class FirebaseAuthTest {
         Mockito.doNothing().when(fbAuth).signOut();
         auth.signOut();
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
-        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 Assert.fail();
@@ -462,4 +485,78 @@ public class FirebaseAuthTest {
         assertThat(auth.validatePassword("1234"), is("Password must be at least 6 characters"));
     }
 
+    @Test
+    public void testCreateAccountSuccessDatabase(){
+
+        Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthSucceedResult);
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                setDBList((DatabaseProvider.AddUserListener) invocation.getArgument(1));
+                return null;
+            }
+        }).when(database).addUser(any(User.class), any(DatabaseProvider.AddUserListener.class));
+
+        AuthProvider.AuthListener testListener = new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                setResult(Result.SUCCESS);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(Result.FAILURE);
+            }
+        };
+        auth.createUserWithEmailAndPassword(database, email, password, testListener);
+        testOnCompleteAuthListener.getValue().onComplete(taskAuthSucceedResult);
+
+        addDatabaseListener.onSuccess();
+        assertThat(opResult, is(Result.SUCCESS));
+        addDatabaseListener.onFailure();
+        assertThat(opResult, is(Result.FAILURE));
+        addDatabaseListener.onAlreadyExists();
+        assertThat(opResult, is(Result.FAILURE));
+
+    }
+
+    @Test
+    public void testGetUser(){
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                 setGetUserListener((DatabaseProvider.GetUserListener) invocation.getArgument(1));
+                return null;
+            }
+        }).when(database).getUserById(any(String.class), any(DatabaseProvider.GetUserListener.class));
+
+        DatabaseProvider.GetUserListener testListener = new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setResult(Result.SUCCESS);
+            }
+
+            @Override
+            public void onDoesntExist() {
+                setResult(Result.DOESNOTEXIST);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(Result.FAILURE);
+            }
+        };
+        Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
+        Mockito.when(fbUser.getUid()).thenReturn("id");
+        auth.getCurrentUser(database, testListener );
+
+        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>(), new TreeSet<String>(),new LinkedList<String>()));
+        assertThat(opResult, is(Result.SUCCESS));
+        getUserDatabaseListener.onDoesntExist();
+        assertThat(opResult, is(Result.DOESNOTEXIST));
+        getUserDatabaseListener.onFailure();
+        assertThat(opResult, is(Result.FAILURE));
+    }
 }
