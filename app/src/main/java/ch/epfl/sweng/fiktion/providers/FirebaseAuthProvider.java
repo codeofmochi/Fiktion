@@ -8,6 +8,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.User;
@@ -159,7 +160,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             //need to create user in our database
 
                             DatabaseSingleton.database
-                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(), new TreeSet<String>()),
+                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>()),
                                             new DatabaseProvider.AddUserListener() {
                                                 @Override
                                                 public void onSuccess() {
