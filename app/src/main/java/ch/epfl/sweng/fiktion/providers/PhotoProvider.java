@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
  * @author Pedro Da Cunha
  */
 public abstract class PhotoProvider {
+    public static int ALL_PHOTOS = 0;
 
     /**
      * Listener that listens the status of a photo upload
@@ -61,11 +62,11 @@ public abstract class PhotoProvider {
     public abstract void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPhotoListener listener);
 
     /**
-     * download the photos associated to a poi, convert them into a bitmap and send them to the
-     * listener
+     * download the bitmaps associated to a poi and send them to the listener
      *
-     * @param poiName  the name of the poi
-     * @param listener the listener
+     * @param poiName         the name of the poi
+     * @param numberOfBitmaps the number of bitmaps to download, ALL_PHOTOS for all the photos
+     * @param listener        the listener
      */
-    public abstract void downloadPOIBitmaps(String poiName, DownloadBitmapListener listener);
+    public abstract void downloadPOIBitmaps(String poiName, int numberOfBitmaps, DownloadBitmapListener listener);
 }

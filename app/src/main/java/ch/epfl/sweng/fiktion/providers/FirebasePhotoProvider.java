@@ -11,6 +11,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -103,7 +105,21 @@ public class FirebasePhotoProvider extends PhotoProvider {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // store the photo name in the database so that we can retrieve it
-                dbRef.child("Photo references").child(poiName).child(finalPhotoName).setValue(true);
+                final DatabaseReference dbPOIRef = dbRef.child("Photo references").child(poiName);
+                dbPOIRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String index = String.valueOf(dataSnapshot.getChildrenCount());
+
+                        dbPOIRef.child(index).setValue(finalPhotoName);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 // inform the listener that the upload succeeded
                 listener.onSuccess();
@@ -131,14 +147,20 @@ public class FirebasePhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void downloadPOIBitmaps(final String poiName, final DownloadBitmapListener listener) {
+    public void downloadPOIBitmaps(final String poiName, int numberOfBitmaps, final DownloadBitmapListener listener) {
+        assert numberOfBitmaps >= 0;
+
         // first, get the reference of the poi and listen for its photo references
-        DatabaseReference poiRef = dbRef.child("Photo references").child(poiName);
-        poiRef.addChildEventListener(new ChildEventListener() {
+        Query query = dbRef.child("Photo references").child(poiName).orderByKey();
+
+        if (numberOfBitmaps > 0)
+            // limit the number of photo references
+            query = query.limitToFirst(numberOfBitmaps);
+        query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // For every photo name, download the associated photo from firebase
-                String photoName = dataSnapshot.getKey() + ".jpg";
+                String photoName = dataSnapshot.getValue() + ".jpg";
                 StorageReference photoRef = stRef.child("Points of interest").child(poiName).child(photoName);
                 photoRef.getBytes(MAXIMUM_SIZE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
@@ -153,24 +175,20 @@ public class FirebasePhotoProvider extends PhotoProvider {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-
                     }
                 });
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
