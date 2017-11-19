@@ -23,6 +23,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.User;
@@ -551,7 +552,7 @@ public class FirebaseAuthTest {
         Mockito.when(fbUser.getUid()).thenReturn("id");
         auth.getCurrentUser(database, testListener );
 
-        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>(), new TreeSet<String>()));
+        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>(), new TreeSet<String>(),new LinkedList<String>()));
         assertThat(opResult, is(Result.SUCCESS));
         getUserDatabaseListener.onDoesntExist();
         assertThat(opResult, is(Result.DOESNOTEXIST));
