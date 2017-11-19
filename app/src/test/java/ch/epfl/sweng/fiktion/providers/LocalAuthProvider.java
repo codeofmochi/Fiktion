@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -13,7 +14,7 @@ import ch.epfl.sweng.fiktion.models.User;
  */
 
 public class LocalAuthProvider extends AuthProvider {
-    private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>());
+    private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
     private final String defaultEmail = "default@email.ch";
     private final List<User> userList = new ArrayList<>
             (Collections.singletonList(defaultUser));
@@ -38,7 +39,7 @@ public class LocalAuthProvider extends AuthProvider {
         if (mailList.contains(email)
                 && password.equals("testing")) {
             listener.onSuccess();
-            currUser = new User("", "defaultID",new TreeSet<String>(), new TreeSet<String>());
+            currUser = new User("", "defaultID",new TreeSet<String>(), new TreeSet<String>(),new LinkedList<String>());
             signedIn = true;
             currentUserEmail = email;
         } else {
@@ -99,9 +100,9 @@ public class LocalAuthProvider extends AuthProvider {
      * @param listener that knows what to do with the results
      */
     @Override
-    public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
+    public void createUserWithEmailAndPassword(DatabaseProvider database, String email, String password, AuthListener listener) {
 
-        User newUser = new User("new", "newID", new TreeSet<String>(), new TreeSet<String>());
+        User newUser = new User("new", "newID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
         if (mailList.contains(email)) {
             listener.onFailure();
         } else {
@@ -157,7 +158,7 @@ public class LocalAuthProvider extends AuthProvider {
      * @param listener handles what to do after the request
      */
     @Override
-    public void getCurrentUser(DatabaseProvider.GetUserListener listener) {
+    public void getCurrentUser(DatabaseProvider database, DatabaseProvider.GetUserListener listener) {
         if (isConnected()) {
             listener.onSuccess(currUser);
         } else {

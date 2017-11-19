@@ -12,6 +12,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -40,7 +41,7 @@ public class UserDetailsActivityTest {
 
     @Before
     public void setVariables(){
-        AuthSingleton.auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(new LocalDatabaseProvider(), new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
                 user=currUser;

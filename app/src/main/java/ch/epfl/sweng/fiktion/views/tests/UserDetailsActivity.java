@@ -94,6 +94,14 @@ public class UserDetailsActivity extends AppCompatActivity {
         new_favourite_input = (EditText) findViewById(R.id.user_detail_addFav_text);
         new_wish_input = (EditText) findViewById(R.id.user_details_addWish_text);
 
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "Started UserDetailsActivity");
+
         //initalize lists
 
         favAdapter = new ArrayAdapter<>(this.getApplicationContext(), android.R.layout.simple_list_item_1);
@@ -103,19 +111,12 @@ public class UserDetailsActivity extends AppCompatActivity {
         wishListView = (ListView) findViewById(R.id.user_details_wishlist_list);
         favouritesListView.setAdapter(favAdapter);
         wishListView.setAdapter(wishAdapter);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d(TAG, "Started UserDetailsActivity");
-
         //initialise user details
 
         if (auth.isConnected()) {
             Log.d(TAG, "Request for the currently  signed in user signed in");
             // Name, email address, and profile photo Url
-            auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User currUser) {
                     name = currUser.getName();

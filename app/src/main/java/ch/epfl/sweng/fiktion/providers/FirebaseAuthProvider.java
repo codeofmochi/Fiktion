@@ -8,6 +8,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.User;
@@ -147,8 +148,9 @@ public class FirebaseAuthProvider extends AuthProvider {
      * @param password used to create the account
      */
     @Override
-    public void createUserWithEmailAndPassword(
-            String email, String password, final AuthListener listener) {
+    public void createUserWithEmailAndPassword(final DatabaseProvider database,
+                                               String email, String password,
+                                               final AuthListener listener) {
         //create user in FirebaseAuthentication
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -158,15 +160,15 @@ public class FirebaseAuthProvider extends AuthProvider {
                             // Account creation was successful in FirebaseAuthentication
                             //need to create user in our database
 
-                            DatabaseSingleton.database
-                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(), new TreeSet<String>()),
+                            database
+                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(),
+                                                    new TreeSet<String>(), new LinkedList<String>()),
                                             new DatabaseProvider.AddUserListener() {
                                                 @Override
                                                 public void onSuccess() {
                                                     user = auth.getCurrentUser();
                                                     listener.onSuccess();
                                                 }
-
 
                                                 @Override
                                                 public void onAlreadyExists() {
@@ -180,7 +182,6 @@ public class FirebaseAuthProvider extends AuthProvider {
                                                 }
                                             });
 
-                            listener.onSuccess();
                         } else {
                             // Account creation failed
                             listener.onFailure();
@@ -260,10 +261,10 @@ public class FirebaseAuthProvider extends AuthProvider {
      * Starts request to retrieve currently signed in User or null if there is not any
      */
     @Override
-    public void getCurrentUser(final DatabaseProvider.GetUserListener listener) {
+    public void getCurrentUser(DatabaseProvider database, final DatabaseProvider.GetUserListener listener) {
         user = auth.getCurrentUser();
         if (user != null) {
-            DatabaseSingleton.database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
+            database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     listener.onSuccess(user);
