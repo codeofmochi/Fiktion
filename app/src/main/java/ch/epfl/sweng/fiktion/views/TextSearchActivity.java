@@ -56,7 +56,9 @@ public class TextSearchActivity extends MenuDrawerActivity {
         searchButton = (ImageButton) findViewById(R.id.searchButton);
 
         // search
-        if (!searchText.isEmpty()) search(searchText);
+        if (searchText != null && !searchText.isEmpty()) {
+            search(searchText);
+        }
     }
 
     /**
@@ -82,7 +84,7 @@ public class TextSearchActivity extends MenuDrawerActivity {
         // check and alert if search field is empty
         if (text.isEmpty()) {
             searchField.setError(getString(R.string.empty_search));
-            Toast.makeText(ctx, "Search field is empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, getString(R.string.empty_search), Toast.LENGTH_SHORT).show();
             return;
         }
 
