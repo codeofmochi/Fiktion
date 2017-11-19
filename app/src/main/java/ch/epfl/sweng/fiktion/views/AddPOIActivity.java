@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -27,9 +28,10 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private final Set<String> fictionSet = new TreeSet<>();
     // Displayed fiction list (as a big string)
     private String fictionListText = "";
-
     // intent result codes
     private static final int LOCATION_RESULT = 1;
+    // this activity's context
+    private Context ctx = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,25 +172,22 @@ public class AddPOIActivity extends MenuDrawerActivity {
             database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
-                    showToast("The Point of Interest " + name + " was added !");
-                    ((TextView) findViewById(R.id.add_poi_fiction_list)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_name)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_description)).setText("");
-                    fictionSet.clear();
-                    fictionListText = "";
+                    showToast("The place " + name + " was successfully added");
+                    // show newly created POI
+                    Intent i = new Intent(ctx, POIPageActivity.class);
+                    i.putExtra("POI_NAME", name);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
                 }
 
                 @Override
                 public void onAlreadyExists() {
-                    showToast("The Point of Interest " + name + " already exists !");
+                    showToast("The place named " + name + " already exists !");
                 }
 
                 @Override
                 public void onFailure() {
-                    showToast("Failed to add " + name + " !");
+                    showToast("An error occured while adding " + name + " : please try again later");
                 }
             });
         }

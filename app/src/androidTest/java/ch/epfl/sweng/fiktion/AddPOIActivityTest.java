@@ -6,6 +6,7 @@ import android.support.test.espresso.action.GeneralLocation;
 import android.support.test.espresso.action.GeneralSwipeAction;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
+import android.support.test.espresso.intent.Intents;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.BeforeClass;
@@ -19,6 +20,7 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
+import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
@@ -26,6 +28,8 @@ import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.intent.Intents.intended;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -245,6 +249,7 @@ public class AddPOIActivityTest {
 
     @Test
     public void succeedsOnCorrectInputsTest() {
+        Intents.init();
         closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest4"));
         closeSoftKeyboard();
@@ -255,13 +260,30 @@ public class AddPOIActivityTest {
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
         addPoiFinish.perform(click());
-        waitASecond();
-        doesToastMatch("The Point of Interest poiTest4 was added !");
+        onView(withId(R.id.menu_scroll)).perform(swipeUpCenterTopFast());
+        onView(withId(R.id.title)).check(matches(withText("poiTest4")));
     }
 
     @Test
     public void failsOnAddingTwiceTest() {
-        closeSoftKeyboard();
+        database.addPoi(
+                new PointOfInterest("poiTest5", new Position(0, 0), new TreeSet<String>(), "", 0, "", ""),
+                new DatabaseProvider.AddPoiListener() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onAlreadyExists() {
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
         addPoiName.perform(typeText("poiTest5"));
         closeSoftKeyboard();
         addPoiLatitude.perform(typeText("45"));
@@ -272,19 +294,7 @@ public class AddPOIActivityTest {
         closeSoftKeyboard();
         addPoiFinish.perform(click());
         waitASecond();
-        doesToastMatch("The Point of Interest poiTest5 was added !");
-        addPoiScroll.perform(swipeDownCenterBottomFast());
-        addPoiName.perform(typeText("poiTest5"));
-        closeSoftKeyboard();
-        addPoiLatitude.perform(typeText("45"));
-        closeSoftKeyboard();
-        addPoiLongitude.perform(typeText("90"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        closeSoftKeyboard();
-        addPoiFinish.perform(click());
-        waitASecond();
-        doesToastMatch("The Point of Interest poiTest5 already exists !");
+        doesToastMatch("The place named poiTest5 already exists !");
     }
 
     @Test
