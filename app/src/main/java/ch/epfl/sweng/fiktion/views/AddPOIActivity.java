@@ -32,6 +32,9 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private static final int LOCATION_RESULT = 1;
     // this activity's context
     private Context ctx = this;
+    // error messages
+    private final String ERR_STRING_FORMAT = "Those characters are not accepted: . $ # [ ] /";
+    private final String ILLEGAL_CHARS_REGEX = ".*[.$#/\\[\\]].*";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,9 +97,9 @@ public class AddPOIActivity extends MenuDrawerActivity {
         if (fiction.isEmpty()) {
             // warning message if no text was entered
             ((EditText) findViewById(R.id.add_poi_fiction)).setError("You can't enter an empty fiction name");
-        } else if (fiction.matches(".*[.$#/\\[\\]].*")) {
+        } else if (fiction.matches(ILLEGAL_CHARS_REGEX)) {
             // warning message if unaccepted characters are present
-            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Those characters are not accepted: . $ # [ ] /");
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError(ERR_STRING_FORMAT);
         } else {
             if (!fictionSet.contains(fiction)) {
                 fictionSet.add(fiction);
@@ -122,6 +125,8 @@ public class AddPOIActivity extends MenuDrawerActivity {
         final String longitudeString = ((EditText) findViewById(R.id.add_poi_longitude)).getText().toString();
         final String latitudeString = ((EditText) findViewById(R.id.add_poi_latitude)).getText().toString();
         final String description = ((EditText) findViewById(R.id.add_poi_description)).getText().toString();
+        final String city = ((EditText) findViewById(R.id.add_poi_city)).getText().toString();
+        final String country = ((EditText) findViewById(R.id.add_poi_country)).getText().toString();
         double longitude = 0.0;
         double latitude = 0.0;
 
@@ -131,9 +136,26 @@ public class AddPOIActivity extends MenuDrawerActivity {
             ((EditText) findViewById(R.id.add_poi_name)).setError("You can't enter an empty point of interest name");
             isCorrect = false;
         }
+        if (name.matches(ILLEGAL_CHARS_REGEX)) {
+            ((EditText) findViewById(R.id.add_poi_name)).setError(ERR_STRING_FORMAT);
+            isCorrect = false;
+        }
 
-        if (name.matches(".*[.$#/\\[\\]].*")) {
-            ((EditText) findViewById(R.id.add_poi_name)).setError("Those characters are not accepted: . $ # [ ] /");
+        if (city.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_city)).setError("City cannot be empty");
+            isCorrect = false;
+        }
+        if (city.matches(ILLEGAL_CHARS_REGEX)) {
+            ((EditText) findViewById(R.id.add_poi_city)).setError(ERR_STRING_FORMAT);
+            isCorrect = false;
+        }
+
+        if (country.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_country)).setError("Country cannot be empty");
+            isCorrect = false;
+        }
+        if (country.matches(ILLEGAL_CHARS_REGEX)) {
+            ((EditText) findViewById(R.id.add_poi_country)).setError(ERR_STRING_FORMAT);
             isCorrect = false;
         }
 

@@ -79,6 +79,8 @@ public class AddPOIActivityTest {
     private final ViewInteraction addWikiButton = onView(withId(R.id.position_wiki));
     private final ViewInteraction wikiURL = onView(withId(R.id.wikipedia_url));
     private final ViewInteraction wikiGetButton = onView(withId(R.id.get_coordinates));
+    private final ViewInteraction addPoiCity = onView(withId(R.id.add_poi_city));
+    private final ViewInteraction addPoiCountry = onView(withId(R.id.add_poi_country));
 
     private void doesToastMatch(String s) {
         onView(withText(s)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
@@ -148,6 +150,108 @@ public class AddPOIActivityTest {
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
         addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+    }
+
+    @Test
+    public void failsWithWrongCityTest() {
+        ViewInteraction field = onView(withId(R.id.add_poi_city));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("City cannot be empty")));
+        field.perform(clearText());
+
+        field.perform(typeText("."));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("$"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("#"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("["));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("]"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("/"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+    }
+
+    @Test
+    public void failsWithWrongCountryTest() {
+        ViewInteraction field = onView(withId(R.id.add_poi_country));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Country cannot be empty")));
+        field.perform(clearText());
+
+        field.perform(typeText("."));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("$"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("#"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("["));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("]"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        field.perform(clearText());
+
+        field.perform(typeText("/"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        addPoiFinish.perform(click());
+        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
@@ -252,6 +356,10 @@ public class AddPOIActivityTest {
         closeSoftKeyboard();
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
+        addPoiCity.perform(typeText("city"));
+        closeSoftKeyboard();
+        addPoiCountry.perform(typeText("country"));
+        closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
         addPoiFinish.perform(click());
@@ -284,6 +392,10 @@ public class AddPOIActivityTest {
         addPoiLatitude.perform(typeText("45"));
         closeSoftKeyboard();
         addPoiLongitude.perform(typeText("90"));
+        closeSoftKeyboard();
+        addPoiCity.perform(typeText("city"));
+        closeSoftKeyboard();
+        addPoiCountry.perform(typeText("country"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
