@@ -37,7 +37,13 @@ public class AddPOIActivity extends MenuDrawerActivity {
         super.onCreate(savedInstanceState);
     }
 
-    // get the coordinates from the child GetLocationFromMapActivity
+    /**
+     * Triggered when an activity launched from here returns a value
+     *
+     * @param requestCode The code of the request
+     * @param resultCode  The code of the result
+     * @param data        the intent from which the result comes from
+     */
     @Override
     @SuppressLint("SetTextI18n") // latitude and longitude are inputs, not hardcoded
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -53,17 +59,34 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
     }
 
+    /**
+     * Triggered when the "From Map" button is clicked
+     * Launches a map activity to select a location
+     *
+     * @param view caller view
+     */
     public void startGetLocationFromMapActivity(View view) {
         Intent i = new Intent(this, GetLocationFromMapActivity.class);
         startActivityForResult(i, LOCATION_RESULT);
     }
 
+    /**
+     * Triggered when the "From wiki linK" button is clicked
+     * Launches a wikipedia link retriever activity to get coordinates
+     *
+     * @param view caller view
+     */
     public void startGetLocationFromWikipedia(View view) {
         Intent i = new Intent(this, GetLocationFromWikipediaActivity.class);
         startActivityForResult(i, LOCATION_RESULT);
     }
 
-    // Adds fictions to the fictions list and display them in a view, checks some bad inputs (empty, etc...)
+    /**
+     * Triggered when the "Add" fiction button is clicked
+     * Adds fictions to the fictions list and display them in a view, checks some bad inputs (empty, etc...)
+     *
+     * @param view caller view
+     */
     public void addFiction(View view) {
         final String fiction = ((EditText) findViewById(R.id.add_poi_fiction)).getText().toString();
         if (fiction.isEmpty()) {
@@ -86,6 +109,12 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
     }
 
+    /**
+     * Triggered by the "save this place" button
+     * Gather all data in fields to create and send a correct POI to the database
+     *
+     * @param view the caller view
+     */
     public void createAndSendPoi(View view) {
         final String name = ((EditText) findViewById(R.id.add_poi_name)).getText().toString();
         final String longitudeString = ((EditText) findViewById(R.id.add_poi_longitude)).getText().toString();
