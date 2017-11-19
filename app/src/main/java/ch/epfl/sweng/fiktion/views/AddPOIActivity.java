@@ -190,7 +190,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
             }
         }
         if (isCorrect) {
-            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, "", "");
+            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
             database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
