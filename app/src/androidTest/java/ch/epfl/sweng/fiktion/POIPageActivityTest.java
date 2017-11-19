@@ -44,6 +44,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static ch.epfl.sweng.fiktion.providers.AuthSingleton.auth;
 import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
+import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
@@ -115,12 +116,12 @@ public class POIPageActivityTest {
         // Build a result to return from the Camera app
         // this tells Espresso to respond with this instead of camera
         intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
-        
+
         onView(withText("Camera")).perform(click());
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
-        photoProvider.downloadPOIBitmaps("poiTest", PhotoProvider.ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        photoProvider.downloadPOIBitmaps("poiTest", ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
                 bitmaps.add(b);
