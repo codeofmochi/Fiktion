@@ -1,6 +1,8 @@
 package ch.epfl.sweng.fiktion.models;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -20,6 +22,40 @@ public class User {
     private TreeSet<String> favourites;
     private TreeSet<String> wishlist;
     //private Set<String> rated;
+    private TreeSet<String> friendlist;
+
+    /**
+     * Creates a new User with given paramaters
+     *
+     * @param input_name Username
+     * @param input_id   User id
+     * @param favs list of favourite POIs
+     * @param wishes POIs wish list
+     * @param friends User friend list
+     */
+    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, TreeSet<String> friends) {
+        name = input_name;
+        id = input_id;
+        favourites = favs;
+        wishlist = wishes;
+        friendlist = friends;
+    }
+
+    /**
+     * Creates a new User with given paramaters
+     *
+     * @param input_name Username
+     * @param input_id   User id
+     * @param favs list of favourite POIs
+     * @param wishes POIs wish list
+     */
+    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes) {
+        name = input_name;
+        id = input_id;
+        favourites = favs;
+        wishlist = wishes;
+        friendlist = new TreeSet<>();
+    }
 
     /**
      * Creates a new User with given paramaters
@@ -27,11 +63,12 @@ public class User {
      * @param input_name Username
      * @param input_id   User id
      */
-    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes) {
+    public User(String input_name, String input_id) {
         name = input_name;
         id = input_id;
-        favourites = favs;
-        wishlist = wishes;
+        favourites = new TreeSet<>();
+        wishlist = new TreeSet<>();
+        friendlist = new TreeSet<>();
     }
 
     /**
@@ -213,16 +250,23 @@ public class User {
     }
 
     /**
-     * @return the user set with his favourite POI's IDs
+     * @return the user's favorite POI's IDs as a set (favourites)
      */
     public Set<String> getFavourites() {
         return Collections.unmodifiableSet(new TreeSet<>(favourites));
     }
 
     /**
-     * @return the user set with his wished POI's IDs
+     * @return the user's wished POI's IDs as a set (wishlist)
      */
     public Set<String> getWishlist() {
         return Collections.unmodifiableSet(new TreeSet<>(wishlist));
+    }
+
+    /**
+     * @return the user's friends IDs as a set (friendlist)
+     */
+    public Set<String> getFriendlist() {
+        return Collections.unmodifiableSet(new TreeSet<>(friendlist));
     }
 }
