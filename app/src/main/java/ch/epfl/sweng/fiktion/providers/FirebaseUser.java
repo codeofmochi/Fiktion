@@ -1,5 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -17,6 +19,7 @@ public class FirebaseUser {
     public String id = "";
     public Map<String, Boolean> favourites = new TreeMap<>();
     public Map<String, Boolean> wishlist = new TreeMap<>();
+    public Map<String, Boolean> visited = new LinkedHashMap<>();
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebaseUser.class)
@@ -47,6 +50,8 @@ public class FirebaseUser {
      * @return the user
      */
     public User toUser() {
-        return new User(name, id, new TreeSet<>(favourites.keySet()), new TreeSet<>(wishlist.keySet()));
+        return new User(name, id, new TreeSet<>(favourites.keySet()),
+                new TreeSet<>(wishlist.keySet()),
+                new LinkedList<>(visited.keySet()));
     }
 }
