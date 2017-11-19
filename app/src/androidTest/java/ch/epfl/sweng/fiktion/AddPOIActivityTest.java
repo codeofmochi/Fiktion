@@ -6,7 +6,6 @@ import android.support.test.espresso.action.GeneralLocation;
 import android.support.test.espresso.action.GeneralSwipeAction;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
-import android.support.test.espresso.intent.Intents;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.BeforeClass;
@@ -246,7 +245,6 @@ public class AddPOIActivityTest {
 
     @Test
     public void succeedsOnCorrectInputsTest() {
-        Intents.init();
         closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest4"));
         closeSoftKeyboard();
