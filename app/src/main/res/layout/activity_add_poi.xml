@@ -27,12 +27,12 @@
                 android:layout_width="60dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="22dp"
-                android:layout_marginTop="46dp"
+                android:layout_marginTop="48dp"
                 android:background="@color/colorPrimary"
                 android:onClick="addFiction"
                 android:text="@string/add"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -70,7 +70,7 @@
                         android:ems="10"
                         android:hint="@string/add_poi_name"
                         android:inputType="text"
-                        android:textSize="14sp" />
+                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -91,9 +91,9 @@
                         android:layout_weight="2"
                         android:ems="10"
                         android:hint="@string/add_poi_fiction"
-                        android:inputType="textPersonName"
+                        android:inputType="text"
                         android:paddingEnd="70dp"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         tools:ignore="RtlSymmetry" />
 
                 </LinearLayout>
@@ -103,11 +103,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:textSize="14sp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:layout_marginTop="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/text_border_bottom"
                     android:text="@string/Position"
@@ -117,8 +118,8 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
                     android:orientation="horizontal">
 
                     <Button
@@ -176,8 +177,8 @@
                         android:layout_weight="2"
                         android:ems="10"
                         android:hint="@string/latitude_example"
-                        android:inputType="textPersonName"
-                        android:textSize="14sp" />
+                        android:inputType="text"
+                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -198,28 +199,85 @@
                         android:layout_weight="2"
                         android:ems="10"
                         android:hint="@string/longitude_example"
-                        android:inputType="textPersonName"
-                        android:textSize="14sp" />
+                        android:inputType="text"
+                        android:textSize="15sp" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/City" />
+
+                    <EditText
+                        android:id="@+id/add_poi_city"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:ems="10"
+                        android:hint="@string/city_example"
+                        android:inputType="text"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/Country" />
+
+                    <EditText
+                        android:id="@+id/add_poi_country"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:ems="10"
+                        android:hint="@string/country_example"
+                        android:inputType="text"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/text_border_bottom"
+                    android:text="@string/Description"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/add_poi_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="#EEEEFF"
                     android:ems="10"
                     android:hint="@string/add_description_to_point"
                     android:inputType="textMultiLine"
-                    android:padding="10dp"
-                    android:textSize="14sp" />
+                    android:textSize="15sp" />
 
                 <Button
                     android:id="@+id/add_poi_finish"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/colorPrimary"
+                    android:elevation="2dp"
                     android:onClick="createAndSendPoi"
-                    android:text="@string/add_point" />
+                    android:text="@string/add_point"
+                    android:textColor="@color/white" />
 
             </LinearLayout>
 

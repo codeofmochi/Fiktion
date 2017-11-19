@@ -18,9 +18,9 @@
     <string name="add_poi_position">Add a Position</string>
     <string name="latitude">latitude</string>
     <string name="longitude">longitude</string>
-    <string name="choose_position_on_map">Choose from map</string>
-    <string name="add_description_to_point">Add a description to the Point</string>
-    <string name="add_point">Add this Point !</string>
+    <string name="choose_position_on_map">From map / you</string>
+    <string name="add_description_to_point">An inspiring text describing this place (can be several lines long, don\'t be shy)…</string>
+    <string name="add_point">Save this place!</string>
     <string name="default_search_radius">50</string>
     <string name="find_near_places">Find near places !</string>
     <string name="set_search_radius">Set your search Radius</string>
@@ -85,4 +85,9 @@
     <string name="longitude_example">ex: 139.7722703</string>
     <string name="Longitude">Longitude</string>
     <string name="Position">Position</string>
+    <string name="City">City</string>
+    <string name="city_example">ex: Tokyo</string>
+    <string name="Country">Country</string>
+    <string name="country_example">ex: Japan</string>
+    <string name="Description">Description</string>
 </resources>
