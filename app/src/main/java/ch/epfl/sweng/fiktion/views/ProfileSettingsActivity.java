@@ -54,7 +54,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         if(auth.isConnected()){
-            auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+            auth.getCurrentUser(DatabaseSingleton.database,new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User currUser) {
                     user = currUser;
@@ -138,6 +138,9 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess() {
                     findViewById(R.id.update_confirm_name).setEnabled(true);
+                    Toast.makeText(ProfileSettingsActivity.this,
+                            "Username updated to : "+newName,
+                            Toast.LENGTH_SHORT).show();
                 }
 
                 @Override

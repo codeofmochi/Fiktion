@@ -11,6 +11,7 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 
 /**
  * This activity enables the user to create a new account using its email and password
@@ -76,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
         Log.d(TAG, "Credentials are valid");
 
-        AuthSingleton.auth.createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
+        AuthSingleton.auth.createUserWithEmailAndPassword(DatabaseSingleton.database,email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 //account creation was successful

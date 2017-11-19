@@ -14,6 +14,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.User;
@@ -40,7 +41,7 @@ import static org.mockito.Mockito.doAnswer;
 @RunWith(MockitoJUnitRunner.class)
 public class UserTest {
 
-    private final User user = new User("default", "defaultID", new TreeSet<String>());
+    private User user;
     private DatabaseProvider localDB = new LocalDatabaseProvider();
     private DatabaseProvider.ModifyUserListener dbListener;
 
@@ -64,16 +65,15 @@ public class UserTest {
     DatabaseReference dbRef, usersRef, userRef;
     @Mock
     DatabaseProvider dbp;
-
     @Mock
     GeoFire geofire;
-
     @Mock
     DataSnapshot snapshot;
 
     public enum Result {SUCCESS, FAILURE, NOTHING}
 
     private UserTest.Result result;
+
     private void setResult(UserTest.Result result) {
         this.result = result;
     }
@@ -82,6 +82,7 @@ public class UserTest {
     public void setUp() {
         localDB = new LocalDatabaseProvider();
         result = NOTHING;
+        user = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
 
         doAnswer(new Answer() {
             @Override
@@ -103,14 +104,15 @@ public class UserTest {
 
     @Test
     public void testEquals() {
-        User other = new User("other user", "defaultID", new TreeSet<String>());
-        User almostEqual = new User("default", "id1", new TreeSet<String>());
-        User same = new User("default", "defaultID", new TreeSet<String>());
+        User other = new User("other user", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+        User almostEqual = new User("default", "id1", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+        User same = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
 
         assertFalse(user.equals(null));
         assertFalse(user.equals(almostEqual));
         assertFalse(user.equals(other));
         assertTrue(user.equals(same));
+        //test different classes
         assertFalse(user.equals(new FirebaseUser()));
     }
 
@@ -130,7 +132,7 @@ public class UserTest {
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
-        new User("", "", set).removeFavourite(dbp, "new POI", authListener);
+        new User("", "", set, new TreeSet<String>(), new LinkedList<String>()).removeFavourite(dbp, "new POI", authListener);
 
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -140,7 +142,6 @@ public class UserTest {
 
         dbListener.onFailure();
         assertThat(result, is(FAILURE));
-
     }
 
     @Test
@@ -154,15 +155,13 @@ public class UserTest {
             }
         }).when(dbp).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
 
-
-        user.changeName(dbp,"new", authListener);
+        user.changeName(dbp, "new", authListener);
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
         dbListener.onDoesntExist();
         assertThat(result, is(FAILURE));
         dbListener.onFailure();
         assertThat(result, is(FAILURE));
-
     }
 
     @Test
@@ -196,13 +195,14 @@ public class UserTest {
 
     @Test
     public void testRemoveFavouriteLogic() {
-
         TreeSet<String> set = new TreeSet<>();
+        final String newPoi = "new POI";
         set.add("new POI");
-        new User("default", "defaultID", set).removeFavourite(localDB, "new POI", new AuthProvider.AuthListener() {
+        final User testUser = new User("default", "defaultID",set, new TreeSet<String>(), new LinkedList<String>());
+        testUser.removeFavourite(localDB, "new POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                assertFalse(user.getFavourites().contains("new POI"));
+                assertFalse(testUser.getFavourites().contains(newPoi));
             }
 
             @Override
@@ -211,7 +211,7 @@ public class UserTest {
             }
         });
 
-        new User("default", "defaultID", set).removeFavourite(localDB, "new POI", new AuthProvider.AuthListener() {
+        testUser.removeFavourite(localDB, "new POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -219,7 +219,183 @@ public class UserTest {
 
             @Override
             public void onFailure() {
-                assertFalse(user.getFavourites().contains("new POI"));
+                assertFalse(testUser.getFavourites().contains("new POI"));
+            }
+        });
+    }
+
+    @Test
+    public void testDatabaseInteractionsWishlist() {
+
+        user.addToWishlist(dbp, "new POI", authListener);
+
+        dbListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+
+        dbListener.onDoesntExist();
+        assertThat(result, is(FAILURE));
+
+        dbListener.onFailure();
+        assertThat(result, is(FAILURE));
+
+        TreeSet<String> set = new TreeSet<>();
+        set.add("new POI");
+        new User("", "", new TreeSet<String>(), set, new LinkedList<String>()).removeFromWishlist(dbp, "new POI", authListener);
+
+        dbListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+
+        dbListener.onDoesntExist();
+        assertThat(result, is(FAILURE));
+
+        dbListener.onFailure();
+        assertThat(result, is(FAILURE));
+    }
+
+    @Test
+    public void testAddToWishlistLogic() {
+        //change to Local database to test addFavourite logic
+
+        user.addToWishlist(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                assertTrue(user.getWishlist().contains("new POI"));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        user.addToWishlist(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                assertTrue(user.getWishlist().contains("new POI"));
+            }
+        });
+    }
+
+
+    @Test
+    public void testDatabaseInteractionsVisited() {
+
+        user.visit(dbp, "new POI", authListener);
+
+        dbListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+
+        dbListener.onDoesntExist();
+        assertThat(result, is(FAILURE));
+
+        dbListener.onFailure();
+        assertThat(result, is(FAILURE));
+
+        LinkedList<String> list = new LinkedList<>();
+        list.add("new POI");
+        new User("", "", new TreeSet<String>(), new TreeSet<String>(), list).removeFromVisited(dbp, "new POI", authListener);
+
+        dbListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+
+        dbListener.onDoesntExist();
+        assertThat(result, is(FAILURE));
+
+        dbListener.onFailure();
+        assertThat(result, is(FAILURE));
+    }
+    @Test
+    public void testRemoveFromWishlistLogic() {
+        TreeSet<String> set = new TreeSet<>();
+        final String newPoi = "new POI";
+        set.add("new POI");
+        final User testUser = new User("default", "defaultID", new TreeSet<String>(), set, new LinkedList<String>());
+        testUser.removeFromWishlist(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                assertFalse(testUser.getWishlist().contains(newPoi));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        testUser.removeFromWishlist(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                assertFalse(testUser.getWishlist().contains("new POI"));
+            }
+        });
+    }
+
+    @Test
+    public void testVisitlistLogic() {
+        //change to Local database to test addFavourite logic
+
+        user.visit(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                assertTrue(user.getVisited().contains("new POI"));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        user.visit(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                assertTrue(user.getVisited().contains("new POI"));
+            }
+        });
+    }
+
+    @Test
+    public void testRemoveFromVisitedLogic() {
+        LinkedList<String> list = new LinkedList<>();
+        final String newPoi = "new POI";
+        list.addFirst("new POI");
+        final User testUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), list);
+        testUser.removeFromVisited(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                assertFalse(testUser.getVisited().contains(newPoi));
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        testUser.removeFromVisited(localDB, "new POI", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                assertFalse(testUser.getVisited().contains("new POI"));
             }
         });
     }

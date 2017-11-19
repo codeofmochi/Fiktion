@@ -16,12 +16,17 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,17 +37,22 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Set;
 
+import ch.epfl.sweng.fiktion.BuildConfig;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+
+import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
@@ -65,8 +75,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         @Override
         public ReviewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             TextView v = (TextView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_card, parent, false);
-            ViewHolder vh = new ViewHolder(v);
-            return vh;
+            return new ViewHolder(v);
         }
 
         @Override
@@ -80,12 +89,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
+    private PointOfInterest poi;
+    private ProgressBar uploadProgressBar;
+    private LinearLayout imageLayout;
     private MapView map;
-    private RecyclerView reviewsView;
-    private RecyclerView.Adapter reviewsAdapter;
-    private RecyclerView.LayoutManager reviewsLayout;
-    private Button addPictureButton;
-    private ImageView image1;
     private String[] reviewsData = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
             "Curabitur condimentum ligula eu diam maximus porttitor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse metus urna, tincidunt sed augue ac, consectetur congue felis. Pellentesque efficitur enim et ultrices pellentesque.",
@@ -100,36 +107,101 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         super.onCreate(savedInstanceState);
 
         //picture button
-        addPictureButton = (Button) findViewById(R.id.addPictureButton);
+        Button addPictureButton = (Button) findViewById(R.id.addPictureButton);
         addPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 selectImage();
             }
         });
-        //result of picture in thumbnail
-        image1 = (ImageView) findViewById(R.id.image1);
 
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain the SupportMapFragment
         map = (MapView) findViewById(R.id.map);
         map.onCreate(savedInstanceState);
-        map.getMapAsync(this);
+
+        imageLayout = (LinearLayout) findViewById(R.id.imageLayout);
+        uploadProgressBar = (ProgressBar) findViewById(R.id.uploadProgressBar);
 
         // get POI name
         Intent from = getIntent();
         String poiName = from.getStringExtra("POI_NAME");
 
+        ((TextView) findViewById(R.id.title)).setText(poiName);
+
         // get POI from database
         DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
-
+                setPoiInformation(poi);
             }
 
             @Override
             public void onDoesntExist() {
+            }
 
+            @Override
+            public void onFailure() {
+            }
+        });
+
+        // get recycler view for reviews
+        RecyclerView reviewsView = (RecyclerView) findViewById(R.id.reviews);
+        RecyclerView.LayoutManager reviewsLayout = new LinearLayoutManager(this);
+        reviewsView.setLayoutManager(reviewsLayout);
+        RecyclerView.Adapter reviewsAdapter = new ReviewsAdapter(reviewsData);
+        reviewsView.setAdapter(reviewsAdapter);
+    }
+
+    private void setPoiInformation(PointOfInterest poi) {
+        this.poi = poi;
+
+        // show the fictions the poi appears in
+        Set<String> fictions = poi.fictions();
+        TextView featured = (TextView) findViewById(R.id.featured);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Featured in ");
+        if (fictions.isEmpty())
+            sb.append("nothing");
+        else {
+            for (String fiction: fictions) {
+                sb.append(fiction + ", ");
+            }
+            sb.delete(sb.length()-2, sb.length());
+        }
+        featured.setText(sb.toString());
+
+        // change text color
+        Spannable span = new SpannableString(featured.getText());
+        span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary)), 12, featured.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        featured.setText(span);
+
+        TextView description = (TextView) findViewById(R.id.description);
+        description.setText(poi.description());
+
+        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
+        final boolean emptyMainImage = true;
+
+        // download the photos of the poi
+        photoProvider.downloadPOIBitmaps(poi.name(), new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onNewPhoto(Bitmap b) {
+                // create a new ImageView which will hold the photo
+                ImageView imgView = new ImageView(getApplicationContext());
+
+                // set the content and the parameters
+                imgView.setImageBitmap(b);
+                imgView.setAdjustViewBounds(true);
+                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+                params.setMarginEnd(20);
+                imgView.setLayoutParams(params);
+
+                // add the ImageView to the pictures
+                imageLayout.addView(imgView);
+
+                if (mainImage.getHeight()< 1) {
+                    mainImage.setImageBitmap(b);
+                    Log.d("mylogs", "onNewPhoto: ");
+                }
             }
 
             @Override
@@ -138,26 +210,19 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
 
-        // get recycler view for reviews
-        reviewsView = (RecyclerView) findViewById(R.id.reviews);
-        reviewsLayout = new LinearLayoutManager(this);
-        reviewsView.setLayoutManager(reviewsLayout);
-        reviewsAdapter = new ReviewsAdapter(reviewsData);
-        reviewsView.setAdapter(reviewsAdapter);
-
-        // change text color
-        TextView featured = (TextView) findViewById(R.id.featured);
-        Spannable span = new SpannableString(featured.getText());
-        span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary)), 12, featured.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        featured.setText(span);
+        // get notified when the map is ready to be used
+        map.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // Akihabara marker
-        LatLng mark = new LatLng(35.7022077, 139.7722703);
+        // add a marker to the poi position
+        Position pos = poi.position();
+        LatLng mark = new LatLng(pos.latitude(), pos.longitude());
         googleMap.addMarker(new MarkerOptions().position(mark)
-                .title("Akihabara"));
+                .title(poi.name()));
+
+        // move to the position and zoom
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(mark));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         map.onResume();
@@ -190,18 +255,24 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //method to open a pop up window
     private void selectImage() {
+
+        if (poi == null) {
+            Toast.makeText(this, "Point of interest information isn't loaded", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         //pop up box to chose how to take picture
         final CharSequence[] choice = {"Camera", "Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(POIPageActivity.this);
 
 
-
-        if (ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
+        if (!BuildConfig.DEBUG && ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             AndroidPermissions.promptCameraPermission(POIPageActivity.this);
         } else {
-            // check camera enable and ask otherwise
-            AndroidServices.promptCameraEnable(POIPageActivity.this);
+            if (!BuildConfig.DEBUG)
+                // check camera enable and ask otherwise
+                AndroidServices.promptCameraEnable(POIPageActivity.this);
 
             builder.setItems(choice, new DialogInterface.OnClickListener() {
                 @Override
@@ -256,20 +327,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             try {
                 image = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
             } catch (IOException e) {
-                e.printStackTrace();
+                return;
             }
         }
 
-        image1.setImageBitmap(image);
+        upload(image);
     }
-
 
     private void onCameraResult(Intent data) {
 
         Bitmap image = (Bitmap) data.getExtras().get("data");
+        if (image == null) {
+            return;
+        }
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         //(format, quality, outstream)
-        image.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        image.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
 
         //need to create the image file from the camera
@@ -282,15 +355,36 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             outstream = new FileOutputStream(destination);
             outstream.write(bytes.toByteArray());
             outstream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        image1.setImageBitmap(image);
+        upload(image);
     }
 
+    private void upload(Bitmap bitmap) {
+        // upload the photo to the cloud
+        // show the progress with the progressbar
+        uploadProgressBar.setVisibility(View.VISIBLE);
+        photoProvider.uploadPOIBitmap(bitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
+            @Override
+            public void onSuccess() {
+                uploadProgressBar.setVisibility(View.INVISIBLE);
+                uploadProgressBar.setProgress(0);
+            }
+
+            @Override
+            public void onFailure() {
+                uploadProgressBar.setVisibility(View.INVISIBLE);
+                uploadProgressBar.setProgress(0);
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+                uploadProgressBar.setProgress((int) progress);
+            }
+        });
+    }
 
 }
 
