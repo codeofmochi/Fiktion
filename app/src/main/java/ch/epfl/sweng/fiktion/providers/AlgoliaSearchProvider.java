@@ -122,6 +122,7 @@ public class AlgoliaSearchProvider extends SearchProvider {
         assert (jsonObject != null);
 
         List<String> results = new ArrayList<>();
+
         JSONArray hits = jsonObject.optJSONArray("hits");
 
         // list is empty
@@ -132,7 +133,7 @@ public class AlgoliaSearchProvider extends SearchProvider {
             JSONObject hit = hits.optJSONObject(i);
             if (hit != null) {
                 String poi = hit.optString("name");
-                if (poi != null) {
+                if (poi != null && poi != "") {
                     results.add(poi);
                 }
             }
