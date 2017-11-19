@@ -88,7 +88,7 @@ public class FirebasePhotoProvider extends PhotoProvider {
         // get the photo reference which is /Points of interest/#poiName/#photoName
         StorageReference poisRef = stRef.child("Points of interest");
         StorageReference poiRef = poisRef.child(poiName);
-        StorageReference photoRef = poiRef.child(photoName + ".jpg");
+        final StorageReference photoRef = poiRef.child(photoName + ".jpg");
 
         // create an uploadTask which takes care of the upload
         UploadTask uploadTask = photoRef.putBytes(data);
@@ -110,19 +110,21 @@ public class FirebasePhotoProvider extends PhotoProvider {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String index = String.valueOf(dataSnapshot.getChildrenCount());
-
                         dbPOIRef.child(index).setValue(finalPhotoName);
+
+                        // inform the listener that the upload succeeded
+                        listener.onSuccess();
 
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        // if the photo reference addition to the database fails, delete the photo
+                        // from the database
+                        photoRef.delete();
+                        listener.onFailure();
                     }
                 });
-
-                // inform the listener that the upload succeeded
-                listener.onSuccess();
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
