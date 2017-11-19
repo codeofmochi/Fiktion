@@ -56,7 +56,7 @@ public class TextSearchActivity extends MenuDrawerActivity {
         searchButton = (ImageButton) findViewById(R.id.searchButton);
 
         // search
-        search(searchText);
+        if (!searchText.isEmpty()) search(searchText);
     }
 
     /**
