@@ -124,7 +124,7 @@ public class ProfileSettingsActivityTest {
 
     @Test
     public void changeUserEmail_invalid() {
-        String newEmail = "";
+        String newEmail = "invalid";
         onView(withId(R.id.emailEdit)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
 
