@@ -64,7 +64,7 @@ public class FirebaseDatabaseUserTest {
 
     @Before
     public void setup() {
-        database = new FirebaseDatabaseProvider(dbRef, null);
+        database = new FirebaseDatabaseProvider(dbRef, null, null);
         result = NOTHING;
     }
 
@@ -250,5 +250,4 @@ public class FirebaseDatabaseUserTest {
         vel.onCancelled(null);
         assertThat(result, is(FAILURE));
     }
-
 }

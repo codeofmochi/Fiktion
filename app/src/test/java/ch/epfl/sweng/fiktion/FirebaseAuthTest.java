@@ -36,7 +36,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -80,21 +79,24 @@ public class FirebaseAuthTest {
     private FirebaseDatabaseProvider database;
 
     private DatabaseProvider.AddUserListener addDatabaseListener;
+
     private void setDBList(DatabaseProvider.AddUserListener listener) {
         addDatabaseListener = listener;
     }
+
     private DatabaseProvider.GetUserListener getUserDatabaseListener;
+
     private void setGetUserListener(DatabaseProvider.GetUserListener listener) {
         getUserDatabaseListener = listener;
     }
 
     private enum Result {SUCCESS, FAILURE, DOESNOTEXIST, NOTHING}
+
     private Result opResult;
+
     private void setResult(Result result) {
         opResult = result;
     }
-
-
 
     @Before
     public void setUp() {
@@ -471,11 +473,10 @@ public class FirebaseAuthTest {
         assertThat(auth.isEmailVerified(), is(false));
 
 
-
     }
 
     @Test
-    public void testValidaters(){
+    public void testValidaters() {
         //validate email
         assertThat(auth.validateEmail(email), is(""));
         assertThat(auth.validateEmail("invalidemail"), is("Requires a valid email"));
@@ -486,7 +487,7 @@ public class FirebaseAuthTest {
     }
 
     @Test
-    public void testCreateAccountSuccessDatabase(){
+    public void testCreateAccountSuccessDatabase() {
 
         Mockito.when(fbAuth.createUserWithEmailAndPassword(email, password)).thenReturn(taskAuthSucceedResult);
 
@@ -522,12 +523,12 @@ public class FirebaseAuthTest {
     }
 
     @Test
-    public void testGetUser(){
+    public void testGetUser() {
 
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                 setGetUserListener((DatabaseProvider.GetUserListener) invocation.getArgument(1));
+                setGetUserListener((DatabaseProvider.GetUserListener) invocation.getArgument(1));
                 return null;
             }
         }).when(database).getUserById(any(String.class), any(DatabaseProvider.GetUserListener.class));
@@ -550,9 +551,9 @@ public class FirebaseAuthTest {
         };
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(fbUser);
         Mockito.when(fbUser.getUid()).thenReturn("id");
-        auth.getCurrentUser(database, testListener );
+        auth.getCurrentUser(database, testListener);
 
-        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>(), new TreeSet<String>(),new LinkedList<String>()));
+        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>()));
         assertThat(opResult, is(Result.SUCCESS));
         getUserDatabaseListener.onDoesntExist();
         assertThat(opResult, is(Result.DOESNOTEXIST));

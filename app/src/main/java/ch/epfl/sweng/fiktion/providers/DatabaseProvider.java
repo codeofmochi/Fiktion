@@ -56,10 +56,11 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+
     /**
-     * Listener that listens the results of searching near points of interest
+     * parent listener for searching points of interest
      */
-    public interface FindNearPoisListener {
+    public interface SearchPOIsListener {
 
         /**
          * what to do when we get a new near point of interest
@@ -72,6 +73,18 @@ public abstract class DatabaseProvider {
          * what to do if operation failed
          */
         void onFailure();
+    }
+
+    /**
+     * Listener that listens the results of searching near points of interest
+     */
+    public interface FindNearPoisListener extends SearchPOIsListener {
+    }
+
+    /**
+     * Listener that  listens the results of searching points of interest by text
+     */
+    public interface SearchPOIByTextListener extends SearchPOIsListener {
     }
 
     /**
@@ -99,6 +112,15 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void findNearPois(Position pos, int radius, final FindNearPoisListener listener);
+
+    /**
+     * seach the points of interest that contain a text in one of their fields and "send" them to
+     * the listener
+     *
+     * @param text     the text we search
+     * @param listener the listener
+     */
+    public abstract void searchByText(String text, SearchPOIByTextListener listener);
 
     /**
      * Listener that listens the result of the addition of a user
@@ -144,9 +166,6 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
-    /**
-     * Listener that listens the result of the deletion of a user
-     */
     public interface OperationOnExistingUserListener {
 
         /**
@@ -165,9 +184,17 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
-    public interface DeleteUserListener extends OperationOnExistingUserListener{}
+    /**
+     * Listener that listens the result of the deletion of a user
+     */
+    public interface DeleteUserListener extends OperationOnExistingUserListener {
+    }
 
-    public interface ModifyUserListener extends OperationOnExistingUserListener{}
+    /**
+     * Listener that listens the result of the modification of a user
+     */
+    public interface ModifyUserListener extends OperationOnExistingUserListener {
+    }
 
     /**
      * add a user to the database, inform the listener of the result
@@ -180,7 +207,7 @@ public abstract class DatabaseProvider {
     /**
      * get the user associated to the id, inform the listener of the result
      *
-     * @param id the id
+     * @param id       the id
      * @param listener the listener
      */
     public abstract void getUserById(String id, final GetUserListener listener);
@@ -188,7 +215,7 @@ public abstract class DatabaseProvider {
     /**
      * delete the user associated to the id, inform the listener of the result
      *
-     * @param id the id
+     * @param id       the id
      * @param listener the listener
      */
     public abstract void deleterUserById(String id, final DeleteUserListener listener);
@@ -196,7 +223,7 @@ public abstract class DatabaseProvider {
     /**
      * modify the user, inform the listener of the result of the modification
      *
-     * @param user the user
+     * @param user     the user
      * @param listener the listener
      */
     public abstract void modifyUser(User user, final ModifyUserListener listener);

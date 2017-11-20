@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -28,10 +29,10 @@ import java.io.OutputStream;
 import ch.epfl.sweng.fiktion.providers.FirebasePhotoProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 
+import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -96,6 +97,12 @@ public class FirebasePhotoTest {
         when(dbRef.child(anyString())).thenReturn(dbRef);
     }
 
+    private ValueEventListener vel;
+
+    private void setVel(ValueEventListener vel) {
+        this.vel = vel;
+    }
+
     @Test
     public void uploadTest() {
         UploadTask uploadTask = mock(UploadTask.class);
@@ -122,7 +129,7 @@ public class FirebasePhotoTest {
                 return storageTask;
             }
         }).when(storageTask).addOnProgressListener(any(OnProgressListener.class));
-        when(dbRef.setValue(anyBoolean())).thenReturn(null);
+        when(dbRef.setValue(anyString())).thenReturn(null);
 
         Bitmap bitmap = mock(Bitmap.class);
         doAnswer(new Answer() {
@@ -133,6 +140,18 @@ public class FirebasePhotoTest {
                 return null;
             }
         }).when(bitmap).compress(any(Bitmap.CompressFormat.class), anyInt(), any(OutputStream.class));
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                setVel((ValueEventListener) invocation.getArgument(0));
+                return null;
+            }
+        }).when(dbRef).addListenerForSingleValueEvent(any(ValueEventListener.class));
+
+        DataSnapshot velSnapshot = mock(DataSnapshot.class);
+        when(velSnapshot.getChildrenCount()).thenReturn((long) 2);
+        when(stRef.delete()).thenReturn(null);
 
         PhotoProvider.UploadPhotoListener listener = new PhotoProvider.UploadPhotoListener() {
             @Override
@@ -156,7 +175,11 @@ public class FirebasePhotoTest {
         failureListener.onFailure(new Exception());
         assertThat(result, is(Result.FAILURE));
         successListener.onSuccess(snapshot);
+        vel.onDataChange(velSnapshot);
         assertThat(result, is(Result.SUCCESS));
+        vel.onCancelled(null);
+        assertThat(result, is(Result.FAILURE));
+
         when(snapshot.getBytesTransferred()).thenReturn((long) 2);
         when(snapshot.getTotalByteCount()).thenReturn((long) 4);
         progressListener.onProgress(snapshot);
@@ -174,6 +197,9 @@ public class FirebasePhotoTest {
 
     @Test
     public void downloadTest() {
+        when(dbRef.orderByKey()).thenReturn(dbRef);
+        when(dbRef.limitToFirst(anyInt())).thenReturn(dbRef);
+
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -212,9 +238,12 @@ public class FirebasePhotoTest {
         Mockito.mock(BitmapFactory.class);
 
         DataSnapshot snapshot = mock(DataSnapshot.class);
-        when(snapshot.getKey()).thenReturn("key");
-        photoProvider.downloadPOIBitmaps("name", listener);
-        cel.onChildChanged(snapshot,"");
+        when(snapshot.getValue()).thenReturn("value");
+
+        photoProvider.downloadPOIBitmaps("name", ALL_PHOTOS, listener);
+        photoProvider.downloadPOIBitmaps("name", 1, listener);
+
+        cel.onChildChanged(snapshot, "");
         cel.onChildMoved(snapshot, "");
         cel.onChildRemoved(snapshot);
         cel.onCancelled(null);
