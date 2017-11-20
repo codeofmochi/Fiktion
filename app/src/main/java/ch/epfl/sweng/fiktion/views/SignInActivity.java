@@ -11,7 +11,6 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
-import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
 /**
  * This activity prompts a sign in or sign up if the user is not already connected

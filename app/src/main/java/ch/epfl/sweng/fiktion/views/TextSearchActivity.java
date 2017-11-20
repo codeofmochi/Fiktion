@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -127,10 +128,8 @@ public class TextSearchActivity extends MenuDrawerActivity {
 
     /**
      * Triggered by search button press
-     *
-     * @param view
      */
-    public void triggerSearch(View view) {
+    public void triggerSearch(@SuppressLint("Unused paramater") View view) {
         String searchText = searchField.getText().toString();
         // search
         search(searchText);

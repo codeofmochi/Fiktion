@@ -10,7 +10,6 @@ import ch.epfl.sweng.fiktion.views.tests.FindNearestPoisActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

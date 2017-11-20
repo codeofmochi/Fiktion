@@ -31,6 +31,7 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     private User user;
 
+
     private Context context = this;
 
     private final int SIGNIN_REQUEST = 0;
@@ -284,7 +285,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         } else {
             //handles the case if user is not currently signed right after calling this method
             Toast.makeText(context, "You are not signed in", Toast.LENGTH_SHORT).show();
-            //TODO maybe start a sign in activity
+            recreate();
         }
         verifyButton.setEnabled(true);
     }
@@ -313,10 +314,11 @@ public class SettingsActivity extends MenuDrawerActivity {
                     }
                 });
         // Get the dialog that confirms if user wants to permanently delete his account
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
+        AlertDialog deleteDialog;
+        deleteDialog = builder.create();
+        deleteDialog.show();
+        deleteDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+        deleteDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
     }
 
     /**
@@ -353,8 +355,8 @@ public class SettingsActivity extends MenuDrawerActivity {
             });
         } else {
             //handles the case if user is not currently signed right after calling this method
-            Toast.makeText(context, "No User currently signed in", Toast.LENGTH_SHORT).show();
-            // Re-enable button
+            Toast.makeText(context, "You are not signed in", Toast.LENGTH_SHORT).show();
+            recreate();
         }
         signOutButton.setEnabled(false);
     }
