@@ -7,7 +7,8 @@
     android:layout_height="wrap_content"
     android:background="@color/bgLightGray"
     android:paddingBottom="20dp"
-    tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity">
+    tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity"
+    tools:ignore="Overdraw">
 
     <ImageView
         android:id="@+id/userBanner"

@@ -13,4 +13,4 @@
     android:orientation="vertical"
     android:text="Some text"
     android:textColor="#A0A0A0"
-    tools:ignore="HardcodedText" /><!-- text is dynamically updated -->
+    tools:ignore="HardcodedText,Overdraw" /><!-- text is dynamically updated -->

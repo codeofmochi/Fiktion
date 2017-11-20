@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/tokyo_sun"
-    tools:context="ch.epfl.sweng.fiktion.views.SignInActivity">
+    tools:context="ch.epfl.sweng.fiktion.views.SignInActivity"
+    tools:ignore="Overdraw">
 
     <ImageView
         android:id="@+id/fiktionLogo"
