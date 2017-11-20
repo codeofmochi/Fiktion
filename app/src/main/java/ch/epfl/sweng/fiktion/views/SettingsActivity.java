@@ -41,6 +41,8 @@ public class SettingsActivity extends MenuDrawerActivity {
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
+                userNewName.setHint(user.getName());
+                userNewEmail.setHint(AuthSingleton.auth.getEmail());
             }
 
             @Override
@@ -56,16 +58,16 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
         });
 
-        if(!AuthSingleton.auth.isEmailVerified()){
+        if (!AuthSingleton.auth.isEmailVerified()) {
             //TODO: modify button to verify email -> deactivate?
         }
 
     }
 
-    public void updateEmail(){
+    public void updateEmail() {
         final String newEmail = userNewEmail.getText().toString();
 
-        if(newEmail.isEmpty()){
+        if (newEmail.isEmpty()) {
             //we only change email if the user has actually written something in the new email field
             return;
         }
@@ -77,7 +79,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             AuthSingleton.auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
-                    findViewById(R.id.update_confirm_email).setEnabled(true);
+                    userNewEmail.setHint(AuthSingleton.auth.getEmail());
                     Toast.makeText(context,
                             "User's email is now : " + newEmail,
                             Toast.LENGTH_LONG).show();
@@ -85,25 +87,23 @@ public class SettingsActivity extends MenuDrawerActivity {
 
                 @Override
                 public void onFailure() {
-                    findViewById(R.id.update_confirm_email).setEnabled(true);
                     Toast.makeText(context,
                             "Failed to update User's email. You may need to re-authenticate",
                             Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            findViewById(R.id.update_confirm_email).setEnabled(true);
             Toast.makeText(this, errMessage, Toast.LENGTH_SHORT).show();
         }
     }
 
 
-        public void updateUsername(){
+    public void updateUsername() {
         final String newUsername = userNewName.getText().toString();
-            if(newUsername.isEmpty()){
-                //we only change username if the user has actually written something in the new username field
-                return;
-            }
+        if (newUsername.isEmpty()) {
+            //we only change username if the user has actually written something in the new username field
+            return;
+        }
 
         //validate name choice
         if (!newUsername.equals(user.getName())) {
@@ -111,7 +111,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             user.changeName(DatabaseSingleton.database, newUsername, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
-                    findViewById(R.id.update_confirm_name).setEnabled(true);
+                    userNewName.setHint(user.getName());
                     Toast.makeText(context,
                             "Username updated to : " + newUsername,
                             Toast.LENGTH_SHORT).show();
@@ -119,21 +119,19 @@ public class SettingsActivity extends MenuDrawerActivity {
 
                 @Override
                 public void onFailure() {
-                    findViewById(R.id.update_confirm_name).setEnabled(true);
                     Toast.makeText(context,
                             "Failed to update User's name.",
                             Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            findViewById(R.id.update_confirm_name).setEnabled(true);
             Toast.makeText(this, "Please type a new and valid username", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void savePersonalInfos(View v) {
         findViewById(R.id.saveAccountSettingsButton).setEnabled(false);
-        if(user== null){
+        if (user == null) {
             Toast.makeText(this, "You are not connected", Toast.LENGTH_SHORT).show();
             return;
         }
