@@ -40,7 +40,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Set;
 
-import ch.epfl.sweng.fiktion.BuildConfig;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
@@ -51,11 +50,14 @@ import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
+
+    private final int MAXIMUM_SIZE = 1000;
 
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
         private String[] data;
@@ -198,6 +200,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         photoProvider.downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
+
                 // create a new ImageView which will hold the photo
                 ImageView imgView = new ImageView(getApplicationContext());
 
@@ -373,10 +376,14 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     private void upload(Bitmap bitmap) {
+
+        Bitmap uploadBitmap = bitmap.getHeight() <= MAXIMUM_SIZE && bitmap.getWidth() <= MAXIMUM_SIZE ?
+                bitmap : POIDisplayer.scaleBitmap(bitmap, MAXIMUM_SIZE);
+
         // upload the photo to the cloud
         // show the progress with the progressbar
         uploadProgressBar.setVisibility(View.VISIBLE);
-        photoProvider.uploadPOIBitmap(bitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
+        photoProvider.uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
                 uploadProgressBar.setVisibility(View.INVISIBLE);
