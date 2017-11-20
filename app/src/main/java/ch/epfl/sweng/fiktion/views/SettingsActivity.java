@@ -27,10 +27,13 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button saveSettingsButton;
     private Button verifyButton;
     private Button deleteButton;
+    private Button signOutButton;
 
     private User user;
 
     private Context context = this;
+
+    private final int SIGNIN_REQUEST = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +47,12 @@ public class SettingsActivity extends MenuDrawerActivity {
         saveSettingsButton = (Button) findViewById(R.id.saveAccountSettingsButton);
         verifyButton = (Button) findViewById(R.id.verifiedButton);
         deleteButton = (Button) findViewById(R.id.deleteAccountButton);
+        signOutButton = (Button) findViewById(R.id.signOutButton);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
         AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
@@ -63,7 +66,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 //TODO: decide what to do if user does not exist in database
                 user = null;
                 //Account settings disappear
-                findViewById(R.id.accountSettingsTitle).setVisibility(View.GONE);
+                findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
                 findViewById(R.id.accountSettings).setVisibility(View.GONE);
                 //Profile settings disappear
                 findViewById(R.id.profileSettingsTitle).setVisibility(View.GONE);
@@ -75,7 +78,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 //TODO: decide what to do if user fails to load from database or is not connected
                 user = null;
                 //Account settings disappear
-                findViewById(R.id.accountSettingsTitle).setVisibility(View.GONE);
+                findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
                 findViewById(R.id.accountSettings).setVisibility(View.GONE);
                 //Profile settings disappear
                 findViewById(R.id.profileSettingsTitle).setVisibility(View.GONE);
@@ -133,7 +136,6 @@ public class SettingsActivity extends MenuDrawerActivity {
         }
     }
 
-
     /**
      * Updates User's username
      */
@@ -170,89 +172,17 @@ public class SettingsActivity extends MenuDrawerActivity {
     }
 
     /**
-     * Updates User's profile with new information retrieved in activity's EditText fields
+     * Finishes this activity and takes the user to home activity
      */
-    public void savePersonalInfos(@SuppressWarnings("UnusedParameters") View v) {
-        //reset errors
-        userNewEmail.setError(null);
-        userNewName.setError(null);
-        //start update
-        saveSettingsButton.setEnabled(false);
-        if (user == null) {
-            Toast.makeText(this, "You are not signed in", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        updateUsername();
-        updateEmail();
-        saveSettingsButton.setEnabled(true);
-    }
-
-    /**
-     * Sends a verification email to the User's current email
-     */
-    public void sendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
-        // Send verification email only if user does not have a verified email
-        verifyButton.setEnabled(false);
-
-        if (AuthSingleton.auth.isConnected()) {
-            AuthSingleton.auth.sendEmailVerification(new AuthProvider.AuthListener() {
-                @Override
-                public void onSuccess() {
-                    Toast.makeText(context,
-                            "Verification email sent",
-                            Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFailure() {
-                    Toast.makeText(context,
-                            "Failed to send verification email.",
-                            Toast.LENGTH_SHORT).show();
-
-                }
-            });
-        } else {
-            //handles the case if user is not currently signed right after calling this method
-            Toast.makeText(context, "You are not signed in", Toast.LENGTH_SHORT).show();
-            //TODO maybe start a sign in activity
-        }
-        verifyButton.setEnabled(true);
-    }
-
-
     private void goHome() {
         Intent home = new Intent(this, HomeActivity.class);
         startActivity(home);
         this.finish();
     }
 
-    public void clickDeleteAccount(View v) {
-        // Instantiate an AlertDialog.Builder with its constructor
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        // Chain together various setter methods to set the dialog characteristics
-        builder.setMessage("You are about to permanently delete your account, do you wish to continue?")
-                .setTitle("Fiktion")
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        deleteAccount();
-                        dialog.dismiss();
-                    }
-                });
-        // Get the AlertDialog from create()
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
-    }
-
+    /**
+     * Attempts to delete user's account
+     */
     private void deleteAccount() {
         if (AuthSingleton.auth.isConnected()) {
 
@@ -309,8 +239,152 @@ public class SettingsActivity extends MenuDrawerActivity {
         }
     }
 
-    public void clickSignOut(View v){
+    /**
+     * Updates User's profile with new information retrieved in activity's EditText fields
+     */
+    public void savePersonalInfos(@SuppressWarnings("UnusedParameters") View v) {
+        //reset errors
+        userNewEmail.setError(null);
+        userNewName.setError(null);
+        //start update
+        saveSettingsButton.setEnabled(false);
+        if (user == null) {
+            Toast.makeText(this, "You are not signed in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        updateUsername();
+        updateEmail();
+        saveSettingsButton.setEnabled(true);
+    }
+
+    /**
+     * Sends a verification email to the User's current email
+     */
+    public void sendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
+        // Send verification email only if user does not have a verified email
+        verifyButton.setEnabled(false);
+
+        if (AuthSingleton.auth.isConnected()) {
+            AuthSingleton.auth.sendEmailVerification(new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(context,
+                            "Verification email sent",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(context,
+                            "Failed to send verification email.",
+                            Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        } else {
+            //handles the case if user is not currently signed right after calling this method
+            Toast.makeText(context, "You are not signed in", Toast.LENGTH_SHORT).show();
+            //TODO maybe start a sign in activity
+        }
+        verifyButton.setEnabled(true);
+    }
+
+    /**
+     * Starts a dialog the confirms if the user really wants to delete his account
+     */
+    public void clickDeleteAccount(@SuppressWarnings("UnusedParameters") View v) {
+        // Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        // Sets up the dialog builder
+        builder.setMessage("You are about to permanently delete your account, do you wish to continue?")
+                .setTitle("Fiktion")
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteAccount();
+                        dialog.dismiss();
+                    }
+                });
+        // Get the dialog that confirms if user wants to permanently delete his account
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
+    }
+
+    /**
+     * Signs the user out
+     */
+    public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
         AuthSingleton.auth.signOut();
         goHome();
+    }
+
+    /**
+     * Sends a reset password email to the user's current email
+     */
+    public void clickResetPassword(@SuppressWarnings("UnusedParameters") View v) {
+        // Disable button
+        signOutButton.setEnabled(false);
+
+        if (AuthSingleton.auth.isConnected()) {
+            AuthSingleton.auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(context,
+                            "Password reset email sent",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(context,
+                            "Failed to send password reset email.",
+                            Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        } else {
+            //handles the case if user is not currently signed right after calling this method
+            Toast.makeText(context, "No User currently signed in", Toast.LENGTH_SHORT).show();
+            // Re-enable button
+        }
+        signOutButton.setEnabled(false);
+    }
+
+    /**
+     * Triggered by login button click
+     *
+     * @param view The caller view
+     */
+    public void redirectToLogin(View view) {
+        Intent i = new Intent(this, SignInActivity.class);
+        startActivityForResult(i, SIGNIN_REQUEST);
+    }
+
+    /**
+     * Triggered by result from another activity launched from here
+     *
+     * @param requestCode The code of the requested activity
+     * @param resultCode  The result code
+     * @param data        The extra data from the activity
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case SIGNIN_REQUEST: {
+                if (resultCode == RESULT_OK) {
+                    this.recreate();
+                }
+                break;
+            }
+        }
     }
 }

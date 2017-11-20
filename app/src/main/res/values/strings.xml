@@ -97,4 +97,5 @@
     <string name="Country">Country</string>
     <string name="country_example">ex: Japan</string>
     <string name="Description">Description</string>
+    <string name="login">Login or register account</string>
 </resources>

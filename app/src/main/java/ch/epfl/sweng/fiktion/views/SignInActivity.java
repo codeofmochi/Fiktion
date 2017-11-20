@@ -33,13 +33,13 @@ public class SignInActivity extends AppCompatActivity {
         //Views
         UserEmail = (EditText) findViewById(R.id.User_Email);
         UserPassword = (EditText) findViewById(R.id.User_Password);
-        // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
-        updateUI(AuthSingleton.auth.isConnected());
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
+        updateUI(AuthSingleton.auth.isConnected());
     }
 
 
@@ -104,9 +104,12 @@ public class SignInActivity extends AppCompatActivity {
     private void updateUI(Boolean isConnected) {
         //start details activity and end this one
         if (isConnected) {
-            Intent user_details_activity = new Intent(this, UserDetailsActivity.class);
-            this.finish();
-            startActivity(user_details_activity);
+            // intent to return to caller
+            Intent i = new Intent();
+            // send the intent to the parent
+            setResult(RESULT_OK, i);
+            // close this activity
+            finish();
         }
     }
 

@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:id="@+id/optionsList"
-        android:layout_width="395dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
@@ -30,14 +30,28 @@
             tools:layout_editor_absoluteX="7dp"
             tools:layout_editor_absoluteY="16dp" />
 
+        <Button
+            android:id="@+id/accountLoginButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary"
+            android:onClick="redirectToLogin"
+            android:visibility="gone"
+            android:text="@string/login"
+            android:textColor="@color/white" />
+
         <LinearLayout
             android:id="@+id/accountSettings"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clipToPadding="false"
             android:orientation="vertical"
-            android:padding="20dp"
-            android:clipToPadding="false">
+            android:padding="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -96,9 +110,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:paddingBottom="7dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
+                android:paddingBottom="7dp"
                 tools:ignore="NestedWeights">
 
                 <TextView
@@ -113,8 +127,9 @@
                     android:id="@+id/passwordReset"
                     android:layout_width="45dp"
                     android:layout_height="36dp"
-                    android:background="@color/lightGray"
                     android:layout_weight="1"
+                    android:background="@color/lightGray"
+                    android:onClick="clickResetPassword"
                     android:text="@string/reset" /> <!-- text is dynamically updated -->
 
             </LinearLayout>
@@ -123,9 +138,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:paddingBottom="7dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
+                android:paddingBottom="7dp"
                 tools:ignore="NestedWeights">
 
                 <TextView
