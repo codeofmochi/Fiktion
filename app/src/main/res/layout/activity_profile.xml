@@ -5,7 +5,7 @@
     android:id="@+id/profileMain"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#EFEFEF"
+    android:background="@color/bgLightGray"
     android:paddingBottom="20dp"
     tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity">
 

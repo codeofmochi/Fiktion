@@ -8,9 +8,9 @@
     <string name="open_location_settings">Settings</string>
     <string name="Cancel">Cancel</string>
     <string name="add_poi_title">Add a Point of Interest</string>
-    <string name="add_poi_name">Name of the point</string>
-    <string name="add_poi_fiction">Add a new Fiction</string>
-    <string name="add_poi_position_wiki">Add from Wiki link</string>
+    <string name="add_poi_name">ex: Akihabara</string>
+    <string name="add_poi_fiction">ex: Steins;Gate</string>
+    <string name="add_poi_position_wiki">From wiki link</string>
     <string name="enter_wikipedia_link">Enter a link to a Wikipedia article that contains coordinates :</string>
     <string name="wikipedia_link">Enter a Wikipedia link…</string>
     <string name="get_coordinates">Get coordinates</string>
@@ -18,9 +18,9 @@
     <string name="add_poi_position">Add a Position</string>
     <string name="latitude">latitude</string>
     <string name="longitude">longitude</string>
-    <string name="choose_position_on_map">Choose position on map</string>
-    <string name="add_description_to_point">Add a description to the Point</string>
-    <string name="add_point">Add this Point !</string>
+    <string name="choose_position_on_map">From map / you</string>
+    <string name="add_description_to_point">An inspiring text describing this place (can be several lines long, don\'t be shy)…</string>
+    <string name="add_point">Save this place!</string>
     <string name="default_search_radius">50</string>
     <string name="find_near_places">Find near places !</string>
     <string name="set_search_radius">Set your search Radius</string>
@@ -52,6 +52,7 @@
     <string name="delete_account">Delete account</string>
     <!-- RegisterActivity -->
     <string name="confirm_pw">Confirm password</string>
+
     <string name="account">Account</string>
     <string name="username">Username</string>
     <string name="e_mail">E-mail</string>
@@ -78,4 +79,21 @@
     <string name="user_profile_picture">User profile picture</string>
     <string name="location_post_photo">Location post photo</string>
     <string name="user_content_picture">User content picture</string>
+    <string name="search_hint">Search a place, movie, city, ...</string>
+    <string name="empty_search">Search field is empty</string>
+    <string name="no_results_found">No results found</string>
+    <string name="search_by_algolia">Search by Algolia</string>
+    <string name="main_image_content_description">Main image</string>
+    <string name="name">Name</string>
+    <string name="in_fiction">Featured in</string>
+    <string name="Latitude">Latitude</string>
+    <string name="latitude_example">ex: 35.7022077</string>
+    <string name="longitude_example">ex: 139.7722703</string>
+    <string name="Longitude">Longitude</string>
+    <string name="Position">Position</string>
+    <string name="City">City</string>
+    <string name="city_example">ex: Tokyo</string>
+    <string name="Country">Country</string>
+    <string name="country_example">ex: Japan</string>
+    <string name="Description">Description</string>
 </resources>

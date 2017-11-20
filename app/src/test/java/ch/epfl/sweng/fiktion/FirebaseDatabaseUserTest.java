@@ -12,6 +12,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.User;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
 public class FirebaseDatabaseUserTest {
 
     private FirebaseDatabaseProvider database;
-    private User user = new User("testName", "id", new TreeSet<String>(), new TreeSet<String>());
+    private User user = new User("testName", "id", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
 
     @Mock
     DatabaseReference dbRef, usersRef, userRef;
@@ -63,7 +64,7 @@ public class FirebaseDatabaseUserTest {
 
     @Before
     public void setup() {
-        database = new FirebaseDatabaseProvider(dbRef, null);
+        database = new FirebaseDatabaseProvider(dbRef, null, null);
         result = NOTHING;
     }
 
@@ -249,5 +250,4 @@ public class FirebaseDatabaseUserTest {
         vel.onCancelled(null);
         assertThat(result, is(FAILURE));
     }
-
 }

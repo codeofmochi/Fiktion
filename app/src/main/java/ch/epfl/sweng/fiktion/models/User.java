@@ -1,7 +1,7 @@
 package ch.epfl.sweng.fiktion.models;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -12,7 +12,7 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 /**
  * This class represents the User in the application
  *
- * @author Rodrigo
+ * @author Rodrigo, Christoph
  */
 
 public class User {
@@ -21,6 +21,7 @@ public class User {
     private final String id;
     private TreeSet<String> favourites;
     private TreeSet<String> wishlist;
+    private LinkedList<String> visited;
     //private Set<String> rated;
     private TreeSet<String> friendlist;
     private TreeSet<String> friendRequests;
@@ -31,14 +32,16 @@ public class User {
      * @param input_name Username
      * @param input_id   User id
      * @param favs list of favourite POIs
+     * @param visits list of visited POIs
      * @param wishes POIs wish list
      * @param friends User friend list
      */
-    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, TreeSet<String> friends, TreeSet<String> fRequests) {
+    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, TreeSet<String> friends, TreeSet<String> fRequests, LinkedList<String> visits) {
         name = input_name;
         id = input_id;
         favourites = favs;
         wishlist = wishes;
+        visited = visits;
         friendlist = friends;
         friendRequests = fRequests;
     }
@@ -50,12 +53,14 @@ public class User {
      * @param input_id   User id
      * @param favs list of favourite POIs
      * @param wishes POIs wish list
+     * @param visits list of visited POIs
      */
-    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes) {
+    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, LinkedList<String> visits) {
         name = input_name;
         id = input_id;
         favourites = favs;
         wishlist = wishes;
+        visited = visits;
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
     }
@@ -71,6 +76,7 @@ public class User {
         id = input_id;
         favourites = new TreeSet<>();
         wishlist = new TreeSet<>();
+        visited = new LinkedList<>();
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
     }
@@ -118,6 +124,7 @@ public class User {
      * @param friendID The friend (user) ID the user wants to ignore
      */
     public void ignoreFriendRequest(final String friendID) {
+        // need to be changed on sb....
         friendRequests.remove(friendID);
     }
 
@@ -249,6 +256,72 @@ public class User {
         }
     }
 
+    /**
+     * Adds new point of interest to this user's visited list
+     * @param db database containing the user data
+     * @param poiID POI ID that the user wishes to visit
+     * @param listener Handles what happens in case of success or failure of the change
+     */
+    public void visit(final DatabaseProvider db,final String poiID, final AuthProvider.AuthListener listener) {
+        if(!visited.contains(poiID)) {
+            visited.addFirst(poiID);
+            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    visited.remove(poiID);
+                    listener.onFailure();
+                }
+
+                @Override
+                public void onFailure() {
+                    visited.remove(poiID);
+                    listener.onFailure();
+                }
+            });
+        } else {
+            listener.onFailure();
+        }
+    }
+
+    /**
+     * Removes given point of interest of this user's visited list
+     * @param db database containing the user data
+     * @param poiID POI ID that the user wishes to remove from visited list
+     * @param listener Handles what happens in case of success or failure of the change
+     */
+    public void removeFromVisited(final DatabaseProvider db,final String poiID, final AuthProvider.AuthListener listener) {
+        if(visited.contains(poiID)) {
+            //we keep the position in a variable if we fail to modify in database
+            // and we need to restore the visited list state
+            final int poiIndex = visited.indexOf(poiID);
+            visited.remove(poiID);
+            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    visited.add(poiIndex, poiID);
+                    listener.onFailure();
+                }
+
+                @Override
+                public void onFailure() {
+                    visited.add(poiIndex, poiID);
+                    listener.onFailure();
+                }
+            });
+        } else {
+            listener.onFailure();
+        }
+    }
     /**
      * Adds new point of interest to this user's wishlist
      *
@@ -428,7 +501,7 @@ public class User {
     }
 
     /**
-     * @return the user's favorite POI's IDs as a set (favourites)
+     * @return the user's favourite POI's IDs as a set (favourites)
      */
     public Set<String> getFavourites() {
         return Collections.unmodifiableSet(new TreeSet<>(favourites));
@@ -453,5 +526,12 @@ public class User {
      */
     public Set<String> getRequests() {
         return Collections.unmodifiableSet(new TreeSet<>(friendRequests));
+    }
+
+    /**
+     * @return list of POIs visited by the user
+     */
+    public List<String> getVisited() {
+        return Collections.unmodifiableList(new LinkedList<>(visited));
     }
 }

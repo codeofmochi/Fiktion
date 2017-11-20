@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -16,7 +17,7 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
-    private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>());
+    private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
     private final List<PointOfInterest> poiList = new ArrayList<>();
     private final List<User> users = new ArrayList<>
             (Collections.singletonList(defaultUser));
@@ -57,6 +58,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
         for (PointOfInterest poi : poiList) {
             if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
+                listener.onNewValue(poi);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void searchByText(String text, SearchPOIByTextListener listener) {
+        for (PointOfInterest poi : poiList) {
+            if (poi.name().contains(text) ||
+                    poi.description().contains(text) ||
+                    poi.city().contains(text) ||
+                    poi.country().contains(text)) {
                 listener.onNewValue(poi);
             }
         }

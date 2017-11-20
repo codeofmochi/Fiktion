@@ -11,7 +11,7 @@ public class Position {
     /**
      * Constructs a position with a lagitude and longitude coordinate
      *
-     * @param latitude  the lagitude
+     * @param latitude  the latitude
      * @param longitude the longitude
      */
     public Position(double latitude, double longitude) {
