@@ -15,9 +15,6 @@
     <string name="wikipedia_link">Enter a Wikipedia link…</string>
     <string name="get_coordinates">Get coordinates</string>
     <string name="add">Add</string>
-    <string name="add_poi_position">Add a Position</string>
-    <string name="latitude">latitude</string>
-    <string name="longitude">longitude</string>
     <string name="choose_position_on_map">From map / you</string>
     <string name="add_description_to_point">An inspiring text describing this place (can be several lines long, don\'t be shy)…</string>
     <string name="add_point">Save this place!</string>
@@ -60,11 +57,9 @@
     <string name="profile">Profile</string>
     <string name="verify_email">Verify e-mail</string>
     <string name="send_email">Send E-mail</string>
-    <string name="background_image">Background image</string>
     <string name="upvote">Vote +1</string>
     <string name="pictures">Pictures</string>
     <string name="add_a_picture">Add a picture</string>
-    <string name="photo">photo</string>
     <string name="user_reviews">User reviews</string>
     <string name="add_a_review">Add a review</string>
     <string name="nearby">Nearby</string>
@@ -80,9 +75,8 @@
     <string name="user_profile_picture">User profile picture</string>
     <string name="location_post_photo">Location post photo</string>
     <string name="user_content_picture">User content picture</string>
-    <string name="search_hint">Search a place, movie, city, ...</string>
+    <string name="search_hint">Search a place, movie, city, …</string>
     <string name="empty_search">Search field is empty</string>
-    <string name="no_results_found">No results found</string>
     <string name="search_by_algolia">Search by Algolia</string>
     <string name="main_image_content_description">Main image</string>
     <string name="name">Name</string>
@@ -98,4 +92,6 @@
     <string name="country_example">ex: Japan</string>
     <string name="Description">Description</string>
     <string name="login">Login or register account</string>
+    <string name="loading_text">Loading…</string>
+    <string name="no_results_found">No results found</string>
 </resources>

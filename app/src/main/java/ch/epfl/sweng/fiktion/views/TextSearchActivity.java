@@ -113,13 +113,13 @@ public class TextSearchActivity extends MenuDrawerActivity {
         });
 
         // show loading text (will be hidden if new result, and replaced by no results if nothing shows up)
-        noResults.setText("Loading...");
+        noResults.setText(R.string.loading_text);
         if (noResults.getVisibility() == View.INVISIBLE) noResults.setVisibility(View.VISIBLE);
         new Handler().postDelayed(
                 new Runnable() {
                     @Override
                     public void run() {
-                        noResults.setText("No results found");
+                        noResults.setText(R.string.no_results_found);
                     }
                 },
                 SEARCH_TIMEOUT

@@ -37,6 +37,7 @@ public class POIDisplayer {
      * @param ctx The context of the call, the activity where we want to include the card
      * @return A view of a POI that can be added in any layout
      */
+    @SuppressWarnings("SetTextI18n")
     public static View createPoiCard(final PointOfInterest poi, final Context ctx) {
         // create new view for this POI
         LinearLayout v = new LinearLayout(ctx);
