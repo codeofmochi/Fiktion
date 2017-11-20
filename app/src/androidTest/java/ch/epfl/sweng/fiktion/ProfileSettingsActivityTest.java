@@ -1,9 +1,7 @@
 package ch.epfl.sweng.fiktion;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
-import android.view.View;
 
 import junit.framework.Assert;
 
@@ -35,7 +33,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsInstanceOf.any;
 import static org.hamcrest.core.IsNot.not;
 
 /**
