@@ -68,10 +68,6 @@ public class SignInActivityTest {
         onView(withId(R.id.User_Password)).perform(typeText(valid_password), closeSoftKeyboard());
         onView(withId(R.id.SignInButton)).perform(click());
 
-
-        //this view is in other activity but no need to tell Espresso
-        //check that we correctly advanced to the next activity
-        onView(withId(R.id.detail_signout)).perform(click());
     }
 
 

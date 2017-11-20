@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -112,13 +113,13 @@ public class TextSearchActivity extends MenuDrawerActivity {
         });
 
         // show loading text (will be hidden if new result, and replaced by no results if nothing shows up)
-        noResults.setText("Loading...");
+        noResults.setText(R.string.loading_text);
         if (noResults.getVisibility() == View.INVISIBLE) noResults.setVisibility(View.VISIBLE);
         new Handler().postDelayed(
                 new Runnable() {
                     @Override
                     public void run() {
-                        noResults.setText("No results found");
+                        noResults.setText(R.string.no_results_found);
                     }
                 },
                 SEARCH_TIMEOUT
@@ -127,10 +128,8 @@ public class TextSearchActivity extends MenuDrawerActivity {
 
     /**
      * Triggered by search button press
-     *
-     * @param view
      */
-    public void triggerSearch(View view) {
+    public void triggerSearch(@SuppressLint("Unused paramater") View view) {
         String searchText = searchField.getText().toString();
         // search
         search(searchText);
