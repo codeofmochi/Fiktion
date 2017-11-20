@@ -118,6 +118,7 @@ public class FirebaseAuthProvider extends AuthProvider {
             errMessage = "Requires a valid email";
         }
         return errMessage;
+
     }
 
     /**

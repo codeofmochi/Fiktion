@@ -110,12 +110,12 @@
                     android:text="@string/password" />
 
                 <Button
-                    android:id="@+id/passwordEdit"
+                    android:id="@+id/passwordReset"
                     android:layout_width="45dp"
                     android:layout_height="36dp"
                     android:background="@color/lightGray"
                     android:layout_weight="1"
-                    android:text="@string/change" /> <!-- text is dynamically updated -->
+                    android:text="@string/reset" /> <!-- text is dynamically updated -->
 
             </LinearLayout>
 
@@ -168,6 +168,7 @@
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:background="@color/red"
+                    android:onClick="clickDeleteAccount"
                     android:text="@string/delete"
                     android:textColor="@color/white" /> <!-- text is dynamically updated -->
 
@@ -182,6 +183,17 @@
                 android:background="@color/colorPrimary"
                 android:onClick="savePersonalInfos"
                 android:text="@string/save_account_settings"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/signOutButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="clickSignOut"
+                android:text="@string/sign_out_button"
                 android:textColor="@color/white" />
 
         </LinearLayout>

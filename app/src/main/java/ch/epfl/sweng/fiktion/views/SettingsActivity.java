@@ -1,6 +1,10 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +26,7 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     private Button saveSettingsButton;
     private Button verifyButton;
+    private Button deleteButton;
 
     private User user;
 
@@ -38,6 +43,7 @@ public class SettingsActivity extends MenuDrawerActivity {
 
         saveSettingsButton = (Button) findViewById(R.id.saveAccountSettingsButton);
         verifyButton = (Button) findViewById(R.id.verifiedButton);
+        deleteButton = (Button) findViewById(R.id.deleteAccountButton);
     }
 
     @Override
@@ -54,7 +60,7 @@ public class SettingsActivity extends MenuDrawerActivity {
 
             @Override
             public void onDoesntExist() {
-                //TODO: decide what to do if user does nto exist in database
+                //TODO: decide what to do if user does not exist in database
                 user = null;
                 //Account settings disappear
                 findViewById(R.id.accountSettingsTitle).setVisibility(View.GONE);
@@ -86,7 +92,10 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     }
 
-    public void updateEmail() {
+    /**
+     * Updates User's email
+     */
+    private void updateEmail() {
         final String newEmail = userNewEmail.getText().toString();
 
         if (newEmail.isEmpty()) {
@@ -94,7 +103,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             return;
         }
 
-        if(newEmail.equals(AuthSingleton.auth.getEmail())){
+        if (newEmail.equals(AuthSingleton.auth.getEmail())) {
             userNewEmail.setError("Please type a new and valid email");
             return;
         }
@@ -125,6 +134,9 @@ public class SettingsActivity extends MenuDrawerActivity {
     }
 
 
+    /**
+     * Updates User's username
+     */
     public void updateUsername() {
         final String newUsername = userNewName.getText().toString();
         if (newUsername.isEmpty()) {
@@ -157,7 +169,10 @@ public class SettingsActivity extends MenuDrawerActivity {
         }
     }
 
-    public void savePersonalInfos(View v) {
+    /**
+     * Updates User's profile with new information retrieved in activity's EditText fields
+     */
+    public void savePersonalInfos(@SuppressWarnings("UnusedParameters") View v) {
         //reset errors
         userNewEmail.setError(null);
         userNewName.setError(null);
@@ -172,18 +187,14 @@ public class SettingsActivity extends MenuDrawerActivity {
         saveSettingsButton.setEnabled(true);
     }
 
-    public void sendEmailVerification(View v) {
+    /**
+     * Sends a verification email to the User's current email
+     */
+    public void sendEmailVerification(@SuppressWarnings("UnusedParameters") View v) {
         // Send verification email only if user does not have a verified email
         verifyButton.setEnabled(false);
 
         if (AuthSingleton.auth.isConnected()) {
-            // Send verification email only if user does not have a verified email
-            /*
-            if (AuthSingleton.auth.isEmailVerified()) {
-                Toast.makeText(this, "User's email is verified", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            */
             AuthSingleton.auth.sendEmailVerification(new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
@@ -209,4 +220,97 @@ public class SettingsActivity extends MenuDrawerActivity {
     }
 
 
+    private void goHome() {
+        Intent home = new Intent(this, HomeActivity.class);
+        startActivity(home);
+        this.finish();
+    }
+
+    public void clickDeleteAccount(View v) {
+        // Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        // Chain together various setter methods to set the dialog characteristics
+        builder.setMessage("You are about to permanently delete your account, do you wish to continue?")
+                .setTitle("Fiktion")
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteAccount();
+                        dialog.dismiss();
+                    }
+                });
+        // Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
+    }
+
+    private void deleteAccount() {
+        if (AuthSingleton.auth.isConnected()) {
+
+            AuthSingleton.auth.deleteAccount(
+                    //first we delete firebase account
+                    new AuthProvider.AuthListener() {
+                        @Override
+                        public void onSuccess() {
+                            //we do not do anything,
+                            // we need to wait that the user is correctly deleted from database
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            deleteButton.setEnabled(true);
+                            Toast.makeText(context,
+                                    "You did not sign in recently, please re-authenticate and try again", Toast.LENGTH_LONG).show();
+                        }
+                    },
+                    //then we deleted database User
+                    new DatabaseProvider.DeleteUserListener() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(context,
+                                    "User account deleted successfully",
+                                    Toast.LENGTH_SHORT).show();
+                            goHome();
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            //account was deleted in firebase previously and does not exist in database = deleted
+                            Toast.makeText(context,
+                                    "User account deleted successfully",
+                                    Toast.LENGTH_SHORT).show();
+                            goHome();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Toast.makeText(context,
+                                    "There was a problem deleting your account, signing you out",
+                                    Toast.LENGTH_SHORT).show();
+                            AuthSingleton.auth.signOut();
+                            goHome();
+                        }
+                    });
+
+        } else {
+            deleteButton.setEnabled(true);
+            Toast.makeText(context,
+                    "No user currently signed in", Toast.LENGTH_LONG).show();
+            this.recreate();
+        }
+    }
+
+    public void clickSignOut(View v){
+        AuthSingleton.auth.signOut();
+        goHome();
+    }
 }

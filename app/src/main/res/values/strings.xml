@@ -75,6 +75,7 @@
     <string name="save_account_settings">Save account settings</string>
     <string name="fiktion_app_logo">Fiktion app logo</string>
     <string name="change">Change</string>
+    <string name="reset">Reset</string>
     <string name="user_banner">User banner</string>
     <string name="user_profile_picture">User profile picture</string>
     <string name="location_post_photo">Location post photo</string>
