@@ -23,7 +23,7 @@ public class LocalAuthProvider extends AuthProvider {
     private User currUser = defaultUser;
     private Boolean signedIn = true;
     private String currentUserEmail = defaultEmail;
-    private Boolean emailVerified = true;
+    public Boolean emailVerified = true;
 
     /**
      * Signs in a user with an email, a password and what to do afterwards

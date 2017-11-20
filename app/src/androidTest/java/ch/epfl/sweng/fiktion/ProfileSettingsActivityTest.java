@@ -279,6 +279,7 @@ public class ProfileSettingsActivityTest {
         //should send an email verification since the user is already connected (default user)
     }
 
+    /*
     @Test
     public void successAndNotSignedInSendEmailVerification() {
         //in our local auth we have only one user with a verified account,
@@ -338,6 +339,7 @@ public class ProfileSettingsActivityTest {
             }
         });
     }
+    */
 
     @Test
     public void successResetPassword() {
