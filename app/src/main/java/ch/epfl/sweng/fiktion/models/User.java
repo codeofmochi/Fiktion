@@ -86,6 +86,33 @@ public class User {
     }
 
     /**
+     * Changes the state of the user's profile privacy (true/false)
+     *
+     * @param db database containing the user data
+     * @param privacyState The state of the privacy
+     * @param listener Handles what happens in case of success or failure of the change
+     */
+    public void changeProfilePrivacy(final DatabaseProvider db, Boolean privacyState, final AuthProvider.AuthListener listener) {
+        isPublicProfile = privacyState;
+        db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                listener.onFailure();
+            }
+
+            @Override
+            public void onFailure() {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
      * Accept a friend request by adding it to the friend list if it is in the requests
      *
      * @param db database containing the user data
@@ -535,6 +562,13 @@ public class User {
      */
     public String getID() {
         return id;
+    }
+
+    /**
+     * @return true if user profile is public, else false
+     */
+    public Boolean isPublicProfile() {
+        return isPublicProfile;
     }
 
     /**
