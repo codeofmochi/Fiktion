@@ -19,6 +19,7 @@ import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
+@SuppressWarnings("FieldCanBeLocal") // those fields might be used elsewhere
 public class TextSearchActivity extends MenuDrawerActivity {
 
     private EditText searchField;

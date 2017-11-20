@@ -27,6 +27,7 @@ import ch.epfl.sweng.fiktion.views.POIPageActivity;
  */
 
 public class POIDisplayer {
+    @SuppressWarnings("FieldCanBeLocal") // might be used elsewhere
     private static int IMAGE_SIZE = 250;
 
     /**
