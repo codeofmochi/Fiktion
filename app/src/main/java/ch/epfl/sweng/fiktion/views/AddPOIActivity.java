@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -27,9 +28,13 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private final Set<String> fictionSet = new TreeSet<>();
     // Displayed fiction list (as a big string)
     private String fictionListText = "";
-
     // intent result codes
     private static final int LOCATION_RESULT = 1;
+    // this activity's context
+    private Context ctx = this;
+    // error messages
+    private final String ERR_STRING_FORMAT = "Those characters are not accepted: . $ # [ ] /";
+    private final String ILLEGAL_CHARS_REGEX = ".*[.$#/\\[\\]].*";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +42,13 @@ public class AddPOIActivity extends MenuDrawerActivity {
         super.onCreate(savedInstanceState);
     }
 
-    // get the coordinates from the child GetLocationFromMapActivity
+    /**
+     * Triggered when an activity launched from here returns a value
+     *
+     * @param requestCode The code of the request
+     * @param resultCode  The code of the result
+     * @param data        the intent from which the result comes from
+     */
     @Override
     @SuppressLint("SetTextI18n") // latitude and longitude are inputs, not hardcoded
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -53,25 +64,42 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
     }
 
+    /**
+     * Triggered when the "From Map" button is clicked
+     * Launches a map activity to select a location
+     *
+     * @param view caller view
+     */
     public void startGetLocationFromMapActivity(View view) {
         Intent i = new Intent(this, GetLocationFromMapActivity.class);
         startActivityForResult(i, LOCATION_RESULT);
     }
 
+    /**
+     * Triggered when the "From wiki linK" button is clicked
+     * Launches a wikipedia link retriever activity to get coordinates
+     *
+     * @param view caller view
+     */
     public void startGetLocationFromWikipedia(View view) {
         Intent i = new Intent(this, GetLocationFromWikipediaActivity.class);
         startActivityForResult(i, LOCATION_RESULT);
     }
 
-    // Adds fictions to the fictions list and display them in a view, checks some bad inputs (empty, etc...)
+    /**
+     * Triggered when the "Add" fiction button is clicked
+     * Adds fictions to the fictions list and display them in a view, checks some bad inputs (empty, etc...)
+     *
+     * @param view caller view
+     */
     public void addFiction(View view) {
         final String fiction = ((EditText) findViewById(R.id.add_poi_fiction)).getText().toString();
         if (fiction.isEmpty()) {
             // warning message if no text was entered
             ((EditText) findViewById(R.id.add_poi_fiction)).setError("You can't enter an empty fiction name");
-        } else if (fiction.matches(".*[.$#/\\[\\]].*")) {
+        } else if (fiction.matches(ILLEGAL_CHARS_REGEX)) {
             // warning message if unaccepted characters are present
-            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Those characters are not accepted: . $ # [ ] /");
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError(ERR_STRING_FORMAT);
         } else {
             if (!fictionSet.contains(fiction)) {
                 fictionSet.add(fiction);
@@ -86,11 +114,19 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
     }
 
+    /**
+     * Triggered by the "save this place" button
+     * Gather all data in fields to create and send a correct POI to the database
+     *
+     * @param view the caller view
+     */
     public void createAndSendPoi(View view) {
         final String name = ((EditText) findViewById(R.id.add_poi_name)).getText().toString();
         final String longitudeString = ((EditText) findViewById(R.id.add_poi_longitude)).getText().toString();
         final String latitudeString = ((EditText) findViewById(R.id.add_poi_latitude)).getText().toString();
         final String description = ((EditText) findViewById(R.id.add_poi_description)).getText().toString();
+        final String city = ((EditText) findViewById(R.id.add_poi_city)).getText().toString();
+        final String country = ((EditText) findViewById(R.id.add_poi_country)).getText().toString();
         double longitude = 0.0;
         double latitude = 0.0;
 
@@ -100,9 +136,26 @@ public class AddPOIActivity extends MenuDrawerActivity {
             ((EditText) findViewById(R.id.add_poi_name)).setError("You can't enter an empty point of interest name");
             isCorrect = false;
         }
+        if (name.matches(ILLEGAL_CHARS_REGEX)) {
+            ((EditText) findViewById(R.id.add_poi_name)).setError(ERR_STRING_FORMAT);
+            isCorrect = false;
+        }
 
-        if (name.matches(".*[.$#/\\[\\]].*")) {
-            ((EditText) findViewById(R.id.add_poi_name)).setError("Those characters are not accepted: . $ # [ ] /");
+        if (city.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_city)).setError("City cannot be empty");
+            isCorrect = false;
+        }
+        if (city.matches(ILLEGAL_CHARS_REGEX)) {
+            ((EditText) findViewById(R.id.add_poi_city)).setError(ERR_STRING_FORMAT);
+            isCorrect = false;
+        }
+
+        if (country.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_country)).setError("Country cannot be empty");
+            isCorrect = false;
+        }
+        if (country.matches(ILLEGAL_CHARS_REGEX)) {
+            ((EditText) findViewById(R.id.add_poi_country)).setError(ERR_STRING_FORMAT);
             isCorrect = false;
         }
 
@@ -137,29 +190,26 @@ public class AddPOIActivity extends MenuDrawerActivity {
             }
         }
         if (isCorrect) {
-            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, "", "");
+            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
             database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
-                    showToast("The Point of Interest " + name + " was added !");
-                    ((TextView) findViewById(R.id.add_poi_fiction_list)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_name)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_longitude)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_latitude)).setText("");
-                    ((EditText) findViewById(R.id.add_poi_description)).setText("");
-                    fictionSet.clear();
-                    fictionListText = "";
+                    showToast("The place " + name + " was successfully added");
+                    // show newly created POI
+                    Intent i = new Intent(ctx, POIPageActivity.class);
+                    i.putExtra("POI_NAME", name);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
                 }
 
                 @Override
                 public void onAlreadyExists() {
-                    showToast("The Point of Interest " + name + " already exists !");
+                    showToast("The place named " + name + " already exists !");
                 }
 
                 @Override
                 public void onFailure() {
-                    showToast("Failed to add " + name + " !");
+                    showToast("An error occured while adding " + name + " : please try again later");
                 }
             });
         }

@@ -97,6 +97,7 @@
             android:text="@string/search"
             android:textColor="@android:color/white"
             android:textSize="14sp"
+            android:onClick="startTextSearchActivity"
             tools:targetApi="m" />
 
         <Space
