@@ -84,6 +84,7 @@ public class User {
     /**
      * Accept a friend request by adding it to the friend list if it is in the requests
      *
+     * @param db database containing the user data
      * @param friendID the friend (user) that the user want to add to his friend list
      * @param listener Handles what happens in case of success or failure of the change
      */
@@ -131,6 +132,7 @@ public class User {
     /**
      * Send a friend request to the friend (user) that the user wants to add as a friend
      *
+     * @param db database containing the user data
      * @param friendID The friend (user) that the user wants to add
      * @param listener Handles what happens in case of success or failure of the change
      */
@@ -172,6 +174,7 @@ public class User {
     /**
      * Adds a friend request in the friend requests list of a user
      *
+     * @param db database containing the user data
      * @param user The user we want to add the request to
      * @param listener Handles what happens in case of success or failure of the change
      */
@@ -197,6 +200,7 @@ public class User {
     /**
      * Add a new friend to the user's friend list
      *
+     * @param db database containing the user data
      * @param friendID user (friend) ID that the user wants to add
      * @param listener Handles what happens in case of success or failure of the change
      */
@@ -228,6 +232,7 @@ public class User {
     /**
      * Removes given friendID from the friend list
      *
+     * @param db database containing the user data
      * @param friendID user (friend) ID that the user wants to remove
      * @param listener Handles what happens in case of success or failure of the change
      */
@@ -258,6 +263,7 @@ public class User {
 
     /**
      * Adds new point of interest to this user's visited list
+     *
      * @param db database containing the user data
      * @param poiID POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
@@ -290,6 +296,7 @@ public class User {
 
     /**
      * Removes given point of interest of this user's visited list
+     *
      * @param db database containing the user data
      * @param poiID POI ID that the user wishes to remove from visited list
      * @param listener Handles what happens in case of success or failure of the change
@@ -325,6 +332,7 @@ public class User {
     /**
      * Adds new point of interest to this user's wishlist
      *
+     * @param db database containing the user data
      * @param poiID POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
@@ -355,6 +363,7 @@ public class User {
     /**
      * Adds new favorite point of interest to this user's favorite list
      *
+     * @param db database containing the user data
      * @param favID POI ID
      * @param listener Handles what happens in case of success or failure of the change
      */
@@ -386,12 +395,13 @@ public class User {
     /**
      * Removes given point of interest of this user wishlist
      *
+     * @param db database containing the user data
      * @param poiID POI ID that user no longer wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFromWishlist(final DatabaseProvider database, final String poiID, final AuthProvider.AuthListener listener) {
+    public void removeFromWishlist(final DatabaseProvider db, final String poiID, final AuthProvider.AuthListener listener) {
         if (wishlist.remove(poiID)) {
-            database.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -417,12 +427,13 @@ public class User {
     /**
      * Removes given point of interest of this user favorite list
      *
+     * @param db database containing the user data
      * @param favID POI ID
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFavourite(final DatabaseProvider database, final String favID, final AuthProvider.AuthListener listener) {
+    public void removeFavourite(final DatabaseProvider db, final String favID, final AuthProvider.AuthListener listener) {
         if (favourites.remove(favID)) {
-            database.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -448,12 +459,13 @@ public class User {
     /**
      * Changes this user's username
      *
+     * @param db database containing the user data
      * @param newName  New username value
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void changeName(DatabaseProvider database, final String newName, final AuthProvider.AuthListener listener) {
+    public void changeName(DatabaseProvider db, final String newName, final AuthProvider.AuthListener listener) {
         //verification is done in the activity
-        database.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+        db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 name = newName;
