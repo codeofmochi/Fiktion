@@ -113,7 +113,6 @@ public class FirebaseAuthProvider extends AuthProvider {
     @Override
     public String validateEmail(String email) {
         String errMessage = "";
-        user = auth.getCurrentUser();
         //TODO elaborate email validation
         if (!email.contains("@")) {
             errMessage = "Requires a valid email";

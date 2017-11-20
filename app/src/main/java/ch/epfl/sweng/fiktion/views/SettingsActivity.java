@@ -3,6 +3,7 @@ package ch.epfl.sweng.fiktion.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -19,6 +20,9 @@ public class SettingsActivity extends MenuDrawerActivity {
     private EditText userNewName;
     private EditText userNewEmail;
 
+    private Button saveSettingsButton;
+    private Button verifyButton;
+
     private User user;
 
     private Context context = this;
@@ -31,6 +35,9 @@ public class SettingsActivity extends MenuDrawerActivity {
 
         userNewEmail = (EditText) findViewById(R.id.emailEdit);
         userNewName = (EditText) findViewById(R.id.usernameEdit);
+
+        saveSettingsButton = (Button) findViewById(R.id.saveAccountSettingsButton);
+        verifyButton = (Button) findViewById(R.id.verifiedButton);
     }
 
     @Override
@@ -49,17 +56,32 @@ public class SettingsActivity extends MenuDrawerActivity {
             public void onDoesntExist() {
                 //TODO: decide what to do if user does nto exist in database
                 user = null;
+                //Account settings disappear
+                findViewById(R.id.accountSettingsTitle).setVisibility(View.GONE);
+                findViewById(R.id.accountSettings).setVisibility(View.GONE);
+                //Profile settings disappear
+                findViewById(R.id.profileSettingsTitle).setVisibility(View.GONE);
+                findViewById(R.id.profileSettings).setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure() {
                 //TODO: decide what to do if user fails to load from database or is not connected
                 user = null;
+                //Account settings disappear
+                findViewById(R.id.accountSettingsTitle).setVisibility(View.GONE);
+                findViewById(R.id.accountSettings).setVisibility(View.GONE);
+                //Profile settings disappear
+                findViewById(R.id.profileSettingsTitle).setVisibility(View.GONE);
+                findViewById(R.id.profileSettings).setVisibility(View.GONE);
             }
         });
 
-        if (!AuthSingleton.auth.isEmailVerified()) {
+        if (AuthSingleton.auth.isEmailVerified()) {
             //TODO: modify button to verify email -> deactivate?
+            //or set visibility gone to text and button
+            verifyButton.setVisibility(View.GONE);
+            findViewById(R.id.verifiedText).setVisibility(View.GONE);
         }
 
     }
@@ -69,6 +91,11 @@ public class SettingsActivity extends MenuDrawerActivity {
 
         if (newEmail.isEmpty()) {
             //we only change email if the user has actually written something in the new email field
+            return;
+        }
+
+        if(newEmail.equals(AuthSingleton.auth.getEmail())){
+            userNewEmail.setError("Please type a new and valid email");
             return;
         }
 
@@ -112,6 +139,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 @Override
                 public void onSuccess() {
                     userNewName.setHint(user.getName());
+                    userNewName.setError(null);
                     Toast.makeText(context,
                             "Username updated to : " + newUsername,
                             Toast.LENGTH_SHORT).show();
@@ -125,20 +153,59 @@ public class SettingsActivity extends MenuDrawerActivity {
                 }
             });
         } else {
-            Toast.makeText(this, "Please type a new and valid username", Toast.LENGTH_SHORT).show();
+            userNewName.setError("Please type a new and valid username");
         }
     }
 
     public void savePersonalInfos(View v) {
-        findViewById(R.id.saveAccountSettingsButton).setEnabled(false);
+        //reset errors
+        userNewEmail.setError(null);
+        userNewName.setError(null);
+        //start update
+        saveSettingsButton.setEnabled(false);
         if (user == null) {
-            Toast.makeText(this, "You are not connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You are not signed in", Toast.LENGTH_SHORT).show();
             return;
         }
-        updateEmail();
         updateUsername();
-        findViewById(R.id.saveAccountSettingsButton).setEnabled(true);
+        updateEmail();
+        saveSettingsButton.setEnabled(true);
+    }
 
+    public void sendEmailVerification(View v) {
+        // Send verification email only if user does not have a verified email
+        verifyButton.setEnabled(false);
+
+        if (AuthSingleton.auth.isConnected()) {
+            // Send verification email only if user does not have a verified email
+            /*
+            if (AuthSingleton.auth.isEmailVerified()) {
+                Toast.makeText(this, "User's email is verified", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            */
+            AuthSingleton.auth.sendEmailVerification(new AuthProvider.AuthListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(context,
+                            "Verification email sent",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(context,
+                            "Failed to send verification email.",
+                            Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        } else {
+            //handles the case if user is not currently signed right after calling this method
+            Toast.makeText(context, "You are not signed in", Toast.LENGTH_SHORT).show();
+            //TODO maybe start a sign in activity
+        }
+        verifyButton.setEnabled(true);
     }
 
 

@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:id="@+id/optionsList"
-        android:layout_width="match_parent"
+        android:layout_width="395dp"
         android:layout_height="wrap_content"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
@@ -139,8 +139,9 @@
                     android:id="@+id/verifiedButton"
                     android:layout_width="45dp"
                     android:layout_height="36dp"
-                    android:background="@color/lightGray"
                     android:layout_weight="1"
+                    android:background="@color/lightGray"
+                    android:onClick="sendEmailVerification"
                     android:text="@string/send_email" /> <!-- text is dynamically updated -->
 
             </LinearLayout>
