@@ -1,7 +1,6 @@
 package ch.epfl.sweng.fiktion.views.tests;
 
 import android.content.Intent;
-import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Set;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.R;
@@ -23,7 +21,7 @@ import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
-import ch.epfl.sweng.fiktion.views.ProfileSettingsActivity;
+import ch.epfl.sweng.fiktion.views.SettingsActivity;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 /**
@@ -210,7 +208,7 @@ public class UserDetailsActivity extends AppCompatActivity {
      */
     public void clickEditAccount(@SuppressWarnings("UnusedParameters") View v) {
         Log.d(TAG, "Start Edit Account Activity");
-        Intent editAccountActivity = new Intent(this, ProfileSettingsActivity.class);
+        Intent editAccountActivity = new Intent(this, SettingsActivity.class);
         startActivity(editAccountActivity);
     }
 
