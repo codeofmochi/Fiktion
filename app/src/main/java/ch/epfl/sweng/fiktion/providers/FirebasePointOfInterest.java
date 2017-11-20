@@ -11,6 +11,7 @@ import ch.epfl.sweng.fiktion.models.Position;
  *
  * @author pedro
  */
+@SuppressWarnings("WeakerAccess") // fields need to be public so that firebase can access them
 public class FirebasePointOfInterest {
     public String name = "";
     public FirebasePosition position = new FirebasePosition(new Position(0, 0));

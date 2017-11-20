@@ -23,9 +23,11 @@ import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.core.IsNot.not;
 
@@ -148,5 +150,15 @@ public class HomeActivityTest {
         closeSoftKeyboard();
         onView(withId(R.id.useGPSButton)).perform(click());
         onView(withId(R.id.map)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void displayTextSearchActivityWhenSearchClicked() {
+        closeSoftKeyboard();
+        onView(withId(R.id.placeText)).perform(typeText("poi"));
+        closeSoftKeyboard();
+        onView(withId(R.id.searchButton)).perform(click());
+        onView(withId(R.id.searchBar)).check(matches(isDisplayed()));
+        onView(withId(R.id.searchText)).check(matches(withText("poi")));
     }
 }

@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,8 +49,10 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
+import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
@@ -152,8 +153,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         reviewsView.setAdapter(reviewsAdapter);
     }
 
-    private void setPoiInformation(PointOfInterest poi) {
+    private void setPoiInformation(final PointOfInterest poi) {
         this.poi = poi;
+
+        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
+
+        // set the mainImage as the first photo of the poi
+        photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onNewPhoto(Bitmap b) {
+                mainImage.setImageBitmap(b);
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
 
         // show the fictions the poi appears in
         Set<String> fictions = poi.fictions();
@@ -163,10 +178,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         if (fictions.isEmpty())
             sb.append("nothing");
         else {
-            for (String fiction: fictions) {
+            for (String fiction : fictions) {
                 sb.append(fiction + ", ");
             }
-            sb.delete(sb.length()-2, sb.length());
+            sb.delete(sb.length() - 2, sb.length());
         }
         featured.setText(sb.toString());
 
@@ -177,12 +192,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(poi.description());
-
-        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
         final boolean emptyMainImage = true;
 
         // download the photos of the poi
-        photoProvider.downloadPOIBitmaps(poi.name(), new PhotoProvider.DownloadBitmapListener() {
+        photoProvider.downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
                 // create a new ImageView which will hold the photo
@@ -192,16 +205,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 imgView.setImageBitmap(b);
                 imgView.setAdjustViewBounds(true);
                 LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                params.setMarginEnd(20);
+                params.setMarginStart(10);
+                params.setMarginEnd(10);
                 imgView.setLayoutParams(params);
+                imgView.setContentDescription("a photo of " + poi.name());
 
                 // add the ImageView to the pictures
                 imageLayout.addView(imgView);
-
-                if (mainImage.getHeight()< 1) {
-                    mainImage.setImageBitmap(b);
-                    Log.d("mylogs", "onNewPhoto: ");
-                }
             }
 
             @Override
@@ -266,11 +276,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         AlertDialog.Builder builder = new AlertDialog.Builder(POIPageActivity.this);
 
 
-        if (!BuildConfig.DEBUG && ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
+        if (!Config.TEST_MODE && ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             AndroidPermissions.promptCameraPermission(POIPageActivity.this);
         } else {
-            if (!BuildConfig.DEBUG)
+            if (!Config.TEST_MODE)
                 // check camera enable and ask otherwise
                 AndroidServices.promptCameraEnable(POIPageActivity.this);
 

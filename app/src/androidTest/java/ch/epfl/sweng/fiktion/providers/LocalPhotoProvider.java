@@ -28,10 +28,10 @@ public class LocalPhotoProvider extends PhotoProvider {
     }
 
     @Override
-    public void downloadPOIBitmaps(String poiName, DownloadBitmapListener listener) {
+    public void downloadPOIBitmaps(String poiName, int numberOfPhotos, DownloadBitmapListener listener) {
         List<Bitmap> poiBitmaps = bitmaps.getOrDefault(poiName, new ArrayList<Bitmap>());
-        for (Bitmap b: poiBitmaps) {
-            listener.onNewPhoto(b);
+        for (int i = 0; (numberOfPhotos == ALL_PHOTOS || i < numberOfPhotos) && i < poiBitmaps.size(); ++i) {
+            listener.onNewPhoto(poiBitmaps.get(i));
         }
     }
 }

@@ -6,6 +6,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
@@ -41,6 +42,18 @@ public class HomeActivity extends MenuDrawerActivity {
     public void startDisplayAkihabara(View view) {
         Intent i = new Intent(this, POIPageActivity.class);
         i.putExtra("POI_NAME", "Akihabara");
+        startActivity(i);
+    }
+
+    public void startTextSearchActivity(View view) {
+        Intent i = new Intent(this, TextSearchActivity.class);
+        // get search field
+        EditText placeText = (EditText) findViewById(R.id.placeText);
+        EditText fictionText = (EditText) findViewById(R.id.fictionText);
+        String searchText = placeText.getText().toString();
+        if (searchText.isEmpty()) searchText = fictionText.getText().toString();
+
+        i.putExtra("SEARCH_TEXT", searchText);
         startActivity(i);
     }
 }

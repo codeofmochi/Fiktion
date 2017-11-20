@@ -64,6 +64,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void searchByText(String text, SearchPOIByTextListener listener) {
+        for (PointOfInterest poi : poiList) {
+            if (poi.name().contains(text) ||
+                    poi.description().contains(text) ||
+                    poi.city().contains(text) ||
+                    poi.country().contains(text)) {
+                listener.onNewValue(poi);
+            }
+        }
+    }
+
+    /**
      * Returns the distance between two points with their latitude and longitude coordinates
      *
      * @param lat1  latitude of the first position
@@ -78,6 +93,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         return 111.18957696 * Math.toDegrees(Math.acos(dist));
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -86,7 +102,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         boolean contains = false;
         String id = user.getID();
         // go through all the users and check if there is one with the same id as the user in parameter
-        for (User u: users) {
+        for (User u : users) {
             contains |= u.getID().equals(id);
         }
         if (contains) {
@@ -102,7 +118,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getUserById(String id, GetUserListener listener) {
-        for(User u: users) {
+        for (User u : users) {
             if (u.getID().equals(id)) {
                 listener.onSuccess(u);
                 return;
@@ -116,7 +132,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void deleterUserById(String id, DeleteUserListener listener) {
-        for (User u: users) {
+        for (User u : users) {
             if (u.getID().equals(id)) {
                 users.remove(u);
                 listener.onSuccess();
