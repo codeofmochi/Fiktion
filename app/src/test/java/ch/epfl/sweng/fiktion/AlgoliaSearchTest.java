@@ -95,7 +95,8 @@ public class AlgoliaSearchTest {
         algolia.addPoi(poi, listener);
         handler.value.requestCompleted(null, null);
         assertThat(result.value, is("SUCCESS"));
-        algolia.addPoi(null, listener);
+        PointOfInterest poiFail = new PointOfInterest("poiFail", null, new TreeSet<String>(), "desc", 0, "country", "city");
+        algolia.addPoi(poiFail, listener);
         assertThat(result.value, is("FAILURE"));
     }
 
