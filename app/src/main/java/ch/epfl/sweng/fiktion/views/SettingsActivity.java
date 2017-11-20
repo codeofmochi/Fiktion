@@ -28,6 +28,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button verifyButton;
     private Button deleteButton;
     private Button signOutButton;
+    private Button resetButton;
 
     private User user;
 
@@ -49,6 +50,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         verifyButton = (Button) findViewById(R.id.verifiedButton);
         deleteButton = (Button) findViewById(R.id.deleteAccountButton);
         signOutButton = (Button) findViewById(R.id.signOutButton);
+        resetButton = (Button) findViewById(R.id.passwordReset);
     }
 
     @Override
@@ -140,7 +142,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     /**
      * Updates User's username
      */
-    public void updateUsername() {
+    private void updateUsername() {
         final String newUsername = userNewName.getText().toString();
         if (newUsername.isEmpty()) {
             //we only change username if the user has actually written something in the new username field
@@ -337,7 +339,7 @@ public class SettingsActivity extends MenuDrawerActivity {
      */
     public void clickResetPassword(@SuppressWarnings("UnusedParameters") View v) {
         // Disable button
-        signOutButton.setEnabled(false);
+        resetButton.setEnabled(false);
 
         if (AuthSingleton.auth.isConnected()) {
             AuthSingleton.auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
@@ -361,7 +363,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             Toast.makeText(context, "You are not signed in", Toast.LENGTH_SHORT).show();
             recreate();
         }
-        signOutButton.setEnabled(true);
+        resetButton.setEnabled(true);
     }
 
     /**
