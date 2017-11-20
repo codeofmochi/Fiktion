@@ -274,72 +274,19 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void alreadyVerifiedSendEmailVerification() {
-        onView(withId(R.id.verifiedButton)).check(matches(not(isDisplayed())));
-        //should send an email verification since the user is already connected (default user)
+    public void NotSignedInSendEmailVerification() {
+        AuthSingleton.auth.signOut();
+        onView(withId(R.id.verifiedButton)).perform(click());
+        onView(withId(R.id.accountLoginButton)).check(matches(isDisplayed()));
     }
 
-    /*
     @Test
-    public void successAndNotSignedInSendEmailVerification() {
-        //in our local auth we have only one user with a verified account,
-        //we must delete this account and create a new one
-        //without a verified email
-        AuthSingleton.auth.deleteAccount(new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                //we succeeded in deleting in firebase
-            }
+    public void SuccessSendEmailVerification() {
+        onView(withId(R.id.verifiedButton)).perform(click());
+        onView(withId(R.id.verifiedButton)).check(matches(isDisplayed()));
 
-            @Override
-            public void onFailure() {
-                //should be able to delete current account because there is one connected by default
-                Assert.fail();
-            }
-        }, new DatabaseProvider.DeleteUserListener() {
-            @Override
-            public void onSuccess() {
-                //we successfully deleted the account on the database
-                AuthSingleton.auth.createUserWithEmailAndPassword(DatabaseSingleton.database, "new@email", "newpassword", new AuthProvider.AuthListener() {
-                    @Override
-                    public void onSuccess() {
-                        //we try to send an email to a unverified account,
-                        //this account was just created successfully
-                        final Activity testActivity = editProfileActivityRule.getActivity();
-                        getInstrumentation().runOnMainSync(new Runnable() {
-                            @Override
-                            public void run() {
-                                testActivity.recreate();
-                            }
-                        });
-                        onView(withId(R.id.verifiedButton)).perform(click());
-
-                        AuthSingleton.auth.signOut();
-                        onView(withId(R.id.verifiedButton)).perform(click());
-                        onView(withId(R.id.accountLoginButton)).check(matches(isDisplayed()));
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        //should be able to create account with given paramaters
-                        Assert.fail();
-                    }
-                });
-            }
-
-
-            @Override
-            public void onDoesntExist() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
     }
-    */
+
 
     @Test
     public void successResetPassword() {
