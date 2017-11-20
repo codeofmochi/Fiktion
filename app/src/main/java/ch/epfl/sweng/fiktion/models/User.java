@@ -19,6 +19,7 @@ public class User {
     private String name;
     //we could use same id as firebase id or create our own id system
     private final String id;
+    private Boolean isPublicProfile;
     private TreeSet<String> favourites;
     private TreeSet<String> wishlist;
     private LinkedList<String> visited;
@@ -27,7 +28,7 @@ public class User {
     private TreeSet<String> friendRequests;
 
     /**
-     * Creates a new User with given paramaters
+     * Creates a new User with given parameters
      *
      * @param input_name Username
      * @param input_id   User id
@@ -36,7 +37,7 @@ public class User {
      * @param wishes POIs wish list
      * @param friends User friend list
      */
-    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, TreeSet<String> friends, TreeSet<String> fRequests, LinkedList<String> visits) {
+    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, TreeSet<String> friends, TreeSet<String> fRequests, LinkedList<String> visits, Boolean isPublic) {
         name = input_name;
         id = input_id;
         favourites = favs;
@@ -44,10 +45,11 @@ public class User {
         visited = visits;
         friendlist = friends;
         friendRequests = fRequests;
+        isPublicProfile = isPublic;
     }
 
     /**
-     * Creates a new User with given paramaters
+     * Creates a new User with given parameters
      *
      * @param input_name Username
      * @param input_id   User id
@@ -63,10 +65,11 @@ public class User {
         visited = visits;
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
+        isPublicProfile = true;
     }
 
     /**
-     * Creates a new User with given paramaters
+     * Creates a new User with given parameters
      *
      * @param input_name Username
      * @param input_id   User id
@@ -79,6 +82,7 @@ public class User {
         visited = new LinkedList<>();
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
+        isPublicProfile = true;
     }
 
     /**
@@ -122,11 +126,32 @@ public class User {
     /**
      * Ignore friend request by removing it from the request list
      *
+     * @param db database containing the user data
      * @param friendID The friend (user) ID the user wants to ignore
+     * @param listener Handles what happens in case of success or failure of the change
      */
-    public void ignoreFriendRequest(final String friendID) {
-        // need to be changed on sb....
-        friendRequests.remove(friendID);
+    public void ignoreFriendRequest(final DatabaseProvider db, final String friendID, final AuthProvider.AuthListener listener) {
+        if(friendRequests.remove(friendID)) {
+            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    listener.onFailure();
+                }
+
+                @Override
+                public void onFailure() {
+                    friendRequests.add(friendID);
+                    listener.onFailure();
+                }
+            });
+        } else {
+            listener.onFailure();
+        }
     }
 
     /**
