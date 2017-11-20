@@ -1,7 +1,9 @@
 package ch.epfl.sweng.fiktion;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
+import android.view.View;
 
 import junit.framework.Assert;
 
@@ -33,6 +35,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsInstanceOf.any;
 import static org.hamcrest.core.IsNot.not;
 
 /**
@@ -351,5 +354,36 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.passwordReset)).perform(click());
         //should send an email verification since the user is already connected (default user)
         onView(withId(R.id.accountLoginButton)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void failSaveInfos(){
+        AuthSingleton.auth.signOut();
+        onView(withId(R.id.saveAccountSettingsButton)).perform(click());
+    }
+
+    @Test
+    public void testRedirectLogin(){
+        AuthSingleton.auth.signOut();
+        onView(withId(R.id.saveAccountSettingsButton)).perform(click());
+        onView(withId(R.id.accountLoginButton)).perform(click());
+        onView(withId(R.id.User_Email)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testActivityForResult(){
+        AuthSingleton.auth.signOut();
+        onView(withId(R.id.saveAccountSettingsButton)).perform(click());
+        onView(withId(R.id.accountLoginButton)).perform(click());
+        onView(withId(R.id.User_Email)).perform(typeText("default@email.ch"), closeSoftKeyboard());
+        onView(withId(R.id.User_Password)).perform(typeText("testing"), closeSoftKeyboard());
+        onView(withId(R.id.SignInButton)).perform(click());
+        onView(withId(R.id.accountSettings)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testSignOut(){
+        onView(withId(R.id.signOutButton)).perform(click());
+        onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
     }
 }

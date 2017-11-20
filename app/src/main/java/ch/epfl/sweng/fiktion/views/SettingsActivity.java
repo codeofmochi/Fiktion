@@ -177,6 +177,7 @@ public class SettingsActivity extends MenuDrawerActivity {
      */
     private void goHome() {
         Intent home = new Intent(this, HomeActivity.class);
+        home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(home);
         this.finish();
     }
@@ -248,9 +249,11 @@ public class SettingsActivity extends MenuDrawerActivity {
         userNewEmail.setError(null);
         userNewName.setError(null);
         //start update
+
         saveSettingsButton.setEnabled(false);
-        if (user == null) {
+        if (!AuthSingleton.auth.isConnected()) {
             Toast.makeText(this, "You are not signed in", Toast.LENGTH_SHORT).show();
+            recreate();
             return;
         }
         updateUsername();
@@ -358,7 +361,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             Toast.makeText(context, "You are not signed in", Toast.LENGTH_SHORT).show();
             recreate();
         }
-        signOutButton.setEnabled(false);
+        signOutButton.setEnabled(true);
     }
 
     /**
@@ -367,6 +370,7 @@ public class SettingsActivity extends MenuDrawerActivity {
      * @param view The caller view
      */
     public void redirectToLogin(View view) {
+        System.out.print("redirecting");
         Intent i = new Intent(this, SignInActivity.class);
         startActivityForResult(i, SIGNIN_REQUEST);
     }
