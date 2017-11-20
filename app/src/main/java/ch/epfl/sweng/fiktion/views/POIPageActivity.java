@@ -40,7 +40,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Set;
 
-import ch.epfl.sweng.fiktion.BuildConfig;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;

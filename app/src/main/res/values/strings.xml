@@ -70,6 +70,7 @@
     <string name="save_account_settings">Save account settings</string>
     <string name="fiktion_app_logo">Fiktion app logo</string>
     <string name="change">Change</string>
+    <string name="reset">Reset</string>
     <string name="user_banner">User banner</string>
     <string name="user_profile_picture">User profile picture</string>
     <string name="location_post_photo">Location post photo</string>
@@ -90,6 +91,7 @@
     <string name="Country">Country</string>
     <string name="country_example">ex: Japan</string>
     <string name="Description">Description</string>
+    <string name="login">Login or register account</string>
     <string name="loading_text">Loading…</string>
     <string name="no_results_found">No results found</string>
 </resources>
