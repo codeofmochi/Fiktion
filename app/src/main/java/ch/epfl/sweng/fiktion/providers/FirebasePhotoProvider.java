@@ -150,7 +150,6 @@ public class FirebasePhotoProvider extends PhotoProvider {
      */
     @Override
     public void downloadPOIBitmaps(final String poiName, int numberOfBitmaps, final DownloadBitmapListener listener) {
-        assert numberOfBitmaps >= 0;
 
         // first, get the reference of the poi and listen for its photo references
         Query query = dbRef.child("Photo references").child(poiName).orderByKey();

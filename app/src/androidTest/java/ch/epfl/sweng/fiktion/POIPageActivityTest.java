@@ -30,6 +30,7 @@ import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalPhotoProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -63,6 +64,7 @@ public class POIPageActivityTest {
 
     @BeforeClass
     public static void setProviders() {
+        Config.TEST_MODE = true;
         auth = new LocalAuthProvider();
         database = new LocalDatabaseProvider();
         photoProvider = new LocalPhotoProvider();

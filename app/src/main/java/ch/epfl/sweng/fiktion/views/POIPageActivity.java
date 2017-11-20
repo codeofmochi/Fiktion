@@ -49,6 +49,7 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
@@ -152,7 +153,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         reviewsView.setAdapter(reviewsAdapter);
     }
 
-    private void setPoiInformation(PointOfInterest poi) {
+    private void setPoiInformation(final PointOfInterest poi) {
         this.poi = poi;
 
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
@@ -207,6 +208,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 params.setMarginStart(10);
                 params.setMarginEnd(10);
                 imgView.setLayoutParams(params);
+                imgView.setContentDescription("a photo of " + poi.name());
 
                 // add the ImageView to the pictures
                 imageLayout.addView(imgView);
@@ -274,11 +276,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         AlertDialog.Builder builder = new AlertDialog.Builder(POIPageActivity.this);
 
 
-        if (!BuildConfig.DEBUG && ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
+        if (!Config.TEST_MODE && ContextCompat.checkSelfPermission(POIPageActivity.this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             AndroidPermissions.promptCameraPermission(POIPageActivity.this);
         } else {
-            if (!BuildConfig.DEBUG)
+            if (!Config.TEST_MODE)
                 // check camera enable and ask otherwise
                 AndroidServices.promptCameraEnable(POIPageActivity.this);
 
