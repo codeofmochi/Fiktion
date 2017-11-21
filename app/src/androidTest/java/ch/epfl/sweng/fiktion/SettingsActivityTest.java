@@ -25,7 +25,7 @@ public class SettingsActivityTest {
 
     @Test
     public void settingsDisplay() {
-        onView(withId(R.id.accountSettings)).check(matches(isDisplayed()));
+        onView(withId(R.id.accountSettingsTitle)).check(matches(isDisplayed()));
     }
 
 }

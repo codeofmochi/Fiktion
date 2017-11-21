@@ -33,7 +33,8 @@
                     android:text="User Profile"
                     android:textAlignment="center"
                     android:textSize="30sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText,InefficientWeight" />
             </LinearLayout>
 
             <LinearLayout
@@ -145,7 +146,8 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:hint="Add new favourite!"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    tools:ignore="HardcodedText" />
 
                 <EditText
                     android:id="@+id/user_details_addWish_text"
@@ -154,7 +156,8 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:hint="Whish to visit?"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
 
             <LinearLayout
@@ -168,7 +171,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="clickAddFavourite"
-                    android:text="Add Favourite" />
+                    android:text="Add Favourite"
+                    tools:ignore="ButtonStyle,HardcodedText" />
 
                 <Button
                     android:id="@+id/user_details_addWish"
@@ -176,12 +180,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="clickAddToWishlist"
-                    android:text="Add to wishlist" />
+                    android:text="Add to wishlist"
+                    tools:ignore="ButtonStyle,HardcodedText" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                tools:ignore="DisableBaselineAlignment">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -197,12 +203,14 @@
                         android:layout_weight="1"
                         android:text="Favourites"
                         android:textAlignment="center"
-                        android:textSize="24sp" />
+                        android:textSize="24sp"
+                        tools:ignore="HardcodedText,InefficientWeight,NestedWeights" />
 
                     <ListView
                         android:id="@+id/user_details_favourites_list"
                         android:layout_width="match_parent"
-                        android:layout_height="277dp" />
+                        android:layout_height="277dp"
+                        tools:ignore="NestedScrolling" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -218,13 +226,15 @@
                         android:layout_height="wrap_content"
                         android:text="Wishlist"
                         android:textAlignment="center"
-                        android:textSize="24sp" />
+                        android:textSize="24sp"
+                        tools:ignore="HardcodedText" />
 
                     <ListView
                         android:id="@+id/user_details_wishlist_list"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"
+                        tools:ignore="InefficientWeight,NestedScrolling,NestedWeights" />
                 </LinearLayout>
             </LinearLayout>
 

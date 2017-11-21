@@ -73,7 +73,7 @@ public class RegisterActivityTest {
     @Test
     public void existingAccountTest() {
         //we type valid but existing credentials and click on the register button
-        String exist_email = "default@test.ch";
+        String exist_email = "default@email.ch";
         onView(withId(R.id.register_email)).perform(typeText(exist_email), ViewActions.closeSoftKeyboard());
         String exist_password = "testing";
         onView(withId(R.id.register_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());

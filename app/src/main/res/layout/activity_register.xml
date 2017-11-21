@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/kyoto_night"
-    tools:context="ch.epfl.sweng.fiktion.views.RegisterActivity">
+    tools:context="ch.epfl.sweng.fiktion.views.RegisterActivity"
+    tools:ignore="Overdraw">
 
     <ImageView
         android:id="@+id/fiktionLogo2"

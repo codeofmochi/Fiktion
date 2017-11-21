@@ -15,7 +15,8 @@
         android:orientation="vertical"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="8dp">
 
         <TextView
             android:id="@+id/accountSettingsTitle"
@@ -29,14 +30,28 @@
             tools:layout_editor_absoluteX="7dp"
             tools:layout_editor_absoluteY="16dp" />
 
+        <Button
+            android:id="@+id/accountLoginButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary"
+            android:onClick="redirectToLogin"
+            android:visibility="gone"
+            android:text="@string/login"
+            android:textColor="@color/white" />
+
         <LinearLayout
             android:id="@+id/accountSettings"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clipToPadding="false"
             android:orientation="vertical"
-            android:padding="20dp"
-            android:clipToPadding="false">
+            android:padding="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -60,7 +75,7 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:text="$userName$"
+                    android:maxLength="15"
                     android:textSize="14sp"
                     tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
 
@@ -87,7 +102,6 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="textEmailAddress"
-                    android:text="$email$"
                     android:textSize="14sp"
                     tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
 
@@ -97,9 +111,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:paddingBottom="7dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
+                android:paddingBottom="7dp"
                 tools:ignore="NestedWeights">
 
                 <TextView
@@ -111,12 +125,13 @@
                     android:text="@string/password" />
 
                 <Button
-                    android:id="@+id/passwordEdit"
+                    android:id="@+id/passwordReset"
                     android:layout_width="45dp"
                     android:layout_height="36dp"
-                    android:background="@color/lightGray"
                     android:layout_weight="1"
-                    android:text="@string/change" /> <!-- text is dynamically updated -->
+                    android:background="@color/lightGray"
+                    android:onClick="clickResetPassword"
+                    android:text="@string/reset" /> <!-- text is dynamically updated -->
 
             </LinearLayout>
 
@@ -124,9 +139,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:paddingBottom="7dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
+                android:paddingBottom="7dp"
                 tools:ignore="NestedWeights">
 
                 <TextView
@@ -140,8 +155,9 @@
                     android:id="@+id/verifiedButton"
                     android:layout_width="45dp"
                     android:layout_height="36dp"
-                    android:background="@color/lightGray"
                     android:layout_weight="1"
+                    android:background="@color/lightGray"
+                    android:onClick="sendEmailVerification"
                     android:text="@string/send_email" /> <!-- text is dynamically updated -->
 
             </LinearLayout>
@@ -168,6 +184,7 @@
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:background="@color/red"
+                    android:onClick="clickDeleteAccount"
                     android:text="@string/delete"
                     android:textColor="@color/white" /> <!-- text is dynamically updated -->
 
@@ -175,13 +192,25 @@
 
             <Button
                 android:id="@+id/saveAccountSettingsButton"
-                android:background="@color/colorPrimary"
-                android:textColor="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_weight="1"
                 android:layout_margin="5dp"
-                android:text="@string/save_account_settings" />
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="savePersonalInfos"
+                android:text="@string/save_account_settings"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/signOutButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="clickSignOut"
+                android:text="@string/sign_out_button"
+                android:textColor="@color/white" />
 
         </LinearLayout>
 
