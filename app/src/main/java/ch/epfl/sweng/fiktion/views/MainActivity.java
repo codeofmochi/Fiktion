@@ -15,22 +15,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-
-    public void startFindNearestPoisActivity(View view) {
-        Intent findPoiIntent = new Intent(this, FindNearestPoisActivity.class);
-        startActivity(findPoiIntent);
-    }
-
-    public void startSignInActivity(View view) {
-        //we advance to the login activity
-        Intent signInActivity = new Intent(this, SignInActivity.class);
-        startActivity(signInActivity);
-    }
-
-    public void startHomeActivity(View view) {
+        // redirect to home activity
         Intent i = new Intent(this, HomeActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
+        // we don't want this to exist anymore
+        this.finish();
     }
-
 }
