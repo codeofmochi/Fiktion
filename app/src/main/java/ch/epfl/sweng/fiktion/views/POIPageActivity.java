@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -95,6 +96,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private PointOfInterest poi;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
+    private ImageView noImages;
     private MapView map;
     private String[] reviewsData = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
@@ -124,6 +126,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         imageLayout = (LinearLayout) findViewById(R.id.imageLayout);
         uploadProgressBar = (ProgressBar) findViewById(R.id.uploadProgressBar);
+
+        // add a "no pictures yet" default image
+        Bitmap bm = POIDisplayer.scaleBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.default_image), 400);
+        noImages = new ImageView(this);
+        noImages.setImageBitmap(bm);
+        imageLayout.addView(noImages);
 
         // get POI name
         Intent from = getIntent();
@@ -215,6 +223,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
                 // add the ImageView to the pictures
                 imageLayout.addView(imgView);
+
+                // remove "no pictures yet"
+                if (noImages.getVisibility() == View.VISIBLE) {
+                    noImages.setVisibility(View.GONE);
+                    imageLayout.removeView(noImages);
+                }
             }
 
             @Override
