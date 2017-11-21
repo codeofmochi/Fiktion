@@ -123,31 +123,68 @@ public class User {
      */
     public void acceptFriendRequest(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
         if(friendRequests.contains(friendID)) {
-            // remove friend invitation
-            friendRequests.remove(friendID);
+            // get instance of the user
+            final User instance = this;
             // Access other user (friend)
             db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
-                    // add friend in friend list
-                    addToFriendlist(db, friendID, listener);
-                    // add it self in friend's friend list
-                    user.addToFriendlist(db, id, listener);
+                    // modify the friend
+                    db.modifyUser(user.addFriend(id), new DatabaseProvider.ModifyUserListener() {
+                        @Override
+                        public void onSuccess() {
+                            // modify the user
+                            db.modifyUser(instance.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
+                                @Override
+                                public void onSuccess() {
+                                    // perform changes locally
+                                    friendRequests.remove(friendID);
+                                    friendlist.add(friendID);
+                                    listener.onSuccess();
+                                }
+
+                                @Override
+                                public void onDoesntExist() {
+                                    // --> the user accepting the request doesn't exist anymore
+                                    listener.onDoesntExist();
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    // --> error modifying the user
+                                    listener.onFailure();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            // --> friend we just accessed doesn't exist anymore
+                            listener.onDoesntExist();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            // --> error on modifying friend
+                            listener.onFailure();
+                        }
+                    });
                 }
 
                 @Override
                 public void onDoesntExist() {
-                    // remove friend invitation
-                    friendRequests.remove(friendID);
+                    // --> report that friend doesn't exist
                     listener.onDoesntExist();
                 }
 
                 @Override
                 public void onFailure() {
+                    // --> report couldn't access friend (database error)
                     listener.onFailure();
                 }
             });
         } else {
+            // should not happen, false request (programmer error)
             listener.onFailure();
         }
     }
@@ -161,6 +198,7 @@ public class User {
      */
     public void ignoreFriendRequest(final DatabaseProvider db, final String friendID, final AuthProvider.AuthListener listener) {
         if(friendRequests.remove(friendID)) {
+            // modify user
             db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
@@ -179,6 +217,7 @@ public class User {
                 }
             });
         } else {
+            // --> trying to remove something that is not the set
             listener.onFailure();
         }
     }
@@ -218,9 +257,42 @@ public class User {
      * Adds a friend request to the friendRequests
      *
      * @param userID The ID of the sender
+     * @return The user with the friend added in his requestList
      */
     private User addRequest(final String userID) {
         friendRequests.add(userID);
+        return this;
+    }
+
+    /**
+     *
+     * @param userID The ID of the sender
+     * @return The user with the friend removed from his requestList
+     */
+    private User removeRequest(final String userID) {
+        friendRequests.remove(userID);
+        return this;
+    }
+
+    /**
+     * Adds a friend to the friendlist
+     *
+     * @param userID The ID of the friend we want to add
+     * @return The user with the the friend added in his friendlist
+     */
+    private User addFriend(final String userID) {
+        friendlist.add(userID);
+        return this;
+    }
+
+    /**
+     * Remove a friend from the friendlist
+     *
+     * @param userID The ID of the friend we want to add
+     * @return The user with the friend removed from the friendlist
+     */
+    private User removeFriend(final String userID) {
+        friendlist.remove(userID);
         return this;
     }
 
@@ -252,35 +324,34 @@ public class User {
     }
 
     /**
-     * Add a new friend to the user's friend list
+     * Helper function for removeFromfriendlist removing friend from user's friendlist
      *
      * @param db database containing the user data
-     * @param friendID user (friend) ID that the user wants to add
+     * @param instance Instance of the user we want to remove the friend
+     * @param friendID The friend we want to remove
      * @param listener Handles what happens in case of success or failure of the change
      */
-    private void addToFriendlist(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
-        if(friendlist.add(friendID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
-                @Override
-                public void onSuccess() {
-                    listener.onSuccess();
-                }
+    private void removeFriendFromUserHelper(final DatabaseProvider db, User instance, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
+        // modify user
+        db.modifyUser(instance.removeFriend(friendID), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                listener.onSuccess();
+            }
 
-                @Override
-                public void onDoesntExist() {
-                    friendlist.remove(friendID);
-                    listener.onDoesntExist();
-                }
+            @Override
+            public void onDoesntExist() {
+                // --> (should not happen)
+                // User performing removal is not in the database anymore
+            }
 
-                @Override
-                public void onFailure() {
-                    friendlist.remove(friendID);
-                    listener.onFailure();
-                }
-            });
-        } else {
-            listener.onFailure();
-        }
+            @Override
+            public void onFailure() {
+                // --> user is not in friend list anymore, but has friend in his list
+                // Needs to perform the action again
+                listener.onFailure();
+            }
+        });
     }
 
     /**
@@ -292,20 +363,45 @@ public class User {
      */
     public void removeFromFriendlist(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
         if(friendlist.remove(friendID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            final User instance = this;
+            // get friend user
+            db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess() {
-                    listener.onSuccess();
+                public void onSuccess(User user) {
+                    // modify friend, remove user from friend list
+                    db.modifyUser(user.removeFriend(id), new DatabaseProvider.ModifyUserListener() {
+                        @Override
+                        public void onSuccess() {
+                            // modify user
+                            removeFriendFromUserHelper(db, instance, friendID, listener);
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            // --> no modifications needed on friend, just on user
+                            // modify user
+                            removeFriendFromUserHelper(db, instance, friendID, listener);
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            // --> error, re-add friend locally
+                            friendlist.add(friendID);
+                            listener.onFailure();
+                        }
+                    });
                 }
 
                 @Override
                 public void onDoesntExist() {
-                    friendlist.add(friendID);
-                    listener.onDoesntExist();
+                    // --> no modifications needed on friend, just on user
+                    // modify user
+                    removeFriendFromUserHelper(db, instance, friendID, listener);
                 }
 
                 @Override
                 public void onFailure() {
+                    // --> error, re-add friend locally
                     friendlist.add(friendID);
                     listener.onFailure();
                 }
