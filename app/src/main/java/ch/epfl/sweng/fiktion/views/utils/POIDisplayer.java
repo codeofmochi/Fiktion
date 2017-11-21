@@ -19,6 +19,8 @@ import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.providers.PhotoSingleton;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 /**
@@ -58,14 +60,25 @@ public class POIDisplayer {
 
         /* add picture */
 
-        ImageView img = new ImageView(ctx);
-        // Get the image here
-        Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.akibairl2);
-        // Scale it to avoid heavy computations
-        b = POIDisplayer.scaleBitmap(b, IMAGE_SIZE);
-        // crop to a centered square, computed from the min(width, height) of the image
-        b = POIDisplayer.cropBitmapToSquare(b);
-        img.setImageBitmap(b);
+        final ImageView img = new ImageView(ctx);
+        // Load a default picture
+        Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.default_image);
+        processAndPutImage(img, b);
+        // Try to load a picture for this poi from DB
+        PhotoSingleton.photoProvider.downloadPOIBitmaps(
+                poi.name(),
+                1,
+                new PhotoProvider.DownloadBitmapListener() {
+                    @Override
+                    public void onNewPhoto(Bitmap b) {
+                        processAndPutImage(img, b);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        // give up and do nothing
+                    }
+                });
         // Define size
         img.setMaxHeight(IMAGE_SIZE);
         img.setMaxWidth(IMAGE_SIZE);
@@ -129,6 +142,21 @@ public class POIDisplayer {
 
         // finally return the whole view
         return v;
+    }
+
+    /**
+     * Transforms a bitmap into appropriate size and replace the ImageView's content
+     *
+     * @param img An ImageView in which we want to put the picture
+     * @param b   An image that we want to resize and display
+     */
+    private static void processAndPutImage(ImageView img, Bitmap b) {
+        // Scale the image to avoid heavy computations
+        Bitmap res = POIDisplayer.scaleBitmap(b, IMAGE_SIZE);
+        // crop to a centered square, computed from the min(width, height) of the image
+        res = POIDisplayer.cropBitmapToSquare(res);
+        // Put the picture in the ImageView
+        img.setImageBitmap(res);
     }
 
     /**
