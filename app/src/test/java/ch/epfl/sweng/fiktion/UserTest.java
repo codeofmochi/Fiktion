@@ -42,6 +42,8 @@ import static org.mockito.Mockito.doAnswer;
 public class UserTest {
 
     private User user;
+    private final User user1 = new User("user1", "id1");
+
     private DatabaseProvider localDB = new LocalDatabaseProvider();
     private DatabaseProvider.ModifyUserListener dbListener;
 
@@ -396,6 +398,41 @@ public class UserTest {
             @Override
             public void onFailure() {
                 assertFalse(testUser.getVisited().contains("new POI"));
+            }
+        });
+    }
+
+    @Test
+    public void testSendRequestLogic() {
+        user.sendFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                localDB.getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertThat(user.getRequests().size(), is(1));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
             }
         });
     }

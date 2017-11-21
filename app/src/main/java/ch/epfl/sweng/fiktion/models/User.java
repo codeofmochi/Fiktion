@@ -37,7 +37,9 @@ public class User {
      * @param wishes POIs wish list
      * @param friends User friend list
      */
-    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, TreeSet<String> friends, TreeSet<String> fRequests, LinkedList<String> visits, Boolean isPublic) {
+    public User(String input_name, String input_id, TreeSet<String> favs,
+                TreeSet<String> wishes, TreeSet<String> friends, TreeSet<String> fRequests,
+                LinkedList<String> visits, Boolean isPublic) {
         name = input_name;
         id = input_id;
         favourites = favs;
