@@ -21,22 +21,7 @@ public class MainActivityTest {
             new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void goToSignIn(){
-        onView(withId(R.id.signInButton)).perform(click());
-
-        onView(withId(R.id.User_Email)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void goToNearbyPos(){
-        onView(withId(R.id.main_findNearPois)).perform(click());
-
-        onView(withId(R.id._findNearPois)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void goToHome(){
-        onView(withId(R.id.startHomeButton)).perform(click());
+    public void goToHomeOnLaunch(){
         onView(withId(R.id.placeText)).check(matches(isDisplayed()));
     }
 }
