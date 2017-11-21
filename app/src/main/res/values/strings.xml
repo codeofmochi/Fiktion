@@ -39,13 +39,7 @@
     <string name="email_is_not_verified">Email is not verified</string>
     <!-- MainActivity -->
     <string name="singn_in_button">SignIn</string>
-    <string name="find_near_poi">Find Nearby POIs</string>
-    <string name="view_home">View Home</string>
     <!-- ProfileSettingsActivity-->
-    <string name="change_username">Change username</string>
-    <string name="update">Update</string>
-    <string name="change_mail">Change email</string>
-    <string name="reset_pw">Reset Password</string>
     <string name="delete_account">Delete account</string>
     <!-- RegisterActivity -->
     <string name="confirm_pw">Confirm password</string>
@@ -69,7 +63,6 @@
     <string name="profile_is_public">Profile is public</string>
     <string name="save_account_settings">Save account settings</string>
     <string name="fiktion_app_logo">Fiktion app logo</string>
-    <string name="change">Change</string>
     <string name="reset">Reset</string>
     <string name="user_banner">User banner</string>
     <string name="user_profile_picture">User profile picture</string>
