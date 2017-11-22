@@ -97,6 +97,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
     private ImageView noImages;
+    private ImageView mainImage;
     private MapView map;
     private String[] reviewsData = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
@@ -124,6 +125,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         map = (MapView) findViewById(R.id.map);
         map.onCreate(savedInstanceState);
 
+        mainImage = (ImageView) findViewById(R.id.mainImage);
+        mainImage.setVisibility(View.GONE);
         imageLayout = (LinearLayout) findViewById(R.id.imageLayout);
         uploadProgressBar = (ProgressBar) findViewById(R.id.uploadProgressBar);
 
@@ -166,13 +169,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private void setPoiInformation(final PointOfInterest poi) {
         this.poi = poi;
 
-        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
-
         // set the mainImage as the first photo of the poi
         photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
-                mainImage.setImageBitmap(b);
+                Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
+                mainImage.setImageBitmap(resized);
+                mainImage.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -202,7 +205,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(poi.description());
-        final boolean emptyMainImage = true;
 
         // download the photos of the poi
         photoProvider.downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
