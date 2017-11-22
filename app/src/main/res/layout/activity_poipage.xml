@@ -182,11 +182,34 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:paddingBottom="100dp"
             android:text="@string/nearby"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/reviews" />
+
+        <LinearLayout
+            android:id="@+id/nearbyPoisList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nearbyTitle"
+            tools:ignore="UselessLeaf" /> <!-- dynamically updated -->
+
+        <TextView
+            android:id="@+id/noNearbyPois"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="100dp"
+            android:text="@string/no_nearby_places_found"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nearbyPoisList" />
 
         <ProgressBar
             android:id="@+id/uploadProgressBar"

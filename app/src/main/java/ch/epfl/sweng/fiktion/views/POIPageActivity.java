@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -59,6 +60,7 @@ import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
     private final int MAXIMUM_SIZE = 1000;
+    private final int SEARCH_RADIUS = 20;
 
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
         private String[] data;
@@ -93,6 +95,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
+    private final Context ctx = this;
+    private LinearLayout nearbyPoisList;
+    private TextView noNearbyPois;
     private PointOfInterest poi;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
@@ -164,6 +169,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         reviewsView.setLayoutManager(reviewsLayout);
         RecyclerView.Adapter reviewsAdapter = new ReviewsAdapter(reviewsData);
         reviewsView.setAdapter(reviewsAdapter);
+
+        // get nearby pois views
+        nearbyPoisList = (LinearLayout) findViewById(R.id.nearbyPoisList);
+        noNearbyPois = (TextView) findViewById(R.id.noNearbyPois);
     }
 
     private void setPoiInformation(final PointOfInterest poi) {
@@ -241,6 +250,23 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // get notified when the map is ready to be used
         map.getMapAsync(this);
+
+        // find nearby pois
+        DatabaseSingleton.database.findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
+            @Override
+            public void onNewValue(PointOfInterest p) {
+                View v = POIDisplayer.createPoiCard(p, ctx);
+                if (!poi.name().equals(p.name())) {
+                    nearbyPoisList.addView(v);
+                    noNearbyPois.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                // do nothing
+            }
+        });
     }
 
     @Override

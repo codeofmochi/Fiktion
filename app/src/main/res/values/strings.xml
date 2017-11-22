@@ -87,4 +87,5 @@
     <string name="login">Login or register account</string>
     <string name="loading_text">Loading…</string>
     <string name="no_results_found">No results found</string>
+    <string name="no_nearby_places_found">No nearby places found.</string>
 </resources>
