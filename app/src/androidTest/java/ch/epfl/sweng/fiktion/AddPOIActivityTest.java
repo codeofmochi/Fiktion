@@ -5,13 +5,17 @@ import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.action.CoordinatesProvider;
+import android.support.test.espresso.action.GeneralClickAction;
 import android.support.test.espresso.action.GeneralLocation;
 import android.support.test.espresso.action.GeneralSwipeAction;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
+import android.support.test.espresso.action.Tap;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
+import android.view.InputDevice;
 import android.view.View;
 import android.widget.EditText;
 
@@ -528,15 +532,6 @@ public class AddPOIActivityTest {
         };
     }
 
-    @Test
-    public void getLocationFromMapNewCoordsTest() {
-        onView(withId(R.id.add_poi_map)).perform(click());
-        onView(withId(R.id.mapForLocation)).perform(click());
-        onView(withId(R.id.getNewLocationButton)).perform(click());
-        addPoiLatitude.check(isBetween(-90, 90));
-        addPoiLongitude.check(isBetween(-180, 180));
-    }
-
     // https://stackoverflow.com/questions/38737127/espresso-how-to-get-current-activity-to-test-fragments
     private Activity getActivityInstance() {
         final Activity[] currentActivity = {null};
@@ -550,6 +545,35 @@ public class AddPOIActivityTest {
         });
 
         return currentActivity[0];
+    }
+
+    public ViewAction clickQuarter() {
+        return new GeneralClickAction(Tap.SINGLE, new CoordinatesProvider() {
+            @Override
+            public float[] calculateCoordinates(View view) {
+                float[] newPos = {view.getWidth() / 2, view.getHeight() / 4};
+                return newPos;
+            }
+        }, Press.FINGER, InputDevice.SOURCE_ANY, 0);
+    }
+
+    @Test
+    public void getLocationFromMapNewCoordsTest() {
+        onView(withId(R.id.add_poi_map)).perform(click());
+
+        GoogleMapsLocationProvider gmaps = ((GetLocationFromMapActivity) getActivityInstance()).gmaps;
+        // busy wait until GPS is ready
+        long t = System.currentTimeMillis();
+        long end = t + 5000;
+        while (System.currentTimeMillis() < end && !gmaps.hasLocation()) ;
+
+        if (gmaps.hasLocation()) {
+            onView(withId(R.id.mapForLocation)).perform(clickQuarter());
+            waitASecond();
+            onView(withId(R.id.getNewLocationButton)).perform(click());
+            addPoiLatitude.check(isBetween(-90, 90));
+            addPoiLongitude.check(isBetween(-180, 180));
+        }
     }
 
     @Test
