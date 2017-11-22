@@ -14,6 +14,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
@@ -42,7 +43,8 @@ import static org.mockito.Mockito.doAnswer;
 public class UserTest {
 
     private User user;
-    private final User user1 = new User("user1", "id1");
+    private User user1;
+    private User userWFR;
 
     private DatabaseProvider localDB = new LocalDatabaseProvider();
     private DatabaseProvider.ModifyUserListener dbListener;
@@ -85,6 +87,14 @@ public class UserTest {
         localDB = new LocalDatabaseProvider();
         result = NOTHING;
         user = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+        user1 = new User("user1", "id1");
+
+        // Initiating friendlists and friendRequests
+        String[] fList = new String[] {"defaultID"};
+        String[] rList = new String[] {"id1"};
+
+        userWFR = new User("userWFR", "idwfr", new TreeSet<String>(), new TreeSet<String>(),
+                new TreeSet<>(Arrays.asList(fList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
 
         doAnswer(new Answer() {
             @Override
@@ -403,7 +413,22 @@ public class UserTest {
     }
 
     @Test
-    public void testSendRequestLogic() {
+    public void testChangeProfilePrivacyLogic() {
+        user.changeProfilePrivacy(localDB, false, new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                assertTrue(!user.isPublicProfile());
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testSendFriendRequestLogic() {
         user.sendFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
@@ -411,6 +436,124 @@ public class UserTest {
                     @Override
                     public void onSuccess(User user) {
                         assertThat(user.getRequests().size(), is(1));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testAcceptFriendRequestLogic() {
+        userWFR.acceptFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                localDB.getUserById(userWFR.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getFriendlist().contains(user1.getID()));
+                        assertTrue(user.getRequests().isEmpty());
+                        localDB.getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
+                            @Override
+                            public void onSuccess(User user) {
+                                assertTrue(user.getFriendlist().contains(userWFR.getID()));
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                Assert.fail();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Assert.fail();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testIgnoreFriendRequestsLogic() {
+        userWFR.ignoreFriendRequest(localDB, user1.getID(), new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                localDB.getUserById(userWFR.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getRequests().isEmpty());
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testRemoveFromFriendlistLogic() {
+        userWFR.removeFromFriendlist(localDB, user.getID(), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                localDB.getUserById(userWFR.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getFriendlist().isEmpty());
+
                     }
 
                     @Override

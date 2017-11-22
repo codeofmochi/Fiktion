@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,7 +21,15 @@ import ch.epfl.sweng.fiktion.models.User;
 public class LocalDatabaseProvider extends DatabaseProvider {
     private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
     private final User user1 = new User("user1", "id1");
-    private final List<User> initialList = Arrays.asList(defaultUser,user1);
+    // Initiating friendlists and friendRequests
+    private final String[] fList = new String[] {"defaultID"};
+    private final String[] rList = new String[] {"id1"};
+
+    // user is friend with defaultUser and has user1 in his requests
+    private final User userWFR = new User("userWFR", "idwfr", new TreeSet<String>(), new TreeSet<String>(),
+            new TreeSet<>(Arrays.asList(fList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
+
+    private final List<User> initialList = Arrays.asList(defaultUser,user1, userWFR);
     private final List<PointOfInterest> poiList = new ArrayList<>();
     private final List<User> users = new ArrayList<> (initialList);
 

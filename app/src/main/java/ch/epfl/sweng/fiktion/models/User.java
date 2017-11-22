@@ -20,12 +20,12 @@ public class User {
     //we could use same id as firebase id or create our own id system
     private final String id;
     private Boolean isPublicProfile;
-    private TreeSet<String> favourites;
-    private TreeSet<String> wishlist;
+    private Set<String> favourites;
+    private Set<String> wishlist;
     private LinkedList<String> visited;
     //private Set<String> rated;
-    private TreeSet<String> friendlist;
-    private TreeSet<String> friendRequests;
+    private Set<String> friendlist;
+    private Set<String> friendRequests;
 
     /**
      * Creates a new User with given parameters
@@ -37,8 +37,8 @@ public class User {
      * @param wishes POIs wish list
      * @param friends User friend list
      */
-    public User(String input_name, String input_id, TreeSet<String> favs,
-                TreeSet<String> wishes, TreeSet<String> friends, TreeSet<String> fRequests,
+    public User(String input_name, String input_id, Set<String> favs,
+                Set<String> wishes, Set<String> friends, Set<String> fRequests,
                 LinkedList<String> visits, Boolean isPublic) {
         name = input_name;
         id = input_id;
@@ -59,7 +59,7 @@ public class User {
      * @param wishes POIs wish list
      * @param visits list of visited POIs
      */
-    public User(String input_name, String input_id, TreeSet<String> favs, TreeSet<String> wishes, LinkedList<String> visits) {
+    public User(String input_name, String input_id, Set<String> favs, Set<String> wishes, LinkedList<String> visits) {
         name = input_name;
         id = input_id;
         favourites = favs;
@@ -123,8 +123,6 @@ public class User {
      */
     public void acceptFriendRequest(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
         if(friendRequests.contains(friendID)) {
-            // get instance of the user
-            final User instance = this;
             // Access other user (friend)
             db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
@@ -134,12 +132,9 @@ public class User {
                         @Override
                         public void onSuccess() {
                             // modify the user
-                            db.modifyUser(instance.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
+                            db.modifyUser(User.this.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
                                 @Override
                                 public void onSuccess() {
-                                    // perform changes locally
-                                    friendRequests.remove(friendID);
-                                    friendlist.add(friendID);
                                     listener.onSuccess();
                                 }
 
@@ -363,7 +358,6 @@ public class User {
      */
     public void removeFromFriendlist(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
         if(friendlist.remove(friendID)) {
-            final User instance = this;
             // get friend user
             db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
@@ -373,14 +367,14 @@ public class User {
                         @Override
                         public void onSuccess() {
                             // modify user
-                            removeFriendFromUserHelper(db, instance, friendID, listener);
+                            removeFriendFromUserHelper(db, User.this, friendID, listener);
                         }
 
                         @Override
                         public void onDoesntExist() {
                             // --> no modifications needed on friend, just on user
                             // modify user
-                            removeFriendFromUserHelper(db, instance, friendID, listener);
+                            removeFriendFromUserHelper(db, User.this, friendID, listener);
                         }
 
                         @Override
@@ -396,7 +390,7 @@ public class User {
                 public void onDoesntExist() {
                     // --> no modifications needed on friend, just on user
                     // modify user
-                    removeFriendFromUserHelper(db, instance, friendID, listener);
+                    removeFriendFromUserHelper(db, User.this, friendID, listener);
                 }
 
                 @Override
