@@ -28,6 +28,7 @@ import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 
 import static ch.epfl.sweng.fiktion.UserTest.Result.DOESNOTEXIST;
 import static ch.epfl.sweng.fiktion.UserTest.Result.FAILURE;
+import static ch.epfl.sweng.fiktion.UserTest.Result.FRIENDEXCEPTION;
 import static ch.epfl.sweng.fiktion.UserTest.Result.NOTHING;
 import static ch.epfl.sweng.fiktion.UserTest.Result.SUCCESS;
 import static junit.framework.Assert.assertTrue;
@@ -800,7 +801,31 @@ public class UserTest {
         });
     }
 
+    @Test
+    public void testIgnoreFriendRequest() {
 
+        AuthProvider.AuthListener testListener = new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                setResult(SUCCESS);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(FAILURE);
+            }
+        };
+
+        userWFR.ignoreFriendRequest(mockDB, user1.getID(), testListener);
+
+        mUserListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+        mUserListener.onDoesntExist();
+        assertThat(result, is(FAILURE));
+        setResult(NOTHING);
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+    }
 
     @Test
     public void testRemoveFromFriendlistLogic() {
@@ -906,6 +931,52 @@ public class UserTest {
                 Assert.fail();
             }
         });
+    }
+
+    @Test
+    public void testRemoveFromFriendlist() {
+        doNothing().when(mockDB).getUserById(any(String.class), getUserListenerArgumentCaptor.capture());
+
+        User.userListener testListener = new User.userListener() {
+            @Override
+            public void onSuccess() {
+                setResult(SUCCESS);
+            }
+
+            @Override
+            public void onFriendlistException() {
+                setResult(FRIENDEXCEPTION);
+            }
+
+            @Override
+            public void onDoesntExist() {
+                setResult(DOESNOTEXIST);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(FAILURE);
+            }
+        };
+
+        userWFR.removeFromFriendlist(mockDB, user.getID(), testListener);
+
+        DatabaseProvider.GetUserListener gAC = getUserListenerArgumentCaptor.getValue();
+        gAC.onFailure();
+        assertThat(result, is(FAILURE));
+        setResult(NOTHING);
+        gAC.onSuccess(user);
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+        mUserListener.onDoesntExist();
+        mUserListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+        mUserListener.onDoesntExist();
+        assertThat(result, is(FAILURE));
+        setResult(NOTHING);
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+
     }
 
 }

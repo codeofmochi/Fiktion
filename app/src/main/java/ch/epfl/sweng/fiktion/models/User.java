@@ -339,6 +339,7 @@ public class User {
             public void onDoesntExist() {
                 // --> (should not happen)
                 // User performing removal is not in the database anymore
+                listener.onFailure();
             }
 
             @Override
