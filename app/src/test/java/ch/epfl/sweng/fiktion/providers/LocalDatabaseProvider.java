@@ -1,6 +1,8 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,9 +20,28 @@ import ch.epfl.sweng.fiktion.models.User;
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
     private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+    private final User user1 = new User("user1", "id1");
+    // Initiating friendlists and friendRequests
+    private final String[] fList = new String[] {"defaultID"};
+    private final String[] rList = new String[] {"id1"};
+    private final String[] fakeFList = new String[] {"idfake"};
+    private final String[] fakeRList = new String[] {"idfake"};
+
+    // user is friend with defaultUser and has user1 in his requests
+    private final User userWFR = new User("userWFR", "idwfr", new TreeSet<String>(), new TreeSet<String>(),
+            new TreeSet<>(Arrays.asList(fList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
+
+    // user with a friend that is not stored in the database
+    private final User userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
+            new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true);
+
+    // user has request from fake friend
+    private final User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
+            new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true);
+
+    private final List<User> initialList = Arrays.asList(defaultUser,user1, userWFR, userFakeF, userFakeR);
     private final List<PointOfInterest> poiList = new ArrayList<>();
-    private final List<User> users = new ArrayList<>
-            (Collections.singletonList(defaultUser));
+    private final List<User> users = new ArrayList<> (initialList);
 
     /**
      * {@inheritDoc}

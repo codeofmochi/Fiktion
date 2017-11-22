@@ -20,6 +20,9 @@ public class FirebaseUser {
     public Map<String, Boolean> favourites = new TreeMap<>();
     public Map<String, Boolean> wishlist = new TreeMap<>();
     public Map<String, Boolean> visited = new LinkedHashMap<>();
+    public Map<String, Boolean> friendlist = new TreeMap<>();
+    public Map<String, Boolean> friendRequests = new TreeMap<>();
+    public Boolean isPublicProfile = true;
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebaseUser.class)
@@ -42,6 +45,16 @@ public class FirebaseUser {
         for (String wish : user.getWishlist()) {
             wishlist.put(wish, true);
         }
+
+        for (String friend : user.getFriendlist()) {
+            friendlist.put(friend, true);
+        }
+
+        for (String request : user.getRequests()) {
+            friendRequests.put(request, true);
+        }
+
+        isPublicProfile = user.isPublicProfile();
     }
 
     /**
@@ -52,6 +65,9 @@ public class FirebaseUser {
     public User toUser() {
         return new User(name, id, new TreeSet<>(favourites.keySet()),
                 new TreeSet<>(wishlist.keySet()),
-                new LinkedList<>(visited.keySet()));
+                new TreeSet<>(friendlist.keySet()),
+                new TreeSet<>(friendRequests.keySet()),
+                new LinkedList<>(visited.keySet()),
+                isPublicProfile);
     }
 }
