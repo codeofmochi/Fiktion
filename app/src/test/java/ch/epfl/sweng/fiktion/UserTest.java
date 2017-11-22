@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
@@ -54,10 +53,10 @@ public class UserTest {
     private User userFakeR;
 
     private DatabaseProvider localDB = new LocalDatabaseProvider();
-    private DatabaseProvider.ModifyUserListener dbListener;
+    private DatabaseProvider.ModifyUserListener mUserListener;
 
     private void setDBList(DatabaseProvider.ModifyUserListener listener) {
-        dbListener = listener;
+        mUserListener = listener;
     }
 
     private AuthProvider.AuthListener authListener = new AuthProvider.AuthListener() {
@@ -149,26 +148,26 @@ public class UserTest {
 
         user.addFavourite(mockDB, "new POI", authListener);
 
-        dbListener.onSuccess();
+        mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        dbListener.onDoesntExist();
+        mUserListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        dbListener.onFailure();
+        mUserListener.onFailure();
         assertThat(result, is(FAILURE));
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
         new User("", "", set, new TreeSet<String>(), new LinkedList<String>()).removeFavourite(mockDB, "new POI", authListener);
 
-        dbListener.onSuccess();
+        mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        dbListener.onDoesntExist();
+        mUserListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        dbListener.onFailure();
+        mUserListener.onFailure();
         assertThat(result, is(FAILURE));
     }
 
@@ -184,11 +183,11 @@ public class UserTest {
         }).when(mockDB).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
 
         user.changeName(mockDB, "new", authListener);
-        dbListener.onSuccess();
+        mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
-        dbListener.onDoesntExist();
+        mUserListener.onDoesntExist();
         assertThat(result, is(FAILURE));
-        dbListener.onFailure();
+        mUserListener.onFailure();
         assertThat(result, is(FAILURE));
     }
 
@@ -257,26 +256,26 @@ public class UserTest {
 
         user.addToWishlist(mockDB, "new POI", authListener);
 
-        dbListener.onSuccess();
+        mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        dbListener.onDoesntExist();
+        mUserListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        dbListener.onFailure();
+        mUserListener.onFailure();
         assertThat(result, is(FAILURE));
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
         new User("", "", new TreeSet<String>(), set, new LinkedList<String>()).removeFromWishlist(mockDB, "new POI", authListener);
 
-        dbListener.onSuccess();
+        mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        dbListener.onDoesntExist();
+        mUserListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        dbListener.onFailure();
+        mUserListener.onFailure();
         assertThat(result, is(FAILURE));
     }
 
@@ -315,26 +314,26 @@ public class UserTest {
 
         user.visit(mockDB, "new POI", authListener);
 
-        dbListener.onSuccess();
+        mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        dbListener.onDoesntExist();
+        mUserListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        dbListener.onFailure();
+        mUserListener.onFailure();
         assertThat(result, is(FAILURE));
 
         LinkedList<String> list = new LinkedList<>();
         list.add("new POI");
         new User("", "", new TreeSet<String>(), new TreeSet<String>(), list).removeFromVisited(mockDB, "new POI", authListener);
 
-        dbListener.onSuccess();
+        mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
-        dbListener.onDoesntExist();
+        mUserListener.onDoesntExist();
         assertThat(result, is(FAILURE));
 
-        dbListener.onFailure();
+        mUserListener.onFailure();
         assertThat(result, is(FAILURE));
     }
     @Test
@@ -441,6 +440,30 @@ public class UserTest {
                 Assert.fail();
             }
         });
+    }
+
+    @Test
+    public void testChangeProfilePrivacy() {
+
+        AuthProvider.AuthListener testListener = new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                setResult(SUCCESS);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(FAILURE);
+            }
+        };
+
+        user.changeProfilePrivacy(mockDB, true, testListener);
+
+        mUserListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+        mUserListener.onDoesntExist();
     }
 
     @Test
@@ -589,6 +612,47 @@ public class UserTest {
     }
 
     @Test
+    public void testSendListeners(){
+        doNothing().when(mockDB).getUserById(any(String.class), getUserListenerArgumentCaptor.capture());
+
+        User.userListener testListener = new User.userListener() {
+            @Override
+            public void onSuccess() {
+                setResult(SUCCESS);
+            }
+
+            @Override
+            public void onFriendlistException() {
+                setResult(Result.FRIENDEXCEPTION);
+            }
+
+            @Override
+            public void onDoesntExist() {
+                setResult(DOESNOTEXIST);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(FAILURE);
+            }
+        };
+        user.sendFriendRequest(mockDB, user1.getID(), testListener);
+
+        DatabaseProvider.GetUserListener gAC = getUserListenerArgumentCaptor.getValue();
+
+        gAC.onFailure();
+        assertThat(result, is(FAILURE));
+        gAC.onSuccess(user1);
+
+        mUserListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+        mUserListener.onDoesntExist();
+        assertThat(result, is(DOESNOTEXIST));
+    }
+
+    @Test
     public void testAcceptFriendRequestNotInRequestsLogic() {
         user.acceptFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
             @Override
@@ -626,6 +690,48 @@ public class UserTest {
                 Assert.fail();
             }
         });
+    }
+
+    @Test
+    public void testAcceptFriendRequest() {
+
+        doNothing().when(mockDB).getUserById(any(String.class), getUserListenerArgumentCaptor.capture());
+
+        DatabaseProvider.ModifyUserListener testListener = new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                setResult(SUCCESS);
+            }
+
+            @Override
+            public void onDoesntExist() {
+                setResult(DOESNOTEXIST);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(FAILURE);
+            }
+        };
+
+        userWFR.acceptFriendRequest(mockDB, user1.getID(), testListener);
+
+        DatabaseProvider.GetUserListener gAC = getUserListenerArgumentCaptor.getValue();
+        gAC.onFailure();
+        assertThat(result, is(FAILURE));
+        setResult(NOTHING);
+        gAC.onSuccess(user1);
+        mUserListener.onDoesntExist();
+        assertThat(result, is(DOESNOTEXIST));
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+        mUserListener.onSuccess();
+        mUserListener.onDoesntExist();
+        assertThat(result, is(DOESNOTEXIST));
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+
+
     }
 
     @Test
@@ -802,45 +908,4 @@ public class UserTest {
         });
     }
 
-    @Test
-    public void testSendListeners(){
-        doNothing().when(mockDB).getUserById(any(String.class), getUserListenerArgumentCaptor.capture());
-
-        User.userListener testListener = new User.userListener() {
-            @Override
-            public void onSuccess() {
-                setResult(SUCCESS);
-            }
-
-            @Override
-            public void onFriendlistException() {
-                setResult(Result.FRIENDEXCEPTION);
-            }
-
-            @Override
-            public void onDoesntExist() {
-                setResult(DOESNOTEXIST);
-            }
-
-            @Override
-            public void onFailure() {
-                setResult(FAILURE);
-            }
-        };
-        user.sendFriendRequest(mockDB, user1.getID(), testListener);
-
-        DatabaseProvider.GetUserListener gAC = getUserListenerArgumentCaptor.getValue();
-
-        gAC.onFailure();
-        assertThat(result, is(FAILURE));
-        gAC.onSuccess(user1);
-
-        dbListener.onSuccess();
-        assertThat(result, is(SUCCESS));
-        dbListener.onFailure();
-        assertThat(result, is(FAILURE));
-        dbListener.onDoesntExist();
-        assertThat(result, is(DOESNOTEXIST));
-
-    }
 }
