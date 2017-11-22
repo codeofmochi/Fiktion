@@ -36,4 +36,12 @@ public class Position {
     public double longitude() {
         return longitude;
     }
+
+    @Override
+    public boolean equals(Object that) {
+        return that != null &&
+                that instanceof Position &&
+                ((Position) that).latitude == latitude &&
+                ((Position) that).longitude == longitude;
+    }
 }

@@ -26,16 +26,54 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private GeoFire geofire;
     private SearchProvider searchProvider;
 
+    /**
+     * Constructs a firebase database class that provides database methods
+     */
     public FirebaseDatabaseProvider() {
         dbRef = FirebaseDatabase.getInstance().getReference();
         geofire = new GeoFire(dbRef.child("geofire"));
         searchProvider = new AlgoliaSearchProvider();
     }
 
+    /**
+     * Constructs a firebase database class with the given fields. Mainly used for testing
+     */
     public FirebaseDatabaseProvider(DatabaseReference dbRef, GeoFire geofire, SearchProvider searchProvider) {
         this.dbRef = dbRef;
         this.geofire = geofire;
         this.searchProvider = searchProvider;
+    }
+
+    /**
+     * encodes a String so that firebase can store it, use decode to decode it
+     *
+     * @param s the String to encode
+     * @return the encoded String
+     */
+    public static String encode(String s) {
+        return s.replace("%", "%%")
+                .replace(".", "%P")
+                .replace("$", "%D")
+                .replace("[", "%O")
+                .replace("]", "%C")
+                .replace("#", "%H")
+                .replace("/", "%S");
+    }
+
+    /**
+     * decodes an encoded String to get back is value
+     *
+     * @param s the encoded String
+     * @return the decoded String
+     */
+    public static String decode(String s) {
+        return s.replace("%%", "%")
+                .replace("%P", ".")
+                .replace("%D", "$")
+                .replace("%O", "[")
+                .replace("%C", "]")
+                .replace("%H", "#")
+                .replace("%S", "/");
     }
 
     /**
