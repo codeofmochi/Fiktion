@@ -82,7 +82,6 @@ public class UserTest {
     DataSnapshot snapshot;
     @Captor
     ArgumentCaptor<DatabaseProvider.GetUserListener> getUserListenerArgumentCaptor;
-    ArgumentCaptor<DatabaseProvider.ModifyUserListener> modifyUserListenerArgumentCaptor;
 
     public enum Result {SUCCESS, FAILURE, DOESNOTEXIST, FRIENDEXCEPTION, NOTHING}
 
@@ -835,15 +834,12 @@ public class UserTest {
         gAC.onFailure();
         assertThat(result, is(FAILURE));
         gAC.onSuccess(user1);
-        doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
 
-
-        DatabaseProvider.ModifyUserListener mAC = modifyUserListenerArgumentCaptor.getValue();
-        mAC.onSuccess();
+        dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
-        mAC.onFailure();
+        dbListener.onFailure();
         assertThat(result, is(FAILURE));
-        mAC.onDoesntExist();
+        dbListener.onDoesntExist();
         assertThat(result, is(DOESNOTEXIST));
 
     }
