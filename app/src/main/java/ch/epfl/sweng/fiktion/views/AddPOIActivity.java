@@ -110,6 +110,8 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 }
                 ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
                 ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
+            } else {
+                showToast(fiction + " already added");
             }
         }
     }
@@ -188,6 +190,10 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 ((EditText) findViewById(R.id.add_poi_latitude)).setError("The latitude must be in range [-90;90]");
                 isCorrect = false;
             }
+        }
+        if (fictionSet.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Enter at least one fiction");
+            isCorrect = false;
         }
         if (isCorrect) {
             PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
