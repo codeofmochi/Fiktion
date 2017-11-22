@@ -37,7 +37,6 @@ public abstract class DatabaseProvider {
      * Listener that listens the result of the retrieval of a point of interest
      */
     public interface GetPoiListener {
-
         /**
          * what to do if the retrieval succeeds
          *
@@ -52,6 +51,26 @@ public abstract class DatabaseProvider {
 
         /**
          * what to do if the retrieval failed
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the result of the modification of a point of interest
+     */
+    public interface ModifyPOIListener {
+        /**
+         * what to do if the modification succeeds
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the poi doesn't exist
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the modification failed
          */
         void onFailure();
     }
@@ -104,6 +123,14 @@ public abstract class DatabaseProvider {
     public abstract void getPoi(String name, final GetPoiListener listener);
 
     /**
+     * Modify an existing point of interest and inform the listener of the result
+     *
+     * @param poi      the new point of interest
+     * @param listener the listener
+     */
+    public abstract void modifyPOI(PointOfInterest poi, ModifyPOIListener listener);
+
+    /**
      * find the points of interest that are within radius range from a position and inform the
      * listener of the results
      *
@@ -111,7 +138,7 @@ public abstract class DatabaseProvider {
      * @param radius   the radius
      * @param listener the listener
      */
-    public abstract void findNearPois(Position pos, int radius, final FindNearPoisListener listener);
+    public abstract void findNearPois(Position pos, int radius, FindNearPoisListener listener);
 
     /**
      * seach the points of interest that contain a text in one of their fields and "send" them to
@@ -202,7 +229,7 @@ public abstract class DatabaseProvider {
      * @param user     the user
      * @param listener the listener
      */
-    public abstract void addUser(final User user, final AddUserListener listener);
+    public abstract void addUser(final User user, AddUserListener listener);
 
     /**
      * get the user associated to the id, inform the listener of the result
@@ -210,7 +237,7 @@ public abstract class DatabaseProvider {
      * @param id       the id
      * @param listener the listener
      */
-    public abstract void getUserById(String id, final GetUserListener listener);
+    public abstract void getUserById(String id, GetUserListener listener);
 
     /**
      * delete the user associated to the id, inform the listener of the result
@@ -218,7 +245,7 @@ public abstract class DatabaseProvider {
      * @param id       the id
      * @param listener the listener
      */
-    public abstract void deleterUserById(String id, final DeleteUserListener listener);
+    public abstract void deleterUserById(String id, DeleteUserListener listener);
 
     /**
      * modify the user, inform the listener of the result of the modification
@@ -226,5 +253,5 @@ public abstract class DatabaseProvider {
      * @param user     the user
      * @param listener the listener
      */
-    public abstract void modifyUser(User user, final ModifyUserListener listener);
+    public abstract void modifyUser(User user, ModifyUserListener listener);
 }

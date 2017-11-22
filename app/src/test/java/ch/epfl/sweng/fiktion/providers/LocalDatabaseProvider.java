@@ -76,6 +76,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void modifyPOI(PointOfInterest poi, ModifyPOIListener listener) {
+        for (int i = 0; i < poiList.size(); ++i) {
+            if (poi.equals(poiList.get(i))) {
+                poiList.set(i, poi);
+                listener.onSuccess();
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
         for (PointOfInterest poi : poiList) {
             if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
