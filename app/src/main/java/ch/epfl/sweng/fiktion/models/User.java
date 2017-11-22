@@ -212,7 +212,7 @@ public class User {
                 }
             });
         } else {
-            // --> trying to remove something that is not the set
+            // --> trying to remove a request that is not in the requestList
             listener.onFailure();
         }
     }
@@ -224,7 +224,7 @@ public class User {
      * @param friendID The friend (user) that the user wants to add
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void sendFriendRequest(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
+    public void sendFriendRequest(final DatabaseProvider db, final String friendID, final userListener listener) {
         if(!friendlist.contains(friendID)) {
             db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
@@ -244,7 +244,8 @@ public class User {
                 }
             });
         } else {
-            listener.onFailure();
+            // friend already in friendlist
+            listener.onFriendlistException();
         }
     }
 
@@ -299,7 +300,7 @@ public class User {
      * @param user The user we want to add the request to
      * @param listener Handles what happens in case of success or failure of the change
      */
-    private void addTofriendRequests(final DatabaseProvider db, User user, final DatabaseProvider.ModifyUserListener listener) {
+    private void addTofriendRequests(final DatabaseProvider db, User user, final userListener listener) {
         db.modifyUser(user.addRequest(id), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
@@ -326,7 +327,7 @@ public class User {
      * @param friendID The friend we want to remove
      * @param listener Handles what happens in case of success or failure of the change
      */
-    private void removeFriendFromUserHelper(final DatabaseProvider db, User instance, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
+    private void removeFriendFromUserHelper(final DatabaseProvider db, User instance, final String friendID, final userListener listener) {
         // modify user
         db.modifyUser(instance.removeFriend(friendID), new DatabaseProvider.ModifyUserListener() {
             @Override
@@ -356,7 +357,7 @@ public class User {
      * @param friendID user (friend) ID that the user wants to remove
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFromFriendlist(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
+    public void removeFromFriendlist(final DatabaseProvider db, final String friendID, final userListener listener) {
         if(friendlist.remove(friendID)) {
             // get friend user
             db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
@@ -401,7 +402,7 @@ public class User {
                 }
             });
         } else {
-            listener.onFailure();
+            listener.onFriendlistException();
         }
     }
 
@@ -640,6 +641,31 @@ public class User {
 
         return this.name.equals(otherUser.name)
                 && this.id.equals(otherUser.id);
+    }
+
+    /**
+     * Interface userListener to handle friendExceptions
+     */
+    public interface userListener {
+        /**
+         * what to do if action succeed
+         */
+        void onSuccess();
+
+        /**
+         * What to do if there is a problem with the friendlist
+         */
+        void onFriendlistException();
+
+        /**
+         * what to do if no matching user id is found
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the action fails
+         */
+        void onFailure();
     }
 
     /**

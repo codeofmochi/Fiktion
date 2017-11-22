@@ -9,7 +9,10 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
@@ -24,6 +27,7 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseUser;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 
+import static ch.epfl.sweng.fiktion.UserTest.Result.DOESNOTEXIST;
 import static ch.epfl.sweng.fiktion.UserTest.Result.FAILURE;
 import static ch.epfl.sweng.fiktion.UserTest.Result.NOTHING;
 import static ch.epfl.sweng.fiktion.UserTest.Result.SUCCESS;
@@ -33,6 +37,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 
 /**
  * This class tests methods of the class USER
@@ -45,6 +50,8 @@ public class UserTest {
     private User user;
     private User user1;
     private User userWFR;
+    private User userFakeF;
+    private User userFakeR;
 
     private DatabaseProvider localDB = new LocalDatabaseProvider();
     private DatabaseProvider.ModifyUserListener dbListener;
@@ -68,13 +75,16 @@ public class UserTest {
     @Mock
     DatabaseReference dbRef, usersRef, userRef;
     @Mock
-    DatabaseProvider dbp;
+    DatabaseProvider mockDB;
     @Mock
     GeoFire geofire;
     @Mock
     DataSnapshot snapshot;
+    @Captor
+    ArgumentCaptor<DatabaseProvider.GetUserListener> getUserListenerArgumentCaptor;
+    ArgumentCaptor<DatabaseProvider.ModifyUserListener> modifyUserListenerArgumentCaptor;
 
-    public enum Result {SUCCESS, FAILURE, NOTHING}
+    public enum Result {SUCCESS, FAILURE, DOESNOTEXIST, FRIENDEXCEPTION, NOTHING}
 
     private UserTest.Result result;
 
@@ -86,15 +96,22 @@ public class UserTest {
     public void setUp() {
         localDB = new LocalDatabaseProvider();
         result = NOTHING;
-        user = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
-        user1 = new User("user1", "id1");
 
         // Initiating friendlists and friendRequests
         String[] fList = new String[] {"defaultID"};
         String[] rList = new String[] {"id1"};
+        String[] fakeFList = new String[] {"idfake"};
+        String[] fakeRList = new String[] {"idfake"};
 
+        // Initiating users
+        user = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+        user1 = new User("user1", "id1");
         userWFR = new User("userWFR", "idwfr", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(fList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
+        userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
+                new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true);
+        userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
+                new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true);
 
         doAnswer(new Answer() {
             @Override
@@ -102,7 +119,7 @@ public class UserTest {
                 setDBList((DatabaseProvider.ModifyUserListener) invocation.getArgument(1));
                 return null;
             }
-        }).when(dbp).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
+        }).when(mockDB).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
 
     }
 
@@ -131,7 +148,7 @@ public class UserTest {
     @Test
     public void testDatabaseInteractionsFavourites() {
 
-        user.addFavourite(dbp, "new POI", authListener);
+        user.addFavourite(mockDB, "new POI", authListener);
 
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -144,7 +161,7 @@ public class UserTest {
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
-        new User("", "", set, new TreeSet<String>(), new LinkedList<String>()).removeFavourite(dbp, "new POI", authListener);
+        new User("", "", set, new TreeSet<String>(), new LinkedList<String>()).removeFavourite(mockDB, "new POI", authListener);
 
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -165,9 +182,9 @@ public class UserTest {
                 setDBList((DatabaseProvider.ModifyUserListener) invocation.getArgument(1));
                 return null;
             }
-        }).when(dbp).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
+        }).when(mockDB).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
 
-        user.changeName(dbp, "new", authListener);
+        user.changeName(mockDB, "new", authListener);
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
         dbListener.onDoesntExist();
@@ -239,7 +256,7 @@ public class UserTest {
     @Test
     public void testDatabaseInteractionsWishlist() {
 
-        user.addToWishlist(dbp, "new POI", authListener);
+        user.addToWishlist(mockDB, "new POI", authListener);
 
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -252,7 +269,7 @@ public class UserTest {
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
-        new User("", "", new TreeSet<String>(), set, new LinkedList<String>()).removeFromWishlist(dbp, "new POI", authListener);
+        new User("", "", new TreeSet<String>(), set, new LinkedList<String>()).removeFromWishlist(mockDB, "new POI", authListener);
 
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -297,7 +314,7 @@ public class UserTest {
     @Test
     public void testDatabaseInteractionsVisited() {
 
-        user.visit(dbp, "new POI", authListener);
+        user.visit(mockDB, "new POI", authListener);
 
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -310,7 +327,7 @@ public class UserTest {
 
         LinkedList<String> list = new LinkedList<>();
         list.add("new POI");
-        new User("", "", new TreeSet<String>(), new TreeSet<String>(), list).removeFromVisited(dbp, "new POI", authListener);
+        new User("", "", new TreeSet<String>(), new TreeSet<String>(), list).removeFromVisited(mockDB, "new POI", authListener);
 
         dbListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -429,7 +446,7 @@ public class UserTest {
 
     @Test
     public void testSendFriendRequestLogic() {
-        user.sendFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
+        user.sendFriendRequest(localDB, user1.getID(), new User.userListener() {
             @Override
             public void onSuccess() {
                 localDB.getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
@@ -451,6 +468,11 @@ public class UserTest {
             }
 
             @Override
+            public void onFriendlistException() {
+                Assert.fail();
+            }
+
+            @Override
             public void onDoesntExist() {
                 Assert.fail();
             }
@@ -461,6 +483,59 @@ public class UserTest {
             }
         });
     }
+
+    @Test
+    public void testSendFriendRequestToFriendLogic() {
+        userWFR.sendFriendRequest(localDB, user.getID(), new User.userListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFriendlistException() {
+                // test passes
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testSendFriendRequestToNoneExistentUser() {
+        User u = new User("u", "idu");
+        user.sendFriendRequest(localDB, u.getID(), new User.userListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFriendlistException() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                // passes test
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+
 
     @Test
     public void testAcceptFriendRequestLogic() {
@@ -515,6 +590,46 @@ public class UserTest {
     }
 
     @Test
+    public void testAcceptFriendRequestNotInRequestsLogic() {
+        user.acceptFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                // test passes
+            }
+        });
+    }
+
+    @Test
+    public void testAcceptFriendRequestNotStoredFriendLogic() {
+        userFakeR.acceptFriendRequest(localDB, userFakeR.getRequests().toArray()[0].toString(), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                // test passes
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
     public void testIgnoreFriendRequestsLogic() {
         userWFR.ignoreFriendRequest(localDB, user1.getID(), new AuthProvider.AuthListener() {
             @Override
@@ -545,8 +660,46 @@ public class UserTest {
     }
 
     @Test
+    public void testIgnoreFriendRequestsNotInRequestsLogic() {
+        user.ignoreFriendRequest(localDB, user1.getID(), new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                // test passes
+            }
+        });
+    }
+
+    @Test
+    public void testIgnoreFriendRequestsFromNotStoredUserLogic() {
+
+        // setUp
+        String[] rL = new String[] {"id1"};
+        User u = new User("u", "idu", new TreeSet<String>(), new TreeSet<String>(),
+                new TreeSet<String>(), new TreeSet<>(Arrays.asList(rL)), new LinkedList<String>(), true);
+
+        u.ignoreFriendRequest(localDB, user1.getID(), new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                // test passes
+            }
+        });
+    }
+
+
+
+    @Test
     public void testRemoveFromFriendlistLogic() {
-        userWFR.removeFromFriendlist(localDB, user.getID(), new DatabaseProvider.ModifyUserListener() {
+        userWFR.removeFromFriendlist(localDB, user.getID(), new User.userListener() {
             @Override
             public void onSuccess() {
                 localDB.getUserById(userWFR.getID(), new DatabaseProvider.GetUserListener() {
@@ -569,6 +722,11 @@ public class UserTest {
             }
 
             @Override
+            public void onFriendlistException() {
+                Assert.fail();
+            }
+
+            @Override
             public void onDoesntExist() {
                 Assert.fail();
             }
@@ -578,5 +736,115 @@ public class UserTest {
                 Assert.fail();
             }
         });
+    }
+
+    @Test
+    public void testRemoveFromFriendListNotFriendLogic() {
+        user.removeFromFriendlist(localDB, user1.getID(), new User.userListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFriendlistException() {
+                // test passes
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testRemoveFromFriendListFriendNotStoredLogic() {
+        userFakeF.removeFromFriendlist(localDB, userFakeF.getFriendlist().toArray()[0].toString(), new User.userListener() {
+            @Override
+            public void onSuccess() {
+                localDB.getUserById(userFakeF.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getFriendlist().isEmpty());
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onFriendlistException() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testSendListeners(){
+        doNothing().when(mockDB).getUserById(any(String.class), getUserListenerArgumentCaptor.capture());
+
+        User.userListener testListener = new User.userListener() {
+            @Override
+            public void onSuccess() {
+                setResult(SUCCESS);
+            }
+
+            @Override
+            public void onFriendlistException() {
+                setResult(Result.FRIENDEXCEPTION);
+            }
+
+            @Override
+            public void onDoesntExist() {
+                setResult(DOESNOTEXIST);
+            }
+
+            @Override
+            public void onFailure() {
+                setResult(FAILURE);
+            }
+        };
+        user.sendFriendRequest(mockDB, user1.getID(), testListener);
+
+        DatabaseProvider.GetUserListener gAC = getUserListenerArgumentCaptor.getValue();
+
+        gAC.onFailure();
+        assertThat(result, is(FAILURE));
+        gAC.onSuccess(user1);
+        doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
+
+
+        DatabaseProvider.ModifyUserListener mAC = modifyUserListenerArgumentCaptor.getValue();
+        mAC.onSuccess();
+        assertThat(result, is(SUCCESS));
+        mAC.onFailure();
+        assertThat(result, is(FAILURE));
+        mAC.onDoesntExist();
+        assertThat(result, is(DOESNOTEXIST));
+
     }
 }
