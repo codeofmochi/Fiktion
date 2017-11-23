@@ -102,7 +102,9 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     public void getPoi(String poiName, final GetPoiListener listener) {
         // get the reference of the poi
         DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
-        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        poiRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -110,8 +112,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     if (fPoi == null) {
                         listener.onFailure();
                     } else {
-                        // inform the listener that we got the matching poi
-                        listener.onSuccess(fPoi.toPoi());
+                        if (firstCall) {
+                            // inform the listener that we got the matching poi
+                            listener.onSuccess(fPoi.toPoi());
+                            firstCall = false;
+                        } else {
+                            //inform the listener that the poi has been modified
+                            listener.onModified(fPoi.toPoi());
+                        }
                     }
                 } else {
                     // inform the listener that the poi doesn't exist
@@ -140,6 +148,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     // if it exists, replace its value
                     FirebasePointOfInterest fPOI = new FirebasePointOfInterest(poi);
                     poiRef.setValue(fPOI);
+
+                    // update the position for geofire
+                    Position pos = poi.position();
+                    final GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
+                    geofire.setLocation(poi.name(), geoLocation);
 
                     // and inform the listener of the success of the modification
                     listener.onSuccess();
@@ -173,6 +186,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     public void onSuccess(PointOfInterest poi) {
                         // inform the listener that we got a new poi
                         listener.onNewValue(poi);
+                    }
+
+                    @Override
+                    public void onModified(PointOfInterest poi) {
+
                     }
 
                     @Override
@@ -225,6 +243,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         @Override
                         public void onSuccess(PointOfInterest poi) {
                             listener.onNewValue(poi);
+                        }
+
+                        @Override
+                        public void onModified(PointOfInterest poi) {
                         }
 
                         @Override

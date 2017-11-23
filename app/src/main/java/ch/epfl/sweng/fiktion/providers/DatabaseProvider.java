@@ -45,6 +45,13 @@ public abstract class DatabaseProvider {
         void onSuccess(PointOfInterest poi);
 
         /**
+         * what to do if the poi is modified
+         *
+         * @param poi the modified poi
+         */
+        void onModified(PointOfInterest poi);
+
+        /**
          * what to do if no mathing point of interest is found
          */
         void onDoesntExist();

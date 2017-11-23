@@ -237,6 +237,10 @@ public class UserDetailsActivity extends AppCompatActivity {
                 }
 
                 @Override
+                public void onModified(PointOfInterest poi) {
+                }
+
+                @Override
                 public void onDoesntExist() {
                     updateUI(UIMode.poiDoesNotExist);
                 }
@@ -273,6 +277,10 @@ public class UserDetailsActivity extends AppCompatActivity {
                             updateUI(UIMode.failure);
                         }
                     });
+                }
+
+                @Override
+                public void onModified(PointOfInterest poi) {
                 }
 
                 @Override

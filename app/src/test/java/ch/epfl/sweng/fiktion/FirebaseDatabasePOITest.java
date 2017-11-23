@@ -75,7 +75,6 @@ public class FirebaseDatabasePOITest {
     @Before
     public void initializers() {
         database = new FirebaseDatabaseProvider(dbRef, geofire, searchProvider);
-        nbPOIs = 0;
     }
 
     @Test
@@ -128,7 +127,7 @@ public class FirebaseDatabasePOITest {
     @Test
     public void GetPoiTest() {
         when(dbRef.child(anyString())).thenReturn(dbRef);
-        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+        when(dbRef.addValueEventListener(vel.capture())).thenReturn(null);
 
         final Mutable<String> result = new Mutable<>("");
 
@@ -136,6 +135,11 @@ public class FirebaseDatabasePOITest {
             @Override
             public void onSuccess(PointOfInterest poi) {
                 result.value = "SUCCESS";
+            }
+
+            @Override
+            public void onModified(PointOfInterest poi) {
+                result.value = "MODIFIED";
             }
 
             @Override
@@ -155,6 +159,8 @@ public class FirebaseDatabasePOITest {
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(new FirebasePointOfInterest(poiTest));
         vel.getValue().onDataChange(snapshot);
         assertThat(result.value, is("SUCCESS"));
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.value, is("MODIFIED"));
 
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
@@ -203,12 +209,6 @@ public class FirebaseDatabasePOITest {
         assertThat(result.value, is("FAILURE"));
     }
 
-    private int nbPOIs = 0;
-
-    private void incr() {
-        ++nbPOIs;
-    }
-
     @Test
     public void findNearPoisTest() {
         GeoQuery geoQuery = mock(GeoQuery.class);
@@ -216,11 +216,12 @@ public class FirebaseDatabasePOITest {
         doNothing().when(geoQuery).addGeoQueryEventListener(geoQueryEventListener.capture());
 
         final Mutable<Boolean> isFailure = new Mutable<>(false);
+        final Mutable<Integer> nbPOIs = new Mutable<>(0);
 
         DatabaseProvider.FindNearPoisListener findPoiListener = new DatabaseProvider.FindNearPoisListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
-                incr();
+                ++nbPOIs.value;
             }
 
             @Override
@@ -236,12 +237,13 @@ public class FirebaseDatabasePOITest {
         databaseSpy.findNearPois(poiTest.position(), 10, findPoiListener);
         geoQueryEventListener.getValue().onKeyEntered("key", null);
         getPOIListener.getValue().onSuccess(poiTest);
-        assertThat(nbPOIs, is(1));
+        assertThat(nbPOIs.value, is(1));
         getPOIListener.getValue().onSuccess(poiTest);
         getPOIListener.getValue().onSuccess(poiTest);
         getPOIListener.getValue().onSuccess(poiTest);
         getPOIListener.getValue().onSuccess(poiTest);
-        assertThat(nbPOIs, is(5));
+        assertThat(nbPOIs.value, is(5));
+        getPOIListener.getValue().onModified(poiTest);
         getPOIListener.getValue().onDoesntExist();
         getPOIListener.getValue().onFailure();
         geoQueryEventListener.getValue().onKeyExited("key");
@@ -256,11 +258,12 @@ public class FirebaseDatabasePOITest {
         doNothing().when(searchProvider).searchByText(anyString(), searchPOIsByTextListener.capture());
 
         final Mutable<Boolean> isFailure = new Mutable<>(false);
+        final Mutable<Integer> nbPOIs = new Mutable<>(0);
 
         DatabaseProvider.SearchPOIByTextListener listener = new DatabaseProvider.SearchPOIByTextListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
-                incr();
+                ++nbPOIs.value;
             }
 
             @Override
@@ -276,17 +279,18 @@ public class FirebaseDatabasePOITest {
         databaseSpy.searchByText("", listener);
         searchPOIsByTextListener.getValue().onSuccess(Collections.singletonList("poi"));
 
-        assertThat(nbPOIs, is(0));
+        assertThat(nbPOIs.value, is(0));
         getPOIListener.getValue().onSuccess(null);
-        assertThat(nbPOIs, is(1));
-        getPOIListener.getValue().onSuccess(null);
-        getPOIListener.getValue().onSuccess(null);
+        assertThat(nbPOIs.value, is(1));
         getPOIListener.getValue().onSuccess(null);
         getPOIListener.getValue().onSuccess(null);
-        assertThat(nbPOIs, is(5));
+        getPOIListener.getValue().onSuccess(null);
+        getPOIListener.getValue().onSuccess(null);
+        assertThat(nbPOIs.value, is(5));
+        getPOIListener.getValue().onModified(poiTest);
         getPOIListener.getValue().onDoesntExist();
         getPOIListener.getValue().onFailure();
-        assertThat(nbPOIs, is(5));
+        assertThat(nbPOIs.value, is(5));
 
         searchPOIsByTextListener.getValue().onFailure();
         assertTrue(isFailure.value);
