@@ -3,6 +3,7 @@ package ch.epfl.sweng.fiktion.providers;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.utils.Config;
 
 
 /**
@@ -11,6 +12,18 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author Pedro Da Cunha
  */
 public abstract class DatabaseProvider {
+
+    private static DatabaseProvider database;
+
+    public static DatabaseProvider getInstance() {
+        if (database == null) {
+            if (Config.TEST_MODE)
+                database = new LocalDatabaseProvider();
+            else
+                database = new FirebaseDatabaseProvider();
+        }
+        return database;
+    }
 
     /**
      * Listener that listens the result of the addition of a point of interest

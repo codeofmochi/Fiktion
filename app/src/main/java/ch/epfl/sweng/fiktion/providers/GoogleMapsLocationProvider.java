@@ -17,8 +17,6 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 
-
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
 
@@ -156,7 +154,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
                 // first update position
                 updateLocation(newLocation);
                 // find nearest pois
-                database.findNearPois(getPosition(), radius, new DatabaseProvider.FindNearPoisListener() {
+                DatabaseProvider.getInstance().findNearPois(getPosition(), radius, new DatabaseProvider.FindNearPoisListener() {
                     @Override
                     public void onNewValue(PointOfInterest poi) {
                         // write new marker
