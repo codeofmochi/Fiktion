@@ -22,14 +22,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
     private final User user1 = new User("user1", "id1");
     // Initiating friendlists and friendRequests
-    private final String[] fList = new String[] {"defaultID"};
+    private final String[] frList = new String[] {"defaultID"};
     private final String[] rList = new String[] {"id1"};
     private final String[] fakeFList = new String[] {"idfake"};
     private final String[] fakeRList = new String[] {"idfake"};
+    private final String[] favList = new String[] {"fav POI"};
+    private final String[] whishList = new String[] {"wish POI"};
+    private final String[] visitedList = new String[] {"vis POI"};
+
+    // user has "fav POI" as favourite, "vis POI" in visited and "wish POI" in wishlist
+    private final User userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
+            new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true);
 
     // user is friend with defaultUser and has user1 in his requests
-    private final User userWFR = new User("userWFR", "idwfr", new TreeSet<String>(), new TreeSet<String>(),
-            new TreeSet<>(Arrays.asList(fList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
+    private final User userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
+            new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
 
     // user with a friend that is not stored in the database
     private final User userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
@@ -39,7 +46,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
             new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true);
 
-    private final List<User> initialList = Arrays.asList(defaultUser,user1, userWFR, userFakeF, userFakeR);
+    private final List<User> initialList = Arrays.asList(defaultUser,user1, userFR, userFakeF, userFakeR, userWVFav);
     private final List<PointOfInterest> poiList = new ArrayList<>();
     private final List<User> users = new ArrayList<> (initialList);
 
@@ -70,6 +77,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             }
         }
         // inform the listener that the poi doesnt exist
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void modifyPOI(PointOfInterest poi, ModifyPOIListener listener) {
+        for (int i = 0; i < poiList.size(); ++i) {
+            if (poi.equals(poiList.get(i))) {
+                poiList.set(i, poi);
+                listener.onSuccess();
+                return;
+            }
+        }
         listener.onDoesntExist();
     }
 

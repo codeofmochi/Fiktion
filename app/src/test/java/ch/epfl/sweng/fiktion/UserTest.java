@@ -49,9 +49,10 @@ public class UserTest {
 
     private User user;
     private User user1;
-    private User userWFR;
+    private User userFR;
     private User userFakeF;
     private User userFakeR;
+    private User userWVFav;
 
     private DatabaseProvider localDB = new LocalDatabaseProvider();
     private DatabaseProvider.ModifyUserListener mUserListener;
@@ -97,20 +98,25 @@ public class UserTest {
         result = NOTHING;
 
         // Initiating friendlists and friendRequests
-        String[] fList = new String[] {"defaultID"};
+        String[] frList = new String[] {"defaultID"};
         String[] rList = new String[] {"id1"};
         String[] fakeFList = new String[] {"idfake"};
         String[] fakeRList = new String[] {"idfake"};
+        String[] favList = new String[] {"fav POI"};
+        String[] whishList = new String[] {"wish POI"};
+        String[] visitedList = new String[] {"vis POI"};
 
         // Initiating users
         user = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
         user1 = new User("user1", "id1");
-        userWFR = new User("userWFR", "idwfr", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<>(Arrays.asList(fList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
+        userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
+                new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
         userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true);
         userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true);
+        userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
+                new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true);
 
         doAnswer(new Answer() {
             @Override
@@ -173,15 +179,39 @@ public class UserTest {
     }
 
     @Test
-    public void testDatabaseInteractionsChangeName() {
-
-        doAnswer(new Answer() {
+    public void testChangeNameLogic() {
+        final String newName = "new";
+        user.changeName(localDB, newName, new AuthProvider.AuthListener() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setDBList((DatabaseProvider.ModifyUserListener) invocation.getArgument(1));
-                return null;
+            public void onSuccess() {
+                assertThat(user.getName(), is(newName));
+                localDB.getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertThat(user.getName(), is(newName));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
-        }).when(mockDB).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testDatabaseInteractionsChangeName() {
 
         user.changeName(mockDB, "new", authListener);
         mUserListener.onSuccess();
@@ -200,6 +230,22 @@ public class UserTest {
             @Override
             public void onSuccess() {
                 assertTrue(user.getFavourites().contains("new POI"));
+                localDB.getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getFavourites().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
 
             @Override
@@ -217,20 +263,48 @@ public class UserTest {
             @Override
             public void onFailure() {
                 assertTrue(user.getFavourites().contains("new POI"));
+                localDB.getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getFavourites().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
         });
     }
 
     @Test
     public void testRemoveFavouriteLogic() {
-        TreeSet<String> set = new TreeSet<>();
-        final String newPoi = "new POI";
-        set.add("new POI");
-        final User testUser = new User("default", "defaultID",set, new TreeSet<String>(), new LinkedList<String>());
-        testUser.removeFavourite(localDB, "new POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFavourite(localDB, "fav POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                assertFalse(testUser.getFavourites().contains(newPoi));
+                assertFalse(userWVFav.getFavourites().contains("fav POI"));
+                localDB.getUserById(userWVFav.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertFalse(user.getFavourites().contains("fav POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
 
             @Override
@@ -239,7 +313,7 @@ public class UserTest {
             }
         });
 
-        testUser.removeFavourite(localDB, "new POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFavourite(localDB, "fav POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -247,7 +321,23 @@ public class UserTest {
 
             @Override
             public void onFailure() {
-                assertFalse(testUser.getFavourites().contains("new POI"));
+                assertFalse(userWVFav.getFavourites().contains("fav POI"));
+                localDB.getUserById(userWVFav.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertFalse(user.getFavourites().contains("fav POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
         });
     }
@@ -288,6 +378,22 @@ public class UserTest {
             @Override
             public void onSuccess() {
                 assertTrue(user.getWishlist().contains("new POI"));
+                localDB.getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getWishlist().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
 
             @Override
@@ -305,6 +411,22 @@ public class UserTest {
             @Override
             public void onFailure() {
                 assertTrue(user.getWishlist().contains("new POI"));
+                localDB.getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getWishlist().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
         });
     }
@@ -339,14 +461,26 @@ public class UserTest {
     }
     @Test
     public void testRemoveFromWishlistLogic() {
-        TreeSet<String> set = new TreeSet<>();
-        final String newPoi = "new POI";
-        set.add("new POI");
-        final User testUser = new User("default", "defaultID", new TreeSet<String>(), set, new LinkedList<String>());
-        testUser.removeFromWishlist(localDB, "new POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromWishlist(localDB, "wish POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                assertFalse(testUser.getWishlist().contains(newPoi));
+                assertFalse(userWVFav.getWishlist().contains("wish POI"));
+                localDB.getUserById(userWVFav.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertFalse(user.getWishlist().contains("wish POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
 
             @Override
@@ -355,7 +489,7 @@ public class UserTest {
             }
         });
 
-        testUser.removeFromWishlist(localDB, "new POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromWishlist(localDB, "wish POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -363,7 +497,23 @@ public class UserTest {
 
             @Override
             public void onFailure() {
-                assertFalse(testUser.getWishlist().contains("new POI"));
+                assertFalse(userWVFav.getWishlist().contains("wish POI"));
+                localDB.getUserById(userWVFav.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertFalse(user.getWishlist().contains("wish POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
         });
     }
@@ -376,6 +526,22 @@ public class UserTest {
             @Override
             public void onSuccess() {
                 assertTrue(user.getVisited().contains("new POI"));
+                localDB.getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getVisited().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
 
             @Override
@@ -393,20 +559,48 @@ public class UserTest {
             @Override
             public void onFailure() {
                 assertTrue(user.getVisited().contains("new POI"));
+                localDB.getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertTrue(user.getVisited().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
         });
     }
 
     @Test
     public void testRemoveFromVisitedLogic() {
-        LinkedList<String> list = new LinkedList<>();
-        final String newPoi = "new POI";
-        list.addFirst("new POI");
-        final User testUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), list);
-        testUser.removeFromVisited(localDB, "new POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromVisited(localDB, "vis POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                assertFalse(testUser.getVisited().contains(newPoi));
+                assertFalse(userWVFav.getVisited().contains("vis POI"));
+                localDB.getUserById(userWVFav.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertFalse(userWVFav.getVisited().contains("vis POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
 
             @Override
@@ -415,7 +609,7 @@ public class UserTest {
             }
         });
 
-        testUser.removeFromVisited(localDB, "new POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromVisited(localDB, "vis POI", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -423,7 +617,23 @@ public class UserTest {
 
             @Override
             public void onFailure() {
-                assertFalse(testUser.getVisited().contains("new POI"));
+                assertFalse(userWVFav.getVisited().contains("vis POI"));
+                localDB.getUserById(userWVFav.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertFalse(userWVFav.getVisited().contains("vis POI"));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
             }
         });
     }
@@ -464,7 +674,9 @@ public class UserTest {
         assertThat(result, is(SUCCESS));
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
+        setResult(NOTHING);
         mUserListener.onDoesntExist();
+        assertThat(result, is(FAILURE));
     }
 
     @Test
@@ -509,7 +721,7 @@ public class UserTest {
 
     @Test
     public void testSendFriendRequestToFriendLogic() {
-        userWFR.sendFriendRequest(localDB, user.getID(), new User.userListener() {
+        userFR.sendFriendRequest(localDB, user.getID(), new User.userListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -562,10 +774,10 @@ public class UserTest {
 
     @Test
     public void testAcceptFriendRequestLogic() {
-        userWFR.acceptFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
+        userFR.acceptFriendRequest(localDB, user1.getID(), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
-                localDB.getUserById(userWFR.getID(), new DatabaseProvider.GetUserListener() {
+                localDB.getUserById(userFR.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
                     public void onSuccess(User user) {
                         assertTrue(user.getFriendlist().contains(user1.getID()));
@@ -573,7 +785,7 @@ public class UserTest {
                         localDB.getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
                             @Override
                             public void onSuccess(User user) {
-                                assertTrue(user.getFriendlist().contains(userWFR.getID()));
+                                assertTrue(user.getFriendlist().contains(userFR.getID()));
                             }
 
                             @Override
@@ -715,7 +927,7 @@ public class UserTest {
             }
         };
 
-        userWFR.acceptFriendRequest(mockDB, user1.getID(), testListener);
+        userFR.acceptFriendRequest(mockDB, user1.getID(), testListener);
 
         DatabaseProvider.GetUserListener gAC = getUserListenerArgumentCaptor.getValue();
         gAC.onFailure();
@@ -737,10 +949,10 @@ public class UserTest {
 
     @Test
     public void testIgnoreFriendRequestsLogic() {
-        userWFR.ignoreFriendRequest(localDB, user1.getID(), new AuthProvider.AuthListener() {
+        userFR.ignoreFriendRequest(localDB, user1.getID(), new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
-                localDB.getUserById(userWFR.getID(), new DatabaseProvider.GetUserListener() {
+                localDB.getUserById(userFR.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
                     public void onSuccess(User user) {
                         assertTrue(user.getRequests().isEmpty());
@@ -816,7 +1028,7 @@ public class UserTest {
             }
         };
 
-        userWFR.ignoreFriendRequest(mockDB, user1.getID(), testListener);
+        userFR.ignoreFriendRequest(mockDB, user1.getID(), testListener);
 
         mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
@@ -829,10 +1041,10 @@ public class UserTest {
 
     @Test
     public void testRemoveFromFriendlistLogic() {
-        userWFR.removeFromFriendlist(localDB, user.getID(), new User.userListener() {
+        userFR.removeFromFriendlist(localDB, user.getID(), new User.userListener() {
             @Override
             public void onSuccess() {
-                localDB.getUserById(userWFR.getID(), new DatabaseProvider.GetUserListener() {
+                localDB.getUserById(userFR.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
                     public void onSuccess(User user) {
                         assertTrue(user.getFriendlist().isEmpty());
@@ -959,7 +1171,7 @@ public class UserTest {
             }
         };
 
-        userWFR.removeFromFriendlist(mockDB, user.getID(), testListener);
+        userFR.removeFromFriendlist(mockDB, user.getID(), testListener);
 
         DatabaseProvider.GetUserListener gAC = getUserListenerArgumentCaptor.getValue();
         gAC.onFailure();

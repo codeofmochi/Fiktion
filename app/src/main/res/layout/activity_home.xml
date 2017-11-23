@@ -177,7 +177,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Featured in Steins;Gate, Love Live!, Oreimo, Shirobako, No Game No Life, The Idolm@ster, more »"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/colorText"
                 tools:ignore="HardcodedText" />
 
             <LinearLayout
