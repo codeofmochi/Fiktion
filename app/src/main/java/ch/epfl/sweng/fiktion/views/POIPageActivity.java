@@ -53,7 +53,6 @@ import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
-import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
@@ -211,7 +210,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
 
         // set the mainImage as the first photo of the poi
-        photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
                 mainImage.setImageBitmap(b);
@@ -223,7 +222,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // download the photos of the poi
-        photoProvider.downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
 
@@ -412,7 +411,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // upload the photo to the cloud
         // show the progress with the progressbar
         uploadProgressBar.setVisibility(View.VISIBLE);
-        photoProvider.uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
                 uploadProgressBar.setVisibility(View.INVISIBLE);

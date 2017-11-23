@@ -15,6 +15,11 @@ public abstract class DatabaseProvider {
 
     private static DatabaseProvider database;
 
+    /**
+     * return the database provider
+     *
+     * @return the database provider
+     */
     public static DatabaseProvider getInstance() {
         if (database == null) {
             if (Config.TEST_MODE)
