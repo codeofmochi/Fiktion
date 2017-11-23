@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
@@ -34,6 +35,7 @@ import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity;
+import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -445,5 +447,39 @@ public class AddPOIActivityTest {
             addPoiLatitude.check(isBetween(-90, 90));
             addPoiLongitude.check(isBetween(-180, 180));
         }
+    }
+
+    // edit a POI
+
+    @Test
+    public void testModifyExistingPoi() {
+        // start activity of existing POI
+        Intent i = new Intent(mActivityRule.getActivity(), POIPageActivity.class);
+        i.putExtra("POI_NAME", "p1");
+        mActivityRule.getActivity().startActivity(i);
+        // click edit button
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Edit")).perform(click());
+        onView(withId(R.id.add_poi_scroll)).check(matches(isDisplayed()));
+
+        closeSoftKeyboard();
+        addPoiFiction.perform(typeText("fiction"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        addPoiLatitude.perform(typeText("45"));
+        closeSoftKeyboard();
+        addPoiLongitude.perform(typeText("90"));
+        closeSoftKeyboard();
+        addPoiCity.perform(typeText("city"));
+        closeSoftKeyboard();
+        addPoiCountry.perform(typeText("country"));
+        closeSoftKeyboard();
+        addPoiScroll.perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
+        addPoiFinish.perform(click());
+        onView(withId(R.id.menu_scroll)).perform(swipeUpCenterTopFast());
+        onView(withId(R.id.title)).check(matches(withText("p1")));
+        onView(withId(R.id.featured)).check(matches(withText("Featured in fiction")));
+        onView(withId(R.id.cityCountry)).check(matches(withText("city, country")));
     }
 }

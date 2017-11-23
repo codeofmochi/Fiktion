@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -172,10 +173,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             @Override
             public void onDoesntExist() {
+                Snackbar.make(findViewById(R.id.title), R.string.data_not_found, Snackbar.LENGTH_INDEFINITE).show();
             }
 
             @Override
             public void onFailure() {
+                Snackbar.make(findViewById(R.id.title), R.string.failed_to_fetch_data, Snackbar.LENGTH_INDEFINITE).show();
             }
         });
 

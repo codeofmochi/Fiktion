@@ -8,6 +8,7 @@ package ch.epfl.sweng.fiktion.utils;
 public class CollectionsUtils {
 
     public static String mkString(Iterable<String> collection, String separator) {
+        if (!collection.iterator().hasNext()) return "";
         StringBuilder sb = new StringBuilder();
         for (String e : collection) {
             sb.append(e);
