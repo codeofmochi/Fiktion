@@ -93,7 +93,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         final String fiction = ((EditText) findViewById(R.id.add_poi_fiction)).getText().toString();
         if (fiction.isEmpty()) {
             // warning message if no text was entered
-            ((EditText) findViewById(R.id.add_poi_fiction)).setError("You can't enter an empty fiction name");
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Fiction name cannot be empty");
         } else {
             if (!fictionSet.contains(fiction)) {
                 fictionSet.add(fiction);
