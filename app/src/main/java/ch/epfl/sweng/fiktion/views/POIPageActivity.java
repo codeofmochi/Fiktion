@@ -194,6 +194,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         map.getMapAsync(this);
     }
 
+    @SuppressWarnings("SetTextI18n")
     private void setPOIInformation() {
 
         // show the fictions the poi appears in
@@ -218,6 +219,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(poi.description());
+
+        TextView cityCountry = (TextView) findViewById(R.id.cityCountry);
+        cityCountry.setText(poi.city() + ", " + poi.country());
+
+        TextView upvotes = (TextView) findViewById(R.id.upvotes);
+        upvotes.setText(poi.rating() + " upvotes");
     }
 
     public void downloadPhotos() {
