@@ -1,9 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -22,13 +20,13 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
     private final User user1 = new User("user1", "id1");
     // Initiating friendlists and friendRequests
-    private final String[] frList = new String[] {"defaultID"};
-    private final String[] rList = new String[] {"id1"};
-    private final String[] fakeFList = new String[] {"idfake"};
-    private final String[] fakeRList = new String[] {"idfake"};
-    private final String[] favList = new String[] {"fav POI"};
-    private final String[] whishList = new String[] {"wish POI"};
-    private final String[] visitedList = new String[] {"vis POI"};
+    private final String[] frList = new String[]{"defaultID"};
+    private final String[] rList = new String[]{"id1"};
+    private final String[] fakeFList = new String[]{"idfake"};
+    private final String[] fakeRList = new String[]{"idfake"};
+    private final String[] favList = new String[]{"fav POI"};
+    private final String[] whishList = new String[]{"wish POI"};
+    private final String[] visitedList = new String[]{"vis POI"};
 
     // user has "fav POI" as favourite, "vis POI" in visited and "wish POI" in wishlist
     private final User userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
@@ -46,14 +44,26 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
             new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true);
 
-    private final List<User> initialList = Arrays.asList(defaultUser,user1, userFR, userFakeF, userFakeR, userWVFav);
+    private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     private final List<PointOfInterest> poiList = new ArrayList<>();
-    private final List<User> users = new ArrayList<> (initialList);
+    private final List<User> users = new ArrayList<>(initialList);
 
     /**
      * {@inheritDoc}
      */
+
     public void addPoi(PointOfInterest poi, AddPoiListener listener) {
+        switch (poi.name()) {
+            case "SUCCESS":
+                listener.onSuccess();
+                return;
+            case "ALREADYEXISTS":
+                listener.onAlreadyExists();
+                return;
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
         if (poiList.contains(poi)) {
             // inform the listener that the poi already exists
             listener.onAlreadyExists();
@@ -69,6 +79,33 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     public void getPoi(String name, GetPoiListener listener) {
+        switch (name) {
+            case "SUCCESS":
+                listener.onSuccess(new PointOfInterest("SUCCESS",
+                        new Position(0, 0),
+                        new TreeSet<String>(),
+                        "",
+                        0,
+                        "",
+                        ""));
+                return;
+            case "MODIFIED":
+                listener.onModified(new PointOfInterest("MODIFIED",
+                        new Position(0, 0),
+                        new TreeSet<String>(),
+                        "",
+                        0,
+                        "",
+                        ""));
+                return;
+            case "DOESNTEXIST":
+                listener.onDoesntExist();
+                return;
+
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
         for (PointOfInterest poi : poiList) {
             if (poi.name().equals(name)) {
                 // inform the listener that we have the poi
@@ -85,6 +122,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void modifyPOI(PointOfInterest poi, ModifyPOIListener listener) {
+        switch (poi.name()) {
+            case "SUCCESS":
+                listener.onSuccess();
+                return;
+            case "DOESNTEXIST":
+                listener.onDoesntExist();
+                return;
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
+        if (poi.name().equals("FAILURE")) {
+            listener.onFailure();
+            return;
+        }
         for (int i = 0; i < poiList.size(); ++i) {
             if (poi.equals(poiList.get(i))) {
                 poiList.set(i, poi);
@@ -99,6 +151,10 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
+        if (pos.latitude() == 1000 && pos.longitude() == 1000) {
+            listener.onFailure();
+            return;
+        }
         for (PointOfInterest poi : poiList) {
             if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
                 listener.onNewValue(poi);
@@ -111,6 +167,20 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void searchByText(String text, SearchPOIByTextListener listener) {
+        switch (text) {
+            case "NEWVALUE":
+                listener.onNewValue(new PointOfInterest("NEWVALUE",
+                        new Position(0, 0),
+                        new TreeSet<String>(),
+                        "",
+                        0,
+                        "",
+                        ""));
+                return;
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
         for (PointOfInterest poi : poiList) {
             if (poi.name().contains(text) ||
                     poi.description().contains(text) ||
@@ -141,10 +211,22 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void addUser(User user, AddUserListener listener) {
+        switch (user.getID()) {
+            case "SUCCESS":
+                listener.onSuccess();
+                return;
+            case "ALREADYEXISTS":
+                listener.onAlreadyExists();
+                return;
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
+
         boolean contains = false;
         String id = user.getID();
         // go through all the users and check if there is one with the same id as the user in parameter
-        for (User u: users) {
+        for (User u : users) {
             contains |= u.getID().equals(id);
         }
         if (contains) {
@@ -160,7 +242,18 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getUserById(String id, GetUserListener listener) {
-        for(User u: users) {
+        switch (id) {
+            case "SUCCESS":
+                listener.onSuccess(new User("SUCCESS", "SUCCESS"));
+                return;
+            case "DOESNTEXIST":
+                listener.onDoesntExist();
+                return;
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
+        for (User u : users) {
             if (u.getID().equals(id)) {
                 listener.onSuccess(u);
                 return;
@@ -174,7 +267,18 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void deleterUserById(String id, DeleteUserListener listener) {
-        for (User u: users) {
+        switch (id) {
+            case "SUCCESS":
+                listener.onSuccess();
+                return;
+            case "DOESNTEXIST":
+                listener.onDoesntExist();
+                return;
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
+        for (User u : users) {
             if (u.getID().equals(id)) {
                 users.remove(u);
                 listener.onSuccess();
@@ -186,6 +290,17 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
+        switch (user.getID()) {
+            case "SUCCESS":
+                listener.onSuccess();
+                return;
+            case "DOESNTEXIST":
+                listener.onDoesntExist();
+                return;
+            case "FAILURE":
+                listener.onFailure();
+                return;
+        }
         deleterUserById(user.getID(), new DeleteUserListener() {
             @Override
             public void onSuccess() {
