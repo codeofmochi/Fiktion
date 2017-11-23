@@ -154,7 +154,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         //validate name choice
         if (!newUsername.equals(user.getName())) {
 
-            user.changeName(database, newUsername, new AuthProvider.AuthListener() {
+            user.changeName(newUsername, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
                     userNewName.setHint(user.getName());

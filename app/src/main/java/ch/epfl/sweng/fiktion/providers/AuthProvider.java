@@ -11,16 +11,20 @@ public abstract class AuthProvider {
 
     private static AuthProvider auth;
 
-    public static AuthProvider getInstance(){
-        if(auth==null){
-            if(Config.TEST_MODE){
+    /**
+     * @return an instance of an authentication provider
+     */
+    public static AuthProvider getInstance() {
+        if (auth == null) {
+            if (Config.TEST_MODE) {
                 auth = new LocalAuthProvider();
-            } else{
+            } else {
                 auth = new FirebaseAuthProvider();
             }
         }
         return auth;
     }
+
     /**
      * Defines what actions to take on auth op callback
      */
@@ -62,10 +66,11 @@ public abstract class AuthProvider {
 
     /**
      * Creates a new account using the provided informations
+     *
      * @param database where the user data is stored
      * @param password used to create the account
      */
-    public abstract void createUserWithEmailAndPassword(DatabaseProvider database,String email, String password, final AuthListener listener);
+    public abstract void createUserWithEmailAndPassword(DatabaseProvider database, String email, String password, final AuthListener listener);
 
     /**
      * Sends a password reset mail, defines what to do afterwards
@@ -90,6 +95,7 @@ public abstract class AuthProvider {
 
     /**
      * starts a request to database to have currently signed in User or null if there is not any
+     *
      * @param database where the user data is stored
      * @param listener handles what to do after the request
      */

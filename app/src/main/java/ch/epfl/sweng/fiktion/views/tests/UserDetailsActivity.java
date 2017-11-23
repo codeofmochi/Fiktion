@@ -222,7 +222,7 @@ public class UserDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(final PointOfInterest poi) {
 
-                    currUser.addFavourite(database, poiName, new AuthProvider.AuthListener() {
+                    currUser.addFavourite(poiName, new AuthProvider.AuthListener() {
                         @Override
                         public void onSuccess() {
                             favAdapter.add(poi.name());
@@ -265,7 +265,7 @@ public class UserDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(final PointOfInterest poi) {
 
-                    currUser.addToWishlist(database, poiName, new AuthProvider.AuthListener() {
+                    currUser.addToWishlist(poiName, new AuthProvider.AuthListener() {
                         @Override
                         public void onSuccess() {
                             wishAdapter.add(poi.name());
