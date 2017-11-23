@@ -80,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
         Log.d(TAG, "Credentials are valid");
 
 
-        AuthProvider.getInstance().createUserWithEmailAndPassword(DatabaseProvider.getInstance(),email, password, new AuthProvider.AuthListener() {
+        AuthProvider.getInstance().createUserWithEmailAndPassword(email, password, new AuthProvider.AuthListener() {
 
             @Override
             public void onSuccess() {

@@ -114,7 +114,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         if (auth.isConnected()) {
             Log.d(TAG, "Request for the currently  signed in user signed in");
             // Name, email address, and profile photo Url
-            auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
+            auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User currUser) {
                     name = currUser.getName();

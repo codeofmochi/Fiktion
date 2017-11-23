@@ -57,7 +57,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     public void onStart() {
         super.onStart();
 
-        auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
 
             @Override
             public void onSuccess(User currUser) {

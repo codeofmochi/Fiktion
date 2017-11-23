@@ -105,7 +105,7 @@ public class LocalAuthProvider extends AuthProvider {
      * @param listener that knows what to do with the results
      */
     @Override
-    public void createUserWithEmailAndPassword(DatabaseProvider database, String email, String password, AuthListener listener) {
+    public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
 
         User newUser = new User("new", "newID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
         if (mailList.contains(email)) {
@@ -163,7 +163,7 @@ public class LocalAuthProvider extends AuthProvider {
      * @param listener handles what to do after the request
      */
     @Override
-    public void getCurrentUser(DatabaseProvider database, DatabaseProvider.GetUserListener listener) {
+    public void getCurrentUser(DatabaseProvider.GetUserListener listener) {
         if (isConnected()) {
             listener.onSuccess(currUser);
         } else {
