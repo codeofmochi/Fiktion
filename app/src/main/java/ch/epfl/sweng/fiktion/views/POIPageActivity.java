@@ -143,7 +143,16 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
-                setPoiInformation(poi);
+                setPOI(poi);
+                downloadPhotos();
+                callMap();
+                setPOIInformation();
+            }
+
+            @Override
+            public void onModified(PointOfInterest poi) {
+                setPOI(poi);
+                setPOIInformation();
             }
 
             @Override
@@ -163,22 +172,16 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         reviewsView.setAdapter(reviewsAdapter);
     }
 
-    private void setPoiInformation(final PointOfInterest poi) {
+    private void setPOI(PointOfInterest poi) {
         this.poi = poi;
+    }
 
-        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
+    private void callMap() {
+        // get notified when the map is ready to be used
+        map.getMapAsync(this);
+    }
 
-        // set the mainImage as the first photo of the poi
-        photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
-            @Override
-            public void onNewPhoto(Bitmap b) {
-                mainImage.setImageBitmap(b);
-            }
-
-            @Override
-            public void onFailure() {
-            }
-        });
+    private void setPOIInformation() {
 
         // show the fictions the poi appears in
         Set<String> fictions = poi.fictions();
@@ -202,7 +205,23 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(poi.description());
-        final boolean emptyMainImage = true;
+    }
+
+    public void downloadPhotos() {
+
+        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
+
+        // set the mainImage as the first photo of the poi
+        photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onNewPhoto(Bitmap b) {
+                mainImage.setImageBitmap(b);
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
 
         // download the photos of the poi
         photoProvider.downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
@@ -236,9 +255,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             }
         });
-
-        // get notified when the map is ready to be used
-        map.getMapAsync(this);
     }
 
     @Override
