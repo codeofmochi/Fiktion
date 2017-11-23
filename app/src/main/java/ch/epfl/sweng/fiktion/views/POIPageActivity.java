@@ -46,13 +46,15 @@ import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
+import static ch.epfl.sweng.fiktion.providers.AuthSingleton.auth;
+import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 
@@ -94,6 +96,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     private PointOfInterest poi;
+    private User user;
+    private Button upvoteButton;
+    private boolean upvoted = false;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
     private ImageView noImages;
@@ -120,6 +125,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
 
+        // upvote button
+        upvoteButton = (Button) findViewById(R.id.upvoteButton);
+        upvoteButton.setEnabled(false);
+
         // Obtain the SupportMapFragment
         map = (MapView) findViewById(R.id.map);
         map.onCreate(savedInstanceState);
@@ -135,12 +144,35 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // get POI name
         Intent from = getIntent();
-        String poiName = from.getStringExtra("POI_NAME");
+        final String poiName = from.getStringExtra("POI_NAME");
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
+        auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setUser(user);
+                upvoteButton.setEnabled(true);
+                if (user.getUpvoted().contains(poiName)) {
+                    upvoted = true;
+                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                } else {
+                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                }
+            }
+
+            @Override
+            public void onDoesntExist() {
+
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+
         // get POI from database
-        DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+        database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
                 setPOI(poi);
@@ -174,6 +206,99 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void setPOI(PointOfInterest poi) {
         this.poi = poi;
+    }
+
+    private void setUser(User user) {
+        this.user = user;
+    }
+
+    public void vote(View view) {
+        if (user != null) {
+            upvoteButton.setEnabled(false);
+            if (upvoted) {
+                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorText));
+                user.removeVote(database, poi.name(), new DatabaseProvider.ModifyUserListener() {
+                    @Override
+                    public void onSuccess() {
+                        PointOfInterest ratedPOI = new PointOfInterest(poi.name(), poi.position(),
+                                poi.fictions(), poi.description(), poi.rating() - 1, poi.country(), poi.city());
+                        database.modifyPOI(ratedPOI, new DatabaseProvider.ModifyPOIListener() {
+                            @Override
+                            public void onSuccess() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                upvoteButton.setEnabled(true);
+                                upvoted = false;
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                upvoteButton.setEnabled(true);
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                upvoteButton.setEnabled(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        upvoteButton.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        upvoteButton.setEnabled(true);
+                    }
+                });
+            } else {
+                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorText));
+                user.upVote(database, poi.name(), new DatabaseProvider.ModifyUserListener() {
+                    @Override
+                    public void onSuccess() {
+                        PointOfInterest ratedPOI = new PointOfInterest(poi.name(), poi.position(),
+                                poi.fictions(), poi.description(), poi.rating() + 1, poi.country(), poi.city());
+                        database.modifyPOI(ratedPOI, new DatabaseProvider.ModifyPOIListener() {
+                            @Override
+                            public void onSuccess() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                upvoteButton.setEnabled(true);
+                                upvoted = true;
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                upvoteButton.setEnabled(true);
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                upvoteButton.setEnabled(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        upvoteButton.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        upvoteButton.setEnabled(true);
+                    }
+                });
+            }
+        }
     }
 
     private void callMap() {
