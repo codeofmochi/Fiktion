@@ -14,7 +14,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -40,6 +40,10 @@ public class ProfileSettingsActivityTest {
 
 
     private User user;
+    private final User defaultUser = new User("default", "defaultID");
+
+
+    private AuthProvider auth = AuthProvider.getInstance();
 
     @Rule
     public final ActivityTestRule<SettingsActivity> editProfileActivityRule =
@@ -47,13 +51,12 @@ public class ProfileSettingsActivityTest {
 
     @BeforeClass
     public static void setAuth() {
-        AuthSingleton.auth = new LocalAuthProvider();
-        DatabaseSingleton.database = new LocalDatabaseProvider();
+        Config.TEST_MODE = true;
     }
 
     @Before
     public void setVariables() {
-        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
@@ -73,9 +76,8 @@ public class ProfileSettingsActivityTest {
 
     @After
     public void resetAuth() {
-        AuthSingleton.auth = new LocalAuthProvider();
-        DatabaseSingleton.database = new LocalDatabaseProvider();
         //wait until all toasts disappear
+        ((LocalAuthProvider)auth).reset();
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -96,10 +98,10 @@ public class ProfileSettingsActivityTest {
 
         assertThat(user.getName(), is("new name"));
 
-        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
-                assertThat(AuthSingleton.auth.getEmail(), is(newEmail));
+                assertThat(auth.getEmail(), is(newEmail));
             }
 
             @Override
@@ -121,11 +123,11 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.emailEdit)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
 
-        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 //assert that we can only write 15 characters
-                assertThat(AuthSingleton.auth.getEmail(), is("default@email.ch"));
+                assertThat(auth.getEmail(), is("default@email.ch"));
             }
 
             @Override
@@ -151,7 +153,7 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.usernameEdit)).perform(typeText(newName), closeSoftKeyboard());
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
 
-        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 //assert that we can only write 15 characters
@@ -180,7 +182,7 @@ public class ProfileSettingsActivityTest {
 
 
         //change email
-        final String newEmail = AuthSingleton.auth.getEmail();
+        final String newEmail = auth.getEmail();
         onView(withId(R.id.emailEdit)).perform(typeText(newEmail), closeSoftKeyboard());
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
 
@@ -188,11 +190,11 @@ public class ProfileSettingsActivityTest {
         onView(withId(R.id.emailEdit)).check(matches(hasErrorText("Please type a new and valid email")));
 
 
-        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 assertThat(user.getName(), is(newName));
-                assertThat(AuthSingleton.auth.getEmail(), is(newEmail));
+                assertThat(auth.getEmail(), is(newEmail));
             }
 
             @Override
@@ -216,32 +218,8 @@ public class ProfileSettingsActivityTest {
                 .inRoot(withDecorView(not(is(editProfileActivityRule.getActivity().getWindow().getDecorView()))))
                 .perform(click());
 
-        AuthSingleton.auth.signIn(AuthSingleton.auth.getEmail(), "testing", new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
-                Assert.fail();
-            }
+        onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
 
-            @Override
-            public void onFailure() {
-                AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
-                    @Override
-                    public void onSuccess(User user) {
-                        Assert.fail();
-                    }
-
-                    @Override
-                    public void onDoesntExist() {
-                        Assert.fail();
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        //success
-                    }
-                });
-            }
-        });
     }
 
     @Test
@@ -258,7 +236,7 @@ public class ProfileSettingsActivityTest {
 
     @Test
     public void failNoUserSignedInDeleteAccount() {
-        AuthSingleton.auth.signOut();
+        auth.signOut();
         //we try to delete the same account with no user currently connected -> failure, toast should appear
         onView(withId(R.id.deleteAccountButton)).perform(click());
         onView(withText("Delete"))
@@ -271,7 +249,7 @@ public class ProfileSettingsActivityTest {
 
     @Test
     public void NotSignedInSendEmailVerification() {
-        AuthSingleton.auth.signOut();
+        auth.signOut();
         onView(withId(R.id.verifiedButton)).perform(click());
         onView(withId(R.id.accountLoginButton)).check(matches(isDisplayed()));
     }
@@ -292,29 +270,29 @@ public class ProfileSettingsActivityTest {
 
     @Test
     public void failResetPassword() {
-        AuthSingleton.auth.signOut();
+        auth.signOut();
         onView(withId(R.id.passwordReset)).perform(click());
         //should send an email verification since the user is already connected (default user)
         onView(withId(R.id.accountLoginButton)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void failSaveInfos(){
-        AuthSingleton.auth.signOut();
+    public void failSaveInfos() {
+       auth.signOut();
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
     }
 
     @Test
-    public void testRedirectLogin(){
-        AuthSingleton.auth.signOut();
+    public void testRedirectLogin() {
+        auth.signOut();
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
         onView(withId(R.id.accountLoginButton)).perform(click());
         onView(withId(R.id.User_Email)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void testActivityForResult(){
-        AuthSingleton.auth.signOut();
+    public void testActivityForResult() {
+        auth.signOut();
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
         onView(withId(R.id.accountLoginButton)).perform(click());
         onView(withId(R.id.User_Email)).perform(typeText("default@email.ch"), closeSoftKeyboard());
@@ -324,7 +302,7 @@ public class ProfileSettingsActivityTest {
     }
 
     @Test
-    public void testSignOut(){
+    public void testSignOut() {
         onView(withId(R.id.signOutButton)).perform(click());
         onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
     }

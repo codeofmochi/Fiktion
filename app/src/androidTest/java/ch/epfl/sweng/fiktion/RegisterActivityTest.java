@@ -10,11 +10,14 @@ import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.RegisterActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -33,17 +36,23 @@ public class RegisterActivityTest {
     private final String new_email = "new@email.com";
     private final String new_password = "validpass";
 
+    private AuthProvider auth = AuthProvider.getInstance();
+
     private RegisterActivity regActivity;
 
     @Rule
     public final ActivityTestRule<RegisterActivity> regActivityRule =
             new ActivityTestRule<>(RegisterActivity.class);
 
+    @BeforeClass
+    public static void setConfig(){
+        Config.TEST_MODE = true;
+    }
+
     @Before
     public void setUp() {
         //define authenticator as our local and not the firebase one
-        AuthSingleton.auth = new LocalAuthProvider();
-        AuthSingleton.auth.signOut();
+        auth.signOut();
         //define context
         regActivity = regActivityRule.getActivity();
     }
@@ -51,7 +60,7 @@ public class RegisterActivityTest {
     @After
     public void end() {
         //we need to sign out everytime in case it fails
-        AuthSingleton.auth.signOut();
+        auth.signOut();
         //regActivity.finish();
     }
 
@@ -64,7 +73,7 @@ public class RegisterActivityTest {
 
         onView(withId(R.id.register_click)).perform(click());
 
-        assertThat(AuthSingleton.auth.getEmail(), is(new_email));
+        assertThat(auth.getEmail(), is(new_email));
 
     }
 

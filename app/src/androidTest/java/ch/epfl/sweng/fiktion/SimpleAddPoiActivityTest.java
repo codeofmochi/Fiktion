@@ -7,7 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.tests.SimpleAddPOIActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -35,7 +35,7 @@ public class SimpleAddPoiActivityTest {
 
     @BeforeClass
     public static void setDatabase() {
-        DatabaseSingleton.database = new LocalDatabaseProvider();
+        Config.TEST_MODE = true;
     }
 
     @Test

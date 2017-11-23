@@ -16,9 +16,9 @@ import ch.epfl.sweng.fiktion.models.User;
 public class LocalAuthProvider extends AuthProvider {
     private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
     private final String defaultEmail = "default@email.ch";
-    private final List<User> userList = new ArrayList<>
+    private List<User> userList = new ArrayList<>
             (Collections.singletonList(defaultUser));
-    private final List<String> mailList = new ArrayList<>
+    private List<String> mailList = new ArrayList<>
             (Collections.singletonList(defaultEmail));
     private User currUser = defaultUser;
     private Boolean signedIn = true;
@@ -192,11 +192,6 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public void deleteAccount(AuthListener listener, DatabaseProvider.DeleteUserListener delListener) {
         if (isConnected()) {
-            mailList.remove(currentUserEmail);
-            userList.remove(currUser);
-            currentUserEmail = null;
-            currUser = null;
-            signedIn = false;
             listener.onSuccess();
             delListener.onSuccess();
 
@@ -222,5 +217,15 @@ public class LocalAuthProvider extends AuthProvider {
         return currentUserEmail;
     }
 
+    public void reset(){
+        userList = new ArrayList<>
+                (Collections.singletonList(defaultUser));
+        mailList = new ArrayList<>
+                (Collections.singletonList(defaultEmail));
+        currUser = defaultUser;
+        signedIn = true;
+        currentUserEmail = defaultEmail;
+        emailVerified = true;
+    }
 
 }

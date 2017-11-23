@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,13 +21,12 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.tests.FindNearestPoisActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -37,6 +37,8 @@ import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("DefaultFileTemplate")
 public class FindAndDisplayNearestPoisActivityTest {
+
+    private DatabaseProvider database = DatabaseProvider.getInstance();
     @Rule
     public final ActivityTestRule<FindNearestPoisActivity> mActivityRule =
             new ActivityTestRule<>(FindNearestPoisActivity.class);
@@ -57,7 +59,11 @@ public class FindAndDisplayNearestPoisActivityTest {
 
     @BeforeClass
     public static void setup() {
-        database = new LocalDatabaseProvider();
+        Config.TEST_MODE = true;
+    }
+
+    @Before
+    public void setUp(){
         database.addPoi(new PointOfInterest("p1", new Position(0.05, 0.05), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
         database.addPoi(new PointOfInterest("p2", new Position(0.3, 0.3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
         database.addPoi(new PointOfInterest("p3", new Position(0.6, 0.6), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);

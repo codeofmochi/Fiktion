@@ -15,6 +15,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -33,6 +35,7 @@ public class SignInActivityTest {
     private final String invalid_email = "invalid";
     private final String invalid_password = "1234";
     private SignInActivity mActivity;
+    private AuthProvider auth = AuthProvider.getInstance();
 
     @Rule
     public final ActivityTestRule<SignInActivity> sinActivityRule =
@@ -40,18 +43,19 @@ public class SignInActivityTest {
 
     @BeforeClass
     public static void setAuth() {
-        AuthSingleton.auth = new LocalAuthProvider();
-        AuthSingleton.auth.signOut();
+        Config.TEST_MODE = true;
     }
 
     @Before
     public void before() {
+        auth.signOut();
+
         mActivity = sinActivityRule.getActivity();
     }
 
     @After
     public void after() {
-        AuthSingleton.auth.signOut();
+        auth.signOut();
     }
 
 

@@ -9,8 +9,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -28,6 +30,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 public class UserDetailsActivityTest {
 
+    private AuthProvider auth = AuthProvider.getInstance();
+
     private User user;
     @Rule
     public final ActivityTestRule<UserDetailsActivity> userDetActivityRule =
@@ -35,12 +39,11 @@ public class UserDetailsActivityTest {
 
     @BeforeClass
     public static void setAuth() {
-        AuthSingleton.auth = new LocalAuthProvider();
-    }
+        Config.TEST_MODE = true;    }
 
     @Before
     public void setVariables() {
-        AuthSingleton.auth.getCurrentUser(new LocalDatabaseProvider(), new DatabaseProvider.GetUserListener() {
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
@@ -60,12 +63,12 @@ public class UserDetailsActivityTest {
 
     @After
     public void resetAuth() {
-        AuthSingleton.auth = new LocalAuthProvider();
+        ((LocalAuthProvider)auth).reset();
     }
 
     @Test
     public void seeDefaultUserInformations() {
-        onView(withId(R.id.detail_user_email)).check(matches(withText(AuthSingleton.auth.getEmail())));
+        onView(withId(R.id.detail_user_email)).check(matches(withText(auth.getEmail())));
         onView(withId(R.id.detail_user_name)).check(matches(withText(user.getName())));
     }
 

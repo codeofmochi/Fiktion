@@ -13,10 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-
-import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
-
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -58,8 +55,8 @@ public class HomeActivityTest {
 
     @BeforeClass
     public static void resetProviders() {
-        AuthSingleton.auth = new LocalAuthProvider();
-        DatabaseSingleton.database = new LocalDatabaseProvider();
+        Config.TEST_MODE = true;
+
         waitSomeTime(2000);
     }
 

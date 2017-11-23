@@ -46,7 +46,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     private final List<PointOfInterest> poiList = new ArrayList<>();
-    private final List<User> users = new ArrayList<>(initialList);
+    private List<User> users = new ArrayList<>(initialList);
 
     /**
      * {@inheritDoc}
@@ -318,5 +318,10 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 listener.onFailure();
             }
         });
+    }
+
+    public void reset() {
+        users = new ArrayList<>(initialList);
+        poiList.clear();
     }
 }

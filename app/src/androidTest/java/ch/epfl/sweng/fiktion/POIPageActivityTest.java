@@ -25,10 +25,6 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-
-import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
-
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalPhotoProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
@@ -45,7 +41,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
-import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -56,6 +51,8 @@ import static org.hamcrest.core.IsNot.not;
 
 public class POIPageActivityTest {
 
+    private PhotoProvider photoProvider = PhotoProvider.getInstance();
+
     @Rule
     public final IntentsTestRule<POIPageActivity> toastRule =
             new IntentsTestRule<>(POIPageActivity.class, true, false);
@@ -63,11 +60,9 @@ public class POIPageActivityTest {
 
     @BeforeClass
     public static void setProviders() {
+        //providers.getInstance will return localProviders
         Config.TEST_MODE = true;
-        auth = new LocalAuthProvider();
-        database = new LocalDatabaseProvider();
-        photoProvider = new LocalPhotoProvider();
-        DatabaseSingleton.database.addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
             @Override
             public void onSuccess() {
             }
@@ -139,7 +134,6 @@ public class POIPageActivityTest {
 
     @Test
     public void loadPhotosTest() {
-        photoProvider = new LocalPhotoProvider();
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);

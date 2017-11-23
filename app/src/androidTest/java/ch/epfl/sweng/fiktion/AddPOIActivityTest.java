@@ -19,6 +19,7 @@ import android.view.InputDevice;
 import android.view.View;
 import android.widget.EditText;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +32,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity;
 
@@ -47,7 +48,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -59,6 +59,9 @@ import static org.hamcrest.Matchers.not;
 
 @SuppressWarnings("DefaultFileTemplate")
 public class AddPOIActivityTest {
+
+    private DatabaseProvider database = DatabaseProvider.getInstance();
+
     @Rule
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
             new ActivityTestRule<>(AddPOIActivity.class);
@@ -79,7 +82,10 @@ public class AddPOIActivityTest {
 
     @BeforeClass
     public static void setup() {
-        database = new LocalDatabaseProvider();
+        Config.TEST_MODE = true;
+    }
+    @Before
+    public void setUp(){
         database.addPoi(new PointOfInterest("p1", new Position(0, 1), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
         database.addPoi(new PointOfInterest("p2", new Position(1, 2), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
         database.addPoi(new PointOfInterest("p3", new Position(2, 3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);

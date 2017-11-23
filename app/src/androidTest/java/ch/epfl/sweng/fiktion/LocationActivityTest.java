@@ -15,11 +15,9 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 
 /**
  * Created by dialexo on 18.10.17.
@@ -91,7 +89,7 @@ public class LocationActivityTest {
             PointOfInterest p3 = new PointOfInterest("p3", pos3, new TreeSet<String>(), "", 0, "", "");
 
             //pois are put into the database
-            database = new LocalDatabaseProvider();
+            DatabaseProvider database = DatabaseProvider.getInstance();
             database.addPoi(p1, emptyAddPoiListener);
             database.addPoi(p2, emptyAddPoiListener);
             database.addPoi(p3, emptyAddPoiListener);
