@@ -433,6 +433,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
     }
 
+    public void startWriteCommentActivity(View view){
+        Intent i = new Intent(this, WriteCommentActivity.class);
+        startActivity(i);
+    }
+
 }
 
 

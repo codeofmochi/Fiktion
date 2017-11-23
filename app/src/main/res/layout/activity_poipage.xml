@@ -163,6 +163,7 @@
             android:textColor="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imgSlider"
+            android:onClick="startWriteCommentActivity"
             tools:targetApi="m" />
 
         <android.support.v7.widget.RecyclerView

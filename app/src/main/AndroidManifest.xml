@@ -92,6 +92,7 @@
         <activity
             android:name=".views.TextSearchActivity"
             android:label="Search" />
+        <activity android:name=".views.WriteCommentActivity"></activity>
     </application>
 
 </manifest>
