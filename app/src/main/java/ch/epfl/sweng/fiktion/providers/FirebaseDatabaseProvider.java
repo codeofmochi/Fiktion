@@ -25,6 +25,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private DatabaseReference dbRef;
     private GeoFire geofire;
     private SearchProvider searchProvider;
+    private final String poisRefName = "Points of interest";
+    private final String usersRefName = "Users";
 
     public FirebaseDatabaseProvider() {
         dbRef = FirebaseDatabase.getInstance().getReference();
@@ -46,7 +48,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         final String poiName = poi.name();
 
         // get/create the reference of the point of interest
-        final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
 
         // add only if the reference doesn't exist
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -99,8 +101,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void getPoi(String poiName, final GetPoiListener listener) {
         // get the reference of the poi
-        DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
-        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -108,11 +112,71 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     if (fPoi == null) {
                         listener.onFailure();
                     } else {
-                        // inform the listener that we got the matching poi
-                        listener.onSuccess(fPoi.toPoi());
+                        if (firstCall) {
+                            // inform the listener that we got the matching poi
+                            listener.onSuccess(fPoi.toPoi());
+                            firstCall = false;
+                        } else {
+                            //inform the listener that the poi has been modified
+                            listener.onModified(fPoi.toPoi());
+                        }
                     }
                 } else {
                     // inform the listener that the poi doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void modifyPOI(final PointOfInterest poi, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poi.name());
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    // modify the poi in the search provider
+                    searchProvider.modifyPOI(poi, new ModifyPOIListener() {
+                        @Override
+                        public void onSuccess() {
+                            // if it succeeds, replace the poi value in firebase
+                            FirebasePointOfInterest fPOI = new FirebasePointOfInterest(poi);
+                            poiRef.setValue(fPOI);
+
+                            // update the position for geofire
+                            Position pos = poi.position();
+                            final GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
+                            geofire.setLocation(poi.name(), geoLocation);
+
+                            // and inform the listener of the success of the modification
+                            listener.onSuccess();
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            // if it doesn't exist in the search provider, we got a coherence problem -> failure
+                            listener.onFailure();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            // inform the listener that the operation failed
+                            listener.onFailure();
+                        }
+                    });
+                } else {
+                    // inform the listener that the point of interest doesn't exist
                     listener.onDoesntExist();
                 }
             }
@@ -141,6 +205,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     public void onSuccess(PointOfInterest poi) {
                         // inform the listener that we got a new poi
                         listener.onNewValue(poi);
+                    }
+
+                    @Override
+                    public void onModified(PointOfInterest poi) {
+
                     }
 
                     @Override
@@ -196,6 +265,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         }
 
                         @Override
+                        public void onModified(PointOfInterest poi) {
+                        }
+
+                        @Override
                         public void onDoesntExist() {
                         }
 
@@ -219,7 +292,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void addUser(final User user, final AddUserListener listener) {
         // get/create the reference of the user
-        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+        final DatabaseReference userRef = dbRef.child(usersRefName).child(user.getID());
 
         // add only if the reference doesn't exist
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -252,7 +325,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void getUserById(String id, final GetUserListener listener) {
         // get the reference of the user associated with the id
-        DatabaseReference userRef = dbRef.child("Users").child(id);
+        DatabaseReference userRef = dbRef.child(usersRefName).child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -285,7 +358,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void deleterUserById(String id, final DeleteUserListener listener) {
         // get the reference of the user associated with the id
-        final DatabaseReference userRef = dbRef.child("Users").child(id);
+        final DatabaseReference userRef = dbRef.child(usersRefName).child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -315,7 +388,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
         // get the reference of the user
-        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+        final DatabaseReference userRef = dbRef.child(usersRefName).child(user.getID());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

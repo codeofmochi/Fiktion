@@ -40,6 +40,14 @@ public abstract class SearchProvider {
     public abstract void addPoi(PointOfInterest poi, DatabaseProvider.AddPoiListener listener);
 
     /**
+     * Modify a point of interest and inform the listener of the result
+     *
+     * @param poi      the modified point of interest
+     * @param listener the listener
+     */
+    public abstract void modifyPOI(PointOfInterest poi, DatabaseProvider.ModifyPOIListener listener);
+
+    /**
      * @param text     query POI's that contains parameter in their names
      * @param listener listens to search process
      */
