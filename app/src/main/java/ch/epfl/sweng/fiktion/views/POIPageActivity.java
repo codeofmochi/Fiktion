@@ -158,6 +158,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 callMap();
                 displayNearPois();
                 setPOIInformation();
+                // hide loading spinner
+                ProgressBar spinner = (ProgressBar) findViewById(R.id.loadingSpinner);
+                spinner.setVisibility(View.GONE);
             }
 
             @Override
