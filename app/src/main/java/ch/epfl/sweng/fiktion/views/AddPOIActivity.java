@@ -143,10 +143,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
             isCorrect = false;
         }
 
-        if (description.isEmpty()) {
-            ((EditText) findViewById(R.id.description)).setError("Description cannot be empty");
-        }
-
         if (longitudeString.isEmpty()) {
             ((EditText) findViewById(R.id.add_poi_longitude)).setError("Longitude cannot be empty");
             isCorrect = false;
