@@ -93,4 +93,6 @@
     <string name="Wishlist">Wishlist</string>
     <string name="Edit">Edit</string>
     <string name="loading_data">Loading data …</string>
+    <string name="data_not_found">Data not found.</string>
+    <string name="failed_to_fetch_data">Failed to fetch data.</string>
 </resources>

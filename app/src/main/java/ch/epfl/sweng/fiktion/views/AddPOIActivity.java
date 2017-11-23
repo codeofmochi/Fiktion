@@ -101,17 +101,17 @@ public class AddPOIActivity extends MenuDrawerActivity {
 
                 @Override
                 public void onModified(PointOfInterest poi) {
-
+                    // do nothing : we don't want the change to cancel the current edit
                 }
 
                 @Override
                 public void onDoesntExist() {
-
+                    loadingSnackbar.setText(R.string.data_not_found);
                 }
 
                 @Override
                 public void onFailure() {
-
+                    loadingSnackbar.setText(R.string.failed_to_fetch_data);
                 }
             });
         }
@@ -258,28 +258,62 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
 
         if (isCorrect) {
+            // create new poi object with current data
             PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
-            database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
-                @Override
-                public void onSuccess() {
-                    showToast("The place " + name + " was successfully added");
-                    // show newly created POI
-                    Intent i = new Intent(ctx, POIPageActivity.class);
-                    i.putExtra("POI_NAME", name);
-                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(i);
-                }
 
-                @Override
-                public void onAlreadyExists() {
-                    showToast("The place named " + name + " already exists !");
-                }
+            switch (action) {
+                case ADD: {
+                    database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
+                        @Override
+                        public void onSuccess() {
+                            showToast("The place " + name + " was successfully added");
+                            // show newly created POI
+                            Intent i = new Intent(ctx, POIPageActivity.class);
+                            i.putExtra("POI_NAME", name);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                        }
 
-                @Override
-                public void onFailure() {
-                    showToast("An error occured while adding " + name + " : please try again later");
+                        @Override
+                        public void onAlreadyExists() {
+                            showToast("The place named " + name + " already exists !");
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            showToast("An error occured while adding " + name + " : please try again later");
+                        }
+                    });
+                    break;
                 }
-            });
+                case EDIT: {
+                    database.modifyPOI(newPoi, new DatabaseProvider.ModifyPOIListener() {
+                        @Override
+                        public void onSuccess() {
+                            showToast("The place " + editName + " was modified");
+                            // show newly created POI
+                            Intent i = new Intent(ctx, POIPageActivity.class);
+                            i.putExtra("POI_NAME", editName);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            showToast("The place " + editName + " was not found");
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            showToast("An error occured while modifying " + editName + " : please try again later");
+                        }
+                    });
+                    break;
+                }
+                default: {
+                    throw new IllegalStateException("Undefined action");
+                }
+            }
         }
     }
 
