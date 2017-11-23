@@ -17,7 +17,6 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
@@ -47,7 +46,7 @@ public class UserDetailsActivity extends AppCompatActivity {
     private User currUser;
     //Authenticator initiation
 
-    private final AuthProvider auth = AuthSingleton.auth;
+    private final AuthProvider auth = AuthProvider.getInstance();
 
     //views
     private TextView user_name_view;

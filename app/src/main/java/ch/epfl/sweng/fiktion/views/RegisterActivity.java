@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 
 /**
@@ -55,7 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         //we need to check if the credentials are valid before attempting to sign in
         //first we check if the email is valid, do not proceed if it is not valid
-        String emailErr = AuthSingleton.auth.validateEmail(email);
+        String emailErr = AuthProvider.getInstance().validateEmail(email);
         if (!emailErr.isEmpty()) {
             Log.d(TAG, "Email is not valid");
             //we set an error corresponding to the failure
@@ -63,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
         //after making sure the email is valid we check if the password is valid and if not we do not proceed
-        String passwordErr = AuthSingleton.auth.validatePassword(password);
+        String passwordErr = AuthProvider.getInstance().validatePassword(password);
         if (!passwordErr.isEmpty()) {
             Log.d(TAG, "Password is not valid");
             //we set an error corresponding to the failure
@@ -77,7 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
         Log.d(TAG, "Credentials are valid");
 
-        AuthSingleton.auth.createUserWithEmailAndPassword(DatabaseSingleton.database,email, password, new AuthProvider.AuthListener() {
+        AuthProvider.getInstance().createUserWithEmailAndPassword(DatabaseSingleton.database,email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 //account creation was successful

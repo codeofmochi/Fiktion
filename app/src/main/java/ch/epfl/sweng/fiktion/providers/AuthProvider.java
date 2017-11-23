@@ -1,5 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.utils.Config;
+
 /**
  * Authentication provider
  * Created by rodri on 17.10.2017.
@@ -7,6 +9,18 @@ package ch.epfl.sweng.fiktion.providers;
 
 public abstract class AuthProvider {
 
+    private static AuthProvider auth;
+
+    public static AuthProvider getInstance(){
+        if(auth==null){
+            if(Config.TEST_MODE){
+                auth = new LocalAuthProvider();
+            } else{
+                auth = new FirebaseAuthProvider();
+            }
+        }
+        return auth;
+    }
     /**
      * Defines what actions to take on auth op callback
      */

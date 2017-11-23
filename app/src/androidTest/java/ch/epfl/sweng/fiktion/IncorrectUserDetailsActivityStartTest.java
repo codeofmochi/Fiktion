@@ -7,8 +7,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
-import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.views.tests.UserDetailsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
