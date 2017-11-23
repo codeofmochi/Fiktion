@@ -59,7 +59,7 @@ import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
     private final int MAXIMUM_SIZE = 1000;
-
+    private static final String POI_NAME = "POI NAME";
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
         private String[] data;
 
@@ -92,7 +92,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             return data.length;
         }
     }
-
+    private String poiName;
     private PointOfInterest poi;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
@@ -135,7 +135,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // get POI name
         Intent from = getIntent();
-        String poiName = from.getStringExtra("POI_NAME");
+        final String poiName = from.getStringExtra("POI_NAME");
+        this.poiName = poiName;
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
@@ -175,7 +176,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private void setPOI(PointOfInterest poi) {
         this.poi = poi;
     }
-
     private void callMap() {
         // get notified when the map is ready to be used
         map.getMapAsync(this);
@@ -435,6 +435,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     public void startWriteCommentActivity(View view){
         Intent i = new Intent(this, WriteCommentActivity.class);
+        i.putExtra(POI_NAME, poiName);
         startActivity(i);
     }
 
