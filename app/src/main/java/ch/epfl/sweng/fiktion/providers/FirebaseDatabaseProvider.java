@@ -145,17 +145,36 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // if it exists, replace its value
-                    FirebasePointOfInterest fPOI = new FirebasePointOfInterest(poi);
-                    poiRef.setValue(fPOI);
 
-                    // update the position for geofire
-                    Position pos = poi.position();
-                    final GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
-                    geofire.setLocation(poi.name(), geoLocation);
+                    // modify the poi in the search provider
+                    searchProvider.modifyPOI(poi, new ModifyPOIListener() {
+                        @Override
+                        public void onSuccess() {
+                            // if it succeeds, replace the poi value in firebase
+                            FirebasePointOfInterest fPOI = new FirebasePointOfInterest(poi);
+                            poiRef.setValue(fPOI);
 
-                    // and inform the listener of the success of the modification
-                    listener.onSuccess();
+                            // update the position for geofire
+                            Position pos = poi.position();
+                            final GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
+                            geofire.setLocation(poi.name(), geoLocation);
+
+                            // and inform the listener of the success of the modification
+                            listener.onSuccess();
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            // if it doesn't exist in the search provider, we got a coherence problem -> failure
+                            listener.onFailure();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            // inform the listener that the operation failed
+                            listener.onFailure();
+                        }
+                    });
                 } else {
                     // inform the listener that the point of interest doesn't exist
                     listener.onDoesntExist();

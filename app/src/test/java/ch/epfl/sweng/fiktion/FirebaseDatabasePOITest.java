@@ -72,6 +72,9 @@ public class FirebaseDatabasePOITest {
     @Captor
     private ArgumentCaptor<SearchProvider.SearchPOIsByTextListener> searchPOIsByTextListener;
 
+    @Captor
+    private ArgumentCaptor<DatabaseProvider.ModifyPOIListener> modifyPOIListener;
+
     @Before
     public void initializers() {
         database = new FirebaseDatabaseProvider(dbRef, geofire, searchProvider);
@@ -178,7 +181,9 @@ public class FirebaseDatabasePOITest {
     public void modifyPOITest() {
         when(dbRef.child(anyString())).thenReturn(dbRef);
         doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+        doNothing().when(searchProvider).modifyPOI(any(PointOfInterest.class), modifyPOIListener.capture());
         when(dbRef.setValue(any())).thenReturn(null);
+        doNothing().when(geofire).setLocation(anyString(), any(GeoLocation.class));
         final Mutable<String> result = new Mutable<>("");
 
         DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
@@ -201,12 +206,17 @@ public class FirebaseDatabasePOITest {
         database.modifyPOI(poiTest, listener);
         when(snapshot.exists()).thenReturn(true);
         vel.getValue().onDataChange(snapshot);
+        modifyPOIListener.getValue().onSuccess();
         assertThat(result.value, is("SUCCESS"));
+        modifyPOIListener.getValue().onDoesntExist();
+        assertThat(result.value, is("FAILURE"));
+        modifyPOIListener.getValue().onFailure();
+        assertThat(result.value, is("FAILURE"));
+
         when(snapshot.exists()).thenReturn(false);
         vel.getValue().onDataChange(snapshot);
         assertThat(result.value, is("DOESNTEXIST"));
         vel.getValue().onCancelled(null);
-        assertThat(result.value, is("FAILURE"));
     }
 
     @Test

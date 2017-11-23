@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -24,6 +26,7 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.AlgoliaSearchProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider.AddPoiListener;
 import ch.epfl.sweng.fiktion.providers.SearchProvider.SearchPOIsByTextListener;
 import ch.epfl.sweng.fiktion.utils.Mutable;
@@ -32,8 +35,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by serdar on 11/16/2017.
@@ -52,8 +58,13 @@ public class AlgoliaSearchTest {
             "TestLand",
             "TestTown");
 
+    private PointOfInterest poiFail = new PointOfInterest("poiFail", null, new TreeSet<String>(), "desc", 0, "country", "city");
+
     @Mock
     Index index;
+
+    @Captor
+    ArgumentCaptor<CompletionHandler> handler;
 
     private AlgoliaSearchProvider algolia;
 
@@ -64,14 +75,7 @@ public class AlgoliaSearchTest {
 
     @Test
     public void addPOITest() {
-        final Mutable<CompletionHandler> handler = new Mutable<>();
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                handler.value = (CompletionHandler) invocation.getArgument(1);
-                return null;
-            }
-        }).when(index).addObjectAsync(any(JSONObject.class), any(CompletionHandler.class));
+        when(index.addObjectAsync(any(JSONObject.class), anyString(), handler.capture())).thenReturn(null);
 
         final Mutable<String> result = new Mutable<>("NOTHING");
 
@@ -93,23 +97,45 @@ public class AlgoliaSearchTest {
         };
 
         algolia.addPoi(poi, listener);
-        handler.value.requestCompleted(null, null);
+        handler.getValue().requestCompleted(null, null);
         assertThat(result.value, is("SUCCESS"));
-        PointOfInterest poiFail = new PointOfInterest("poiFail", null, new TreeSet<String>(), "desc", 0, "country", "city");
+
         algolia.addPoi(poiFail, listener);
         assertThat(result.value, is("FAILURE"));
     }
 
     @Test
-    public void searchByTextTest() throws JSONException {
-        final Mutable<CompletionHandler> handler = new Mutable<>();
-        doAnswer(new Answer() {
+    public void modifyPOITest() {
+        when(index.saveObjectAsync(any(JSONObject.class), anyString(), handler.capture())).thenReturn(null);
+
+        final Mutable<String> result = new Mutable<>("NOTHING");
+        DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                handler.value = (CompletionHandler) invocation.getArgument(1);
-                return null;
+            public void onSuccess() {
+                result.value = "SUCCESS";
             }
-        }).when(index).searchAsync(any(Query.class), any(CompletionHandler.class));
+
+            @Override
+            public void onDoesntExist() {
+                result.value = "DOESNTEXIST";
+            }
+
+            @Override
+            public void onFailure() {
+                result.value = "FAILURE";
+            }
+        };
+
+        algolia.modifyPOI(poi, listener);
+        handler.getValue().requestCompleted(null, null);
+        assertThat(result.value, is("SUCCESS"));
+        algolia.modifyPOI(poiFail, listener);
+        assertThat(result.value, is("FAILURE"));
+    }
+
+    @Test
+    public void searchByTextTest() throws JSONException {
+        when(index.searchAsync(any(Query.class), handler.capture())).thenReturn(null);
 
         final List<String> poiNames = new ArrayList<>();
         final Mutable<Boolean> failure = new Mutable<>(false);
@@ -135,7 +161,7 @@ public class AlgoliaSearchTest {
         hits.add(new JSONObject().put("name", "poi2"));
         JSONObject json = new JSONObject().put("hits", new JSONArray(hits));
 
-        handler.value.requestCompleted(json, null);
+        handler.getValue().requestCompleted(json, null);
         assertThat(poiNames.size(), is(2));
         assertThat(failure.value, is(false));
         poiNames.clear();
@@ -143,7 +169,7 @@ public class AlgoliaSearchTest {
         JSONObject emptyJSON = new JSONObject()
                 .put("hits", new JSONArray(new ArrayList<JSONObject>()));
 
-        handler.value.requestCompleted(emptyJSON, null);
+        handler.getValue().requestCompleted(emptyJSON, null);
         assertThat(poiNames.size(), is(0));
         assertThat(failure.value, is(false));
         poiNames.clear();
@@ -151,7 +177,7 @@ public class AlgoliaSearchTest {
         JSONObject nohitJSON = new JSONObject()
                 .put("notHits", 42);
 
-        handler.value.requestCompleted(nohitJSON, null);
+        handler.getValue().requestCompleted(nohitJSON, null);
         assertThat(poiNames.size(), is(0));
         poiNames.clear();
 
@@ -162,14 +188,14 @@ public class AlgoliaSearchTest {
         weirdHits.add(new JSONObject().put("name", "poi3"));
         JSONObject weirdJSON = new JSONObject().put("hits", new JSONArray(weirdHits));
 
-        handler.value.requestCompleted(weirdJSON, null);
+        handler.getValue().requestCompleted(weirdJSON, null);
         assertThat(poiNames.size(), is(2));
         assertThat(failure.value, is(false));
         poiNames.clear();
 
         AlgoliaException e = mock(AlgoliaException.class);
 
-        handler.value.requestCompleted(json, e);
+        handler.getValue().requestCompleted(json, e);
         assertThat(poiNames.size(), is(0));
         assertThat(failure.value, is(true));
 
