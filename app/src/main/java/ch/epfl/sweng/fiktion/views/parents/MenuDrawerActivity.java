@@ -3,7 +3,6 @@ package ch.epfl.sweng.fiktion.views.parents;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +20,7 @@ import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 import ch.epfl.sweng.fiktion.views.ProfileActivity;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
+import ch.epfl.sweng.fiktion.views.TextSearchActivity;
 
 /**
  * A parent class for activities that implement the left menu drawer
@@ -30,7 +30,7 @@ import ch.epfl.sweng.fiktion.views.SettingsActivity;
 public abstract class MenuDrawerActivity extends AppCompatActivity {
 
     // menu drawer properties
-    private String[] menuItems = {"Home", "Nearby", "Profile", "Discover", "Contribute", "Settings"};
+    private String[] menuItems = {"Home", "Search", "Nearby", "Profile", "Discover", "Contribute", "Settings"};
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     protected int includeLayout;
@@ -40,15 +40,15 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-            selectItem(pos);
+            selectItem(menuItems[pos]);
         }
     }
 
     // what to do on menu item select
-    private void selectItem(int pos) {
+    private void selectItem(String menuId) {
         // close current activity
-        switch (pos) {
-            case 0: {
+        switch (menuId) {
+            case "Home": {
                 // home activity
                 if (this.getClass().equals(HomeActivity.class)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
@@ -60,7 +60,19 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
                 }
                 break;
             }
-            case 1: {
+            case "Search": {
+                // search activity
+                if (this.getClass().equals(TextSearchActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    Intent i = new Intent(this, TextSearchActivity.class);
+                    // clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
+                break;
+            }
+            case "Nearby": {
                 // location activity
                 if (this.getClass().equals(LocationActivity.class)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
@@ -72,7 +84,7 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
                 }
                 break;
             }
-            case 2:
+            case "Profile":
                 // profile activity
                 if (this.getClass().equals(ProfileActivity.class)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
@@ -83,10 +95,10 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
                     startActivity(i);
                 }
                 break;
-            case 3:
+            case "Discover":
                 // discover activity
                 break;
-            case 4: {
+            case "Contribute": {
                 // add POI activity
                 if (this.getClass().equals(AddPOIActivity.class)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
@@ -98,7 +110,7 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
                 }
                 break;
             }
-            case 5:
+            case "Settings":
                 // settings activity
                 if (this.getClass().equals(SettingsActivity.class)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
@@ -114,7 +126,6 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
         }
 
         // change menu state
-        drawerList.setItemChecked(pos, true);
         drawerLayout.closeDrawer(drawerList);
     }
 
