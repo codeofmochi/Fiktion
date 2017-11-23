@@ -97,6 +97,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
+    private String poiName;
     private final Context ctx = this;
     private LinearLayout nearbyPoisList;
     private TextView noNearbyPois;
@@ -145,7 +146,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // get POI name
         Intent from = getIntent();
-        String poiName = from.getStringExtra("POI_NAME");
+        poiName = from.getStringExtra("POI_NAME");
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
@@ -499,6 +500,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         return true;
                     case R.id.edit:
                         // do stuff on click edit
+                        Intent i = new Intent(ctx, AddPOIActivity.class);
+                        i.putExtra("EDIT_POI_NAME", poiName);
+                        startActivity(i);
                         return true;
                     default:
                         return false;

@@ -92,4 +92,5 @@
     <string name="Favorite">Favorite</string>
     <string name="Wishlist">Wishlist</string>
     <string name="Edit">Edit</string>
+    <string name="loading_data">Loading data …</string>
 </resources>

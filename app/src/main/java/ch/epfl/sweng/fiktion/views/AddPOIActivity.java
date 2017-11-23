@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +18,8 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
+import ch.epfl.sweng.fiktion.utils.CollectionsUtils;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
@@ -33,10 +37,84 @@ public class AddPOIActivity extends MenuDrawerActivity {
     // this activity's context
     private Context ctx = this;
 
+    // this activity can either add or edit POIs
+    private enum Action {
+        ADD, EDIT
+    }
+
+    ;
+    private Action action;
+    private String editName;
+
     @Override
+    @SuppressWarnings("SetTextI18n")
     protected void onCreate(Bundle savedInstanceState) {
         includeLayout = R.layout.activity_add_poi;
         super.onCreate(savedInstanceState);
+
+        // check if it is an edit request
+        Intent from = getIntent();
+        editName = from.getStringExtra("EDIT_POI_NAME");
+
+        // assume it is an edit if no extra data
+        if (editName == null || editName.isEmpty()) {
+            action = Action.ADD;
+        } else {
+            action = Action.EDIT;
+        }
+
+        // if the goal is to edit, disable actions until fetched from database
+        if (action == Action.EDIT) {
+
+            // modify activity title
+            this.setTitle("Edit " + editName);
+            // show loading snackbar
+            final Snackbar loadingSnackbar = Snackbar.make(findViewById(R.id.add_poi_scroll), R.string.loading_data, Snackbar.LENGTH_INDEFINITE);
+            loadingSnackbar.show();
+            // disable save button
+            final Button saveButton = (Button) findViewById(R.id.add_poi_finish);
+            saveButton.setEnabled(false);
+            saveButton.setBackgroundColor(getResources().getColor(R.color.lightGray));
+
+            // database request
+            DatabaseSingleton.database.getPoi(editName, new DatabaseProvider.GetPoiListener() {
+                @Override
+                public void onSuccess(PointOfInterest poi) {
+                    // set fields
+                    EditText addPoiName = (EditText) findViewById(R.id.add_poi_name);
+                    addPoiName.setText(poi.name());
+                    addPoiName.setEnabled(false);
+                    fictionSet.addAll(poi.fictions());
+                    fictionListText = CollectionsUtils.mkString(poi.fictions(), ", ");
+                    ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
+                    ((EditText) findViewById(R.id.add_poi_latitude)).setText(Double.toString(poi.position().latitude()));
+                    ((EditText) findViewById(R.id.add_poi_longitude)).setText(Double.toString(poi.position().longitude()));
+                    ((EditText) findViewById(R.id.add_poi_city)).setText(poi.city());
+                    ((EditText) findViewById(R.id.add_poi_country)).setText(poi.country());
+                    ((EditText) findViewById(R.id.add_poi_description)).setText(poi.description());
+                    // hide loading snackbar
+                    loadingSnackbar.dismiss();
+                    // enable save button
+                    saveButton.setEnabled(true);
+                    saveButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                }
+
+                @Override
+                public void onModified(PointOfInterest poi) {
+
+                }
+
+                @Override
+                public void onDoesntExist() {
+
+                }
+
+                @Override
+                public void onFailure() {
+
+                }
+            });
+        }
     }
 
     /**
