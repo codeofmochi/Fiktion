@@ -128,13 +128,6 @@ public class UserTest {
         userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
                 new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true);
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setDBList((DatabaseProvider.ModifyUserListener) invocation.getArgument(1));
-                return null;
-            }
-        }).when(mockDB).modifyUser(any(User.class), any(DatabaseProvider.ModifyUserListener.class));
 
     }
 
@@ -198,9 +191,6 @@ public class UserTest {
             @Override
             public void onSuccess() {
                 assertThat(user.getName(), is(newName));
-                for(User u : dbUserList){
-                    System.out.println(u.getName());
-                }
                 int index = dbUserList.indexOf(newUser);
                 User u = dbUserList.get(index);
                 assertThat(u.getName(), is(newName));

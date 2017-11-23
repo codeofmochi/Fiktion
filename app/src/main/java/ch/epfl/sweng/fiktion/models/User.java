@@ -27,7 +27,6 @@ public class User {
     private Set<String> friendlist;
     private Set<String> friendRequests;
 
-    private static final DatabaseProvider db = DatabaseProvider.getInstance();
     /**
      * Creates a new User with given parameters
      *
@@ -97,7 +96,7 @@ public class User {
     public void changeProfilePrivacy(Boolean privacyState, final AuthProvider.AuthListener listener) {
         final Boolean oldPrivacy = isPublicProfile;
         isPublicProfile = privacyState;
-        db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+        DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();
@@ -126,15 +125,15 @@ public class User {
     public void acceptFriendRequest(final String friendID, final DatabaseProvider.ModifyUserListener listener) {
         if(friendRequests.contains(friendID)) {
             // Access other user (friend)
-            db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
+            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     // modify the friend
-                    db.modifyUser(user.addFriend(id), new DatabaseProvider.ModifyUserListener() {
+                    DatabaseProvider.getInstance().modifyUser(user.addFriend(id), new DatabaseProvider.ModifyUserListener() {
                         @Override
                         public void onSuccess() {
                             // modify the user
-                            db.modifyUser(User.this.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
+                            DatabaseProvider.getInstance().modifyUser(User.this.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
                                 @Override
                                 public void onSuccess() {
                                     listener.onSuccess();
@@ -197,7 +196,7 @@ public class User {
     public void ignoreFriendRequest(final String friendID, final AuthProvider.AuthListener listener) {
         if(friendRequests.remove(friendID)) {
             // modify user
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -228,7 +227,7 @@ public class User {
      */
     public void sendFriendRequest(final String friendID, final userListener listener) {
         if(!friendlist.contains(friendID)) {
-            db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
+            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     // add the request in the friend's requests list
@@ -302,7 +301,7 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the change
      */
     private void addTofriendRequests(User user, final userListener listener) {
-        db.modifyUser(user.addRequest(id), new DatabaseProvider.ModifyUserListener() {
+        DatabaseProvider.getInstance().modifyUser(user.addRequest(id), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();
@@ -329,7 +328,7 @@ public class User {
      */
     private void removeFriendFromUserHelper(User instance, final String friendID, final userListener listener) {
         // modify user
-        db.modifyUser(instance.removeFriend(friendID), new DatabaseProvider.ModifyUserListener() {
+        DatabaseProvider.getInstance().modifyUser(instance.removeFriend(friendID), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();
@@ -360,11 +359,11 @@ public class User {
     public void removeFromFriendlist(final String friendID, final userListener listener) {
         if(friendlist.remove(friendID)) {
             // get friend user
-            db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
+            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     // modify friend, remove user from friend list
-                    db.modifyUser(user.removeFriend(id), new DatabaseProvider.ModifyUserListener() {
+                    DatabaseProvider.getInstance().modifyUser(user.removeFriend(id), new DatabaseProvider.ModifyUserListener() {
                         @Override
                         public void onSuccess() {
                             // modify user
@@ -415,7 +414,7 @@ public class User {
     public void visit(final String poiID, final AuthProvider.AuthListener listener) {
         if(!visited.contains(poiID)) {
             visited.addFirst(poiID);
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -450,7 +449,7 @@ public class User {
             // and we need to restore the visited list state
             final int poiIndex = visited.indexOf(poiID);
             visited.remove(poiID);
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -480,7 +479,7 @@ public class User {
      */
     public void addToWishlist(final String poiID, final AuthProvider.AuthListener listener) {
         if (wishlist.add(poiID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -510,7 +509,7 @@ public class User {
      */
     public void addFavourite(final String favID, final AuthProvider.AuthListener listener) {
         if (favourites.add(favID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -541,7 +540,7 @@ public class User {
      */
     public void removeFromWishlist(final String poiID, final AuthProvider.AuthListener listener) {
         if (wishlist.remove(poiID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -572,7 +571,7 @@ public class User {
      */
     public void removeFavourite(final String favID, final AuthProvider.AuthListener listener) {
         if (favourites.remove(favID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -605,7 +604,7 @@ public class User {
         //verification is done in the activity
         final String oldName = name;
         name = newName;
-        db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+        DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();

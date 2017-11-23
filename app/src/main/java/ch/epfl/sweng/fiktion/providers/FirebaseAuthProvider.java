@@ -26,7 +26,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     // firebase user that we authenticate
     private FirebaseUser user;
 
-    private DatabaseProvider database = DatabaseProvider.getInstance();
+    private DatabaseProvider database;
 
     // firebase status
     /*
@@ -66,11 +66,14 @@ public class FirebaseAuthProvider extends AuthProvider {
 
     public FirebaseAuthProvider() {
         auth = FirebaseAuth.getInstance();
+        database = DatabaseProvider.getInstance();
     }
 
-    public FirebaseAuthProvider(FirebaseAuth fbAuth) {
+    public FirebaseAuthProvider(FirebaseAuth fbAuth, DatabaseProvider db) {
         auth = fbAuth;
+        database = db;
     }
+
 
     /**
      * Signs in a user with an email, a password and what to do afterwards
@@ -163,25 +166,25 @@ public class FirebaseAuthProvider extends AuthProvider {
                             //need to create user in our database
 
                             database.addUser(new User("", auth.getUid(), new TreeSet<String>(),
-                                                    new TreeSet<String>(), new LinkedList<String>()),
-                                            new DatabaseProvider.AddUserListener() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    user = auth.getCurrentUser();
-                                                    listener.onSuccess();
-                                                }
+                                            new TreeSet<String>(), new LinkedList<String>()),
+                                    new DatabaseProvider.AddUserListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            user = auth.getCurrentUser();
+                                            listener.onSuccess();
+                                        }
 
-                                                @Override
-                                                public void onAlreadyExists() {
-                                                    listener.onFailure();
-                                                }
+                                        @Override
+                                        public void onAlreadyExists() {
+                                            listener.onFailure();
+                                        }
 
 
-                                                @Override
-                                                public void onFailure() {
-                                                    listener.onFailure();
-                                                }
-                                            });
+                                        @Override
+                                        public void onFailure() {
+                                            listener.onFailure();
+                                        }
+                                    });
 
                         } else {
                             // Account creation failed

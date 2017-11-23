@@ -30,6 +30,7 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 
@@ -75,9 +76,10 @@ public class FirebaseAuthTest {
     @Captor
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
-    private AuthProvider auth;
+    private FirebaseAuthProvider auth;
     @Mock
     private FirebaseDatabaseProvider database;
+
 
     private DatabaseProvider.AddUserListener addDatabaseListener;
 
@@ -106,9 +108,11 @@ public class FirebaseAuthTest {
 
     @Before
     public void setUp() {
-        auth = AuthProvider.getInstance();
+        auth = new FirebaseAuthProvider(fbAuth, database);
         setTasks();
         opResult = Result.NOTHING;
+
+
     }
 
     private void setTasks() {
@@ -559,7 +563,7 @@ public class FirebaseAuthTest {
         Mockito.when(fbUser.getUid()).thenReturn("id");
         auth.getCurrentUser(testListener);
 
-        getUserDatabaseListener.onSuccess(new User("name", "id", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>()));
+        getUserDatabaseListener.onSuccess(new User("name", "id"));
         assertThat(opResult, is(Result.SUCCESS));
         getUserDatabaseListener.onDoesntExist();
         assertThat(opResult, is(Result.DOESNOTEXIST));
