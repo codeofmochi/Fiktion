@@ -32,9 +32,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private static final int LOCATION_RESULT = 1;
     // this activity's context
     private Context ctx = this;
-    // error messages
-    private final String ERR_STRING_FORMAT = "Those characters are not accepted: . $ # [ ] /";
-    private final String ILLEGAL_CHARS_REGEX = ".*[.$#/\\[\\]].*";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,9 +94,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
         if (fiction.isEmpty()) {
             // warning message if no text was entered
             ((EditText) findViewById(R.id.add_poi_fiction)).setError("You can't enter an empty fiction name");
-        } else if (fiction.matches(ILLEGAL_CHARS_REGEX)) {
-            // warning message if unaccepted characters are present
-            ((EditText) findViewById(R.id.add_poi_fiction)).setError(ERR_STRING_FORMAT);
         } else {
             if (!fictionSet.contains(fiction)) {
                 fictionSet.add(fiction);
@@ -135,11 +129,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         boolean isCorrect = true;
 
         if (name.isEmpty()) {
-            ((EditText) findViewById(R.id.add_poi_name)).setError("You can't enter an empty point of interest name");
-            isCorrect = false;
-        }
-        if (name.matches(ILLEGAL_CHARS_REGEX)) {
-            ((EditText) findViewById(R.id.add_poi_name)).setError(ERR_STRING_FORMAT);
+            ((EditText) findViewById(R.id.add_poi_name)).setError("Name cannot be empty");
             isCorrect = false;
         }
 
@@ -147,25 +137,21 @@ public class AddPOIActivity extends MenuDrawerActivity {
             ((EditText) findViewById(R.id.add_poi_city)).setError("City cannot be empty");
             isCorrect = false;
         }
-        if (city.matches(ILLEGAL_CHARS_REGEX)) {
-            ((EditText) findViewById(R.id.add_poi_city)).setError(ERR_STRING_FORMAT);
-            isCorrect = false;
-        }
 
         if (country.isEmpty()) {
             ((EditText) findViewById(R.id.add_poi_country)).setError("Country cannot be empty");
             isCorrect = false;
         }
-        if (country.matches(ILLEGAL_CHARS_REGEX)) {
-            ((EditText) findViewById(R.id.add_poi_country)).setError(ERR_STRING_FORMAT);
-            isCorrect = false;
+
+        if (description.isEmpty()) {
+            ((EditText) findViewById(R.id.description)).setError("Description cannot be empty");
         }
 
         if (longitudeString.isEmpty()) {
-            ((EditText) findViewById(R.id.add_poi_longitude)).setError("You can't enter an empty longitude");
+            ((EditText) findViewById(R.id.add_poi_longitude)).setError("Longitude cannot be empty");
             isCorrect = false;
         } else if (!isNumeric(longitudeString)) {
-            ((EditText) findViewById(R.id.add_poi_longitude)).setError("You need to enter a number");
+            ((EditText) findViewById(R.id.add_poi_longitude)).setError("Please provide a valid number");
             isCorrect = false;
         } else {
             // If longitude is a number, parse it to double
@@ -178,10 +164,10 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
 
         if (latitudeString.isEmpty()) {
-            ((EditText) findViewById(R.id.add_poi_latitude)).setError("You can't enter an empty latitude");
+            ((EditText) findViewById(R.id.add_poi_latitude)).setError("Latitude cannot be empty");
             isCorrect = false;
         } else if (!isNumeric(latitudeString)) {
-            ((EditText) findViewById(R.id.add_poi_latitude)).setError("You need to enter a number");
+            ((EditText) findViewById(R.id.add_poi_latitude)).setError("Please provide a valid number");
             isCorrect = false;
         } else {
 
@@ -191,10 +177,12 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 isCorrect = false;
             }
         }
+
         if (fictionSet.isEmpty()) {
-            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Enter at least one fiction");
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Please add at least one fiction");
             isCorrect = false;
         }
+
         if (isCorrect) {
             PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
             database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
