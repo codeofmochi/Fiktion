@@ -18,7 +18,6 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LONGITUDE;
 
@@ -191,7 +190,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
         if (isCorrect) {
             PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
-            database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
+            DatabaseProvider.getInstance().addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
                     showToast("The place " + name + " was successfully added");

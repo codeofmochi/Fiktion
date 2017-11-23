@@ -19,7 +19,6 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
@@ -30,6 +29,8 @@ import ch.epfl.sweng.fiktion.views.SignInActivity;
  * @author Rodrigo
  */
 public class UserDetailsActivity extends AppCompatActivity {
+
+    private DatabaseProvider database = DatabaseProvider.getInstance();
 
     //constants
     //LOGCAT
@@ -114,7 +115,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         if (auth.isConnected()) {
             Log.d(TAG, "Request for the currently  signed in user signed in");
             // Name, email address, and profile photo Url
-            auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+            auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User currUser) {
                     name = currUser.getName();
@@ -218,11 +219,11 @@ public class UserDetailsActivity extends AppCompatActivity {
     public void clickAddFavourite(@SuppressWarnings("UnusedParameters") View v) {
         final String poiName = new_favourite_input.getText().toString();
         if(!poiName.isEmpty() ) {
-            DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+            database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
                 @Override
                 public void onSuccess(final PointOfInterest poi) {
 
-                    currUser.addFavourite(DatabaseSingleton.database, poiName, new AuthProvider.AuthListener() {
+                    currUser.addFavourite(database, poiName, new AuthProvider.AuthListener() {
                         @Override
                         public void onSuccess() {
                             favAdapter.add(poi.name());
@@ -261,11 +262,11 @@ public class UserDetailsActivity extends AppCompatActivity {
     public void clickAddToWishlist(@SuppressWarnings("UnusedParameters") View v) {
         final String poiName = new_wish_input.getText().toString();
         if(!poiName.isEmpty()) {
-            DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+            database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
                 @Override
                 public void onSuccess(final PointOfInterest poi) {
 
-                    currUser.addToWishlist(DatabaseSingleton.database, poiName, new AuthProvider.AuthListener() {
+                    currUser.addToWishlist(database, poiName, new AuthProvider.AuthListener() {
                         @Override
                         public void onSuccess() {
                             wishAdapter.add(poi.name());

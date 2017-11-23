@@ -328,7 +328,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             if (task.isSuccessful()) {
                                 listener.onSuccess();
                                 //delete user in our database
-                                DatabaseSingleton.database.deleterUserById(user.getUid(), delListener);
+                                DatabaseProvider.getInstance().deleterUserById(user.getUid(), delListener);
                             } else {
                                 listener.onFailure();
                             }

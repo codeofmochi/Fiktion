@@ -47,7 +47,6 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
@@ -140,7 +139,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
         // get POI from database
-        DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+        DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
                 setPOI(poi);

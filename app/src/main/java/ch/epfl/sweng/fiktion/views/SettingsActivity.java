@@ -16,7 +16,6 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 public class SettingsActivity extends MenuDrawerActivity {
@@ -31,6 +30,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button resetButton;
 
     private User user;
+    private DatabaseProvider database = DatabaseProvider.getInstance();
 
 
     private Context context = this;
@@ -56,7 +56,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     @Override
     public void onStart() {
         super.onStart();
-        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+        AuthSingleton.auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
@@ -152,7 +152,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         //validate name choice
         if (!newUsername.equals(user.getName())) {
 
-            user.changeName(DatabaseSingleton.database, newUsername, new AuthProvider.AuthListener() {
+            user.changeName(database, newUsername, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
                     userNewName.setHint(user.getName());

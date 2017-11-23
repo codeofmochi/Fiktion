@@ -14,7 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.providers.AuthSingleton;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
