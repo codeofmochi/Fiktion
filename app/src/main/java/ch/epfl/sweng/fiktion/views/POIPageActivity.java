@@ -151,7 +151,17 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         DatabaseSingleton.database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
-                setPoiInformation(poi);
+                setPOI(poi);
+                downloadPhotos();
+                callMap();
+                displayNearPois();
+                setPOIInformation();
+            }
+
+            @Override
+            public void onModified(PointOfInterest poi) {
+                setPOI(poi);
+                setPOIInformation();
             }
 
             @Override
@@ -175,22 +185,16 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         noNearbyPois = (TextView) findViewById(R.id.noNearbyPois);
     }
 
-    private void setPoiInformation(final PointOfInterest poi) {
+    private void setPOI(PointOfInterest poi) {
         this.poi = poi;
+    }
 
-        // set the mainImage as the first photo of the poi
-        photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
-            @Override
-            public void onNewPhoto(Bitmap b) {
-                Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
-                mainImage.setImageBitmap(resized);
-                mainImage.setVisibility(View.VISIBLE);
-            }
+    private void callMap() {
+        // get notified when the map is ready to be used
+        map.getMapAsync(this);
+    }
 
-            @Override
-            public void onFailure() {
-            }
-        });
+    private void setPOIInformation() {
 
         // show the fictions the poi appears in
         Set<String> fictions = poi.fictions();
@@ -214,6 +218,25 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(poi.description());
+    }
+
+    public void downloadPhotos() {
+
+        final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
+
+        // set the mainImage as the first photo of the poi
+        photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onNewPhoto(Bitmap b) {
+                Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
+                mainImage.setImageBitmap(resized);
+                mainImage.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
 
         // download the photos of the poi
         photoProvider.downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
@@ -247,10 +270,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             }
         });
+    }
 
-        // get notified when the map is ready to be used
-        map.getMapAsync(this);
-
+    public void displayNearPois() {
         // find nearby pois
         DatabaseSingleton.database.findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
             @Override
