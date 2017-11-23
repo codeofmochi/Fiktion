@@ -95,6 +95,7 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void changeProfilePrivacy(final DatabaseProvider db, Boolean privacyState, final AuthProvider.AuthListener listener) {
+        final Boolean oldPrivacy = isPublicProfile;
         isPublicProfile = privacyState;
         db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
             @Override
@@ -109,6 +110,8 @@ public class User {
 
             @Override
             public void onFailure() {
+                // revert local changes
+                isPublicProfile = oldPrivacy;
                 listener.onFailure();
             }
         });
@@ -146,7 +149,9 @@ public class User {
 
                                 @Override
                                 public void onFailure() {
-                                    // --> error modifying the user
+                                    // --> error modifying the user, revert local changes
+                                    User.this.addRequest(friendID);
+                                    User.this.removeFriend(friendID);
                                     listener.onFailure();
                                 }
                             });
@@ -611,20 +616,23 @@ public class User {
      */
     public void changeName(DatabaseProvider db, final String newName, final AuthProvider.AuthListener listener) {
         //verification is done in the activity
+        final String oldName = name;
+        name = newName;
         db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
-                name = newName;
                 listener.onSuccess();
             }
 
             @Override
             public void onDoesntExist() {
+                name = oldName;
                 listener.onFailure();
             }
 
             @Override
             public void onFailure() {
+                name = oldName;
                 listener.onFailure();
             }
         });
