@@ -19,12 +19,14 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -472,6 +474,35 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 uploadProgressBar.setProgress((int) progress);
             }
         });
+    }
+
+    /**
+     * Triggered by more menu button
+     *
+     * @param v the caller view
+     */
+    public void showMoreMenu(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.inflate(R.menu.poi_more_actions);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.favorite:
+                        // do stuff on click favorite
+                        return true;
+                    case R.id.wishlist:
+                        // do stuff on click wishlist
+                        return true;
+                    case R.id.edit:
+                        // do stuff on click edit
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popup.show();
     }
 
 }

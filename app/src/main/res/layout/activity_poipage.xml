@@ -35,28 +35,16 @@
             tools:ignore="HardcodedText" /> <!-- dynamically updated -->
 
         <TextView
-            android:id="@+id/featured"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="5dp"
-            android:paddingEnd="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title"
-            tools:ignore="HardcodedText,RtlSymmetry" /> <!-- dynamically updated -->
-
-        <TextView
             android:id="@+id/cityCountry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
             android:paddingEnd="20dp"
             android:textColor="@color/colorText"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/featured"
+            app:layout_constraintTop_toBottomOf="@id/title"
             tools:ignore="RtlSymmetry" />
 
         <TextView
@@ -64,9 +52,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
+            android:layout_marginTop="5dp"
             android:textColor="@color/colorText"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/featured" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <TextView
+            android:id="@+id/featured"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:paddingEnd="20dp"
+            android:textColor="@color/colorText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cityCountry"
+            tools:ignore="HardcodedText,RtlSymmetry" /> <!-- dynamically updated -->
 
         <TextView
             android:id="@+id/description"
@@ -78,14 +80,14 @@
             android:paddingEnd="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cityCountry"
+            app:layout_constraintTop_toBottomOf="@+id/featured"
             tools:ignore="HardcodedText,RtlSymmetry" /> <!-- dynamically updated -->
 
         <Button
             android:id="@+id/upvoteButton"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginTop="15dp"
             android:background="@color/colorPrimary"
             android:drawablePadding="10dp"
@@ -95,9 +97,24 @@
             android:paddingRight="10dp"
             android:text="@string/upvote"
             android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/moreMenu"
             app:layout_constraintTop_toBottomOf="@+id/mainImage"
             tools:targetApi="m" />
+
+        <ImageButton
+            android:id="@+id/moreMenu"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/colorPrimary"
+            android:contentDescription="@string/actions"
+            android:elevation="3dp"
+            android:onClick="showMoreMenu"
+            android:src="@drawable/more_vertical_icon"
+            android:tint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainImage" />
 
         <ch.epfl.sweng.fiktion.views.utils.ScrollableMapView
             android:id="@+id/map"
