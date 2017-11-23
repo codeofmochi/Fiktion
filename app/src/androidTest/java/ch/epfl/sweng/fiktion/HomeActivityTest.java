@@ -88,7 +88,7 @@ public class HomeActivityTest {
     public void backHomeWhenHomeClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
-        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
         closeSoftKeyboard();
         waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
@@ -101,7 +101,7 @@ public class HomeActivityTest {
     public void showMapWhenNearbyClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
-        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(1).perform(click());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(2).perform(click());
         waitSomeTime(1000);
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
@@ -110,7 +110,7 @@ public class HomeActivityTest {
     public void CloseDrawerWhenProfileClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
-        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(2).perform(click());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(3).perform(click());
         onView(withId(R.id.profileMain)).check(matches(isDisplayed()));
     }
 
@@ -119,7 +119,7 @@ public class HomeActivityTest {
     public void CloseDrawerWhenDiscoverClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
-        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(3).perform(click());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
         waitSomeTime(1000);
         homeMainLayout.check(matches(isDisplayed()));
     }
@@ -128,20 +128,30 @@ public class HomeActivityTest {
     public void AddPoiToAddPoiWhenContributeClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
-        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
         closeSoftKeyboard();
         waitSomeTime(1000);
         onView(withId(R.id.add_poi_scroll)).perform(swipeRightFast());
-        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(4).perform(click());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
         waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
+    }
+
+    @Test
+    public void displayTextSearchActivityOnMenuSearchClick() {
+        closeSoftKeyboard();
+        homeMainLayout.perform(swipeRightFast());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(1).perform(click());
+        closeSoftKeyboard();
+        waitSomeTime(1000);
+        onView(withId(R.id.searchBar)).check(matches(isDisplayed()));
     }
 
     @Test
     public void CloseDrawerWhenSettingsClicked() {
         closeSoftKeyboard();
         homeMainLayout.perform(swipeRightFast());
-        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(6).perform(click());
         onView(withId(R.id.accountSettings)).check(matches(isDisplayed()));
     }
 
