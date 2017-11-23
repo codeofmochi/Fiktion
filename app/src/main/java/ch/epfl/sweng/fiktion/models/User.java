@@ -27,7 +27,7 @@ public class User {
     private Set<String> friendlist;
     private Set<String> friendRequests;
 
-    private final DatabaseProvider db = DatabaseProvider.getInstance();
+    private static final DatabaseProvider db = DatabaseProvider.getInstance();
     /**
      * Creates a new User with given parameters
      *

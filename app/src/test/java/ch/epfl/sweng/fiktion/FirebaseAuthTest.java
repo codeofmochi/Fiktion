@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseReference;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -29,8 +30,8 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.FirebaseAuthProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -74,7 +75,7 @@ public class FirebaseAuthTest {
     @Captor
     private ArgumentCaptor<OnCompleteListener<Void>> testOnCompleteVoidListener;
 
-    private FirebaseAuthProvider auth;
+    private AuthProvider auth;
     @Mock
     private FirebaseDatabaseProvider database;
 
@@ -98,9 +99,14 @@ public class FirebaseAuthTest {
         opResult = result;
     }
 
+    @BeforeClass
+    public static void setConfig() {
+        Config.TEST_MODE = true;
+    }
+
     @Before
     public void setUp() {
-        auth = new FirebaseAuthProvider(fbAuth);
+        auth = AuthProvider.getInstance();
         setTasks();
         opResult = Result.NOTHING;
     }

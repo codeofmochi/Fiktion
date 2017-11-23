@@ -17,7 +17,7 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
-    private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+    private final User defaultUser = new User("default", "defaultID");
     private final User user1 = new User("user1", "id1");
     // Initiating friendlists and friendRequests
     private final String[] frList = new String[]{"defaultID"};
@@ -46,7 +46,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     private final List<PointOfInterest> poiList = new ArrayList<>();
-    private List<User> users = new ArrayList<>(initialList);
+    public List<User> users = new ArrayList<>(initialList);
 
     /**
      * {@inheritDoc}
@@ -290,6 +290,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
+
         switch (user.getID()) {
             case "SUCCESS":
                 listener.onSuccess();
@@ -301,6 +302,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 listener.onFailure();
                 return;
         }
+
         deleterUserById(user.getID(), new DeleteUserListener() {
             @Override
             public void onSuccess() {
