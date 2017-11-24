@@ -70,6 +70,42 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void upvote(String poiName, ModifyPOIListener listener) {
+        for (int i = 0; i < poiList.size(); ++i) {
+            PointOfInterest poi = poiList.get(i);
+            if (poiName.equals(poi.name())) {
+                PointOfInterest poiPlus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
+                        poi.description(), poi.rating() + 1, poi.country(), poi.city());
+                poiList.set(i, poiPlus);
+                listener.onSuccess();
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void downvote(String poiName, ModifyPOIListener listener) {
+        for (int i = 0; i < poiList.size(); ++i) {
+            PointOfInterest poi = poiList.get(i);
+            if (poiName.equals(poi.name())) {
+                PointOfInterest poiMinus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
+                        poi.description(), poi.rating() - 1, poi.country(), poi.city());
+                poiList.set(i, poiMinus);
+                listener.onSuccess();
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
         for (PointOfInterest poi : poiList) {
             if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {

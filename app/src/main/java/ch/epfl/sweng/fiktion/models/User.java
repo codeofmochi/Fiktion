@@ -70,6 +70,7 @@ public class User {
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
+        upvoted = new TreeSet<>();
     }
 
     /**
