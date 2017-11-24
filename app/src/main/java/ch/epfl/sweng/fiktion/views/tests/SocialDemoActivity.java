@@ -114,7 +114,6 @@ public class SocialDemoActivity extends AppCompatActivity {
         user.sendFriendRequest(DatabaseSingleton.database, friendID, new User.userListener() {
             @Override
             public void onSuccess() {
-                friendsAdapter.add(friendID);
                 sendRequestButton.setEnabled(true);
                 Toast.makeText(ctx, "Friend request sent to " + friendID, Toast.LENGTH_SHORT).show();
             }
@@ -176,7 +175,8 @@ public class SocialDemoActivity extends AppCompatActivity {
         user.acceptFriendRequest(DatabaseSingleton.database, friendID, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
-                requestsAdapter.add(friendID);
+                requestsAdapter.remove(friendID);
+                friendsAdapter.add(friendID);
                 acceptRequestButton.setEnabled(true);
                 Toast.makeText(ctx, friendID+" is now your friend!", Toast.LENGTH_SHORT).show();
             }
