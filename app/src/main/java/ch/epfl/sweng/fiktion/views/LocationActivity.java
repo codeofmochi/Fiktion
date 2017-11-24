@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -19,6 +21,7 @@ import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 public class LocationActivity extends MapLocationActivity {
 
+    // poi cards attributes
     private final Context ctx = this;
     private ConstraintLayout frame;
     private View pv;
@@ -32,7 +35,19 @@ public class LocationActivity extends MapLocationActivity {
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // find frame of activity
         frame = (ConstraintLayout) findViewById(R.id.locationFrame);
+    }
+
+    /**
+     * Adds the list view button in the action bar
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, 0, 0, "List").setIcon(R.drawable.list_icon_40).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
     }
 
 
@@ -54,12 +69,15 @@ public class LocationActivity extends MapLocationActivity {
             public boolean onMarkerClick(Marker marker) {
                 //checks if the marker is a POI marker
                 if (!marker.getTitle().equals("My position")) {
+                    // get POI from db
                     DatabaseSingleton.database.getPoi(marker.getTitle(), new DatabaseProvider.GetPoiListener() {
                         @Override
                         public void onSuccess(PointOfInterest poi) {
                             // remove old view if any
                             if (pv != null) frame.removeView(pv);
+                            // create POI card
                             pv = POIDisplayer.createPoiCard(poi, ctx);
+                            // display POI card in ConstraintLayout
                             frame.addView(pv);
                             ConstraintSet constraints = new ConstraintSet();
                             constraints.clone(frame);
