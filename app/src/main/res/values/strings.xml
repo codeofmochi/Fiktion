@@ -51,7 +51,7 @@
     <string name="profile">Profile</string>
     <string name="verify_email">Verify e-mail</string>
     <string name="send_email">Send E-mail</string>
-    <string name="upvote">Vote +1</string>
+    <string name="vote">Vote</string>
     <string name="pictures">Pictures</string>
     <string name="add_a_picture">Add a picture</string>
     <string name="user_reviews">User reviews</string>
@@ -87,4 +87,12 @@
     <string name="login">Login or register account</string>
     <string name="loading_text">Loading…</string>
     <string name="no_results_found">No results found</string>
+    <string name="no_nearby_places_found">No nearby places found.</string>
+    <string name="actions">actions</string>
+    <string name="Favorite">Favorite</string>
+    <string name="Wishlist">Wishlist</string>
+    <string name="Edit">Edit</string>
+    <string name="loading_data">Loading data …</string>
+    <string name="data_not_found">Data not found.</string>
+    <string name="failed_to_fetch_data">Failed to fetch data.</string>
 </resources>

@@ -120,13 +120,13 @@ public class UserTest {
         user = new User("default", "defaultID");
         user1 = new User("user1", "id1");
         userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
+                new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true, new TreeSet<String>());
         userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true);
+                new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true, new TreeSet<String>());
         userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true);
+                new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true, new TreeSet<String>());
         userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
-                new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true);
+                new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>());
 
 
     }
@@ -997,7 +997,7 @@ public class UserTest {
         // setUp
         String[] rL = new String[]{"id1"};
         User u = new User("u", "idu", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<String>(), new TreeSet<>(Arrays.asList(rL)), new LinkedList<String>(), true);
+                new TreeSet<String>(), new TreeSet<>(Arrays.asList(rL)), new LinkedList<String>(), true, new TreeSet<String>());
 
         u.ignoreFriendRequest(user1.getID(), new AuthProvider.AuthListener() {
             @Override

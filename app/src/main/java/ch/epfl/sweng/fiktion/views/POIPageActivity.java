@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,12 +20,14 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +50,8 @@ import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
@@ -57,6 +63,7 @@ import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
     private final int MAXIMUM_SIZE = 1000;
+    private final int SEARCH_RADIUS = 20;
 
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
         private String[] data;
@@ -91,10 +98,18 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
+    private String poiName;
+    private final Context ctx = this;
+    private LinearLayout nearbyPoisList;
+    private TextView noNearbyPois;
     private PointOfInterest poi;
+    private User user;
+    private Button upvoteButton;
+    private boolean upvoted = false;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
     private ImageView noImages;
+    private ImageView mainImage;
     private MapView map;
     private String[] reviewsData = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
@@ -118,10 +133,16 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
 
+        // upvote button
+        upvoteButton = (Button) findViewById(R.id.upvoteButton);
+        upvoteButton.setEnabled(false);
+
         // Obtain the SupportMapFragment
         map = (MapView) findViewById(R.id.map);
         map.onCreate(savedInstanceState);
 
+        mainImage = (ImageView) findViewById(R.id.mainImage);
+        mainImage.setVisibility(View.GONE);
         imageLayout = (LinearLayout) findViewById(R.id.imageLayout);
         uploadProgressBar = (ProgressBar) findViewById(R.id.uploadProgressBar);
 
@@ -133,9 +154,32 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // get POI name
         Intent from = getIntent();
-        String poiName = from.getStringExtra("POI_NAME");
+        poiName = from.getStringExtra("POI_NAME");
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
+
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setUser(user);
+                upvoteButton.setEnabled(true);
+                if (user.getUpvoted().contains(poiName)) {
+                    upvoted = true;
+                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                } else {
+                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                }
+            }
+
+            @Override
+            public void onDoesntExist() {
+
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
 
         // get POI from database
         DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
@@ -144,7 +188,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 setPOI(poi);
                 downloadPhotos();
                 callMap();
+                displayNearPois();
                 setPOIInformation();
+                // hide loading spinner
+                ProgressBar spinner = (ProgressBar) findViewById(R.id.loadingSpinner);
+                spinner.setVisibility(View.GONE);
             }
 
             @Override
@@ -155,10 +203,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             @Override
             public void onDoesntExist() {
+                Snackbar.make(findViewById(R.id.title), R.string.data_not_found, Snackbar.LENGTH_INDEFINITE).show();
             }
 
             @Override
             public void onFailure() {
+                Snackbar.make(findViewById(R.id.title), R.string.failed_to_fetch_data, Snackbar.LENGTH_INDEFINITE).show();
             }
         });
 
@@ -168,10 +218,107 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         reviewsView.setLayoutManager(reviewsLayout);
         RecyclerView.Adapter reviewsAdapter = new ReviewsAdapter(reviewsData);
         reviewsView.setAdapter(reviewsAdapter);
+
+        // get nearby pois views
+        nearbyPoisList = (LinearLayout) findViewById(R.id.nearbyPoisList);
+        noNearbyPois = (TextView) findViewById(R.id.noNearbyPois);
     }
 
     private void setPOI(PointOfInterest poi) {
         this.poi = poi;
+    }
+
+    private void setUser(User user) {
+        this.user = user;
+    }
+
+    public void vote(View view) {
+        if (user != null && poi != null) {
+            // disable the button
+            upvoteButton.setEnabled(false);
+            // set the button color to gray
+            upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorText));
+            if (upvoted) {
+                // remove the vote
+                user.removeVote(poi.name(), new DatabaseProvider.ModifyUserListener() {
+                    @Override
+                    public void onSuccess() {
+                        // downvote in the database
+                        DatabaseProvider.getInstance().downvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
+                            @Override
+                            public void onSuccess() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                upvoteButton.setEnabled(true);
+                                upvoted = false;
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                upvoteButton.setEnabled(true);
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                upvoteButton.setEnabled(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        upvoteButton.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        upvoteButton.setEnabled(true);
+                    }
+                });
+            } else {
+                // upvote
+                user.upVote(poi.name(), new DatabaseProvider.ModifyUserListener() {
+                    @Override
+                    public void onSuccess() {
+                        DatabaseProvider.getInstance().upvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
+                            @Override
+                            public void onSuccess() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                upvoteButton.setEnabled(true);
+                                upvoted = true;
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                upvoteButton.setEnabled(true);
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                                upvoteButton.setEnabled(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        upvoteButton.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        upvoteButton.setEnabled(true);
+                    }
+                });
+            }
+        }
     }
 
     private void callMap() {
@@ -179,6 +326,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         map.getMapAsync(this);
     }
 
+    @SuppressWarnings("SetTextI18n")
     private void setPOIInformation() {
 
         // show the fictions the poi appears in
@@ -203,6 +351,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(poi.description());
+
+        TextView cityCountry = (TextView) findViewById(R.id.cityCountry);
+        cityCountry.setText(poi.city() + ", " + poi.country());
+
+        TextView upvotes = (TextView) findViewById(R.id.upvotes);
+        upvotes.setText(poi.rating() + " upvotes");
     }
 
     public void downloadPhotos() {
@@ -213,7 +367,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
-                mainImage.setImageBitmap(b);
+                Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
+                mainImage.setImageBitmap(resized);
+                mainImage.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -251,6 +407,25 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             @Override
             public void onFailure() {
 
+            }
+        });
+    }
+
+    public void displayNearPois() {
+        // find nearby pois
+        DatabaseProvider.getInstance().findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
+            @Override
+            public void onNewValue(PointOfInterest p) {
+                View v = POIDisplayer.createPoiCard(p, ctx);
+                if (!poi.name().equals(p.name())) {
+                    nearbyPoisList.addView(v);
+                    noNearbyPois.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                // do nothing
             }
         });
     }
@@ -429,6 +604,38 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 uploadProgressBar.setProgress((int) progress);
             }
         });
+    }
+
+    /**
+     * Triggered by more menu button
+     *
+     * @param v the caller view
+     */
+    public void showMoreMenu(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.inflate(R.menu.poi_more_actions);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.favorite:
+                        // do stuff on click favorite
+                        return true;
+                    case R.id.wishlist:
+                        // do stuff on click wishlist
+                        return true;
+                    case R.id.edit:
+                        // do stuff on click edit
+                        Intent i = new Intent(ctx, AddPOIActivity.class);
+                        i.putExtra("EDIT_POI_NAME", poiName);
+                        startActivity(i);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popup.show();
     }
 
 }

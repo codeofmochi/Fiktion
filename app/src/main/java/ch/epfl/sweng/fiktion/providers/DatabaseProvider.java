@@ -156,6 +156,22 @@ public abstract class DatabaseProvider {
     public abstract void modifyPOI(PointOfInterest poi, ModifyPOIListener listener);
 
     /**
+     * increases by 1 the rating of a point of interest, inform the listener of the result
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void upvote(String poiName, ModifyPOIListener listener);
+
+    /**
+     * decreases by 1 the rating of a point of interest, inform the listener of the result
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void downvote(String poiName, ModifyPOIListener listener);
+
+    /**
      * find the points of interest that are within radius range from a position and inform the
      * listener of the results
      *

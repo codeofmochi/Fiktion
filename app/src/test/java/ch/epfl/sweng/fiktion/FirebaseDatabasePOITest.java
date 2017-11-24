@@ -220,6 +220,75 @@ public class FirebaseDatabasePOITest {
     }
 
     @Test
+    public void upvoteAndDownvoteTest() {
+        when(dbRef.child(anyString())).thenReturn(dbRef);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+        ArgumentCaptor<Long> value = ArgumentCaptor.forClass(Long.class);
+        when(dbRef.setValue(value.capture())).thenReturn(null);
+        final Mutable<String> result = new Mutable<>("");
+        DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
+            @Override
+            public void onSuccess() {
+                result.value = "SUCCESS";
+            }
+
+            @Override
+            public void onDoesntExist() {
+                result.value = "DOESNTEXIST";
+            }
+
+            @Override
+            public void onFailure() {
+                result.value = "FAILURE";
+            }
+        };
+        database.upvote("randomPOI", listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.child(anyString())).thenReturn(snapshot);
+        when(snapshot.getValue()).thenReturn((long) 10);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.value, is("SUCCESS"));
+        assertThat(value.getValue(), is((long) 11));
+        result.value = "";
+
+        when(snapshot.getValue()).thenReturn(null);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(value.getValue(), is((long) 1));
+        assertThat(result.value, is("SUCCESS"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.value, is("DOESNTEXIST"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.value, is("FAILURE"));
+
+        // ---- downvote ----
+
+        database.downvote("randomPOI", listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.child(anyString())).thenReturn(snapshot);
+        when(snapshot.getValue()).thenReturn((long) 10);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.value, is("SUCCESS"));
+        assertThat(value.getValue(), is((long) 9));
+        result.value = "";
+
+        when(snapshot.getValue()).thenReturn(null);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(value.getValue(), is((long) -1));
+        assertThat(result.value, is("SUCCESS"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.value, is("DOESNTEXIST"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.value, is("FAILURE"));
+
+    }
+
+    @Test
     public void findNearPoisTest() {
         GeoQuery geoQuery = mock(GeoQuery.class);
         when(geofire.queryAtLocation(any(GeoLocation.class), anyDouble())).thenReturn(geoQuery);

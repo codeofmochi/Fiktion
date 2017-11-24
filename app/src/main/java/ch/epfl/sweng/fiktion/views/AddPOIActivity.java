@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.CollectionsUtils;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
@@ -31,14 +34,84 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private static final int LOCATION_RESULT = 1;
     // this activity's context
     private Context ctx = this;
-    // error messages
-    private final String ERR_STRING_FORMAT = "Those characters are not accepted: . $ # [ ] /";
-    private final String ILLEGAL_CHARS_REGEX = ".*[.$#/\\[\\]].*";
+
+    // this activity can either add or edit POIs
+    private enum Action {
+        ADD, EDIT
+    }
+
+    private Action action;
+    private String editName;
 
     @Override
+    @SuppressWarnings("SetTextI18n")
     protected void onCreate(Bundle savedInstanceState) {
         includeLayout = R.layout.activity_add_poi;
         super.onCreate(savedInstanceState);
+
+        // check if it is an edit request
+        Intent from = getIntent();
+        editName = from.getStringExtra("EDIT_POI_NAME");
+
+        // assume it is an edit if no extra data
+        if (editName == null || editName.isEmpty()) {
+            action = Action.ADD;
+        } else {
+            action = Action.EDIT;
+        }
+
+        // if the goal is to edit, disable actions until fetched from database
+        if (action == Action.EDIT) {
+
+            // modify activity title
+            this.setTitle("Edit " + editName);
+            // show loading snackbar
+            final Snackbar loadingSnackbar = Snackbar.make(findViewById(R.id.add_poi_scroll), R.string.loading_data, Snackbar.LENGTH_INDEFINITE);
+            loadingSnackbar.show();
+            // disable save button
+            final Button saveButton = (Button) findViewById(R.id.add_poi_finish);
+            saveButton.setEnabled(false);
+            saveButton.setBackgroundColor(getResources().getColor(R.color.lightGray));
+
+            // database request
+            DatabaseProvider.getInstance().getPoi(editName, new DatabaseProvider.GetPoiListener() {
+                @Override
+                public void onSuccess(PointOfInterest poi) {
+                    // set fields
+                    EditText addPoiName = (EditText) findViewById(R.id.add_poi_name);
+                    addPoiName.setText(poi.name());
+                    addPoiName.setEnabled(false);
+                    fictionSet.addAll(poi.fictions());
+                    fictionListText = CollectionsUtils.mkString(poi.fictions(), ", ");
+                    ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
+                    ((EditText) findViewById(R.id.add_poi_latitude)).setText(Double.toString(poi.position().latitude()));
+                    ((EditText) findViewById(R.id.add_poi_longitude)).setText(Double.toString(poi.position().longitude()));
+                    ((EditText) findViewById(R.id.add_poi_city)).setText(poi.city());
+                    ((EditText) findViewById(R.id.add_poi_country)).setText(poi.country());
+                    ((EditText) findViewById(R.id.add_poi_description)).setText(poi.description());
+                    // hide loading snackbar
+                    loadingSnackbar.dismiss();
+                    // enable save button
+                    saveButton.setEnabled(true);
+                    saveButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                }
+
+                @Override
+                public void onModified(PointOfInterest poi) {
+                    // do nothing : we don't want the change to cancel the current edit
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    loadingSnackbar.setText(R.string.data_not_found);
+                }
+
+                @Override
+                public void onFailure() {
+                    loadingSnackbar.setText(R.string.failed_to_fetch_data);
+                }
+            });
+        }
     }
 
     /**
@@ -95,10 +168,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         final String fiction = ((EditText) findViewById(R.id.add_poi_fiction)).getText().toString();
         if (fiction.isEmpty()) {
             // warning message if no text was entered
-            ((EditText) findViewById(R.id.add_poi_fiction)).setError("You can't enter an empty fiction name");
-        } else if (fiction.matches(ILLEGAL_CHARS_REGEX)) {
-            // warning message if unaccepted characters are present
-            ((EditText) findViewById(R.id.add_poi_fiction)).setError(ERR_STRING_FORMAT);
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Fiction name cannot be empty");
         } else {
             if (!fictionSet.contains(fiction)) {
                 fictionSet.add(fiction);
@@ -109,6 +179,8 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 }
                 ((TextView) findViewById(R.id.add_poi_fiction_list)).setText(fictionListText);
                 ((EditText) findViewById(R.id.add_poi_fiction)).setText("");
+            } else {
+                showToast(fiction + " already added");
             }
         }
     }
@@ -132,11 +204,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         boolean isCorrect = true;
 
         if (name.isEmpty()) {
-            ((EditText) findViewById(R.id.add_poi_name)).setError("You can't enter an empty point of interest name");
-            isCorrect = false;
-        }
-        if (name.matches(ILLEGAL_CHARS_REGEX)) {
-            ((EditText) findViewById(R.id.add_poi_name)).setError(ERR_STRING_FORMAT);
+            ((EditText) findViewById(R.id.add_poi_name)).setError("Name cannot be empty");
             isCorrect = false;
         }
 
@@ -144,25 +212,17 @@ public class AddPOIActivity extends MenuDrawerActivity {
             ((EditText) findViewById(R.id.add_poi_city)).setError("City cannot be empty");
             isCorrect = false;
         }
-        if (city.matches(ILLEGAL_CHARS_REGEX)) {
-            ((EditText) findViewById(R.id.add_poi_city)).setError(ERR_STRING_FORMAT);
-            isCorrect = false;
-        }
 
         if (country.isEmpty()) {
             ((EditText) findViewById(R.id.add_poi_country)).setError("Country cannot be empty");
             isCorrect = false;
         }
-        if (country.matches(ILLEGAL_CHARS_REGEX)) {
-            ((EditText) findViewById(R.id.add_poi_country)).setError(ERR_STRING_FORMAT);
-            isCorrect = false;
-        }
 
         if (longitudeString.isEmpty()) {
-            ((EditText) findViewById(R.id.add_poi_longitude)).setError("You can't enter an empty longitude");
+            ((EditText) findViewById(R.id.add_poi_longitude)).setError("Longitude cannot be empty");
             isCorrect = false;
         } else if (!isNumeric(longitudeString)) {
-            ((EditText) findViewById(R.id.add_poi_longitude)).setError("You need to enter a number");
+            ((EditText) findViewById(R.id.add_poi_longitude)).setError("Please provide a valid number");
             isCorrect = false;
         } else {
             // If longitude is a number, parse it to double
@@ -175,10 +235,10 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
 
         if (latitudeString.isEmpty()) {
-            ((EditText) findViewById(R.id.add_poi_latitude)).setError("You can't enter an empty latitude");
+            ((EditText) findViewById(R.id.add_poi_latitude)).setError("Latitude cannot be empty");
             isCorrect = false;
         } else if (!isNumeric(latitudeString)) {
-            ((EditText) findViewById(R.id.add_poi_latitude)).setError("You need to enter a number");
+            ((EditText) findViewById(R.id.add_poi_latitude)).setError("Please provide a valid number");
             isCorrect = false;
         } else {
 
@@ -188,29 +248,69 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 isCorrect = false;
             }
         }
+
+        if (fictionSet.isEmpty()) {
+            ((EditText) findViewById(R.id.add_poi_fiction)).setError("Please add at least one fiction");
+            isCorrect = false;
+        }
+
         if (isCorrect) {
+            // create new poi object with current data
             PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
-            DatabaseProvider.getInstance().addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
-                @Override
-                public void onSuccess() {
-                    showToast("The place " + name + " was successfully added");
-                    // show newly created POI
-                    Intent i = new Intent(ctx, POIPageActivity.class);
-                    i.putExtra("POI_NAME", name);
-                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(i);
-                }
 
-                @Override
-                public void onAlreadyExists() {
-                    showToast("The place named " + name + " already exists !");
-                }
+            switch (action) {
+                case ADD: {
+                    DatabaseProvider.getInstance().addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
+                        @Override
+                        public void onSuccess() {
+                            showToast("The place " + name + " was successfully added");
+                            // show newly created POI
+                            Intent i = new Intent(ctx, POIPageActivity.class);
+                            i.putExtra("POI_NAME", name);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                        }
 
-                @Override
-                public void onFailure() {
-                    showToast("An error occured while adding " + name + " : please try again later");
+                        @Override
+                        public void onAlreadyExists() {
+                            showToast("The place named " + name + " already exists !");
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            showToast("An error occured while adding " + name + " : please try again later");
+                        }
+                    });
+                    break;
                 }
-            });
+                case EDIT: {
+                    DatabaseProvider.getInstance().modifyPOI(newPoi, new DatabaseProvider.ModifyPOIListener() {
+                        @Override
+                        public void onSuccess() {
+                            showToast("The place " + editName + " was modified");
+                            // show newly created POI
+                            Intent i = new Intent(ctx, POIPageActivity.class);
+                            i.putExtra("POI_NAME", editName);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(i);
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            showToast("The place " + editName + " was not found");
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            showToast("An error occured while modifying " + editName + " : please try again later");
+                        }
+                    });
+                    break;
+                }
+                default: {
+                    throw new IllegalStateException("Undefined action");
+                }
+            }
         }
     }
 

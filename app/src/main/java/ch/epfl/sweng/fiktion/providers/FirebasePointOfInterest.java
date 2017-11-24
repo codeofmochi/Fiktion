@@ -1,10 +1,15 @@
 package ch.epfl.sweng.fiktion.providers;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.decode;
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;
 
 /**
  * A point of interest implementation for Firebase
@@ -33,15 +38,15 @@ public class FirebasePointOfInterest {
      * @param poi a point of interest
      */
     public FirebasePointOfInterest(PointOfInterest poi) {
-        name = poi.name();
+        name = encode(poi.name());
         position = new FirebasePosition(poi.position());
-        description = poi.description();
+        description = encode(poi.description());
         rating = poi.rating();
         for (String fiction : poi.fictions()) {
-            fictions.put(fiction, true);
+            fictions.put(encode(fiction), true);
         }
-        country = poi.country();
-        city = poi.city();
+        country = encode(poi.country());
+        city = encode(poi.city());
     }
 
     /**
@@ -49,7 +54,17 @@ public class FirebasePointOfInterest {
      *
      * @return the point of interest
      */
-    PointOfInterest toPoi() {
-        return new PointOfInterest(name, position.toPosition(), fictions.keySet(), description, rating, country, city);
+    public PointOfInterest toPoi() {
+        Set<String> poiFictions = new TreeSet<>();
+        for (String fiction : fictions.keySet()) {
+            poiFictions.add(decode(fiction));
+        }
+        return new PointOfInterest(decode(name),
+                position.toPosition(),
+                poiFictions,
+                decode(description),
+                rating,
+                decode(country),
+                decode(city));
     }
 }

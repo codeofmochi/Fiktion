@@ -30,19 +30,19 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     // user has "fav POI" as favourite, "vis POI" in visited and "wish POI" in wishlist
     private final User userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
-            new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true);
+            new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>());
 
     // user is friend with defaultUser and has user1 in his requests
     private final User userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
-            new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true);
+            new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true, new TreeSet<String>());
 
     // user with a friend that is not stored in the database
     private final User userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
-            new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true);
+            new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true, new TreeSet<String>());
 
     // user has request from fake friend
     private final User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
-            new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true);
+            new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true, new TreeSet<String>());
 
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     private final List<PointOfInterest> poiList = new ArrayList<>();
@@ -140,6 +140,42 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         for (int i = 0; i < poiList.size(); ++i) {
             if (poi.equals(poiList.get(i))) {
                 poiList.set(i, poi);
+                listener.onSuccess();
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void upvote(String poiName, ModifyPOIListener listener) {
+        for (int i = 0; i < poiList.size(); ++i) {
+            PointOfInterest poi = poiList.get(i);
+            if (poiName.equals(poi.name())) {
+                PointOfInterest poiPlus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
+                        poi.description(), poi.rating() + 1, poi.country(), poi.city());
+                poiList.set(i, poiPlus);
+                listener.onSuccess();
+                return;
+            }
+        }
+        listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void downvote(String poiName, ModifyPOIListener listener) {
+        for (int i = 0; i < poiList.size(); ++i) {
+            PointOfInterest poi = poiList.get(i);
+            if (poiName.equals(poi.name())) {
+                PointOfInterest poiMinus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
+                        poi.description(), poi.rating() - 1, poi.country(), poi.city());
+                poiList.set(i, poiMinus);
                 listener.onSuccess();
                 return;
             }

@@ -26,20 +26,21 @@ public class User {
     //private Set<String> rated;
     private Set<String> friendlist;
     private Set<String> friendRequests;
+    private Set<String> upvoted;
 
     /**
      * Creates a new User with given parameters
      *
      * @param input_name Username
      * @param input_id   User id
-     * @param favs list of favourite POIs
-     * @param visits list of visited POIs
-     * @param wishes POIs wish list
-     * @param friends User friend list
+     * @param favs       list of favourite POIs
+     * @param visits     list of visited POIs
+     * @param wishes     POIs wish list
+     * @param friends    User friend list
      */
     public User(String input_name, String input_id, Set<String> favs,
                 Set<String> wishes, Set<String> friends, Set<String> fRequests,
-                LinkedList<String> visits, Boolean isPublic) {
+                LinkedList<String> visits, Boolean isPublic, Set<String> upVotes) {
         name = input_name;
         id = input_id;
         favourites = favs;
@@ -48,6 +49,7 @@ public class User {
         friendlist = friends;
         friendRequests = fRequests;
         isPublicProfile = isPublic;
+        upvoted = upVotes;
     }
 
     /**
@@ -55,9 +57,9 @@ public class User {
      *
      * @param input_name Username
      * @param input_id   User id
-     * @param favs list of favourite POIs
-     * @param wishes POIs wish list
-     * @param visits list of visited POIs
+     * @param favs       list of favourite POIs
+     * @param wishes     POIs wish list
+     * @param visits     list of visited POIs
      */
     public User(String input_name, String input_id, Set<String> favs, Set<String> wishes, LinkedList<String> visits) {
         name = input_name;
@@ -68,6 +70,7 @@ public class User {
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
+        upvoted = new TreeSet<>();
     }
 
     /**
@@ -85,13 +88,74 @@ public class User {
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
+        upvoted = new TreeSet<>();
+    }
+
+    /**
+     * Current user upvotes given position of interest
+     *
+     * @param poiID    id of the poi to be upvoted
+     * @param listener handles what to do when trying to modify the user
+     */
+    public void upVote(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
+        if (upvoted.add(poiID)) {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    upvoted.remove(poiID);
+                    listener.onDoesntExist();
+                }
+
+                @Override
+                public void onFailure() {
+                    upvoted.remove(poiID);
+                    listener.onDoesntExist();
+                }
+            });
+        } else {
+            listener.onFailure();
+        }
+    }
+
+    /**
+     * Current user removes his upvote in the given position of interest
+     *
+     * @param poiID    id of the poi
+     * @param listener handles what to do when trying to modify the user
+     */
+    public void removeVote(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
+        if (upvoted.remove(poiID)) {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    upvoted.add(poiID);
+                    listener.onDoesntExist();
+                }
+
+                @Override
+                public void onFailure() {
+                    upvoted.add(poiID);
+                    listener.onDoesntExist();
+                }
+            });
+        }
     }
 
     /**
      * Changes the state of the user's profile privacy (true/false)
      *
      * @param privacyState The state of the privacy
-     * @param listener Handles what happens in case of success or failure of the change
+     * @param listener     Handles what happens in case of success or failure of the change
      */
     public void changeProfilePrivacy(Boolean privacyState, final AuthProvider.AuthListener listener) {
         final Boolean oldPrivacy = isPublicProfile;
@@ -262,7 +326,6 @@ public class User {
     }
 
     /**
-     *
      * @param userID The ID of the sender
      * @return The user with the friend removed from his requestList
      */
@@ -294,6 +357,7 @@ public class User {
     }
 
     // User can be final ?
+
     /**
      * Adds a friend request in the friend requests list of a user
      *
@@ -471,6 +535,7 @@ public class User {
             listener.onFailure();
         }
     }
+
     /**
      * Adds new point of interest to this user's wishlist
      *
@@ -501,6 +566,7 @@ public class User {
             listener.onFailure();
         }
     }
+
     /**
      * Adds new favorite point of interest to this user's favorite list
      *
@@ -566,7 +632,6 @@ public class User {
     /**
      * Removes given point of interest of this user favorite list
      *
-     * @param favID POI ID
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void removeFavourite(final String favID, final AuthProvider.AuthListener listener) {
@@ -717,5 +782,12 @@ public class User {
      */
     public List<String> getVisited() {
         return Collections.unmodifiableList(new LinkedList<>(visited));
+    }
+
+    /**
+     * @return the user's requests list
+     */
+    public Set<String> getUpvoted() {
+        return Collections.unmodifiableSet(new TreeSet<>(upvoted));
     }
 }
