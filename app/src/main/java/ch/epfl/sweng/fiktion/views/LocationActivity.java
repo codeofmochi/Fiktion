@@ -1,16 +1,27 @@
 package ch.epfl.sweng.fiktion.views;
 
-import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
+import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MapLocationActivity;
+import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 public class LocationActivity extends MapLocationActivity {
+
+    private final Context ctx = this;
+    private ConstraintLayout frame;
+    private View pv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +31,8 @@ public class LocationActivity extends MapLocationActivity {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        frame = (ConstraintLayout) findViewById(R.id.locationFrame);
     }
 
 
@@ -40,16 +53,39 @@ public class LocationActivity extends MapLocationActivity {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //checks if the marker is a POI marker
-                if(!marker.getTitle().equals("My position")){
-                    AlertDialog.Builder alertbox = new AlertDialog.Builder(LocationActivity.this);
-                    alertbox.setMessage(marker.getTitle() + " was clicked. It's at: "
-                            + marker.getPosition().latitude + ", " + marker.getPosition().longitude + ".");
+                if (!marker.getTitle().equals("My position")) {
+                    DatabaseSingleton.database.getPoi(marker.getTitle(), new DatabaseProvider.GetPoiListener() {
+                        @Override
+                        public void onSuccess(PointOfInterest poi) {
+                            // remove old view if any
+                            if (pv != null) frame.removeView(pv);
+                            pv = POIDisplayer.createPoiCard(poi, ctx);
+                            frame.addView(pv);
+                            ConstraintSet constraints = new ConstraintSet();
+                            constraints.clone(frame);
+                            constraints.connect(pv.getId(), ConstraintSet.START, frame.getId(), ConstraintSet.START, 15);
+                            constraints.connect(pv.getId(), ConstraintSet.BOTTOM, frame.getId(), ConstraintSet.BOTTOM, 15);
+                            constraints.connect(pv.getId(), ConstraintSet.END, frame.getId(), ConstraintSet.END, 15);
+                            constraints.applyTo(frame);
+                        }
 
-                    alertbox.show();
+                        @Override
+                        public void onModified(PointOfInterest poi) {
+
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+
+                        }
+
+                        @Override
+                        public void onFailure() {
+
+                        }
+                    });
                 }
-                // Return false to indicate that we have not consumed the event and that we wish
-                // for the default behavior to occur (which is for the camera to move such that the
-                // marker is centered and for the marker's info window to open, if it has one).
+                // Return false to indicate that we have not consumed the event
                 return false;
             }
         });
