@@ -235,16 +235,18 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     public void vote(View view) {
-        if (user != null) {
+        if (user != null && poi != null) {
+            // disable the button
             upvoteButton.setEnabled(false);
+            // set the button color to gray
+            upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorText));
             if (upvoted) {
-                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorText));
+                // remove the vote
                 user.removeVote(database, poi.name(), new DatabaseProvider.ModifyUserListener() {
                     @Override
                     public void onSuccess() {
-                        PointOfInterest ratedPOI = new PointOfInterest(poi.name(), poi.position(),
-                                poi.fictions(), poi.description(), poi.rating() - 1, poi.country(), poi.city());
-                        database.modifyPOI(ratedPOI, new DatabaseProvider.ModifyPOIListener() {
+                        // downvote in the database
+                        database.downvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
                             @Override
                             public void onSuccess() {
                                 upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
@@ -279,13 +281,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                     }
                 });
             } else {
-                upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorText));
+                // upvote
                 user.upVote(database, poi.name(), new DatabaseProvider.ModifyUserListener() {
                     @Override
                     public void onSuccess() {
-                        PointOfInterest ratedPOI = new PointOfInterest(poi.name(), poi.position(),
-                                poi.fictions(), poi.description(), poi.rating() + 1, poi.country(), poi.city());
-                        database.modifyPOI(ratedPOI, new DatabaseProvider.ModifyPOIListener() {
+                        database.upvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
                             @Override
                             public void onSuccess() {
                                 upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
