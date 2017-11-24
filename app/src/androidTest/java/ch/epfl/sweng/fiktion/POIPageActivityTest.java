@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.ViewAssertion;
+import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
@@ -24,6 +25,8 @@ import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
@@ -47,6 +50,8 @@ import static ch.epfl.sweng.fiktion.providers.AuthSingleton.auth;
 import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -79,6 +84,33 @@ public class POIPageActivityTest {
 
             @Override
             public void onFailure() {
+            }
+        });
+        auth.signIn("default@email.ch", "testing", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+        auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+
+            }
+
+            @Override
+            public void onDoesntExist() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
             }
         });
     }
@@ -182,6 +214,52 @@ public class POIPageActivityTest {
                 assertThat(((LinearLayout) view).getChildCount(), is(2));
             }
         });
+    }
+
+    private User user;
+
+    private void setUser(User user) {
+        this.user = user;
+    }
+
+    @Test
+    public void voteTest() {
+        auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setUser(user);
+            }
+
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        ViewInteraction upvoteButton = onView(withId(R.id.upvoteButton));
+        upvoteButton.perform(click());
+        upvoteButton.check(new ViewAssertion() {
+            @Override
+            public void check(View view, NoMatchingViewException noViewFoundException) {
+                assertTrue(view.isEnabled());
+            }
+        });
+        assertTrue(user.getUpvoted().contains("poiTest"));
+        upvoteButton.perform(click());
+        upvoteButton.check(new ViewAssertion() {
+            @Override
+            public void check(View view, NoMatchingViewException noViewFoundException) {
+                assertTrue(view.isEnabled());
+            }
+        });
+        assertFalse(user.getUpvoted().contains("poiTest"));
     }
 
 }
