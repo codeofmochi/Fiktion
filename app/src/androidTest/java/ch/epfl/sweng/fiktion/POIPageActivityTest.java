@@ -15,6 +15,7 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -102,6 +103,11 @@ public class POIPageActivityTest {
             public void onFailure() {
             }
         });
+    }
+
+    @After
+    public void resetPhotoProvider() {
+        PhotoProvider.destroyInstance();
     }
 
     @AfterClass

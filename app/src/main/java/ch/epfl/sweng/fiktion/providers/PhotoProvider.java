@@ -30,6 +30,14 @@ public abstract class PhotoProvider {
         return photoProvider;
     }
 
+    public static void setInstance(PhotoProvider photoProvider) {
+        PhotoProvider.photoProvider = photoProvider;
+    }
+
+    public static void destroyInstance() {
+        photoProvider = null;
+    }
+
     /**
      * Listener that listens the status of a photo upload
      */
