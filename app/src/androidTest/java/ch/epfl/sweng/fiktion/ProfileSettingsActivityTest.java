@@ -38,7 +38,6 @@ import static org.hamcrest.core.IsNot.not;
 
 public class ProfileSettingsActivityTest {
 
-
     private User user;
     private final User defaultUser = new User("default", "defaultID");
 
@@ -250,7 +249,6 @@ public class ProfileSettingsActivityTest {
     @Test
     public void NotSignedInSendEmailVerification() {
         auth.signOut();
-        onView(withId(R.id.verifiedButton)).perform(click());
         onView(withId(R.id.accountLoginButton)).check(matches(isDisplayed()));
     }
 

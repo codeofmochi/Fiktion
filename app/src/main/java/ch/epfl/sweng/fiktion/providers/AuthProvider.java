@@ -26,6 +26,21 @@ public abstract class AuthProvider {
     }
 
     /**
+     * Sets the authentication with given instance
+     * @param mockAuth
+     */
+    public void setInstance(FirebaseAuthProvider mockAuth) {
+        auth = mockAuth;
+    }
+
+    /**
+     * Destroys current authentication instance
+     */
+    public void destroyInstance() {
+        auth = null;
+    }
+
+    /**
      * Defines what actions to take on auth op callback
      */
     public interface AuthListener {
