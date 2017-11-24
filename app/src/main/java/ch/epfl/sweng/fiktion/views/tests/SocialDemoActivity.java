@@ -80,6 +80,8 @@ public class SocialDemoActivity extends AppCompatActivity {
                     friendsAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, new ArrayList<String>(user.getFriendlist()));
                     requestsAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, new ArrayList<String>(user.getRequests()));
 
+                    friendsListView.setAdapter(friendsAdapter);
+                    requestsListView.setAdapter(requestsAdapter);
                 }
 
                 @Override
@@ -112,6 +114,7 @@ public class SocialDemoActivity extends AppCompatActivity {
         user.sendFriendRequest(DatabaseSingleton.database, friendID, new User.userListener() {
             @Override
             public void onSuccess() {
+                friendsAdapter.add(friendID);
                 sendRequestButton.setEnabled(true);
                 Toast.makeText(ctx, "Friend request sent to " + friendID, Toast.LENGTH_SHORT).show();
             }
@@ -143,6 +146,7 @@ public class SocialDemoActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 removeFriendButton.setEnabled(true);
+                friendsAdapter.remove(friendID);
                 Toast.makeText(ctx, friendID+" was successfully removed", Toast.LENGTH_SHORT).show();
             }
 
@@ -172,6 +176,7 @@ public class SocialDemoActivity extends AppCompatActivity {
         user.acceptFriendRequest(DatabaseSingleton.database, friendID, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
+                requestsAdapter.add(friendID);
                 acceptRequestButton.setEnabled(true);
                 Toast.makeText(ctx, friendID+" is now your friend!", Toast.LENGTH_SHORT).show();
             }
@@ -196,6 +201,7 @@ public class SocialDemoActivity extends AppCompatActivity {
         user.ignoreFriendRequest(DatabaseSingleton.database, friendID, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
+                requestsAdapter.remove(friendID);
                 ignoreRequestButton.setEnabled(true);
                 Toast.makeText(ctx, "The friend request was ignored", Toast.LENGTH_SHORT).show();
             }
