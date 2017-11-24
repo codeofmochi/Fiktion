@@ -36,7 +36,6 @@ import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.isInternal;
@@ -124,7 +123,7 @@ public class POIPageActivityTest {
         toastRule.launchActivity(i);
         onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
         try {
-            Thread.sleep(10);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -154,7 +153,12 @@ public class POIPageActivityTest {
         intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
 
         onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
-        onView(withText("Camera")).perform(longClick());
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withText("Camera")).perform(click());
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
