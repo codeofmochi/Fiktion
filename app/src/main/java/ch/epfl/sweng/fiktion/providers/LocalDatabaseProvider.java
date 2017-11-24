@@ -392,9 +392,4 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             }
         });
     }
-
-    public void reset() {
-        users = new ArrayList<>(initialList);
-        poiList.clear();
-    }
 }
