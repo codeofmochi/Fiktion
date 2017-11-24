@@ -20,7 +20,7 @@ import android.view.InputDevice;
 import android.view.View;
 import android.widget.EditText;
 
-import org.junit.Before;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,8 +62,6 @@ import static org.hamcrest.Matchers.not;
 @SuppressWarnings("DefaultFileTemplate")
 public class AddPOIActivityTest {
 
-    private DatabaseProvider database = DatabaseProvider.getInstance();
-
     @Rule
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
             new ActivityTestRule<>(AddPOIActivity.class);
@@ -85,12 +83,17 @@ public class AddPOIActivityTest {
     @BeforeClass
     public static void setup() {
         Config.TEST_MODE = true;
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest5",
+                new Position(0, 0), new TreeSet<String>(), "", 0,
+                "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest6",
+                new Position(1, 2), new TreeSet<String>(), "", 0,
+                "", ""), emptyAddPoiListener);
     }
-    @Before
-    public void setUp(){
-        database.addPoi(new PointOfInterest("p1", new Position(0, 1), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(1, 2), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(2, 3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+
+    @AfterClass
+    public static void clean() {
+        DatabaseProvider.destroyInstance();
     }
 
     private final ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
@@ -273,24 +276,6 @@ public class AddPOIActivityTest {
 
     @Test
     public void failsOnAddingTwiceTest() {
-        database.addPoi(
-                new PointOfInterest("poiTest5", new Position(0, 0), new TreeSet<String>(), "", 0, "", ""),
-                new DatabaseProvider.AddPoiListener() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onAlreadyExists() {
-
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
         addPoiName.perform(typeText("poiTest5"));
         closeSoftKeyboard();
         addPoiFiction.perform(typeText("fiction"));
@@ -461,7 +446,7 @@ public class AddPOIActivityTest {
     public void testModifyExistingPoi() {
         // start activity of existing POI
         Intent i = new Intent(mActivityRule.getActivity(), POIPageActivity.class);
-        i.putExtra("POI_NAME", "p1");
+        i.putExtra("POI_NAME", "poiTest6");
         mActivityRule.getActivity().startActivity(i);
         // click edit button
         onView(withId(R.id.moreMenu)).perform(click());
@@ -484,7 +469,7 @@ public class AddPOIActivityTest {
         closeSoftKeyboard();
         addPoiFinish.perform(click());
         onView(withId(R.id.menu_scroll)).perform(swipeUpCenterTopFast());
-        onView(withId(R.id.title)).check(matches(withText("p1")));
+        onView(withId(R.id.title)).check(matches(withText("poiTest6")));
         onView(withId(R.id.featured)).check(matches(withText("Featured in fiction")));
         onView(withId(R.id.cityCountry)).check(matches(withText("city, country")));
     }

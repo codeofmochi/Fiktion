@@ -6,6 +6,8 @@ import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,6 +17,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
@@ -27,7 +30,7 @@ public class LocationActivityTest {
 
     // setup UI automator
     static UiDevice device = UiDevice.getInstance(getInstrumentation());
-    static DatabaseProvider.AddPoiListener emptyAddPoiListener =
+    private DatabaseProvider.AddPoiListener emptyAddPoiListener =
             new DatabaseProvider.AddPoiListener() {
                 @Override
                 public void onSuccess() {
@@ -46,6 +49,16 @@ public class LocationActivityTest {
     @Rule
     public final ActivityTestRule<LocationActivity> mActivityRule =
             new ActivityTestRule<>(LocationActivity.class);
+
+    @BeforeClass
+    public static void setup() {
+        Config.TEST_MODE = true;
+    }
+
+    @AfterClass
+    public static void clean() {
+        DatabaseProvider.destroyInstance();
+    }
 
     /**
      * Tests if marker exists on map
@@ -89,10 +102,9 @@ public class LocationActivityTest {
             PointOfInterest p3 = new PointOfInterest("p3", pos3, new TreeSet<String>(), "", 0, "", "");
 
             //pois are put into the database
-            DatabaseProvider database = DatabaseProvider.getInstance();
-            database.addPoi(p1, emptyAddPoiListener);
-            database.addPoi(p2, emptyAddPoiListener);
-            database.addPoi(p3, emptyAddPoiListener);
+            DatabaseProvider.getInstance().addPoi(p1, emptyAddPoiListener);
+            DatabaseProvider.getInstance().addPoi(p2, emptyAddPoiListener);
+            DatabaseProvider.getInstance().addPoi(p3, emptyAddPoiListener);
 
             // get marker when popped
             UiObject marker = device.findObject(new UiSelector().descriptionContains("p1"));

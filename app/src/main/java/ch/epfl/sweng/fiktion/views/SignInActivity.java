@@ -21,8 +21,6 @@ public class SignInActivity extends AppCompatActivity {
     private EditText UserEmail;
     private EditText UserPassword;
 
-    private AuthProvider auth = AuthProvider.getInstance();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +37,7 @@ public class SignInActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
-        updateUI(auth.isConnected());
+        updateUI(AuthProvider.getInstance().isConnected());
     }
 
 
@@ -53,7 +51,7 @@ public class SignInActivity extends AppCompatActivity {
     public void signIn(String email, String password) {
         //we need to check if the credentials are valid before attempting to sign in
         //first we check if the email is valid, do not proceed if it is not valid
-        String emailErr = auth.validateEmail(email);
+        String emailErr = AuthProvider.getInstance().validateEmail(email);
         if (!emailErr.isEmpty()) {
 
             //Log.d(TAG, "Email is not valid");
@@ -63,7 +61,7 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         //after making sure the email is valid we check if the password is valid and if not we do not proceed
-        String passwordErr = auth.validatePassword(password);
+        String passwordErr = AuthProvider.getInstance().validatePassword(password);
         if (!passwordErr.isEmpty()) {
 
             //Log.d(TAG, "Password is not valid");
@@ -75,7 +73,7 @@ public class SignInActivity extends AppCompatActivity {
         Log.d(TAG, "Credentials are valid");
         Log.d(TAG, "signIn:" + email);
         */
-        auth.signIn(email, password, new AuthProvider.AuthListener() {
+        AuthProvider.getInstance().signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 //sign in was successful

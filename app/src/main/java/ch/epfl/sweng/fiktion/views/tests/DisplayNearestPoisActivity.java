@@ -28,7 +28,6 @@ public class DisplayNearestPoisActivity extends AppCompatActivity {
         ListView resultsListView = (ListView) findViewById(R.id.displayResultPois);
         resultsListView.setAdapter(adapter);
         DatabaseProvider.getInstance().findNearPois(position, radius, new DatabaseProvider.FindNearPoisListener() {
-
             @Override
             public void onNewValue(PointOfInterest poi) {
                 // add the poi name to the adapter

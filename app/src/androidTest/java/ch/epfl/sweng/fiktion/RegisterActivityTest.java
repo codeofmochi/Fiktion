@@ -9,6 +9,7 @@ import android.support.test.espresso.action.ViewActions;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -30,13 +31,10 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.CoreMatchers.is;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RegisterActivityTest {
 
     private final String new_email = "new@email.com";
     private final String new_password = "validpass";
-
-    private AuthProvider auth = AuthProvider.getInstance();
 
     private RegisterActivity regActivity;
 
@@ -52,7 +50,7 @@ public class RegisterActivityTest {
     @Before
     public void setUp() {
         //define authenticator as our local and not the firebase one
-        auth.signOut();
+        AuthProvider.getInstance().signOut();
         //define context
         regActivity = regActivityRule.getActivity();
     }
@@ -60,8 +58,13 @@ public class RegisterActivityTest {
     @After
     public void end() {
         //we need to sign out everytime in case it fails
-        auth.signOut();
+        AuthProvider.getInstance().signOut();
         //regActivity.finish();
+    }
+
+    @AfterClass
+    public static void clean() {
+        AuthProvider.destroyInstance();
     }
 
     @Test
@@ -73,7 +76,7 @@ public class RegisterActivityTest {
 
         onView(withId(R.id.register_click)).perform(click());
 
-        assertThat(auth.getEmail(), is(new_email));
+        assertThat(AuthProvider.getInstance().getEmail(), is(new_email));
 
     }
 

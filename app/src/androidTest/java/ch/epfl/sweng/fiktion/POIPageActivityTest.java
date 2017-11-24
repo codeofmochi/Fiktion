@@ -15,6 +15,7 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,19 +92,22 @@ public class POIPageActivityTest {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
-
             }
 
             @Override
             public void onDoesntExist() {
-
             }
 
             @Override
             public void onFailure() {
-
             }
         });
+    }
+
+    @AfterClass
+    public static void clean() {
+        DatabaseProvider.destroyInstance();
+        AuthProvider.destroyInstance();
     }
 
     @Test

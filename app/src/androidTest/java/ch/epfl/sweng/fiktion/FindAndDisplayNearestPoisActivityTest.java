@@ -11,7 +11,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 
 import org.hamcrest.Matcher;
-import org.junit.Before;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,8 +37,6 @@ import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("DefaultFileTemplate")
 public class FindAndDisplayNearestPoisActivityTest {
-
-    private DatabaseProvider database = DatabaseProvider.getInstance();
     @Rule
     public final ActivityTestRule<FindNearestPoisActivity> mActivityRule =
             new ActivityTestRule<>(FindNearestPoisActivity.class);
@@ -60,13 +58,14 @@ public class FindAndDisplayNearestPoisActivityTest {
     @BeforeClass
     public static void setup() {
         Config.TEST_MODE = true;
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("p1", new Position(0.05, 0.05), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("p2", new Position(0.3, 0.3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("p3", new Position(0.6, 0.6), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
     }
 
-    @Before
-    public void setUp(){
-        database.addPoi(new PointOfInterest("p1", new Position(0.05, 0.05), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(0.3, 0.3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(0.6, 0.6), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+    @AfterClass
+    public static void clean() {
+        DatabaseProvider.destroyInstance();
     }
 
     private ViewAction setProgress(final int progress) {
