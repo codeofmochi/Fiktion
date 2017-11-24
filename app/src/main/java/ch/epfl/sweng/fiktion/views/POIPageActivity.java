@@ -156,7 +156,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // get POI name
         Intent from = getIntent();
-        final String poiName = from.getStringExtra("POI_NAME");
+        poiName = from.getStringExtra("POI_NAME");
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
