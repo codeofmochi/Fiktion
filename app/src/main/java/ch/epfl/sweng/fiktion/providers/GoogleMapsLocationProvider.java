@@ -87,7 +87,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
      */
 
 
-    public void addMarkerClickListener(final GoogleMap.OnMarkerClickListener listener){
+    public void addMarkerClickListener(final GoogleMap.OnMarkerClickListener listener) {
         //Set a listener for marker click already defined by google maps.
         // https://developers.google.com/android/reference/com/google/android/gms/maps/GoogleMap.OnMarkerClickListener
         gmap.setOnMarkerClickListener(listener);

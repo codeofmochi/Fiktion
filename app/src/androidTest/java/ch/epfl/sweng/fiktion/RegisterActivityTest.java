@@ -12,10 +12,8 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
@@ -43,7 +41,7 @@ public class RegisterActivityTest {
             new ActivityTestRule<>(RegisterActivity.class);
 
     @BeforeClass
-    public static void setConfig(){
+    public static void setConfig() {
         Config.TEST_MODE = true;
     }
 
@@ -68,7 +66,7 @@ public class RegisterActivityTest {
     }
 
     @Test
-    public void newAccountTest(){
+    public void newAccountTest() {
         //we type valid credentials and click on the register button
         onView(withId(R.id.register_email)).perform(typeText(new_email), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText(new_password), ViewActions.closeSoftKeyboard());

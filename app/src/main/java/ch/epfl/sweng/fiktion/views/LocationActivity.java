@@ -44,6 +44,7 @@ public class LocationActivity extends MapLocationActivity {
 
     /**
      * Adds the list view button in the action bar
+     *
      * @param menu
      * @return
      */

@@ -11,8 +11,6 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 
-import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-
 
 /**
  * This activity enables the user to create a new account using its email and password

@@ -187,7 +187,7 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void acceptFriendRequest(final String friendID, final DatabaseProvider.ModifyUserListener listener) {
-        if(friendRequests.contains(friendID)) {
+        if (friendRequests.contains(friendID)) {
             // Access other user (friend)
             DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
@@ -258,7 +258,7 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void ignoreFriendRequest(final String friendID, final AuthProvider.AuthListener listener) {
-        if(friendRequests.remove(friendID)) {
+        if (friendRequests.remove(friendID)) {
             // modify user
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
@@ -290,7 +290,7 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void sendFriendRequest(final String friendID, final userListener listener) {
-        if(!friendlist.contains(friendID)) {
+        if (!friendlist.contains(friendID)) {
             DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
@@ -361,7 +361,7 @@ public class User {
     /**
      * Adds a friend request in the friend requests list of a user
      *
-     * @param user The user we want to add the request to
+     * @param user     The user we want to add the request to
      * @param listener Handles what happens in case of success or failure of the change
      */
     private void addTofriendRequests(User user, final userListener listener) {
@@ -421,7 +421,7 @@ public class User {
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void removeFromFriendlist(final String friendID, final userListener listener) {
-        if(friendlist.remove(friendID)) {
+        if (friendlist.remove(friendID)) {
             // get friend user
             DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
@@ -472,11 +472,11 @@ public class User {
     /**
      * Adds new point of interest to this user's visited list
      *
-     * @param poiID POI ID that the user wishes to visit
+     * @param poiID    POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void visit(final String poiID, final AuthProvider.AuthListener listener) {
-        if(!visited.contains(poiID)) {
+        if (!visited.contains(poiID)) {
             visited.addFirst(poiID);
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
@@ -504,11 +504,11 @@ public class User {
     /**
      * Removes given point of interest of this user's visited list
      *
-     * @param poiID POI ID that the user wishes to remove from visited list
+     * @param poiID    POI ID that the user wishes to remove from visited list
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void removeFromVisited(final String poiID, final AuthProvider.AuthListener listener) {
-        if(visited.contains(poiID)) {
+        if (visited.contains(poiID)) {
             //we keep the position in a variable if we fail to modify in database
             // and we need to restore the visited list state
             final int poiIndex = visited.indexOf(poiID);
@@ -539,7 +539,7 @@ public class User {
     /**
      * Adds new point of interest to this user's wishlist
      *
-     * @param poiID POI ID that the user wishes to visit
+     * @param poiID    POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void addToWishlist(final String poiID, final AuthProvider.AuthListener listener) {
@@ -570,7 +570,7 @@ public class User {
     /**
      * Adds new favorite point of interest to this user's favorite list
      *
-     * @param favID POI ID
+     * @param favID    POI ID
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void addFavourite(final String favID, final AuthProvider.AuthListener listener) {
@@ -601,7 +601,7 @@ public class User {
     /**
      * Removes given point of interest of this user wishlist
      *
-     * @param poiID POI ID that user no longer wishes to visit
+     * @param poiID    POI ID that user no longer wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
     public void removeFromWishlist(final String poiID, final AuthProvider.AuthListener listener) {

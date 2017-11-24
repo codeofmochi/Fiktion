@@ -32,7 +32,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-/** This class tests the firebase database proxy concerning User interactions
+/**
+ * This class tests the firebase database proxy concerning User interactions
+ *
  * @author Pedro
  */
 

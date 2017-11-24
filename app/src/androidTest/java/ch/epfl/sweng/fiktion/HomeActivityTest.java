@@ -61,7 +61,7 @@ public class HomeActivityTest {
     }
 
     @After
-    public void reset(){
+    public void reset() {
         waitSomeTime(500);
     }
 
@@ -73,6 +73,7 @@ public class HomeActivityTest {
         homeMainLayout.perform(swipeLeftFast());
         menuDrawer.check(matches(not(isDisplayed())));
     }
+
     @Test
     public void homeToHomeWhenHomeClicked() {
         closeSoftKeyboard();
@@ -81,6 +82,7 @@ public class HomeActivityTest {
         waitSomeTime(1000);
         menuDrawer.check(matches(not(isDisplayed())));
     }
+
     @Test
     public void backHomeWhenHomeClicked() {
         closeSoftKeyboard();

@@ -13,6 +13,7 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 
 /**
  * This activity prompts a sign in or sign up if the user is not already connected
+ *
  * @author Rodrigo
  */
 public class SignInActivity extends AppCompatActivity {

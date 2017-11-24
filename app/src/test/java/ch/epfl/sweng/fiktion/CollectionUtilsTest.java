@@ -12,7 +12,7 @@ import static org.hamcrest.core.Is.is;
 
 /**
  * Tests for CollectionUtils
- *
+ * <p>
  * Created by dialexo on 24.11.17.
  */
 

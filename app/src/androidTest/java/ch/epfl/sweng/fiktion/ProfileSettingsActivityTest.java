@@ -6,7 +6,6 @@ import android.support.test.rule.ActivityTestRule;
 import junit.framework.Assert;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -15,7 +14,6 @@ import org.junit.Test;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
 
@@ -269,7 +267,7 @@ public class ProfileSettingsActivityTest {
 
     @Test
     public void failSaveInfos() {
-       AuthProvider.getInstance().signOut();
+        AuthProvider.getInstance().signOut();
         onView(withId(R.id.saveAccountSettingsButton)).perform(click());
     }
 
