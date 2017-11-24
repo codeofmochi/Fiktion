@@ -51,7 +51,7 @@
     <string name="profile">Profile</string>
     <string name="verify_email">Verify e-mail</string>
     <string name="send_email">Send E-mail</string>
-    <string name="upvote">Vote +1</string>
+    <string name="vote">Vote</string>
     <string name="pictures">Pictures</string>
     <string name="add_a_picture">Add a picture</string>
     <string name="user_reviews">User reviews</string>
