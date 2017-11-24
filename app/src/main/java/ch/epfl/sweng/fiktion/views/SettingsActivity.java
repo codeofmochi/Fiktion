@@ -18,6 +18,7 @@ import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.tests.SocialDemoActivity;
 
 public class SettingsActivity extends MenuDrawerActivity {
 
@@ -394,5 +395,10 @@ public class SettingsActivity extends MenuDrawerActivity {
                 break;
             }
         }
+    }
+
+    public void startSocialDemo(View v){
+        Intent i = new Intent(this, SocialDemoActivity.class);
+        this.startActivity(i);
     }
 }
