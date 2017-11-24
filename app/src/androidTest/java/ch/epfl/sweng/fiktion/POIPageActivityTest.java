@@ -36,6 +36,7 @@ import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.isInternal;
@@ -136,11 +137,6 @@ public class POIPageActivityTest {
 
     @Test
     public void cameraTest() {
-        Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
-        toastRule.launchActivity(i);
-
-        onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
         Bitmap icon = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
@@ -148,11 +144,17 @@ public class POIPageActivityTest {
         // Build a result to return from the Camera app
         Intent resultData = new Intent();
         resultData.putExtra("data", icon);
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
         // Build a result to return from the Camera app
         // this tells Espresso to respond with this instead of camera
         intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
 
-        onView(withText("Camera")).perform(click());
+        onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withText("Camera")).perform(longClick());
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
