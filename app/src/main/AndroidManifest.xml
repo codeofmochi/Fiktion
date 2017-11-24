@@ -26,8 +26,6 @@
         android:glEsVersion="0x00020000"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -92,6 +90,13 @@
         <activity
             android:name=".views.TextSearchActivity"
             android:label="Search" />
+        <activity
+            android:name=".views.NearbyListActivity"
+            android:label="Nearby">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.LocationActivity" />
+        </activity>
     </application>
 
 </manifest>
