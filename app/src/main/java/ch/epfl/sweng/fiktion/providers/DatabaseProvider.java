@@ -31,6 +31,22 @@ public abstract class DatabaseProvider {
     }
 
     /**
+     * Sets the current instance to the given database instance
+     *
+     * @param dbInstance database instance
+     */
+    public static void setInstance(DatabaseProvider dbInstance) {
+        database = dbInstance;
+    }
+
+    /**
+     * Destroys the current database instance
+     */
+    public static void destroyInstance() {
+        database = null;
+    }
+
+    /**
      * Listener that listens the result of the addition of a point of interest
      */
     public interface AddPoiListener {
