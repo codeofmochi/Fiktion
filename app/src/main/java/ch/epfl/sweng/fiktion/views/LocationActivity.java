@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MapLocationActivity;
@@ -27,6 +28,7 @@ public class LocationActivity extends MapLocationActivity {
     private final Context ctx = this;
     private ConstraintLayout frame;
     private View pv;
+    private Position cache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,9 @@ public class LocationActivity extends MapLocationActivity {
                 .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        if (gmaps.hasLocation()) {
+                            cache = new Position(gmaps.getLocation().getLatitude(), gmaps.getLocation().getLongitude());
+                        }
                         startNearbyListActivity();
                         return true;
                     }
@@ -122,13 +127,13 @@ public class LocationActivity extends MapLocationActivity {
     }
 
     public void startNearbyListActivity() {
-        if(!gmaps.hasLocation()) {
+        if (cache == null) {
             Toast.makeText(this, R.string.loading_text, Toast.LENGTH_SHORT).show();
             return;
         }
         Intent i = new Intent(ctx, NearbyListActivity.class);
-        i.putExtra("LATITUDE", gmaps.getLocation().getLatitude());
-        i.putExtra("LONGITUDE", gmaps.getLocation().getLongitude());
+        i.putExtra("LATITUDE", cache.latitude());
+        i.putExtra("LONGITUDE", cache.longitude());
         startActivity(i);
     }
 }
