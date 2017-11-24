@@ -1,12 +1,14 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -46,7 +48,16 @@ public class LocationActivity extends MapLocationActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 0, 0, "List").setIcon(R.drawable.list_icon_40).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, 0, 0, "List")
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        startNearbyListActivity();
+                        return true;
+                    }
+                })
+                .setIcon(R.drawable.list_icon_40)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return true;
     }
 
@@ -110,5 +121,14 @@ public class LocationActivity extends MapLocationActivity {
 
     }
 
-
+    public void startNearbyListActivity() {
+        if(!gmaps.hasLocation()) {
+            Toast.makeText(this, R.string.loading_text, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent i = new Intent(ctx, NearbyListActivity.class);
+        i.putExtra("LATITUDE", gmaps.getLocation().getLatitude());
+        i.putExtra("LONGITUDE", gmaps.getLocation().getLongitude());
+        startActivity(i);
+    }
 }

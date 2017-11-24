@@ -90,6 +90,13 @@
         <activity
             android:name=".views.TextSearchActivity"
             android:label="Search" />
+        <activity
+            android:name=".views.NearbyListActivity"
+            android:label="Nearby">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.LocationActivity" />
+        </activity>
     </application>
 
 </manifest>

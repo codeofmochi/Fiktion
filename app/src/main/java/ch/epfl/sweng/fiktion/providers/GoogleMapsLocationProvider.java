@@ -187,4 +187,21 @@ public class GoogleMapsLocationProvider extends LocationProvider {
             }
         });
     }
+
+    /**
+     * Function to set the location change listener
+     *
+     * @param listener the custom listener
+     */
+    public void setCustomLocationChangeListener(final GoogleMap.OnMyLocationChangeListener listener) {
+        gmap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(Location newLocation) {
+                // still update position to keep location provider functionality
+                updateLocation(newLocation);
+                // trigger new listener
+                listener.onMyLocationChange(newLocation);
+            }
+        });
+    }
 }
