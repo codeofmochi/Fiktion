@@ -449,6 +449,7 @@ public class AddPOIActivityTest {
         i.putExtra("POI_NAME", "poiTest6");
         mActivityRule.getActivity().startActivity(i);
         // click edit button
+        onView(withId(R.id.moreMenu)).check(matches(isDisplayed()));
         onView(withId(R.id.moreMenu)).perform(click());
         onView(withText("Edit")).perform(click());
         onView(withId(R.id.add_poi_scroll)).check(matches(isDisplayed()));
@@ -457,8 +458,10 @@ public class AddPOIActivityTest {
         addPoiFiction.perform(typeText("fiction"));
         closeSoftKeyboard();
         addPoiFictionButton.perform(click());
+        addPoiLatitude.perform(clearText());
         addPoiLatitude.perform(typeText("45"));
         closeSoftKeyboard();
+        addPoiLongitude.perform(clearText());
         addPoiLongitude.perform(typeText("90"));
         closeSoftKeyboard();
         addPoiCity.perform(typeText("city"));

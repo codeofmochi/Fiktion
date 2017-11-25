@@ -149,7 +149,8 @@ public class POIPageActivityTest {
         // Build a result to return from the Camera app
         // this tells Espresso to respond with this instead of camera
         intending(toPackage("com.android.camera2")).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
-        onView(withText("Camera")).check(matches(isDisplayed())).perform(click());
+        onView(withText("Camera")).check(matches(isDisplayed()));
+        onView(withText("Camera")).perform(click());
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
