@@ -143,6 +143,7 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public void sendEmailVerification(AuthListener listener) {
         if (isConnected()) {
+            emailVerified = true;
             listener.onSuccess();
         } else {
             listener.onFailure();
@@ -192,6 +193,10 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public void deleteAccount(AuthListener listener, DatabaseProvider.DeleteUserListener delListener) {
         if (isConnected()) {
+            userList.remove(currUser);
+            mailList.remove(currentUserEmail);
+            signedIn = false;
+            emailVerified=false;
             listener.onSuccess();
             delListener.onSuccess();
 
