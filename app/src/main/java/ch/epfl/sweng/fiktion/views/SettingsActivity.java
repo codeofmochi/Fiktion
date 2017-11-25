@@ -154,7 +154,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         //validate name choice
         if (!newUsername.equals(user.getName())) {
 
-            user.changeName(newUsername, new AuthProvider.AuthListener() {
+            user.changeName(newUsername, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     userNewName.setHint(user.getName());
@@ -164,6 +164,13 @@ public class SettingsActivity extends MenuDrawerActivity {
                             Toast.LENGTH_SHORT).show();
                 }
 
+
+                @Override
+                public void onDoesntExist(){
+                    Toast.makeText(context,
+                            "User no longer exists in database",
+                            Toast.LENGTH_SHORT).show();
+                }
                 @Override
                 public void onFailure() {
                     Toast.makeText(context,

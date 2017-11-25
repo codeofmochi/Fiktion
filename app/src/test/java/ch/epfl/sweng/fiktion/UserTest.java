@@ -20,6 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.PointOfInterest;
+import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -53,10 +55,32 @@ public class UserTest {
     private User userFakeF;
     private User userFakeR;
     private User userWVFav;
+    private User userWithUpvoted;
+
+    private PointOfInterest defPoi = poiWithName("poi");
 
     private DatabaseProvider localDB = DatabaseProvider.getInstance();
+
     private DatabaseProvider.ModifyUserListener mUserListener;
 
+    private PointOfInterest poiWithName(String name) {
+        return new PointOfInterest(name, new Position(0, 0),
+                new TreeSet<String>(), "", 0, "", "");
+    }
+
+    private DatabaseProvider.AddPoiListener emptyAddPOIListener = new DatabaseProvider.AddPoiListener() {
+        @Override
+        public void onSuccess() {
+        }
+
+        @Override
+        public void onAlreadyExists() {
+        }
+
+        @Override
+        public void onFailure() {
+        }
+    };
     private AuthProvider.AuthListener authListener = new AuthProvider.AuthListener() {
         @Override
         public void onSuccess() {
@@ -78,6 +102,23 @@ public class UserTest {
         @Override
         public void onFriendlistException() {
             setResult(FRIENDEXCEPTION);
+        }
+
+        @Override
+        public void onDoesntExist() {
+            setResult(DOESNOTEXIST);
+        }
+
+        @Override
+        public void onFailure() {
+            setResult(FAILURE);
+        }
+    };
+
+    private DatabaseProvider.ModifyUserListener modifyUserListener = new DatabaseProvider.ModifyUserListener() {
+        @Override
+        public void onSuccess() {
+            setResult(SUCCESS);
         }
 
         @Override
@@ -129,18 +170,26 @@ public class UserTest {
         String[] favList = new String[]{"fav POI"};
         String[] whishList = new String[]{"wish POI"};
         String[] visitedList = new String[]{"vis POI"};
+        String[] upvotedList = new String[]{"poi"};
 
         // Initiating users
         user = new User("default", "defaultID");
         user1 = new User("user1", "id1");
         userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(), true, new TreeSet<String>());
+                new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(),
+                true, new TreeSet<String>());
         userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(), true, new TreeSet<String>());
+                new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(),
+                true, new TreeSet<String>());
         userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true, new TreeSet<String>());
-        userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
-                new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>());
+                new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(),
+                true, new TreeSet<String>());
+        userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)),
+                new TreeSet<>(Arrays.asList(whishList)), new TreeSet<String>(), new TreeSet<String>(),
+                new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>());
+        userWithUpvoted = new User("userWVFav", "idwvfav", new TreeSet<String>(), new TreeSet<String>(),
+                new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>(),
+                true, new TreeSet<>(Arrays.asList(upvotedList)));
 
         doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
 
@@ -154,11 +203,139 @@ public class UserTest {
         assertThat(user.getFavourites().size(), is(0));
     }
 
+
+    @Test
+    public void testUpVotingLogic() {
+        DatabaseProvider.getInstance().addPoi(defPoi, emptyAddPOIListener);
+        final String poiName = defPoi.name();
+        userWithUpvoted.upVote(poiName, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                //should fail
+            }
+        });
+
+        user.upVote(poiName, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                assertThat(user.getUpvoted().contains(poiName), is(true));
+                DatabaseProvider.getInstance().getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertThat(user.getUpvoted().contains(poiName), is(true));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+        DatabaseProvider.destroyInstance();
+    }
+
+    @Test
+    public void testRemovePoiVotingLogic() {
+        DatabaseProvider.getInstance().addPoi(defPoi, emptyAddPOIListener);
+        final String poiName = defPoi.name();
+        userWithUpvoted.removeVote(poiName, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                assertThat(userWithUpvoted.getUpvoted().contains(poiName), is(false));
+                DatabaseProvider.getInstance().getUserById(userWithUpvoted.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        assertThat(user.getUpvoted().contains(poiName), is(false));
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+    }
+
+    @Test
+    public void testUpVotingListeners() {
+        DatabaseProvider.setInstance(mockDB);
+        user.upVote(defPoi.name(), modifyUserListener);
+
+        mUserListener = modifyUserListenerArgumentCaptor.getValue();
+
+        mUserListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+        mUserListener.onDoesntExist();
+        assertThat(result, is(DOESNOTEXIST));
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+        DatabaseProvider.destroyInstance();
+    }
+
+    @Test
+    public void testRemoveVotingListeners() {
+        DatabaseProvider.setInstance(mockDB);
+        userWithUpvoted.removeVote(defPoi.name(), modifyUserListener);
+
+        mUserListener = modifyUserListenerArgumentCaptor.getValue();
+
+        mUserListener.onSuccess();
+        assertThat(result, is(SUCCESS));
+        mUserListener.onDoesntExist();
+        assertThat(result, is(DOESNOTEXIST));
+        mUserListener.onFailure();
+        assertThat(result, is(FAILURE));
+        DatabaseProvider.destroyInstance();
+    }
+
     @Test
     public void testEquals() {
-        User other = new User("other user", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
-        User almostEqual = new User("default", "id1", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
-        User same = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+        User other = new User("other user", "defaultID");
+        User almostEqual = new User("default", "id1");
+        User same = new User("default", "defaultID");
 
         assertFalse(user.equals(null));
         assertFalse(user.equals(almostEqual));
@@ -173,7 +350,7 @@ public class UserTest {
     public void testDatabaseInteractionsFavourites() {
 
         DatabaseProvider.setInstance(mockDB);
-        user.addFavourite("new POI", authListener);
+        user.addFavourite("new POI", modifyUserListener);
 
         mUserListener = modifyUserListenerArgumentCaptor.getValue();
 
@@ -181,20 +358,21 @@ public class UserTest {
         assertThat(result, is(SUCCESS));
 
         mUserListener.onDoesntExist();
-        assertThat(result, is(FAILURE));
+        assertThat(result, is(DOESNOTEXIST));
 
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
-        new User("", "", set, new TreeSet<String>(), new LinkedList<String>()).removeFavourite("new POI", authListener);
+        new User("", "", set, new TreeSet<String>(), new LinkedList<String>()).removeFavourite("new POI", modifyUserListener);
 
+        mUserListener = modifyUserListenerArgumentCaptor.getValue();
         mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
         mUserListener.onDoesntExist();
-        assertThat(result, is(FAILURE));
+        assertThat(result, is(DOESNOTEXIST));
 
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
@@ -207,13 +385,18 @@ public class UserTest {
         final List<User> dbUserList = ((LocalDatabaseProvider) DatabaseProvider.getInstance()).users;
         final String newName = "new";
         final User newUser = new User(newName, "defaultID");
-        user.changeName(newName, new AuthProvider.AuthListener() {
+        user.changeName(newName, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 assertThat(user.getName(), is(newName));
                 int index = dbUserList.indexOf(newUser);
                 User u = dbUserList.get(index);
                 assertThat(u.getName(), is(newName));
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
             }
 
             @Override
@@ -228,23 +411,24 @@ public class UserTest {
     public void testDatabaseInteractionsChangeName() {
 
         DatabaseProvider.setInstance(mockDB);
-        user.changeName("new", authListener);
+        user.changeName("new", modifyUserListener);
 
         mUserListener = modifyUserListenerArgumentCaptor.getValue();
         mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
         mUserListener.onDoesntExist();
-        assertThat(result, is(FAILURE));
+        assertThat(result, is(DOESNOTEXIST));
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
         DatabaseProvider.destroyInstance();
     }
 
+
     @Test
     public void testAddFavouriteLogic() {
         //change to Local database to test addFavourite logic
 
-        user.addFavourite("new POI", new AuthProvider.AuthListener() {
+        user.addFavourite("new POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 assertTrue(user.getFavourites().contains("new POI"));
@@ -267,14 +451,24 @@ public class UserTest {
             }
 
             @Override
+            public void onDoesntExist() {
+
+            }
+
+            @Override
             public void onFailure() {
-                Assert.fail();
+
             }
         });
 
-        user.addFavourite("new POI", new AuthProvider.AuthListener() {
+        user.addFavourite("new POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
                 Assert.fail();
             }
 
@@ -303,7 +497,7 @@ public class UserTest {
 
     @Test
     public void testRemoveFavouriteLogic() {
-        userWVFav.removeFavourite("fav POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFavourite("fav POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 assertFalse(userWVFav.getFavourites().contains("fav POI"));
@@ -326,14 +520,24 @@ public class UserTest {
             }
 
             @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
             public void onFailure() {
                 Assert.fail();
             }
         });
 
-        userWVFav.removeFavourite("fav POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFavourite("fav POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
                 Assert.fail();
             }
 
@@ -365,7 +569,7 @@ public class UserTest {
     public void testDatabaseInteractionsWishlist() {
 
         DatabaseProvider.setInstance(mockDB);
-        user.addToWishlist("new POI", authListener);
+        user.addToWishlist("new POI", modifyUserListener);
 
         mUserListener = modifyUserListenerArgumentCaptor.getValue();
 
@@ -373,20 +577,21 @@ public class UserTest {
         assertThat(result, is(SUCCESS));
 
         mUserListener.onDoesntExist();
-        assertThat(result, is(FAILURE));
+        assertThat(result, is(DOESNOTEXIST));
 
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
 
         TreeSet<String> set = new TreeSet<>();
         set.add("new POI");
-        new User("", "", new TreeSet<String>(), set, new LinkedList<String>()).removeFromWishlist("new POI", authListener);
+        new User("", "", new TreeSet<String>(), set, new LinkedList<String>()).removeFromWishlist("new POI", modifyUserListener);
 
+        mUserListener = modifyUserListenerArgumentCaptor.getValue();
         mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
         mUserListener.onDoesntExist();
-        assertThat(result, is(FAILURE));
+        assertThat(result, is(DOESNOTEXIST));
 
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
@@ -397,7 +602,7 @@ public class UserTest {
     public void testAddToWishlistLogic() {
         //change to Local database to test addFavourite logic
 
-        user.addToWishlist("new POI", new AuthProvider.AuthListener() {
+        user.addToWishlist("new POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 assertTrue(user.getWishlist().contains("new POI"));
@@ -420,14 +625,24 @@ public class UserTest {
             }
 
             @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
             public void onFailure() {
                 Assert.fail();
             }
         });
 
-        user.addToWishlist("new POI", new AuthProvider.AuthListener() {
+        user.addToWishlist("new POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
                 Assert.fail();
             }
 
@@ -459,7 +674,7 @@ public class UserTest {
     public void testDatabaseInteractionsVisited() {
 
         DatabaseProvider.setInstance(mockDB);
-        user.visit("new POI", authListener);
+        user.visit("new POI", modifyUserListener);
 
         mUserListener = modifyUserListenerArgumentCaptor.getValue();
 
@@ -467,20 +682,20 @@ public class UserTest {
         assertThat(result, is(SUCCESS));
 
         mUserListener.onDoesntExist();
-        assertThat(result, is(FAILURE));
+        assertThat(result, is(DOESNOTEXIST));
 
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
 
-        LinkedList<String> list = new LinkedList<>();
-        list.add("new POI");
-        new User("", "", new TreeSet<String>(), new TreeSet<String>(), list).removeFromVisited("new POI", authListener);
+        userWVFav.removeFromVisited("vis POI", modifyUserListener);
+
+        mUserListener = modifyUserListenerArgumentCaptor.getValue();
 
         mUserListener.onSuccess();
         assertThat(result, is(SUCCESS));
 
         mUserListener.onDoesntExist();
-        assertThat(result, is(FAILURE));
+        assertThat(result, is(DOESNOTEXIST));
 
         mUserListener.onFailure();
         assertThat(result, is(FAILURE));
@@ -491,7 +706,7 @@ public class UserTest {
 
     @Test
     public void testRemoveFromWishlistLogic() {
-        userWVFav.removeFromWishlist("wish POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromWishlist("wish POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 assertFalse(userWVFav.getWishlist().contains("wish POI"));
@@ -514,14 +729,24 @@ public class UserTest {
             }
 
             @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
             public void onFailure() {
                 Assert.fail();
             }
         });
 
-        userWVFav.removeFromWishlist("wish POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromWishlist("wish POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
                 Assert.fail();
             }
 
@@ -552,7 +777,7 @@ public class UserTest {
     public void testVisitlistLogic() {
         //change to Local database to test addFavourite logic
 
-        user.visit("new POI", new AuthProvider.AuthListener() {
+        user.visit("new POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 assertTrue(user.getVisited().contains("new POI"));
@@ -575,14 +800,24 @@ public class UserTest {
             }
 
             @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
             public void onFailure() {
                 Assert.fail();
             }
         });
 
-        user.visit("new POI", new AuthProvider.AuthListener() {
+        user.visit("new POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
                 Assert.fail();
             }
 
@@ -611,7 +846,7 @@ public class UserTest {
 
     @Test
     public void testRemoveFromVisitedLogic() {
-        userWVFav.removeFromVisited("vis POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromVisited("vis POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 assertFalse(userWVFav.getVisited().contains("vis POI"));
@@ -634,14 +869,24 @@ public class UserTest {
             }
 
             @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
             public void onFailure() {
                 Assert.fail();
             }
         });
 
-        userWVFav.removeFromVisited("vis POI", new AuthProvider.AuthListener() {
+        userWVFav.removeFromVisited("vis POI", new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
                 Assert.fail();
             }
 

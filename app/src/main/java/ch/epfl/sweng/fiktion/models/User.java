@@ -114,7 +114,7 @@ public class User {
                 @Override
                 public void onFailure() {
                     upvoted.remove(poiID);
-                    listener.onDoesntExist();
+                    listener.onFailure();
                 }
             });
         } else {
@@ -145,7 +145,7 @@ public class User {
                 @Override
                 public void onFailure() {
                     upvoted.add(poiID);
-                    listener.onDoesntExist();
+                    listener.onFailure();
                 }
             });
         }
@@ -475,7 +475,7 @@ public class User {
      * @param poiID    POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void visit(final String poiID, final AuthProvider.AuthListener listener) {
+    public void visit(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
         if (!visited.contains(poiID)) {
             visited.addFirst(poiID);
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
@@ -487,7 +487,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     visited.remove(poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -507,7 +507,7 @@ public class User {
      * @param poiID    POI ID that the user wishes to remove from visited list
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFromVisited(final String poiID, final AuthProvider.AuthListener listener) {
+    public void removeFromVisited(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
         if (visited.contains(poiID)) {
             //we keep the position in a variable if we fail to modify in database
             // and we need to restore the visited list state
@@ -522,7 +522,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     visited.add(poiIndex, poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -542,7 +542,7 @@ public class User {
      * @param poiID    POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void addToWishlist(final String poiID, final AuthProvider.AuthListener listener) {
+    public void addToWishlist(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
         if (wishlist.add(poiID)) {
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
@@ -553,7 +553,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     wishlist.remove(poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -573,7 +573,7 @@ public class User {
      * @param favID    POI ID
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void addFavourite(final String favID, final AuthProvider.AuthListener listener) {
+    public void addFavourite(final String favID, final DatabaseProvider.ModifyUserListener listener) {
         if (favourites.add(favID)) {
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
@@ -584,7 +584,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     favourites.remove(favID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -604,7 +604,7 @@ public class User {
      * @param poiID    POI ID that user no longer wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFromWishlist(final String poiID, final AuthProvider.AuthListener listener) {
+    public void removeFromWishlist(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
         if (wishlist.remove(poiID)) {
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
@@ -615,7 +615,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     wishlist.add(poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -634,7 +634,7 @@ public class User {
      *
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFavourite(final String favID, final AuthProvider.AuthListener listener) {
+    public void removeFavourite(final String favID, final DatabaseProvider.ModifyUserListener listener) {
         if (favourites.remove(favID)) {
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
@@ -645,7 +645,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     favourites.add(favID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -665,7 +665,7 @@ public class User {
      * @param newName  New username value
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void changeName(final String newName, final AuthProvider.AuthListener listener) {
+    public void changeName(final String newName, final DatabaseProvider.ModifyUserListener listener) {
         //verification is done in the activity
         final String oldName = name;
         name = newName;
@@ -678,7 +678,7 @@ public class User {
             @Override
             public void onDoesntExist() {
                 name = oldName;
-                listener.onFailure();
+                listener.onDoesntExist();
             }
 
             @Override

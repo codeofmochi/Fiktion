@@ -45,7 +45,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true, new TreeSet<String>());
 
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
-    private final List<PointOfInterest> poiList = new ArrayList<>();
+    public List<PointOfInterest> poiList = new ArrayList<>();
     public List<User> users = new ArrayList<>(initialList);
 
     /**
