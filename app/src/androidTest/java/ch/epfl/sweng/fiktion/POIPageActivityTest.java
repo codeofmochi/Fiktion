@@ -8,8 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.action.GeneralLocation;
+import android.support.test.espresso.action.GeneralSwipeAction;
+import android.support.test.espresso.action.Press;
+import android.support.test.espresso.action.Swipe;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
@@ -34,8 +39,11 @@ import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
@@ -258,6 +266,53 @@ public class POIPageActivityTest {
             }
         });
         assertFalse(user.getUpvoted().contains("poiTest"));
+    }
+
+    // edit a POI
+
+    private static ViewAction swipeUpCenterTopFast() {
+        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.TOP_CENTER, Press.FINGER);
+    }
+
+    @Test
+    public void testModifyExistingPoi() {
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        // click edit button
+        onView(withId(R.id.moreMenu)).check(matches(isDisplayed()));
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Edit")).perform(click());
+        onView(withId(R.id.add_poi_scroll)).check(matches(isDisplayed()));
+
+
+        ViewInteraction addPoiFiction = onView(withId(R.id.add_poi_fiction));
+        ViewInteraction addPoiFictionButton = onView(withId(R.id.add_poi_fiction_button));
+        ViewInteraction addPoiLatitude = onView(withId(R.id.add_poi_latitude));
+        ViewInteraction addPoiLongitude = onView(withId(R.id.add_poi_longitude));
+
+        closeSoftKeyboard();
+        addPoiFiction.perform(typeText("fiction"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
+        addPoiLatitude.perform(clearText());
+        addPoiLatitude.perform(typeText("45"));
+        closeSoftKeyboard();
+        addPoiLongitude.perform(clearText());
+        addPoiLongitude.perform(typeText("90"));
+        closeSoftKeyboard();
+        onView(withId(R.id.add_poi_city)).perform(typeText("city"));
+        closeSoftKeyboard();
+        onView(withId(R.id.add_poi_country)).perform(typeText("country"));
+        closeSoftKeyboard();
+        onView(withId(R.id.add_poi_scroll)).perform(swipeUpCenterTopFast());
+        closeSoftKeyboard();
+        onView(withId(R.id.add_poi_finish)).perform(click());
+        onView(withId(R.id.menu_scroll)).perform(swipeUpCenterTopFast());
+        onView(withId(R.id.title)).check(matches(withText("poiTest")));
+        onView(withId(R.id.featured)).check(matches(withText("Featured in fiction")));
+        onView(withId(R.id.cityCountry)).check(matches(withText("city, country")));
     }
 
 }
