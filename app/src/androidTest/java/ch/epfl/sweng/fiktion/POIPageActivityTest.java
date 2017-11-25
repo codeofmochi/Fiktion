@@ -131,6 +131,13 @@ public class POIPageActivityTest {
 
     @Test
     public void cameraTest() {
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
+
         Bitmap icon = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
@@ -139,15 +146,9 @@ public class POIPageActivityTest {
         Intent resultData = new Intent();
         resultData.putExtra("data", icon);
 
-        Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
-        toastRule.launchActivity(i);
-
         // Build a result to return from the Camera app
         // this tells Espresso to respond with this instead of camera
         intending(toPackage("com.android.camera2")).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
-
-        onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
         onView(withText("Camera")).perform(click());
 
         final List<Bitmap> bitmaps = new ArrayList<>();
