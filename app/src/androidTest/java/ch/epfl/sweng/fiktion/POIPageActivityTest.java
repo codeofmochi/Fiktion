@@ -125,7 +125,15 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void buttonTest() {
+    public void buttonTest1() {
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
+    }
+
+    @Test
+    public void buttonTest2() {
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
         toastRule.launchActivity(i);
@@ -134,6 +142,19 @@ public class POIPageActivityTest {
         onView(withText("Camera")).inRoot(withDecorView(not(is(toastRule.getActivity()
                 .getWindow().getDecorView()))))
                 .check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void buttonTest3() {
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
+
+        onView(withText("Camera")).inRoot(withDecorView(not(is(toastRule.getActivity()
+                .getWindow().getDecorView()))))
+                .check(matches(isDisplayed()));
+        
         onView(withText("Cancel")).perform(click());
     }
 
