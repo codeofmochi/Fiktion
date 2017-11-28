@@ -136,9 +136,10 @@ public class POIPageActivityTest {
                 .check(matches(isDisplayed()));
         onView(withText("Cancel")).perform(click());
     }
- /*
+
+    /*
     @Test
-    public void cameraTest() throws InterruptedException {
+    public void cameraTest() {
 
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
@@ -157,7 +158,6 @@ public class POIPageActivityTest {
         // Build a result to return from the Camera app
         // this tells Espresso to respond with this instead of camera
         intending(toPackage("com.android.camera2")).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
-        Thread.sleep(1000);
         onView(withText("Camera")).check(matches(isDisplayed()));
         onView(withText("Camera")).perform(click());
 
