@@ -9,7 +9,6 @@ import ch.epfl.sweng.fiktion.models.Comment;
  */
 public class FirebaseComment {
     public String text = "";
-    public String authorName = "";
     public String authorId = "";
     public FirebaseDate date = new FirebaseDate();
 
@@ -26,7 +25,6 @@ public class FirebaseComment {
      */
     public FirebaseComment(Comment comment) {
         text = comment.getText();
-        authorName = comment.getAuthorName();
         authorId = comment.getAuthorId();
         date = new FirebaseDate(comment.getDate());
     }
@@ -37,6 +35,6 @@ public class FirebaseComment {
      * @return the comment
      */
     public Comment toComment() {
-        return new Comment(text, authorName, authorId, date.toDate());
+        return new Comment(text, authorId, date.toDate());
     }
 }

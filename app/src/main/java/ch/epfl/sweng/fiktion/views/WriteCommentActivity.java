@@ -38,6 +38,6 @@ public class WriteCommentActivity extends AppCompatActivity {
     }
 
     private void uploadComment(String text) {
-        Comment review = new Comment(text, "", "", new Date());
+        Comment review = new Comment(text, "", new Date());
     }
 }
