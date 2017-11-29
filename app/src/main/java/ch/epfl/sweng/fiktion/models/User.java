@@ -26,20 +26,21 @@ public class User {
     //private Set<String> rated;
     private Set<String> friendlist;
     private Set<String> friendRequests;
+    private Set<String> upvoted;
 
     /**
      * Creates a new User with given parameters
      *
      * @param input_name Username
      * @param input_id   User id
-     * @param favs list of favourite POIs
-     * @param visits list of visited POIs
-     * @param wishes POIs wish list
-     * @param friends User friend list
+     * @param favs       list of favourite POIs
+     * @param visits     list of visited POIs
+     * @param wishes     POIs wish list
+     * @param friends    User friend list
      */
     public User(String input_name, String input_id, Set<String> favs,
                 Set<String> wishes, Set<String> friends, Set<String> fRequests,
-                LinkedList<String> visits, Boolean isPublic) {
+                LinkedList<String> visits, Boolean isPublic, Set<String> upVotes) {
         name = input_name;
         id = input_id;
         favourites = favs;
@@ -48,6 +49,7 @@ public class User {
         friendlist = friends;
         friendRequests = fRequests;
         isPublicProfile = isPublic;
+        upvoted = upVotes;
     }
 
     /**
@@ -55,9 +57,9 @@ public class User {
      *
      * @param input_name Username
      * @param input_id   User id
-     * @param favs list of favourite POIs
-     * @param wishes POIs wish list
-     * @param visits list of visited POIs
+     * @param favs       list of favourite POIs
+     * @param wishes     POIs wish list
+     * @param visits     list of visited POIs
      */
     public User(String input_name, String input_id, Set<String> favs, Set<String> wishes, LinkedList<String> visits) {
         name = input_name;
@@ -68,6 +70,7 @@ public class User {
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
+        upvoted = new TreeSet<>();
     }
 
     /**
@@ -85,19 +88,79 @@ public class User {
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
+        upvoted = new TreeSet<>();
+    }
+
+    /**
+     * Current user upvotes given position of interest
+     *
+     * @param poiID    id of the poi to be upvoted
+     * @param listener handles what to do when trying to modify the user
+     */
+    public void upVote(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
+        if (upvoted.add(poiID)) {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    upvoted.remove(poiID);
+                    listener.onDoesntExist();
+                }
+
+                @Override
+                public void onFailure() {
+                    upvoted.remove(poiID);
+                    listener.onFailure();
+                }
+            });
+        } else {
+            listener.onFailure();
+        }
+    }
+
+    /**
+     * Current user removes his upvote in the given position of interest
+     *
+     * @param poiID    id of the poi
+     * @param listener handles what to do when trying to modify the user
+     */
+    public void removeVote(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
+        if (upvoted.remove(poiID)) {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    listener.onSuccess();
+                }
+
+                @Override
+                public void onDoesntExist() {
+                    upvoted.add(poiID);
+                    listener.onDoesntExist();
+                }
+
+                @Override
+                public void onFailure() {
+                    upvoted.add(poiID);
+                    listener.onFailure();
+                }
+            });
+        }
     }
 
     /**
      * Changes the state of the user's profile privacy (true/false)
      *
-     * @param db database containing the user data
      * @param privacyState The state of the privacy
-     * @param listener Handles what happens in case of success or failure of the change
+     * @param listener     Handles what happens in case of success or failure of the change
      */
-    public void changeProfilePrivacy(final DatabaseProvider db, Boolean privacyState, final AuthProvider.AuthListener listener) {
+    public void changeProfilePrivacy(Boolean privacyState, final AuthProvider.AuthListener listener) {
         final Boolean oldPrivacy = isPublicProfile;
         isPublicProfile = privacyState;
-        db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+        DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();
@@ -120,22 +183,21 @@ public class User {
     /**
      * Accept a friend request by adding it to the friend list if it is in the requests
      *
-     * @param db database containing the user data
      * @param friendID the friend (user) that the user want to add to his friend list
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void acceptFriendRequest(final DatabaseProvider db, final String friendID, final DatabaseProvider.ModifyUserListener listener) {
-        if(friendRequests.contains(friendID)) {
+    public void acceptFriendRequest(final String friendID, final DatabaseProvider.ModifyUserListener listener) {
+        if (friendRequests.contains(friendID)) {
             // Access other user (friend)
-            db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
+            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     // modify the friend
-                    db.modifyUser(user.addFriend(id), new DatabaseProvider.ModifyUserListener() {
+                    DatabaseProvider.getInstance().modifyUser(user.addFriend(id), new DatabaseProvider.ModifyUserListener() {
                         @Override
                         public void onSuccess() {
                             // modify the user
-                            db.modifyUser(User.this.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
+                            DatabaseProvider.getInstance().modifyUser(User.this.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
                                 @Override
                                 public void onSuccess() {
                                     listener.onSuccess();
@@ -192,14 +254,13 @@ public class User {
     /**
      * Ignore friend request by removing it from the request list
      *
-     * @param db database containing the user data
      * @param friendID The friend (user) ID the user wants to ignore
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void ignoreFriendRequest(final DatabaseProvider db, final String friendID, final AuthProvider.AuthListener listener) {
-        if(friendRequests.remove(friendID)) {
+    public void ignoreFriendRequest(final String friendID, final AuthProvider.AuthListener listener) {
+        if (friendRequests.remove(friendID)) {
             // modify user
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -225,17 +286,16 @@ public class User {
     /**
      * Send a friend request to the friend (user) that the user wants to add as a friend
      *
-     * @param db database containing the user data
      * @param friendID The friend (user) that the user wants to add
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void sendFriendRequest(final DatabaseProvider db, final String friendID, final userListener listener) {
-        if(!friendlist.contains(friendID)) {
-            db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
+    public void sendFriendRequest(final String friendID, final userListener listener) {
+        if (!friendlist.contains(friendID)) {
+            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     // add the request in the friend's requests list
-                    addTofriendRequests(db, user, listener);
+                    addTofriendRequests(user, listener);
                 }
 
                 @Override
@@ -266,7 +326,6 @@ public class User {
     }
 
     /**
-     *
      * @param userID The ID of the sender
      * @return The user with the friend removed from his requestList
      */
@@ -298,15 +357,15 @@ public class User {
     }
 
     // User can be final ?
+
     /**
      * Adds a friend request in the friend requests list of a user
      *
-     * @param db database containing the user data
-     * @param user The user we want to add the request to
+     * @param user     The user we want to add the request to
      * @param listener Handles what happens in case of success or failure of the change
      */
-    private void addTofriendRequests(final DatabaseProvider db, User user, final userListener listener) {
-        db.modifyUser(user.addRequest(id), new DatabaseProvider.ModifyUserListener() {
+    private void addTofriendRequests(User user, final userListener listener) {
+        DatabaseProvider.getInstance().modifyUser(user.addRequest(id), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();
@@ -327,14 +386,13 @@ public class User {
     /**
      * Helper function for removeFromfriendlist removing friend from user's friendlist
      *
-     * @param db database containing the user data
      * @param instance Instance of the user we want to remove the friend
      * @param friendID The friend we want to remove
      * @param listener Handles what happens in case of success or failure of the change
      */
-    private void removeFriendFromUserHelper(final DatabaseProvider db, User instance, final String friendID, final userListener listener) {
+    private void removeFriendFromUserHelper(User instance, final String friendID, final userListener listener) {
         // modify user
-        db.modifyUser(instance.removeFriend(friendID), new DatabaseProvider.ModifyUserListener() {
+        DatabaseProvider.getInstance().modifyUser(instance.removeFriend(friendID), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();
@@ -359,29 +417,28 @@ public class User {
     /**
      * Removes given friendID from the friend list
      *
-     * @param db database containing the user data
      * @param friendID user (friend) ID that the user wants to remove
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFromFriendlist(final DatabaseProvider db, final String friendID, final userListener listener) {
-        if(friendlist.remove(friendID)) {
+    public void removeFromFriendlist(final String friendID, final userListener listener) {
+        if (friendlist.remove(friendID)) {
             // get friend user
-            db.getUserById(friendID, new DatabaseProvider.GetUserListener() {
+            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
                     // modify friend, remove user from friend list
-                    db.modifyUser(user.removeFriend(id), new DatabaseProvider.ModifyUserListener() {
+                    DatabaseProvider.getInstance().modifyUser(user.removeFriend(id), new DatabaseProvider.ModifyUserListener() {
                         @Override
                         public void onSuccess() {
                             // modify user
-                            removeFriendFromUserHelper(db, User.this, friendID, listener);
+                            removeFriendFromUserHelper(User.this, friendID, listener);
                         }
 
                         @Override
                         public void onDoesntExist() {
                             // --> no modifications needed on friend, just on user
                             // modify user
-                            removeFriendFromUserHelper(db, User.this, friendID, listener);
+                            removeFriendFromUserHelper(User.this, friendID, listener);
                         }
 
                         @Override
@@ -397,7 +454,7 @@ public class User {
                 public void onDoesntExist() {
                     // --> no modifications needed on friend, just on user
                     // modify user
-                    removeFriendFromUserHelper(db, User.this, friendID, listener);
+                    removeFriendFromUserHelper(User.this, friendID, listener);
                 }
 
                 @Override
@@ -415,14 +472,13 @@ public class User {
     /**
      * Adds new point of interest to this user's visited list
      *
-     * @param db database containing the user data
-     * @param poiID POI ID that the user wishes to visit
+     * @param poiID    POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void visit(final DatabaseProvider db,final String poiID, final AuthProvider.AuthListener listener) {
-        if(!visited.contains(poiID)) {
+    public void visit(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
+        if (!visited.contains(poiID)) {
             visited.addFirst(poiID);
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -431,7 +487,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     visited.remove(poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -448,17 +504,16 @@ public class User {
     /**
      * Removes given point of interest of this user's visited list
      *
-     * @param db database containing the user data
-     * @param poiID POI ID that the user wishes to remove from visited list
+     * @param poiID    POI ID that the user wishes to remove from visited list
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFromVisited(final DatabaseProvider db,final String poiID, final AuthProvider.AuthListener listener) {
-        if(visited.contains(poiID)) {
+    public void removeFromVisited(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
+        if (visited.contains(poiID)) {
             //we keep the position in a variable if we fail to modify in database
             // and we need to restore the visited list state
             final int poiIndex = visited.indexOf(poiID);
             visited.remove(poiID);
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -467,7 +522,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     visited.add(poiIndex, poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -480,16 +535,16 @@ public class User {
             listener.onFailure();
         }
     }
+
     /**
      * Adds new point of interest to this user's wishlist
      *
-     * @param db database containing the user data
-     * @param poiID POI ID that the user wishes to visit
+     * @param poiID    POI ID that the user wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void addToWishlist(final DatabaseProvider db,final String poiID, final AuthProvider.AuthListener listener) {
+    public void addToWishlist(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
         if (wishlist.add(poiID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -498,7 +553,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     wishlist.remove(poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -511,16 +566,16 @@ public class User {
             listener.onFailure();
         }
     }
+
     /**
      * Adds new favorite point of interest to this user's favorite list
      *
-     * @param db database containing the user data
-     * @param favID POI ID
+     * @param favID    POI ID
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void addFavourite(final DatabaseProvider db,final String favID, final AuthProvider.AuthListener listener) {
+    public void addFavourite(final String favID, final DatabaseProvider.ModifyUserListener listener) {
         if (favourites.add(favID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -529,7 +584,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     favourites.remove(favID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -546,13 +601,12 @@ public class User {
     /**
      * Removes given point of interest of this user wishlist
      *
-     * @param db database containing the user data
-     * @param poiID POI ID that user no longer wishes to visit
+     * @param poiID    POI ID that user no longer wishes to visit
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFromWishlist(final DatabaseProvider db, final String poiID, final AuthProvider.AuthListener listener) {
+    public void removeFromWishlist(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
         if (wishlist.remove(poiID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -561,7 +615,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     wishlist.add(poiID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -578,13 +632,11 @@ public class User {
     /**
      * Removes given point of interest of this user favorite list
      *
-     * @param db database containing the user data
-     * @param favID POI ID
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void removeFavourite(final DatabaseProvider db, final String favID, final AuthProvider.AuthListener listener) {
+    public void removeFavourite(final String favID, final DatabaseProvider.ModifyUserListener listener) {
         if (favourites.remove(favID)) {
-            db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     listener.onSuccess();
@@ -593,7 +645,7 @@ public class User {
                 @Override
                 public void onDoesntExist() {
                     favourites.add(favID);
-                    listener.onFailure();
+                    listener.onDoesntExist();
                 }
 
                 @Override
@@ -610,15 +662,14 @@ public class User {
     /**
      * Changes this user's username
      *
-     * @param db database containing the user data
      * @param newName  New username value
      * @param listener Handles what happens in case of success or failure of the change
      */
-    public void changeName(DatabaseProvider db, final String newName, final AuthProvider.AuthListener listener) {
+    public void changeName(final String newName, final DatabaseProvider.ModifyUserListener listener) {
         //verification is done in the activity
         final String oldName = name;
         name = newName;
-        db.modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+        DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 listener.onSuccess();
@@ -627,7 +678,7 @@ public class User {
             @Override
             public void onDoesntExist() {
                 name = oldName;
-                listener.onFailure();
+                listener.onDoesntExist();
             }
 
             @Override
@@ -731,5 +782,12 @@ public class User {
      */
     public List<String> getVisited() {
         return Collections.unmodifiableList(new LinkedList<>(visited));
+    }
+
+    /**
+     * @return the user's requests list
+     */
+    public Set<String> getUpvoted() {
+        return Collections.unmodifiableSet(new TreeSet<>(upvoted));
     }
 }

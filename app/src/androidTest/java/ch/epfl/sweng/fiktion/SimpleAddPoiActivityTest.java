@@ -3,12 +3,13 @@ package ch.epfl.sweng.fiktion;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.tests.SimpleAddPOIActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -36,7 +37,12 @@ public class SimpleAddPoiActivityTest {
 
     @BeforeClass
     public static void setDatabase() {
-        DatabaseSingleton.database = new LocalDatabaseProvider();
+        Config.TEST_MODE = true;
+    }
+
+    @AfterClass
+    public static void clean() {
+        DatabaseProvider.destroyInstance();
     }
 
     @Test

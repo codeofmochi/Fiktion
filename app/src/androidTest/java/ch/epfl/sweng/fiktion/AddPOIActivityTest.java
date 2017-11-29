@@ -19,6 +19,7 @@ import android.view.InputDevice;
 import android.view.View;
 import android.widget.EditText;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +32,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity;
 
@@ -47,7 +48,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -59,6 +59,7 @@ import static org.hamcrest.Matchers.not;
 
 @SuppressWarnings("DefaultFileTemplate")
 public class AddPOIActivityTest {
+
     @Rule
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
             new ActivityTestRule<>(AddPOIActivity.class);
@@ -79,10 +80,18 @@ public class AddPOIActivityTest {
 
     @BeforeClass
     public static void setup() {
-        database = new LocalDatabaseProvider();
-        database.addPoi(new PointOfInterest("p1", new Position(0, 1), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(1, 2), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(2, 3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        Config.TEST_MODE = true;
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest5",
+                new Position(0, 0), new TreeSet<String>(), "", 0,
+                "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest6",
+                new Position(1, 2), new TreeSet<String>(), "", 0,
+                "", ""), emptyAddPoiListener);
+    }
+
+    @AfterClass
+    public static void clean() {
+        DatabaseProvider.destroyInstance();
     }
 
     private final ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
@@ -115,58 +124,13 @@ public class AddPOIActivityTest {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.TOP_CENTER, Press.FINGER);
     }
 
-    private static ViewAction swipeDownCenterBottomFast() {
-        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.BOTTOM_CENTER, Press.FINGER);
-    }
-
     @Test
     public void failsWithWrongInputNameTest() {
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
-        addPoiName.check(matches(hasErrorText("You can't enter an empty point of interest name")));
+        addPoiName.check(matches(hasErrorText("Name cannot be empty")));
         addPoiName.perform(clearText());
-
-        addPoiName.perform(typeText("."));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiName.perform(clearText());
-
-        addPoiName.perform(typeText("$"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiName.perform(clearText());
-
-        addPoiName.perform(typeText("#"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiName.perform(clearText());
-
-        addPoiName.perform(typeText("["));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiName.perform(clearText());
-
-        addPoiName.perform(typeText("]"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiName.perform(clearText());
-
-        addPoiName.perform(typeText("/"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        addPoiName.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
@@ -177,47 +141,6 @@ public class AddPOIActivityTest {
         addPoiFinish.perform(click());
         field.check(matches(hasErrorText("City cannot be empty")));
         field.perform(clearText());
-
-        field.perform(typeText("."));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("$"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("#"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("["));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("]"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("/"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
@@ -228,69 +151,30 @@ public class AddPOIActivityTest {
         addPoiFinish.perform(click());
         field.check(matches(hasErrorText("Country cannot be empty")));
         field.perform(clearText());
-
-        field.perform(typeText("."));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("$"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("#"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("["));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("]"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        field.perform(clearText());
-
-        field.perform(typeText("/"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        addPoiFinish.perform(click());
-        field.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
     }
 
     @Test
     public void failsWithEmptyLatitudeOrLongitudeTest() {
+        String emptyLat = "Latitude cannot be empty";
+        String emptyLon = "Longitude cannot be empty";
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         addPoiFinish.perform(click());
-        addPoiLatitude.check(matches(hasErrorText("You can't enter an empty latitude")));
-        addPoiLongitude.check(matches(hasErrorText("You can't enter an empty longitude")));
+        addPoiLatitude.check(matches(hasErrorText(emptyLat)));
+        addPoiLongitude.check(matches(hasErrorText(emptyLon)));
         addPoiLatitude.perform(typeText("15"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
         addPoiFinish.perform(click());
-        addPoiLongitude.check(matches(hasErrorText("You can't enter an empty longitude")));
+        addPoiLongitude.check(matches(hasErrorText(emptyLon)));
         addPoiLatitude.perform(clearText());
         addPoiLongitude.perform(typeText("30"));
         closeSoftKeyboard();
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
         addPoiFinish.perform(click());
-        addPoiLatitude.check(matches(hasErrorText("You can't enter an empty latitude")));
+        addPoiLatitude.check(matches(hasErrorText(emptyLat)));
     }
 
     @Test
@@ -340,6 +224,7 @@ public class AddPOIActivityTest {
 
     @Test
     public void failsOnWrongCoordinateInputTest() {
+        String numFormat = "Please provide a valid number";
         closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest3"));
         closeSoftKeyboard();
@@ -350,8 +235,8 @@ public class AddPOIActivityTest {
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
         addPoiFinish.perform(click());
-        addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
-        addPoiLatitude.check(matches(hasErrorText("You need to enter a number")));
+        addPoiLongitude.check(matches(hasErrorText(numFormat)));
+        addPoiLatitude.check(matches(hasErrorText(numFormat)));
         addPoiLatitude.perform(clearText());
         addPoiLongitude.perform(clearText());
         addPoiLatitude.perform(typeText("45.3"));
@@ -361,7 +246,7 @@ public class AddPOIActivityTest {
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
         addPoiFinish.perform(click());
-        addPoiLongitude.check(matches(hasErrorText("You need to enter a number")));
+        addPoiLongitude.check(matches(hasErrorText(numFormat)));
     }
 
     @Test
@@ -369,6 +254,9 @@ public class AddPOIActivityTest {
         closeSoftKeyboard();
         addPoiName.perform(typeText("poiTest4"));
         closeSoftKeyboard();
+        addPoiFiction.perform(typeText("fiction"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
         addPoiLatitude.perform(typeText("45"));
         closeSoftKeyboard();
         addPoiLongitude.perform(typeText("90"));
@@ -386,26 +274,11 @@ public class AddPOIActivityTest {
 
     @Test
     public void failsOnAddingTwiceTest() {
-        database.addPoi(
-                new PointOfInterest("poiTest5", new Position(0, 0), new TreeSet<String>(), "", 0, "", ""),
-                new DatabaseProvider.AddPoiListener() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onAlreadyExists() {
-
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
         addPoiName.perform(typeText("poiTest5"));
         closeSoftKeyboard();
+        addPoiFiction.perform(typeText("fiction"));
+        closeSoftKeyboard();
+        addPoiFictionButton.perform(click());
         addPoiLatitude.perform(typeText("45"));
         closeSoftKeyboard();
         addPoiLongitude.perform(typeText("90"));
@@ -424,35 +297,8 @@ public class AddPOIActivityTest {
     @Test
     public void addingFictionFailsOnWrongInputTest() {
         closeSoftKeyboard();
-        addPoiFiction.perform(typeText("["));
-        closeSoftKeyboard();
         addPoiFictionButton.perform(click());
-        addPoiFiction.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiFiction.perform(clearText());
-        addPoiFiction.perform(typeText("hello$test"));
-        closeSoftKeyboard();
-        addPoiFictionButton.perform(click());
-        addPoiFiction.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiFiction.perform(clearText());
-        addPoiFiction.perform(typeText("hello[test"));
-        closeSoftKeyboard();
-        addPoiFictionButton.perform(click());
-        addPoiFiction.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiFiction.perform(clearText());
-        addPoiFiction.perform(typeText("hello]test"));
-        closeSoftKeyboard();
-        addPoiFictionButton.perform(click());
-        addPoiFiction.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiFiction.perform(clearText());
-        addPoiFiction.perform(typeText("hello.test"));
-        closeSoftKeyboard();
-        addPoiFictionButton.perform(click());
-        addPoiFiction.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
-        addPoiFiction.perform(clearText());
-        addPoiFiction.perform(typeText("hello/test"));
-        closeSoftKeyboard();
-        addPoiFictionButton.perform(click());
-        addPoiFiction.check(matches(hasErrorText("Those characters are not accepted: . $ # [ ] /")));
+        addPoiFiction.check(matches(hasErrorText("Fiction name cannot be empty")));
     }
 
     @Test

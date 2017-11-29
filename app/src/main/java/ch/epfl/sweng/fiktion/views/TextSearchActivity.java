@@ -16,7 +16,6 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
@@ -91,7 +90,7 @@ public class TextSearchActivity extends MenuDrawerActivity {
         }
 
         // perform search
-        DatabaseSingleton.database.searchByText(text, new DatabaseProvider.SearchPOIByTextListener() {
+        DatabaseProvider.getInstance().searchByText(text, new DatabaseProvider.SearchPOIByTextListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 View pv = POIDisplayer.createPoiCard(poi, ctx);

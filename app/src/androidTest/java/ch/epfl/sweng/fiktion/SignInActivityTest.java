@@ -8,15 +8,13 @@ package ch.epfl.sweng.fiktion;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
-import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -28,13 +26,11 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SignInActivityTest {
 
     private final String valid_email = "default@email.ch";
     private final String invalid_email = "invalid";
     private final String invalid_password = "1234";
-    private SignInActivity mActivity;
 
     @Rule
     public final ActivityTestRule<SignInActivity> sinActivityRule =
@@ -42,18 +38,18 @@ public class SignInActivityTest {
 
     @BeforeClass
     public static void setAuth() {
-        AuthSingleton.auth = new LocalAuthProvider();
-        AuthSingleton.auth.signOut();
-    }
-
-    @Before
-    public void before() {
-        mActivity = sinActivityRule.getActivity();
+        Config.TEST_MODE = true;
+        AuthProvider.getInstance().signOut();
     }
 
     @After
     public void after() {
-        AuthSingleton.auth.signOut();
+        AuthProvider.getInstance().signOut();
+    }
+
+    @AfterClass
+    public static void clean() {
+        AuthProvider.destroyInstance();
     }
 
 
@@ -79,7 +75,7 @@ public class SignInActivityTest {
         onView(withId(R.id.User_Password)).perform(typeText(invalid_password), closeSoftKeyboard());
         onView(withId(R.id.SignInButton)).perform(click());
 
-        onView(withId(R.id.User_Email)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_email_error))));
+        onView(withId(R.id.User_Email)).check(matches(hasErrorText(sinActivityRule.getActivity().getString(R.string.invalid_email_error))));
     }
 
     @Test
@@ -95,13 +91,11 @@ public class SignInActivityTest {
 
     @Test
     public void emptyPassword_login() {
-        mActivity = sinActivityRule.getActivity();
-
         //type invalid credentials and click sign in
         onView(withId(R.id.User_Email)).perform(typeText(invalid_email), closeSoftKeyboard());
         onView(withId(R.id.SignInButton)).perform(click());
 
-        onView(withId(R.id.User_Email)).check(matches(hasErrorText(mActivity.getString(R.string.invalid_email_error))));
+        onView(withId(R.id.User_Email)).check(matches(hasErrorText(sinActivityRule.getActivity().getString(R.string.invalid_email_error))));
     }
 
     @Test

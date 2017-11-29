@@ -37,6 +37,7 @@ public class HomeActivity extends MenuDrawerActivity {
 
     /**
      * Starts display akihabara activity
+     *
      * @param view
      */
     public void startDisplayAkihabara(View view) {

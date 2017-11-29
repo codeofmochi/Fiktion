@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -60,8 +61,6 @@ public class TextSearchActivityTest {
         onView(withId(R.id.searchText)).check(matches(withText("poi")));
     }
 
-    // tests for POIDisplayer
-
     @Test
     public void createFictionsString() {
         Set<String> f = new TreeSet<>();
@@ -74,22 +73,6 @@ public class TextSearchActivityTest {
         s = POIDisplayer.makeFictionsString(f, 2, testRule.getActivity());
         t = s.toString();
         assertThat(t, is("Featured in f1, f2"));
-    }
-
-    @Test
-    public void testScaleBitmap() {
-        Bitmap bitmap = Bitmap.createBitmap(400, 200, Bitmap.Config.ARGB_8888);
-        Bitmap b = POIDisplayer.scaleBitmap(bitmap, 100);
-        assertThat(b.getWidth(), is(200));
-        assertThat(b.getHeight(), is(100));
-    }
-
-    @Test
-    public void testCropToSquareBitmap() {
-        Bitmap bitmap = Bitmap.createBitmap(400, 200, Bitmap.Config.ARGB_8888);
-        Bitmap b = POIDisplayer.cropBitmapToSquare(bitmap);
-        assertThat(b.getWidth(), is(200));
-        assertThat(b.getHeight(), is(200));
     }
 
     @Test
@@ -129,5 +112,87 @@ public class TextSearchActivityTest {
         assertThat(cityCountry.getText().toString(), is("city, country"));
         assertThat(featured.getText().toString(), is("Featured in fiction"));
         assertThat(upvotes.getText().toString(), is("0 upvotes"));
+    }
+
+    // tests for POIDisplayer
+
+    @Test
+    public void testScaleBitmap() {
+        Bitmap bitmap = Bitmap.createBitmap(400, 200, Bitmap.Config.ARGB_8888);
+        Bitmap b = POIDisplayer.scaleBitmap(bitmap, 100);
+        assertThat(b.getWidth(), CoreMatchers.is(200));
+        assertThat(b.getHeight(), CoreMatchers.is(100));
+    }
+
+    @Test
+    public void testCropToSquareBitmap() {
+        Bitmap bitmap = Bitmap.createBitmap(400, 200, Bitmap.Config.ARGB_8888);
+        Bitmap b = POIDisplayer.cropBitmapToSquare(bitmap);
+        assertThat(b.getWidth(), CoreMatchers.is(200));
+        assertThat(b.getHeight(), CoreMatchers.is(200));
+    }
+
+    @Test
+    public void testCropAndScaleBitmapOnHorizontal() {
+        Bitmap b = Bitmap.createBitmap(400, 200, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.cropAndScaleBitmapTo(b, 100, 100);
+        assertThat(b.getWidth(), CoreMatchers.is(100));
+        assertThat(b.getHeight(), CoreMatchers.is(100));
+    }
+
+    @Test
+    public void testCropAndScaleBitmapOnSquare() {
+        Bitmap b = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.cropAndScaleBitmapTo(b, 100, 100);
+        assertThat(b.getWidth(), CoreMatchers.is(100));
+        assertThat(b.getHeight(), CoreMatchers.is(100));
+    }
+
+    @Test
+    public void testCropAndScaleBitmapOnVertical() {
+        Bitmap b = Bitmap.createBitmap(200, 400, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.cropAndScaleBitmapTo(b, 100, 100);
+        assertThat(b.getWidth(), CoreMatchers.is(100));
+        assertThat(b.getHeight(), CoreMatchers.is(100));
+    }
+
+    @Test
+    public void testScaleWidthTo() {
+        Bitmap b = Bitmap.createBitmap(200, 400, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.scaleWidthTo(b, 100);
+        assertThat(b.getWidth(), CoreMatchers.is(100));
+        assertThat(b.getHeight(), CoreMatchers.is(200));
+    }
+
+    @Test
+    public void testCropWidthBigger() {
+        Bitmap b = Bitmap.createBitmap(200, 400, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.cropWidth(b, 100);
+        assertThat(b.getWidth(), CoreMatchers.is(100));
+        assertThat(b.getHeight(), CoreMatchers.is(400));
+    }
+
+    @Test
+    public void testCropWidthSmaller() {
+        Bitmap b = Bitmap.createBitmap(200, 400, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.cropWidth(b, 300);
+        assertThat(b.getWidth(), CoreMatchers.is(200));
+        assertThat(b.getHeight(), CoreMatchers.is(400));
+    }
+
+    @Test
+    public void testCropHeightBigger() {
+        Bitmap b = Bitmap.createBitmap(200, 400, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.cropHeight(b, 300);
+        assertThat(b.getWidth(), CoreMatchers.is(200));
+        assertThat(b.getHeight(), CoreMatchers.is(300));
+    }
+
+    @Test
+    public void testCropHeightSmaller() {
+        Bitmap b = Bitmap.createBitmap(200, 400, Bitmap.Config.ARGB_8888);
+        b = POIDisplayer.cropHeight(b, 500);
+        assertThat(b.getWidth(), CoreMatchers.is(200));
+        assertThat(b.getHeight(), CoreMatchers.is(400));
     }
 }
