@@ -51,16 +51,14 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
-import static ch.epfl.sweng.fiktion.providers.AuthSingleton.auth;
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
-import static ch.epfl.sweng.fiktion.providers.PhotoSingleton.photoProvider;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
@@ -160,7 +158,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
-        auth.getCurrentUser(database, new DatabaseProvider.GetUserListener() {
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 setUser(user);
@@ -184,7 +182,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // get POI from database
-        database.getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+        DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
                 setPOI(poi);
@@ -242,11 +240,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorText));
             if (upvoted) {
                 // remove the vote
-                user.removeVote(database, poi.name(), new DatabaseProvider.ModifyUserListener() {
+                user.removeVote(poi.name(), new DatabaseProvider.ModifyUserListener() {
                     @Override
                     public void onSuccess() {
                         // downvote in the database
-                        database.downvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
+                        DatabaseProvider.getInstance().downvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
                             @Override
                             public void onSuccess() {
                                 upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
@@ -282,10 +280,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 });
             } else {
                 // upvote
-                user.upVote(database, poi.name(), new DatabaseProvider.ModifyUserListener() {
+                user.upVote(poi.name(), new DatabaseProvider.ModifyUserListener() {
                     @Override
                     public void onSuccess() {
-                        database.upvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
+                        DatabaseProvider.getInstance().upvote(poi.name(), new DatabaseProvider.ModifyPOIListener() {
                             @Override
                             public void onSuccess() {
                                 upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -366,7 +364,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
 
         // set the mainImage as the first photo of the poi
-        photoProvider.downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
@@ -380,7 +378,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // download the photos of the poi
-        photoProvider.downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
 
@@ -415,7 +413,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     public void displayNearPois() {
         // find nearby pois
-        database.findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
             @Override
             public void onNewValue(PointOfInterest p) {
                 View v = POIDisplayer.createPoiCard(p, ctx);
@@ -588,7 +586,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // upload the photo to the cloud
         // show the progress with the progressbar
         uploadProgressBar.setVisibility(View.VISIBLE);
-        photoProvider.uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
                 uploadProgressBar.setVisibility(View.INVISIBLE);

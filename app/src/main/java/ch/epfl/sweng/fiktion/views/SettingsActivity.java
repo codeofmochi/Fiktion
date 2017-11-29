@@ -14,9 +14,7 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
 public class SettingsActivity extends MenuDrawerActivity {
@@ -31,7 +29,9 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button resetButton;
 
     private User user;
+    private DatabaseProvider database = DatabaseProvider.getInstance();
 
+    private AuthProvider auth = AuthProvider.getInstance();
 
     private Context context = this;
 
@@ -56,12 +56,14 @@ public class SettingsActivity extends MenuDrawerActivity {
     @Override
     public void onStart() {
         super.onStart();
-        AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
+
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
                 userNewName.setHint(user.getName());
-                userNewEmail.setHint(AuthSingleton.auth.getEmail());
+                userNewEmail.setHint(auth.getEmail());
             }
 
             @Override
@@ -89,7 +91,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
         });
 
-        if (AuthSingleton.auth.isEmailVerified()) {
+        if (auth.isEmailVerified()) {
             //TODO: modify button to verify email -> deactivate?
             //or set visibility gone to text and button
             verifyButton.setVisibility(View.GONE);
@@ -109,19 +111,19 @@ public class SettingsActivity extends MenuDrawerActivity {
             return;
         }
 
-        if (newEmail.equals(AuthSingleton.auth.getEmail())) {
+        if (newEmail.equals(auth.getEmail())) {
             userNewEmail.setError("Please type a new and valid email");
             return;
         }
 
-        String errMessage = AuthSingleton.auth.validateEmail(newEmail);
+        String errMessage = auth.validateEmail(newEmail);
 
         //validate name choice
         if (errMessage.isEmpty()) {
-            AuthSingleton.auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
+            auth.changeEmail(newEmail, new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
-                    userNewEmail.setHint(AuthSingleton.auth.getEmail());
+                    userNewEmail.setHint(auth.getEmail());
                     Toast.makeText(context,
                             "User's email is now : " + newEmail,
                             Toast.LENGTH_LONG).show();
@@ -152,7 +154,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         //validate name choice
         if (!newUsername.equals(user.getName())) {
 
-            user.changeName(DatabaseSingleton.database, newUsername, new AuthProvider.AuthListener() {
+            user.changeName(newUsername, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
                     userNewName.setHint(user.getName());
@@ -162,6 +164,13 @@ public class SettingsActivity extends MenuDrawerActivity {
                             Toast.LENGTH_SHORT).show();
                 }
 
+
+                @Override
+                public void onDoesntExist(){
+                    Toast.makeText(context,
+                            "User no longer exists in database",
+                            Toast.LENGTH_SHORT).show();
+                }
                 @Override
                 public void onFailure() {
                     Toast.makeText(context,
@@ -188,9 +197,9 @@ public class SettingsActivity extends MenuDrawerActivity {
      * Attempts to delete user's account
      */
     private void deleteAccount() {
-        if (AuthSingleton.auth.isConnected()) {
+        if (auth.isConnected()) {
 
-            AuthSingleton.auth.deleteAccount(
+            auth.deleteAccount(
                     //first we delete firebase account
                     new AuthProvider.AuthListener() {
                         @Override
@@ -230,7 +239,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                             Toast.makeText(context,
                                     "There was a problem deleting your account, signing you out",
                                     Toast.LENGTH_SHORT).show();
-                            AuthSingleton.auth.signOut();
+                            auth.signOut();
                             goHome();
                         }
                     });
@@ -253,7 +262,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         //start update
 
         saveSettingsButton.setEnabled(false);
-        if (!AuthSingleton.auth.isConnected()) {
+        if (!auth.isConnected()) {
             Toast.makeText(this, "You are not signed in", Toast.LENGTH_SHORT).show();
             recreate();
             return;
@@ -270,8 +279,8 @@ public class SettingsActivity extends MenuDrawerActivity {
         // Send verification email only if user does not have a verified email
         verifyButton.setEnabled(false);
 
-        if (AuthSingleton.auth.isConnected()) {
-            AuthSingleton.auth.sendEmailVerification(new AuthProvider.AuthListener() {
+        if (auth.isConnected()) {
+            auth.sendEmailVerification(new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(context,
@@ -330,7 +339,7 @@ public class SettingsActivity extends MenuDrawerActivity {
      * Signs the user out
      */
     public void clickSignOut(@SuppressWarnings("UnusedParameters") View v) {
-        AuthSingleton.auth.signOut();
+        auth.signOut();
         goHome();
     }
 
@@ -341,8 +350,8 @@ public class SettingsActivity extends MenuDrawerActivity {
         // Disable button
         resetButton.setEnabled(false);
 
-        if (AuthSingleton.auth.isConnected()) {
-            AuthSingleton.auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
+        if (auth.isConnected()) {
+            auth.sendPasswordResetEmail(new AuthProvider.AuthListener() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(context,

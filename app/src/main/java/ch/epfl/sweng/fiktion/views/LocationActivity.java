@@ -18,7 +18,6 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MapLocationActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
@@ -45,6 +44,7 @@ public class LocationActivity extends MapLocationActivity {
 
     /**
      * Adds the list view button in the action bar
+     *
      * @param menu
      * @return
      */
@@ -76,7 +76,7 @@ public class LocationActivity extends MapLocationActivity {
         super.onMapReady(googleMap);
         gmaps.showNearPOIs(50);
 
-        /**
+        /*
          * Shows a summary of the marker if clicked on
          */
         gmaps.addMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -86,7 +86,7 @@ public class LocationActivity extends MapLocationActivity {
                 //checks if the marker is a POI marker
                 if (!marker.getTitle().equals("My position")) {
                     // get POI from db
-                    DatabaseSingleton.database.getPoi(marker.getTitle(), new DatabaseProvider.GetPoiListener() {
+                    DatabaseProvider.getInstance().getPoi(marker.getTitle(), new DatabaseProvider.GetPoiListener() {
                         @Override
                         public void onSuccess(PointOfInterest poi) {
                             // remove old view if any

@@ -17,8 +17,6 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 
-
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_BLUE;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker;
 
@@ -89,7 +87,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
      */
 
 
-    public void addMarkerClickListener(final GoogleMap.OnMarkerClickListener listener){
+    public void addMarkerClickListener(final GoogleMap.OnMarkerClickListener listener) {
         //Set a listener for marker click already defined by google maps.
         // https://developers.google.com/android/reference/com/google/android/gms/maps/GoogleMap.OnMarkerClickListener
         gmap.setOnMarkerClickListener(listener);
@@ -170,7 +168,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
                 // first update position
                 updateLocation(newLocation);
                 // find nearest pois
-                database.findNearPois(getPosition(), radius, new DatabaseProvider.FindNearPoisListener() {
+                DatabaseProvider.getInstance().findNearPois(getPosition(), radius, new DatabaseProvider.FindNearPoisListener() {
                     @Override
                     public void onNewValue(PointOfInterest poi) {
                         // write new marker

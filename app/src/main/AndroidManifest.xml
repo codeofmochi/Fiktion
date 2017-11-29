@@ -60,7 +60,6 @@
         <activity android:name=".views.tests.FindNearestPoisActivity" />
         <activity android:name=".views.tests.DisplayNearestPoisActivity" />
         <activity android:name=".views.SignInActivity" />
-        <activity android:name=".views.tests.UserDetailsActivity" />
         <activity android:name=".views.RegisterActivity" />
         <activity
             android:name=".views.AddPOIActivity"

@@ -92,17 +92,17 @@ public class FirebaseDatabasePOITest {
         DatabaseProvider.AddPoiListener listener = new DatabaseProvider.AddPoiListener() {
             @Override
             public void onSuccess() {
-                result.value = "SUCCESS";
+                result.set("SUCCESS");
             }
 
             @Override
             public void onAlreadyExists() {
-                result.value = "ALREADYEXISTS";
+                result.set("ALREADYEXISTS");
             }
 
             @Override
             public void onFailure() {
-                result.value = "FAILURE";
+                result.set("FAILURE");
             }
         };
         when(dbRef.setValue(any(FirebasePointOfInterest.class))).thenReturn(null);
@@ -114,17 +114,19 @@ public class FirebaseDatabasePOITest {
         database.addPoi(poiTest, listener);
         vel.getValue().onDataChange(snapshot);
         addPoiListener.getValue().onSuccess();
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
+
+        addPoiListener.getValue().onAlreadyExists();
 
         addPoiListener.getValue().onFailure();
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
 
         when(snapshot.exists()).thenReturn(true);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("ALREADYEXISTS"));
+        assertThat(result.get(), is("ALREADYEXISTS"));
 
         vel.getValue().onCancelled(null);
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
     }
 
     @Test
@@ -137,22 +139,22 @@ public class FirebaseDatabasePOITest {
         DatabaseProvider.GetPoiListener listener = new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
-                result.value = "SUCCESS";
+                result.set("SUCCESS");
             }
 
             @Override
             public void onModified(PointOfInterest poi) {
-                result.value = "MODIFIED";
+                result.set("MODIFIED");
             }
 
             @Override
             public void onDoesntExist() {
-                result.value = "DOESNTEXIST";
+                result.set("DOESNTEXIST");
             }
 
             @Override
             public void onFailure() {
-                result.value = "FAILURE";
+                result.set("FAILURE");
             }
         };
 
@@ -161,20 +163,20 @@ public class FirebaseDatabasePOITest {
         when(snapshot.exists()).thenReturn(true);
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(new FirebasePointOfInterest(poiTest));
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("MODIFIED"));
+        assertThat(result.get(), is("MODIFIED"));
 
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
 
         when(snapshot.exists()).thenReturn(false);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("DOESNTEXIST"));
+        assertThat(result.get(), is("DOESNTEXIST"));
 
         vel.getValue().onCancelled(null);
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
     }
 
     @Test
@@ -189,17 +191,17 @@ public class FirebaseDatabasePOITest {
         DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
             @Override
             public void onSuccess() {
-                result.value = "SUCCESS";
+                result.set("SUCCESS");
             }
 
             @Override
             public void onDoesntExist() {
-                result.value = "DOESNTEXIST";
+                result.set("DOESNTEXIST");
             }
 
             @Override
             public void onFailure() {
-                result.value = "FAILURE";
+                result.set("FAILURE");
             }
         };
 
@@ -207,15 +209,15 @@ public class FirebaseDatabasePOITest {
         when(snapshot.exists()).thenReturn(true);
         vel.getValue().onDataChange(snapshot);
         modifyPOIListener.getValue().onSuccess();
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
         modifyPOIListener.getValue().onDoesntExist();
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
         modifyPOIListener.getValue().onFailure();
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
 
         when(snapshot.exists()).thenReturn(false);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("DOESNTEXIST"));
+        assertThat(result.get(), is("DOESNTEXIST"));
         vel.getValue().onCancelled(null);
     }
 
@@ -229,17 +231,17 @@ public class FirebaseDatabasePOITest {
         DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
             @Override
             public void onSuccess() {
-                result.value = "SUCCESS";
+                result.set("SUCCESS");
             }
 
             @Override
             public void onDoesntExist() {
-                result.value = "DOESNTEXIST";
+                result.set("DOESNTEXIST");
             }
 
             @Override
             public void onFailure() {
-                result.value = "FAILURE";
+                result.set("FAILURE");
             }
         };
         database.upvote("randomPOI", listener);
@@ -247,21 +249,21 @@ public class FirebaseDatabasePOITest {
         when(snapshot.child(anyString())).thenReturn(snapshot);
         when(snapshot.getValue()).thenReturn((long) 10);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
         assertThat(value.getValue(), is((long) 11));
-        result.value = "";
+        result.set("");
 
         when(snapshot.getValue()).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
         assertThat(value.getValue(), is((long) 1));
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
 
         when(snapshot.exists()).thenReturn(false);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("DOESNTEXIST"));
+        assertThat(result.get(), is("DOESNTEXIST"));
 
         vel.getValue().onCancelled(null);
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
 
         // ---- downvote ----
 
@@ -270,21 +272,21 @@ public class FirebaseDatabasePOITest {
         when(snapshot.child(anyString())).thenReturn(snapshot);
         when(snapshot.getValue()).thenReturn((long) 10);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
         assertThat(value.getValue(), is((long) 9));
-        result.value = "";
+        result.set("");
 
         when(snapshot.getValue()).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
         assertThat(value.getValue(), is((long) -1));
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
 
         when(snapshot.exists()).thenReturn(false);
         vel.getValue().onDataChange(snapshot);
-        assertThat(result.value, is("DOESNTEXIST"));
+        assertThat(result.get(), is("DOESNTEXIST"));
 
         vel.getValue().onCancelled(null);
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
 
     }
 
@@ -300,12 +302,12 @@ public class FirebaseDatabasePOITest {
         DatabaseProvider.FindNearPoisListener findPoiListener = new DatabaseProvider.FindNearPoisListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
-                ++nbPOIs.value;
+                nbPOIs.set(nbPOIs.get() + 1);
             }
 
             @Override
             public void onFailure() {
-                isFailure.value = true;
+                isFailure.set(true);
             }
         };
 
@@ -316,12 +318,12 @@ public class FirebaseDatabasePOITest {
         databaseSpy.findNearPois(poiTest.position(), 10, findPoiListener);
         geoQueryEventListener.getValue().onKeyEntered("key", null);
         getPOIListener.getValue().onSuccess(poiTest);
-        assertThat(nbPOIs.value, is(1));
+        assertThat(nbPOIs.get(), is(1));
         getPOIListener.getValue().onSuccess(poiTest);
         getPOIListener.getValue().onSuccess(poiTest);
         getPOIListener.getValue().onSuccess(poiTest);
         getPOIListener.getValue().onSuccess(poiTest);
-        assertThat(nbPOIs.value, is(5));
+        assertThat(nbPOIs.get(), is(5));
         getPOIListener.getValue().onModified(poiTest);
         getPOIListener.getValue().onDoesntExist();
         getPOIListener.getValue().onFailure();
@@ -329,7 +331,7 @@ public class FirebaseDatabasePOITest {
         geoQueryEventListener.getValue().onKeyMoved("key", null);
         geoQueryEventListener.getValue().onGeoQueryReady();
         geoQueryEventListener.getValue().onGeoQueryError(null);
-        assertTrue(isFailure.value);
+        assertTrue(isFailure.get());
     }
 
     @Test
@@ -342,12 +344,12 @@ public class FirebaseDatabasePOITest {
         DatabaseProvider.SearchPOIByTextListener listener = new DatabaseProvider.SearchPOIByTextListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
-                ++nbPOIs.value;
+                nbPOIs.set(nbPOIs.get() + 1);
             }
 
             @Override
             public void onFailure() {
-                isFailure.value = true;
+                isFailure.set(true);
             }
         };
 
@@ -358,21 +360,21 @@ public class FirebaseDatabasePOITest {
         databaseSpy.searchByText("", listener);
         searchPOIsByTextListener.getValue().onSuccess(Collections.singletonList("poi"));
 
-        assertThat(nbPOIs.value, is(0));
+        assertThat(nbPOIs.get(), is(0));
         getPOIListener.getValue().onSuccess(null);
-        assertThat(nbPOIs.value, is(1));
-        getPOIListener.getValue().onSuccess(null);
-        getPOIListener.getValue().onSuccess(null);
+        assertThat(nbPOIs.get(), is(1));
         getPOIListener.getValue().onSuccess(null);
         getPOIListener.getValue().onSuccess(null);
-        assertThat(nbPOIs.value, is(5));
+        getPOIListener.getValue().onSuccess(null);
+        getPOIListener.getValue().onSuccess(null);
+        assertThat(nbPOIs.get(), is(5));
         getPOIListener.getValue().onModified(poiTest);
         getPOIListener.getValue().onDoesntExist();
         getPOIListener.getValue().onFailure();
-        assertThat(nbPOIs.value, is(5));
+        assertThat(nbPOIs.get(), is(5));
 
         searchPOIsByTextListener.getValue().onFailure();
-        assertTrue(isFailure.value);
+        assertTrue(isFailure.get());
 
     }
 }

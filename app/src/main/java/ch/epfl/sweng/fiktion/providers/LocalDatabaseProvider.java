@@ -1,9 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -19,16 +17,16 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
-    private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+    private final User defaultUser = new User("default", "defaultID");
     private final User user1 = new User("user1", "id1");
     // Initiating friendlists and friendRequests
-    private final String[] frList = new String[] {"defaultID"};
-    private final String[] rList = new String[] {"id1"};
-    private final String[] fakeFList = new String[] {"idfake"};
-    private final String[] fakeRList = new String[] {"idfake"};
-    private final String[] favList = new String[] {"fav POI"};
-    private final String[] whishList = new String[] {"wish POI"};
-    private final String[] visitedList = new String[] {"vis POI"};
+    private final String[] frList = new String[]{"defaultID"};
+    private final String[] rList = new String[]{"id1"};
+    private final String[] fakeFList = new String[]{"idfake"};
+    private final String[] fakeRList = new String[]{"idfake"};
+    private final String[] favList = new String[]{"fav POI"};
+    private final String[] whishList = new String[]{"wish POI"};
+    private final String[] visitedList = new String[]{"vis POI"};
 
     // user has "fav POI" as favourite, "vis POI" in visited and "wish POI" in wishlist
     private final User userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
@@ -46,14 +44,28 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
             new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true, new TreeSet<String>());
 
-    private final List<User> initialList = Arrays.asList(defaultUser,user1, userFR, userFakeF, userFakeR, userWVFav);
-    private final List<PointOfInterest> poiList = new ArrayList<>();
-    private final List<User> users = new ArrayList<> (initialList);
+    private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
+    public List<PointOfInterest> poiList = new ArrayList<>();
+    public List<User> users = new ArrayList<>(initialList);
 
     /**
      * {@inheritDoc}
      */
+
     public void addPoi(PointOfInterest poi, AddPoiListener listener) {
+        if (poi.name().contains("ADDPOIS")) {
+            listener.onSuccess();
+            return;
+        }
+        if (poi.name().contains("ADDPOIA")) {
+            listener.onAlreadyExists();
+            return;
+        }
+        if (poi.name().contains("ADDPOIF")) {
+            listener.onFailure();
+            return;
+        }
+
         if (poiList.contains(poi)) {
             // inform the listener that the poi already exists
             listener.onAlreadyExists();
@@ -69,6 +81,35 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     public void getPoi(String name, GetPoiListener listener) {
+        if (name.contains("GETPOIS")) {
+            listener.onSuccess(new PointOfInterest("SUCCESS",
+                    new Position(0, 0),
+                    new TreeSet<String>(),
+                    "",
+                    0,
+                    "",
+                    ""));
+            return;
+        }
+        if (name.contains("GETPOIM")) {
+            listener.onModified(new PointOfInterest("MODIFIED",
+                    new Position(0, 0),
+                    new TreeSet<String>(),
+                    "",
+                    0,
+                    "",
+                    ""));
+            return;
+        }
+        if (name.contains("GETPOID")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (name.contains("GETPOIF")) {
+            listener.onFailure();
+            return;
+        }
+
         for (PointOfInterest poi : poiList) {
             if (poi.name().equals(name)) {
                 // inform the listener that we have the poi
@@ -85,6 +126,19 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void modifyPOI(PointOfInterest poi, ModifyPOIListener listener) {
+        if (poi.name().contains("MODIFYPOIS")) {
+            listener.onSuccess();
+            return;
+        }
+        if (poi.name().contains("MODIFYPOID")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (poi.name().contains("MODIFYPOIF")) {
+            listener.onFailure();
+            return;
+        }
+
         for (int i = 0; i < poiList.size(); ++i) {
             if (poi.equals(poiList.get(i))) {
                 poiList.set(i, poi);
@@ -100,6 +154,19 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void upvote(String poiName, ModifyPOIListener listener) {
+        if (poiName.contains("UPVOTES")) {
+            listener.onSuccess();
+            return;
+        }
+        if (poiName.contains("UPVOTED")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (poiName.contains("UPVOTEF")) {
+            listener.onFailure();
+            return;
+        }
+
         for (int i = 0; i < poiList.size(); ++i) {
             PointOfInterest poi = poiList.get(i);
             if (poiName.equals(poi.name())) {
@@ -118,6 +185,19 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void downvote(String poiName, ModifyPOIListener listener) {
+        if (poiName.contains("DOWNVOTES")) {
+            listener.onSuccess();
+            return;
+        }
+        if (poiName.contains("DOWNVOTED")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (poiName.contains("DOWNVOTEF")) {
+            listener.onFailure();
+            return;
+        }
+
         for (int i = 0; i < poiList.size(); ++i) {
             PointOfInterest poi = poiList.get(i);
             if (poiName.equals(poi.name())) {
@@ -135,6 +215,11 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
+        if (pos.latitude() == 1000 && pos.longitude() == 1000) {
+            listener.onFailure();
+            return;
+        }
+
         for (PointOfInterest poi : poiList) {
             if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
                 listener.onNewValue(poi);
@@ -147,6 +232,21 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void searchByText(String text, SearchPOIByTextListener listener) {
+        if (text.contains("SEARCHN")) {
+            listener.onNewValue(new PointOfInterest("NEWVALUE",
+                    new Position(0, 0),
+                    new TreeSet<String>(),
+                    "",
+                    0,
+                    "",
+                    ""));
+            return;
+        }
+        if (text.contains("SEARCHF")) {
+            listener.onFailure();
+            return;
+        }
+
         for (PointOfInterest poi : poiList) {
             if (poi.name().contains(text) ||
                     poi.description().contains(text) ||
@@ -177,10 +277,23 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void addUser(User user, AddUserListener listener) {
+        if (user.getID().contains("ADDUSERS")) {
+            listener.onSuccess();
+            return;
+        }
+        if (user.getID().contains("ADDUSERA")) {
+            listener.onAlreadyExists();
+            return;
+        }
+        if (user.getID().contains("ADDUSERF")) {
+            listener.onFailure();
+            return;
+        }
+
         boolean contains = false;
         String id = user.getID();
         // go through all the users and check if there is one with the same id as the user in parameter
-        for (User u: users) {
+        for (User u : users) {
             contains |= u.getID().equals(id);
         }
         if (contains) {
@@ -196,7 +309,20 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getUserById(String id, GetUserListener listener) {
-        for(User u: users) {
+        if (id.contains("GETUSERS")) {
+            listener.onSuccess(new User(id, id));
+            return;
+        }
+        if (id.contains("GETUSERD")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (id.contains("GETUSERF")) {
+            listener.onFailure();
+            return;
+        }
+
+        for (User u : users) {
             if (u.getID().equals(id)) {
                 listener.onSuccess(u);
                 return;
@@ -210,7 +336,20 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void deleterUserById(String id, DeleteUserListener listener) {
-        for (User u: users) {
+        if (id.contains("DELETEUSERS")) {
+            listener.onSuccess();
+            return;
+        }
+        if (id.contains("DELETEUSERD")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (id.contains("DELETEUSERF")) {
+            listener.onFailure();
+            return;
+        }
+
+        for (User u : users) {
             if (u.getID().equals(id)) {
                 users.remove(u);
                 listener.onSuccess();
@@ -222,6 +361,19 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
+        if (user.getID().contains("MODIFYUSERS")) {
+            listener.onSuccess();
+            return;
+        }
+        if (user.getID().contains("MODIFYUSERD")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (user.getID().contains("MODIFYUSERF")) {
+            listener.onFailure();
+            return;
+        }
+
         deleterUserById(user.getID(), new DeleteUserListener() {
             @Override
             public void onSuccess() {

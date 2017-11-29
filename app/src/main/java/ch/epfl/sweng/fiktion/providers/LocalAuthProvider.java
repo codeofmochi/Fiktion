@@ -16,9 +16,9 @@ import ch.epfl.sweng.fiktion.models.User;
 public class LocalAuthProvider extends AuthProvider {
     private final User defaultUser = new User("default", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
     private final String defaultEmail = "default@email.ch";
-    private final List<User> userList = new ArrayList<>
+    private List<User> userList = new ArrayList<>
             (Collections.singletonList(defaultUser));
-    private final List<String> mailList = new ArrayList<>
+    private List<String> mailList = new ArrayList<>
             (Collections.singletonList(defaultEmail));
     private User currUser = defaultUser;
     private Boolean signedIn = true;
@@ -36,10 +36,15 @@ public class LocalAuthProvider extends AuthProvider {
     public void signIn(String email, String password, AuthListener listener) {
         //we use same ID for every user in the tests. Firebase does not allow to create 2 account with same email
         //so we will focus on accounts with the same email
-        if (mailList.contains(email)
+        if (email.equals("user1@test.ch") && password.equals("testing")) {
+            currUser = new User("user1", "id1");
+            signedIn = true;
+            currentUserEmail = email;
+            listener.onSuccess();
+        } else if (mailList.contains(email)
                 && password.equals("testing")) {
             listener.onSuccess();
-            currUser = new User("", "defaultID",new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
+            currUser = new User("", "defaultID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
             signedIn = true;
             currentUserEmail = email;
         } else {
@@ -100,7 +105,7 @@ public class LocalAuthProvider extends AuthProvider {
      * @param listener that knows what to do with the results
      */
     @Override
-    public void createUserWithEmailAndPassword(DatabaseProvider database, String email, String password, AuthListener listener) {
+    public void createUserWithEmailAndPassword(String email, String password, AuthListener listener) {
 
         User newUser = new User("new", "newID", new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>());
         if (mailList.contains(email)) {
@@ -138,6 +143,7 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public void sendEmailVerification(AuthListener listener) {
         if (isConnected()) {
+            emailVerified = true;
             listener.onSuccess();
         } else {
             listener.onFailure();
@@ -158,7 +164,7 @@ public class LocalAuthProvider extends AuthProvider {
      * @param listener handles what to do after the request
      */
     @Override
-    public void getCurrentUser(DatabaseProvider database, DatabaseProvider.GetUserListener listener) {
+    public void getCurrentUser(DatabaseProvider.GetUserListener listener) {
         if (isConnected()) {
             listener.onSuccess(currUser);
         } else {
@@ -187,11 +193,10 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public void deleteAccount(AuthListener listener, DatabaseProvider.DeleteUserListener delListener) {
         if (isConnected()) {
-            mailList.remove(currentUserEmail);
             userList.remove(currUser);
-            currentUserEmail = null;
-            currUser = null;
+            mailList.remove(currentUserEmail);
             signedIn = false;
+            emailVerified=false;
             listener.onSuccess();
             delListener.onSuccess();
 
@@ -217,5 +222,15 @@ public class LocalAuthProvider extends AuthProvider {
         return currentUserEmail;
     }
 
+    public void reset() {
+        userList = new ArrayList<>
+                (Collections.singletonList(defaultUser));
+        mailList = new ArrayList<>
+                (Collections.singletonList(defaultEmail));
+        currUser = defaultUser;
+        signedIn = true;
+        currentUserEmail = defaultEmail;
+        emailVerified = false;
+    }
 
 }

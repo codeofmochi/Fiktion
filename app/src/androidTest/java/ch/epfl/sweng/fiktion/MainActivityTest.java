@@ -8,7 +8,6 @@ import org.junit.Test;
 import ch.epfl.sweng.fiktion.views.MainActivity;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -21,7 +20,7 @@ public class MainActivityTest {
             new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void goToHomeOnLaunch(){
+    public void goToHomeOnLaunch() {
         onView(withId(R.id.placeText)).check(matches(isDisplayed()));
     }
 }

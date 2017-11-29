@@ -1,7 +1,6 @@
 package ch.epfl.sweng.fiktion;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
@@ -20,6 +19,7 @@ import android.view.InputDevice;
 import android.view.View;
 import android.widget.EditText;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,10 +32,9 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity;
-import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -49,7 +48,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -61,6 +59,7 @@ import static org.hamcrest.Matchers.not;
 
 @SuppressWarnings("DefaultFileTemplate")
 public class AddPOIActivityTest {
+
     @Rule
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
             new ActivityTestRule<>(AddPOIActivity.class);
@@ -81,10 +80,18 @@ public class AddPOIActivityTest {
 
     @BeforeClass
     public static void setup() {
-        database = new LocalDatabaseProvider();
-        database.addPoi(new PointOfInterest("p1", new Position(0, 1), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p2", new Position(1, 2), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        database.addPoi(new PointOfInterest("p3", new Position(2, 3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        Config.TEST_MODE = true;
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest5",
+                new Position(0, 0), new TreeSet<String>(), "", 0,
+                "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest6",
+                new Position(1, 2), new TreeSet<String>(), "", 0,
+                "", ""), emptyAddPoiListener);
+    }
+
+    @AfterClass
+    public static void clean() {
+        DatabaseProvider.destroyInstance();
     }
 
     private final ViewInteraction addPoiFinish = onView(withId(R.id.add_poi_finish));
@@ -267,24 +274,6 @@ public class AddPOIActivityTest {
 
     @Test
     public void failsOnAddingTwiceTest() {
-        database.addPoi(
-                new PointOfInterest("poiTest5", new Position(0, 0), new TreeSet<String>(), "", 0, "", ""),
-                new DatabaseProvider.AddPoiListener() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onAlreadyExists() {
-
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
         addPoiName.perform(typeText("poiTest5"));
         closeSoftKeyboard();
         addPoiFiction.perform(typeText("fiction"));
@@ -447,39 +436,5 @@ public class AddPOIActivityTest {
             addPoiLatitude.check(isBetween(-90, 90));
             addPoiLongitude.check(isBetween(-180, 180));
         }
-    }
-
-    // edit a POI
-
-    @Test
-    public void testModifyExistingPoi() {
-        // start activity of existing POI
-        Intent i = new Intent(mActivityRule.getActivity(), POIPageActivity.class);
-        i.putExtra("POI_NAME", "p1");
-        mActivityRule.getActivity().startActivity(i);
-        // click edit button
-        onView(withId(R.id.moreMenu)).perform(click());
-        onView(withText("Edit")).perform(click());
-        onView(withId(R.id.add_poi_scroll)).check(matches(isDisplayed()));
-
-        closeSoftKeyboard();
-        addPoiFiction.perform(typeText("fiction"));
-        closeSoftKeyboard();
-        addPoiFictionButton.perform(click());
-        addPoiLatitude.perform(typeText("45"));
-        closeSoftKeyboard();
-        addPoiLongitude.perform(typeText("90"));
-        closeSoftKeyboard();
-        addPoiCity.perform(typeText("city"));
-        closeSoftKeyboard();
-        addPoiCountry.perform(typeText("country"));
-        closeSoftKeyboard();
-        addPoiScroll.perform(swipeUpCenterTopFast());
-        closeSoftKeyboard();
-        addPoiFinish.perform(click());
-        onView(withId(R.id.menu_scroll)).perform(swipeUpCenterTopFast());
-        onView(withId(R.id.title)).check(matches(withText("p1")));
-        onView(withId(R.id.featured)).check(matches(withText("Featured in fiction")));
-        onView(withId(R.id.cityCountry)).check(matches(withText("city, country")));
     }
 }
