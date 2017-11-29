@@ -63,7 +63,7 @@ import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
     private final int MAXIMUM_SIZE = 1000;
-    private static final String POI_NAME = "POI NAME";
+    public static final String POI_NAME = "POI_NAME";
     private final int SEARCH_RADIUS = 20;
 
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
@@ -608,7 +608,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     public void startWriteCommentActivity(View view) {
-        Intent i = new Intent(this, WriteCommentActivity.class);
+        Intent i = new Intent(ctx, WriteCommentActivity.class);
         i.putExtra(POI_NAME, poiName);
         startActivity(i);
     }

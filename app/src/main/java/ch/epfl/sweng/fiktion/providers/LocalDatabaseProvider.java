@@ -2,10 +2,14 @@ package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -47,6 +51,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     public List<PointOfInterest> poiList = new ArrayList<>();
     public List<User> users = new ArrayList<>(initialList);
+    private Map<String, List<Comment>> comments = new TreeMap<>();
 
     /**
      * {@inheritDoc}
@@ -391,5 +396,48 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 listener.onFailure();
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addComment(Comment comment, String poiName, AddCommentListener listener) {
+        if (poiName.contains("ADDCOMMENTS")) {
+            listener.onSuccess();
+            return;
+        }
+        if (poiName.contains("ADDCOMMENTF")) {
+            listener.onFailure();
+            return;
+        }
+        if (comments.containsKey(poiName)) {
+            List<Comment> poiComments = comments.get(poiName);
+            poiComments.add(comment);
+        } else {
+            List<Comment> poiComments = new ArrayList<>();
+            poiComments.add(comment);
+            comments.put(poiName, poiComments);
+        }
+        listener.onSuccess();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getComments(String poiName, GetCommentsListener listener) {
+        if (poiName.contains("GETCOMMENTN")) {
+            listener.onNewValue(new Comment("GETCOMMENTN", "author", new Date(0), 0));
+            return;
+        }
+        if (poiName.contains("GETCOMMENTF")) {
+            listener.onFailure();
+            return;
+        }
+        if (comments.containsKey(poiName)) {
+            for (Comment c : comments.get(poiName))
+                listener.onNewValue(c);
+        }
     }
 }
