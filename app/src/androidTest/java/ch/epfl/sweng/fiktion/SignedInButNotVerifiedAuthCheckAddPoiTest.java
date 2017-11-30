@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
@@ -23,7 +22,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 
-/**
+/** Tests that verification is required when trying to contribute
  * Created by Rodrigo on 30.11.2017.
  */
 
@@ -42,6 +41,10 @@ public class SignedInButNotVerifiedAuthCheckAddPoiTest {
     public void resetAuth(){
         AuthProvider.destroyInstance();
     }
+    @Before
+    public void resetAuthAfter(){
+        AuthProvider.destroyInstance();
+    }
 
     @Test
     public void AddPoiVerifyCheckTest(){
@@ -58,10 +61,15 @@ public class SignedInButNotVerifiedAuthCheckAddPoiTest {
 
     @Test
     public void AddPoiVerifyCheckCancelTest(){
+
         onView(withText("Cancel"))
                 .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
                 .perform(click());
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
     }
 }
