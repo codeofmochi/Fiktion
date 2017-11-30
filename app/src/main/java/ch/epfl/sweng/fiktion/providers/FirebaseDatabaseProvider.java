@@ -230,6 +230,58 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
+    public void upvote(String poiName, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Object value = dataSnapshot.child("rating").getValue();
+                    // if value is null, then the poi was created before pois had rating, set it to 0
+                    long rating = value == null ? 0 : (long) value;
+                    poiRef.child("rating").setValue(rating + 1);
+                    listener.onSuccess();
+                } else {
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void downvote(String poiName, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Object value = dataSnapshot.child("rating").getValue();
+                    long rating = value == null ? 0 : (long) value;
+                    // if value is null, then the poi was created before pois had rating, set it to 0
+                    poiRef.child("rating").setValue(rating - 1);
+                    listener.onSuccess();
+                } else {
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void findNearPois(Position pos, int radius, final FindNearPoisListener listener) {
         // query the points of interests within the radius

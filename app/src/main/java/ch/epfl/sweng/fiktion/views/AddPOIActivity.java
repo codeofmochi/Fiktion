@@ -18,11 +18,9 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.utils.CollectionsUtils;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LONGITUDE;
 
@@ -42,7 +40,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
         ADD, EDIT
     }
 
-    ;
     private Action action;
     private String editName;
 
@@ -77,7 +74,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
             saveButton.setBackgroundColor(getResources().getColor(R.color.lightGray));
 
             // database request
-            DatabaseSingleton.database.getPoi(editName, new DatabaseProvider.GetPoiListener() {
+            DatabaseProvider.getInstance().getPoi(editName, new DatabaseProvider.GetPoiListener() {
                 @Override
                 public void onSuccess(PointOfInterest poi) {
                     // set fields
@@ -263,7 +260,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
 
             switch (action) {
                 case ADD: {
-                    database.addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
+                    DatabaseProvider.getInstance().addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
                         @Override
                         public void onSuccess() {
                             showToast("The place " + name + " was successfully added");
@@ -287,7 +284,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
                     break;
                 }
                 case EDIT: {
-                    database.modifyPOI(newPoi, new DatabaseProvider.ModifyPOIListener() {
+                    DatabaseProvider.getInstance().modifyPOI(newPoi, new DatabaseProvider.ModifyPOIListener() {
                         @Override
                         public void onSuccess() {
                             showToast("The place " + editName + " was modified");

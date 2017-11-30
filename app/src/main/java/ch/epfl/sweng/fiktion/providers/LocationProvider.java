@@ -16,6 +16,7 @@ public abstract class LocationProvider {
 
     /**
      * Returns the current location in an android.location.Location object
+     *
      * @return Location : current android location
      */
     public Location getLocation() {
@@ -25,10 +26,11 @@ public abstract class LocationProvider {
 
     /**
      * Returns the current position in a Position object
+     *
      * @return Position : current position
      */
     public Position getPosition() {
-        if(location == null) return null;
+        if (location == null) return null;
         else return new Position(this.location.getLatitude(), this.location.getLongitude());
     }
 }

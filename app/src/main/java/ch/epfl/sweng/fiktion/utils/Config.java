@@ -1,9 +1,10 @@
 package ch.epfl.sweng.fiktion.utils;
 
 /**
- * Created by pedro on 20/11/17.
+ * Configuration class
+ *
+ * @author pedro
  */
-
 public class Config {
     public static boolean TEST_MODE = false;
 }

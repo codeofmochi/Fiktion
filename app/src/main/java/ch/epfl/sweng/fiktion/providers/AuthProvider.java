@@ -1,11 +1,45 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.utils.Config;
+
 /**
  * Authentication provider
  * Created by rodri on 17.10.2017.
  */
 
 public abstract class AuthProvider {
+
+    private static AuthProvider auth;
+
+    /**
+     * @return an instance of an authentication provider
+     */
+    public static AuthProvider getInstance() {
+        if (auth == null) {
+            if (Config.TEST_MODE) {
+                auth = new LocalAuthProvider();
+            } else {
+                auth = new FirebaseAuthProvider();
+            }
+        }
+        return auth;
+    }
+
+    /**
+     * Sets the authentication with given instance
+     *
+     * @param authInstance Mock of the authentication instance
+     */
+    public static void setInstance(FirebaseAuthProvider authInstance) {
+        auth = authInstance;
+    }
+
+    /**
+     * Destroys current authentication instance
+     */
+    public static void destroyInstance() {
+        auth = null;
+    }
 
     /**
      * Defines what actions to take on auth op callback
@@ -48,10 +82,11 @@ public abstract class AuthProvider {
 
     /**
      * Creates a new account using the provided informations
-     * @param database where the user data is stored
+     *
      * @param password used to create the account
      */
-    public abstract void createUserWithEmailAndPassword(DatabaseProvider database,String email, String password, final AuthListener listener);
+    public abstract void createUserWithEmailAndPassword(String email, String password, final AuthListener listener);
+
 
     /**
      * Sends a password reset mail, defines what to do afterwards
@@ -76,10 +111,10 @@ public abstract class AuthProvider {
 
     /**
      * starts a request to database to have currently signed in User or null if there is not any
-     * @param database where the user data is stored
+     *
      * @param listener handles what to do after the request
      */
-    public abstract void getCurrentUser(DatabaseProvider database, DatabaseProvider.GetUserListener listener);
+    public abstract void getCurrentUser(DatabaseProvider.GetUserListener listener);
 
     /*
      * Enables the user to change his primary email
