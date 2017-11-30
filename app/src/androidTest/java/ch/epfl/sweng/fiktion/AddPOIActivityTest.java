@@ -30,11 +30,13 @@ import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity;
+import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -81,6 +83,17 @@ public class AddPOIActivityTest {
     @BeforeClass
     public static void setup() {
         Config.TEST_MODE = true;
+        AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+                // we expect success
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
         DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest5",
                 new Position(0, 0), new TreeSet<String>(), "", 0,
                 "", ""), emptyAddPoiListener);
