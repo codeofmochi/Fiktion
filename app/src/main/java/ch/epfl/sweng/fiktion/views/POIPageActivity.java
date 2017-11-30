@@ -181,6 +181,14 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
 
+        // get recycler view for reviews
+        RecyclerView reviewsView = (RecyclerView) findViewById(R.id.reviews);
+        RecyclerView.LayoutManager reviewsLayout = new LinearLayoutManager(this);
+        reviewsView.setLayoutManager(reviewsLayout);
+        reviewsAdapter = new ReviewsAdapter(reviewsData);
+        reviewsView.setAdapter(reviewsAdapter);
+
+
         // get POI from database
         DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
@@ -212,14 +220,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 Snackbar.make(findViewById(R.id.title), R.string.failed_to_fetch_data, Snackbar.LENGTH_INDEFINITE).show();
             }
         });
-
-        // get recycler view for reviews
-        RecyclerView reviewsView = (RecyclerView) findViewById(R.id.reviews);
-        RecyclerView.LayoutManager reviewsLayout = new LinearLayoutManager(this);
-        reviewsView.setLayoutManager(reviewsLayout);
-        reviewsAdapter = new ReviewsAdapter(reviewsData);
-        reviewsView.setAdapter(reviewsAdapter);
-
 
         // get nearby pois views
         nearbyPoisList = (LinearLayout) findViewById(R.id.nearbyPoisList);
@@ -362,7 +362,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     private void downloadComments() {
-        DatabaseProvider.getInstance().getComments(poi.name(), new DatabaseProvider.GetCommentsListener(){
+        DatabaseProvider.getInstance().getComments(poi.name(), new DatabaseProvider.GetCommentsListener() {
 
             @Override
             public void onNewValue(Comment comment) {
@@ -375,6 +375,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
     }
+
     private void downloadPhotos() {
 
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);

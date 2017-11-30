@@ -539,16 +539,22 @@ public class LocalDatabaseTest {
         assertThat(count.get(), is(0));
 
         db.addComment(commentWithText("text"), "poi1", emptyAddCommentListener);
-        db.getComments("poi1", listener);
         assertThat(result.get(), is("good"));
         assertThat(count.get(), is(1));
+        count.set(0);
+
+        db.addComment(commentWithText("text"), "poi2", emptyAddCommentListener);
+        db.getComments("poi2", listener);
+        assertThat(result.get(), is("good"));
+        assertThat(count.get(), is(1));
+        count.set(0);
 
         db.getComments("GETCOMMENTN", listener);
         assertThat(result.get(), is("good"));
-        assertThat(count.get(), is(2));
+        assertThat(count.get(), is(1));
 
         db.getComments("GETCOMMENTF", listener);
         assertThat(result.get(), is("F"));
-        assertThat(count.get(), is(2));
+        assertThat(count.get(), is(1));
     }
 }
