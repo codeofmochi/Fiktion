@@ -190,12 +190,30 @@ public class User {
     }
 
     /**
+     * @param userID The ID of the sender
+     * @return The user with userID in his requests
+     */
+    public User addRequestAndGet(final String userID) {
+        friendRequests.add(userID);
+        return this;
+    }
+
+    /**
      * Removes locally a friend request from the friendRequests
      *
      * @param userID The ID of the sender
      */
     public void removeRequest(final String userID) {
         friendRequests.remove(userID);
+    }
+
+    /**
+     * @param userID The ID of the sender
+     * @return The user without userID in his requests
+     */
+    public User removeRequestAndGet(final String userID) {
+        friendRequests.remove(userID);
+        return this;
     }
 
     /**
@@ -208,12 +226,30 @@ public class User {
     }
 
     /**
+     * @param userID The ID of the friend we want to add
+     * @return The user with userID in his friendlist
+     */
+    public User addFriendAndGet(final String userID) {
+        friendlist.add(userID);
+        return this;
+    }
+
+    /**
      * Removes locally a friend from the friendlist
      *
      * @param userID The ID of the friend we want to remove
      */
     public void removeFriend(final String userID) {
         friendlist.remove(userID);
+    }
+
+    /**
+     * @param userID The ID of the friend we want to remove
+     * @return The user without userID in his friendlist
+     */
+    public User removeFriendAndGet(final String userID) {
+        friendlist.remove(userID);
+        return this;
     }
 
     /**
