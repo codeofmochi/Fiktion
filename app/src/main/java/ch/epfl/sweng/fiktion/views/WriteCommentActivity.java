@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,18 +28,22 @@ public class WriteCommentActivity extends AppCompatActivity {
     public void uploadComment(View view) {
 
         String text = ((EditText) findViewById(R.id.comment)).getText().toString();
-        Comment review = new Comment(text, "testID", java.util.Calendar.getInstance().getTime(), 0);
+        if(!text.isEmpty()) {
+            Comment review = new Comment(text, "testID", java.util.Calendar.getInstance().getTime(), 0);
 
-        DatabaseProvider.getInstance().addComment(review, poiName, new DatabaseProvider.AddCommentListener() {
-            @Override
-            public void onSuccess() {
-                ((EditText) findViewById(R.id.comment)).setText("");
-            }
+            DatabaseProvider.getInstance().addComment(review, poiName, new DatabaseProvider.AddCommentListener() {
+                @Override
+                public void onSuccess() {
+                    finish();
+                }
 
-            @Override
-            public void onFailure() {
-            }
-        });
+                @Override
+                public void onFailure() {
+                }
+            });
+
+
+        }
     }
 
     public void getComments(View view) {
