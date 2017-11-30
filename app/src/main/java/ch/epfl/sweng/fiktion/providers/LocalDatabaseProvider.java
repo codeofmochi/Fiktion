@@ -32,6 +32,8 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final String[] whishList = new String[]{"wish POI"};
     private final String[] visitedList = new String[]{"vis POI"};
 
+    List<GetCommentsListener> getCommentsListeners = new ArrayList<>();
+
     // user has "fav POI" as favourite, "vis POI" in visited and "wish POI" in wishlist
     private final User userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
             new TreeSet<String>(), new TreeSet<String>(), new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>());
@@ -419,6 +421,9 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             poiComments.add(comment);
             comments.put(poiName, poiComments);
         }
+        for (GetCommentsListener l : getCommentsListeners) {
+            l.onNewValue(comment);
+        }
         listener.onSuccess();
     }
 
@@ -435,6 +440,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             listener.onFailure();
             return;
         }
+        getCommentsListeners.add(listener);
         if (comments.containsKey(poiName)) {
             for (Comment c : comments.get(poiName))
                 listener.onNewValue(c);

@@ -316,4 +316,21 @@ public class POIPageActivityTest {
         onView(withId(R.id.cityCountry)).check(matches(withText("city, country")));
     }
 
+    @Test
+    public void writeComment() throws InterruptedException {
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        i.putExtra("USER_NAME", "default");
+        toastRule.launchActivity(i);
+
+        onView(withId(R.id.addReviewButton)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.comment)).check(matches(isDisplayed()));
+        onView(withId(R.id.comment)).perform(typeText("this is a test"));
+        closeSoftKeyboard();
+        onView(withId(R.id.uploadCommentButton)).perform(click());
+        onView(withId(R.id.nearbyTitle)).perform(ViewActions.scrollTo());
+        onView(withText("this is a test")).check(matches(isDisplayed()));
+    }
+
 }

@@ -66,7 +66,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private final int MAXIMUM_SIZE = 1000;
     public static final String POI_NAME = "POI_NAME";
-    public static final String USER_NAME = "USER_NAME";
+    public static final String USER_ID = "USER_ID";
     private final int SEARCH_RADIUS = 20;
 
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
@@ -116,7 +116,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private ImageView mainImage;
     private MapView map;
     private RecyclerView.Adapter reviewsAdapter;
-    private ArrayList<String> reviewsData = new ArrayList<String>();
+    private ArrayList<String> reviewsData = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -361,12 +361,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         upvotes.setText(poi.rating() + " upvotes");
     }
 
-    public void downloadComments() {
+    private void downloadComments() {
         DatabaseProvider.getInstance().getComments(poi.name(), new DatabaseProvider.GetCommentsListener(){
 
             @Override
             public void onNewValue(Comment comment) {
-                reviewsData.add(comment.getText() + System.lineSeparator() + "Written by: " + comment.getAuthorId());
+                reviewsData.add(comment.getText());
                 reviewsAdapter.notifyDataSetChanged();
             }
 
@@ -375,7 +375,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
     }
-    public void downloadPhotos() {
+    private void downloadPhotos() {
 
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
 
@@ -427,7 +427,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
     }
 
-    public void displayNearPois() {
+    private void displayNearPois() {
         // find nearby pois
         DatabaseProvider.getInstance().findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
             @Override
@@ -463,10 +463,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //photo and gallery
 
-    private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
+    private final int REQUEST_CAMERA = 0, SELECT_FILE = 1;
 
     // string to pass to onRequestPerm to know if camera or gallery was chosen
-    String userChoice;
+    private String userChoice;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -625,7 +625,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     public void startWriteCommentActivity(View view) {
         Intent i = new Intent(ctx, WriteCommentActivity.class);
         i.putExtra(POI_NAME, poiName);
-        i.putExtra(USER_NAME, user.getName());
+        i.putExtra(USER_ID, user.getID());
         startActivity(i);
     }
 

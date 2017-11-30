@@ -1,6 +1,5 @@
 package ch.epfl.sweng.fiktion.views;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,15 +9,13 @@ import android.widget.EditText;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
-import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 
-import static ch.epfl.sweng.fiktion.views.POIPageActivity.USER_NAME;
 
 public class WriteCommentActivity extends AppCompatActivity {
 
     private String poiName;
-    private String userName;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,14 +24,14 @@ public class WriteCommentActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         poiName = i.getStringExtra(POIPageActivity.POI_NAME);
-        userName = i.getStringExtra(POIPageActivity.USER_NAME);
+        userId = i.getStringExtra(POIPageActivity.USER_ID);
     }
 
     public void uploadComment(View view) {
 
         String text = ((EditText) findViewById(R.id.comment)).getText().toString();
         if(!text.isEmpty()) {
-            Comment review = new Comment(text, userName, java.util.Calendar.getInstance().getTime(), 0);
+            Comment review = new Comment(text, userId, java.util.Calendar.getInstance().getTime(), 0);
 
             DatabaseProvider.getInstance().addComment(review, poiName, new DatabaseProvider.AddCommentListener() {
                 @Override
