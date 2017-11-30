@@ -49,6 +49,7 @@ import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
+import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -134,7 +135,7 @@ public class POIPageActivityTest {
         onView(withText("Camera")).inRoot(withDecorView(not(is(toastRule.getActivity()
                 .getWindow().getDecorView()))))
                 .check(matches(isDisplayed()));
-        
+
         onView(withText("Cancel")).perform(click());
     }
 
@@ -317,7 +318,7 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void writeComment() throws InterruptedException {
+    public void writeComment() {
 
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
@@ -326,6 +327,9 @@ public class POIPageActivityTest {
 
         onView(withId(R.id.addReviewButton)).perform(ViewActions.scrollTo()).perform(click());
         onView(withId(R.id.comment)).check(matches(isDisplayed()));
+        onView(withId(R.id.uploadCommentButton)).perform(click());
+        onView(withId(R.id.comment)).check(matches(hasErrorText("You can't add an empty comment")));
+
         onView(withId(R.id.comment)).perform(typeText("this is a test"));
         closeSoftKeyboard();
         onView(withId(R.id.uploadCommentButton)).perform(click());

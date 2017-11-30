@@ -30,7 +30,9 @@ public class WriteCommentActivity extends AppCompatActivity {
     public void uploadComment(View view) {
 
         String text = ((EditText) findViewById(R.id.comment)).getText().toString();
-        if(!text.isEmpty()) {
+        if(text.isEmpty()) {
+            ((EditText) findViewById(R.id.comment)).setError("You can't add an empty comment");
+        } else {
             Comment review = new Comment(text, userId, java.util.Calendar.getInstance().getTime(), 0);
 
             DatabaseProvider.getInstance().addComment(review, poiName, new DatabaseProvider.AddCommentListener() {
@@ -46,20 +48,5 @@ public class WriteCommentActivity extends AppCompatActivity {
 
 
         }
-    }
-
-    public void getComments(View view) {
-        // just a call to check the comments in the logs
-        DatabaseProvider.getInstance().getComments(poiName, new DatabaseProvider.GetCommentsListener() {
-            @Override
-            public void onNewValue(Comment comment) {
-                Log.d("comments", "onNewValue: " + comment.getText());
-            }
-
-            @Override
-            public void onFailure() {
-                Log.d("comments", "onFailure: ");
-            }
-        });
     }
 }
