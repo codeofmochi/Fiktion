@@ -181,292 +181,39 @@ public class User {
     }
 
     /**
-     * Accept a friend request by adding it to the friend list if it is in the requests
-     *
-     * @param friendID the friend (user) that the user want to add to his friend list
-     * @param listener Handles what happens in case of success or failure of the change
-     */
-    public void acceptFriendRequest(final String friendID, final DatabaseProvider.ModifyUserListener listener) {
-        if (friendRequests.contains(friendID)) {
-            // Access other user (friend)
-            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User user) {
-                    // modify the friend
-                    DatabaseProvider.getInstance().modifyUser(user.addFriend(id), new DatabaseProvider.ModifyUserListener() {
-                        @Override
-                        public void onSuccess() {
-                            // modify the user
-                            DatabaseProvider.getInstance().modifyUser(User.this.removeRequest(friendID).addFriend(friendID), new DatabaseProvider.ModifyUserListener() {
-                                @Override
-                                public void onSuccess() {
-                                    listener.onSuccess();
-                                }
-
-                                @Override
-                                public void onDoesntExist() {
-                                    // --> the user accepting the request doesn't exist anymore
-                                    listener.onDoesntExist();
-                                }
-
-                                @Override
-                                public void onFailure() {
-                                    // --> error modifying the user, revert local changes
-                                    User.this.addRequest(friendID);
-                                    User.this.removeFriend(friendID);
-                                    listener.onFailure();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onDoesntExist() {
-                            // --> friend we just accessed doesn't exist anymore
-                            listener.onDoesntExist();
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            // --> error on modifying friend
-                            listener.onFailure();
-                        }
-                    });
-                }
-
-                @Override
-                public void onDoesntExist() {
-                    // --> report that friend doesn't exist
-                    listener.onDoesntExist();
-                }
-
-                @Override
-                public void onFailure() {
-                    // --> report couldn't access friend (database error)
-                    listener.onFailure();
-                }
-            });
-        } else {
-            // should not happen, false request (programmer error)
-            listener.onFailure();
-        }
-    }
-
-    /**
-     * Ignore friend request by removing it from the request list
-     *
-     * @param friendID The friend (user) ID the user wants to ignore
-     * @param listener Handles what happens in case of success or failure of the change
-     */
-    public void ignoreFriendRequest(final String friendID, final AuthProvider.AuthListener listener) {
-        if (friendRequests.remove(friendID)) {
-            // modify user
-            DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
-                @Override
-                public void onSuccess() {
-                    listener.onSuccess();
-                }
-
-                @Override
-                public void onDoesntExist() {
-                    listener.onFailure();
-                }
-
-                @Override
-                public void onFailure() {
-                    friendRequests.add(friendID);
-                    listener.onFailure();
-                }
-            });
-        } else {
-            // --> trying to remove a request that is not in the requestList
-            listener.onFailure();
-        }
-    }
-
-    /**
-     * Send a friend request to the friend (user) that the user wants to add as a friend
-     *
-     * @param friendID The friend (user) that the user wants to add
-     * @param listener Handles what happens in case of success or failure of the change
-     */
-    public void sendFriendRequest(final String friendID, final userListener listener) {
-        if (!friendlist.contains(friendID)) {
-            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User user) {
-                    // add the request in the friend's requests list
-                    addTofriendRequests(user, listener);
-                }
-
-                @Override
-                public void onDoesntExist() {
-                    listener.onDoesntExist();
-                }
-
-                @Override
-                public void onFailure() {
-                    listener.onFailure();
-                }
-            });
-        } else {
-            // friend already in friendlist
-            listener.onFriendlistException();
-        }
-    }
-
-    /**
-     * Adds a friend request to the friendRequests
+     * Adds locally a friend request to the friendRequests
      *
      * @param userID The ID of the sender
-     * @return The user with the friend added in his requestList
      */
-    private User addRequest(final String userID) {
+    public void addRequest(final String userID) {
         friendRequests.add(userID);
-        return this;
     }
 
     /**
+     * Removes locally a friend request from the friendRequests
+     *
      * @param userID The ID of the sender
-     * @return The user with the friend removed from his requestList
      */
-    private User removeRequest(final String userID) {
+    public void removeRequest(final String userID) {
         friendRequests.remove(userID);
-        return this;
     }
 
     /**
-     * Adds a friend to the friendlist
+     * Adds locally a friend to the friendlist
      *
      * @param userID The ID of the friend we want to add
-     * @return The user with the the friend added in his friendlist
      */
-    private User addFriend(final String userID) {
+    public void addFriend(final String userID) {
         friendlist.add(userID);
-        return this;
     }
 
     /**
-     * Remove a friend from the friendlist
+     * Removes locally a friend from the friendlist
      *
-     * @param userID The ID of the friend we want to add
-     * @return The user with the friend removed from the friendlist
+     * @param userID The ID of the friend we want to remove
      */
-    private User removeFriend(final String userID) {
+    public void removeFriend(final String userID) {
         friendlist.remove(userID);
-        return this;
-    }
-
-    // User can be final ?
-
-    /**
-     * Adds a friend request in the friend requests list of a user
-     *
-     * @param user     The user we want to add the request to
-     * @param listener Handles what happens in case of success or failure of the change
-     */
-    private void addTofriendRequests(User user, final userListener listener) {
-        DatabaseProvider.getInstance().modifyUser(user.addRequest(id), new DatabaseProvider.ModifyUserListener() {
-            @Override
-            public void onSuccess() {
-                listener.onSuccess();
-            }
-
-            @Override
-            public void onDoesntExist() {
-                listener.onDoesntExist();
-            }
-
-            @Override
-            public void onFailure() {
-                listener.onFailure();
-            }
-        });
-    }
-
-    /**
-     * Helper function for removeFromfriendlist removing friend from user's friendlist
-     *
-     * @param instance Instance of the user we want to remove the friend
-     * @param friendID The friend we want to remove
-     * @param listener Handles what happens in case of success or failure of the change
-     */
-    private void removeFriendFromUserHelper(User instance, final String friendID, final userListener listener) {
-        // modify user
-        DatabaseProvider.getInstance().modifyUser(instance.removeFriend(friendID), new DatabaseProvider.ModifyUserListener() {
-            @Override
-            public void onSuccess() {
-                listener.onSuccess();
-            }
-
-            @Override
-            public void onDoesntExist() {
-                // --> (should not happen)
-                // User performing removal is not in the database anymore
-                listener.onFailure();
-            }
-
-            @Override
-            public void onFailure() {
-                // --> user is not in friend list anymore, but has friend in his list
-                // Needs to perform the action again
-                listener.onFailure();
-            }
-        });
-    }
-
-    /**
-     * Removes given friendID from the friend list
-     *
-     * @param friendID user (friend) ID that the user wants to remove
-     * @param listener Handles what happens in case of success or failure of the change
-     */
-    public void removeFromFriendlist(final String friendID, final userListener listener) {
-        if (friendlist.remove(friendID)) {
-            // get friend user
-            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User user) {
-                    // modify friend, remove user from friend list
-                    DatabaseProvider.getInstance().modifyUser(user.removeFriend(id), new DatabaseProvider.ModifyUserListener() {
-                        @Override
-                        public void onSuccess() {
-                            // modify user
-                            removeFriendFromUserHelper(User.this, friendID, listener);
-                        }
-
-                        @Override
-                        public void onDoesntExist() {
-                            // --> no modifications needed on friend, just on user
-                            // modify user
-                            removeFriendFromUserHelper(User.this, friendID, listener);
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            // --> error, re-add friend locally
-                            friendlist.add(friendID);
-                            listener.onFailure();
-                        }
-                    });
-                }
-
-                @Override
-                public void onDoesntExist() {
-                    // --> no modifications needed on friend, just on user
-                    // modify user
-                    removeFriendFromUserHelper(User.this, friendID, listener);
-                }
-
-                @Override
-                public void onFailure() {
-                    // --> error, re-add friend locally
-                    friendlist.add(friendID);
-                    listener.onFailure();
-                }
-            });
-        } else {
-            listener.onFriendlistException();
-        }
     }
 
     /**
@@ -701,31 +448,6 @@ public class User {
 
         return this.name.equals(otherUser.name)
                 && this.id.equals(otherUser.id);
-    }
-
-    /**
-     * Interface userListener to handle friendExceptions
-     */
-    public interface userListener {
-        /**
-         * what to do if action succeed
-         */
-        void onSuccess();
-
-        /**
-         * What to do if there is a problem with the friendlist
-         */
-        void onFriendlistException();
-
-        /**
-         * what to do if no matching user id is found
-         */
-        void onDoesntExist();
-
-        /**
-         * what to do if the action fails
-         */
-        void onFailure();
     }
 
     /**
