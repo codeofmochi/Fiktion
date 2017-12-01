@@ -48,6 +48,7 @@ public class SignedInButNotVerifiedAuthCheckAddPoiTest {
 
     @Test
     public void AddPoiVerifyCheckTest(){
+
         onView(withText("Verify"))
                 .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
                 .perform(click());
@@ -55,8 +56,12 @@ public class SignedInButNotVerifiedAuthCheckAddPoiTest {
         onView(withText("Refresh"))
                 .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
                 .perform(click());
-
-        onView(withId(R.id.add_poi_country)).check(matches(isDisplayed()));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.add_poi_main_constraint)).check(matches(isDisplayed()));
     }
 
     @Test
