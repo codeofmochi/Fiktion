@@ -25,11 +25,11 @@ public class UserController {
             // set each other as friend and remove from requests
             DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess(final User user) {
+                public void onSuccess(User user) {
                     DatabaseProvider.getInstance().modifyUser(user.addFriendAndGet(user.getID()), new DatabaseProvider.ModifyUserListener() {
                         @Override
                         public void onSuccess() {
-                            DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(user.getID()), new DatabaseProvider.ModifyUserListener() {
+                            DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
                                 @Override
                                 public void onSuccess() {
                                     listener.onNewFriend();
@@ -37,13 +37,13 @@ public class UserController {
 
                                 @Override
                                 public void onDoesntExist() {
-                                    localUser.removeFriend(user.getID());
+                                    localUser.removeFriend(friendID);
                                     listener.onFailure();
                                 }
 
                                 @Override
                                 public void onFailure() {
-                                    localUser.removeFriend(user.getID());
+                                    localUser.removeFriend(friendID);
                                     listener.onFailure();
                                 }
                             });
@@ -75,11 +75,11 @@ public class UserController {
             // add user id in friend's requestList
             DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess(final User user) {
+                public void onSuccess(User user) {
                     // if the sender is in user friend list (caused by a previous database modification error)
                     if(user.getFriendlist().contains(localUser.getID())) {
                         // add friend to sender's friendlist
-                        DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(user.getID()), new DatabaseProvider.ModifyUserListener() {
+                        DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
                             @Override
                             public void onSuccess() {
                                 listener.onNewFriend();
@@ -87,13 +87,13 @@ public class UserController {
 
                             @Override
                             public void onDoesntExist() {
-                                localUser.removeFriend(user.getID());
+                                localUser.removeFriend(friendID);
                                 listener.onFailure();
                             }
 
                             @Override
                             public void onFailure() {
-                                localUser.removeFriend(user.getID());
+                                localUser.removeFriend(friendID);
                                 listener.onFailure();
                             }
                         });
@@ -192,23 +192,115 @@ public class UserController {
     }
 
     /**
+     * Ignores the friend request requestID received by localUser
      *
-     * @param localUser
-     * @param requestID
-     * @param listener
+     * @param localUser The local user
+     * @param requestID The user ID that the local user wants to ignore
+     * @param listener The listener handling every DB responses
      */
-    public void ignoreFriendRequest(final User localUser, final String requestID, final RequestListener listener) {
+    public void ignoreFriendRequest(final User localUser, final String requestID, final BinaryListener listener) {
+        DatabaseProvider.getInstance().modifyUser(localUser.removeRequestAndGet(requestID), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                listener.onSuccess();
+            }
 
+            @Override
+            public void onDoesntExist() {
+                localUser.addRequest(requestID);
+                listener.onFailure();
+            }
+
+            @Override
+            public void onFailure() {
+                localUser.addRequest(requestID);
+                listener.onFailure();
+            }
+        });
     }
 
     /**
+     * Removes localUser and user with id friendID from each other's friendlist
+     * (In case of failure, it can happen that localUser is not in friend's friendlist but has friendID in his list,
+     *  the problem can be fixed by repeating the action)
      *
-     * @param localUser
-     * @param friendID
-     * @param listener
+     * @param localUser The local user
+     * @param friendID The id of the friend that the local user wants to remove
+     * @param listener The listener handling every DB responses
      */
-    public void removeFromFriendList(final User localUser, final String friendID, final RequestListener listener) {
+    public void removeFromFriendList(final User localUser, final String friendID, final BinaryListener listener) {
+        DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                DatabaseProvider.getInstance().modifyUser(user.removeFriendAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
+                    @Override
+                    public void onSuccess() {
+                        removeFromLocalUserFriendList(localUser, friendID, listener);
+                    }
 
+                    @Override
+                    public void onDoesntExist() {
+                        removeFromLocalUserFriendList(localUser, friendID, listener);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        listener.onFailure();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                removeFromLocalUserFriendList(localUser, friendID, listener);
+            }
+
+            @Override
+            public void onFailure() {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * Removes user with id friendID from localUser's friendList
+     * (helper method for removeFromFriendList)
+     *
+     * @param localUser The local user
+     * @param friendID The id of the friend that the local user wants to remove
+     * @param listener The listener handling every DB responses
+     */
+    private void removeFromLocalUserFriendList(final User localUser, final String friendID, final BinaryListener listener) {
+        DatabaseProvider.getInstance().modifyUser(localUser.removeFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                localUser.addFriend(friendID);
+                listener.onFailure();
+            }
+
+            @Override
+            public void onFailure() {
+                localUser.addFriend(friendID);
+                listener.onFailure();
+            }
+        });
+    }
+
+    public interface BinaryListener {
+        /**
+         * what to do if action succeed
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the action fails
+         */
+        void onFailure();
     }
 
     public interface RequestListener {
