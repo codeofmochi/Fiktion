@@ -125,7 +125,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
     @Override
     public void onStart() {
         super.onStart();
-        AuthenticationChecks.checkAuthState(this);
     }
 
 

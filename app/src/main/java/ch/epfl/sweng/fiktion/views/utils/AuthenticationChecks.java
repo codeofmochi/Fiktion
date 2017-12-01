@@ -54,7 +54,7 @@ public class AuthenticationChecks {
 
 
         // Sets up the dialog builder
-        refreshBuilder.setMessage("You need to verify your account before contributing to Fiktion!")
+        refreshBuilder.setMessage("You need to verify your Fiktion account!")
                 .setTitle("Fiktion")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Verify", null)
@@ -68,7 +68,6 @@ public class AuthenticationChecks {
                 ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        goHome(ctx);
                         verifyDialog.cancel();
                     }
                 });
