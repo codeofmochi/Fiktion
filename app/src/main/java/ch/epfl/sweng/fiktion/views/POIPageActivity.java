@@ -57,6 +57,7 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
@@ -470,8 +471,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //photo and gallery
 
-    private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
-
     // string to pass to onRequestPerm to know if camera or gallery was chosen
     String userChoice;
 
@@ -536,7 +535,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     //camera intent
     private void intentCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, REQUEST_CAMERA);
+        startActivityForResult(intent, ActivityCodes.REQUEST_CAMERA);
     }
 
 
@@ -545,18 +544,21 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         Intent gallery = new Intent();
         gallery.setType("image/*");
         gallery.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(gallery, "Select File"), SELECT_FILE);
+        startActivityForResult(Intent.createChooser(gallery, "Select File"), ActivityCodes.SELECT_FILE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE) {
+            if (requestCode == ActivityCodes.SELECT_FILE) {
                 onGalleryResult(data);
-            } else if (requestCode == REQUEST_CAMERA) {
+            } else if (requestCode == ActivityCodes.REQUEST_CAMERA) {
                 onCameraResult(data);
+            } else if (requestCode == ActivityCodes.SIGNIN_REQUEST) {
+                recreate();
             }
+
         }
     }
 
@@ -575,6 +577,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void onCameraResult(Intent data) {
 
+        if(data==null){
+            return;
+        }
         Bitmap image = (Bitmap) data.getExtras().get("data");
         if (image == null) {
             return;
