@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -120,7 +121,7 @@ public abstract class DatabaseProvider {
     /**
      * parent listener for searching points of interest
      */
-    public interface SearchPOIsListener {
+    private interface SearchPOIsListener {
 
         /**
          * what to do when we get a new near point of interest
@@ -250,7 +251,7 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
-    public interface OperationOnExistingUserListener {
+    private interface OperationOnExistingUserListener {
 
         /**
          * what to do if the deletion succeeded
@@ -311,4 +312,43 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void modifyUser(User user, ModifyUserListener listener);
+
+    /**
+     * Listener that listens the result of the add
+     */
+    public interface AddCommentListener {
+
+        /**
+         * what to do if the addition succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the addition failed
+         */
+        void onFailure();
+    }
+
+    public interface GetCommentsListener {
+        void onNewValue(Comment comment);
+
+        void onFailure();
+    }
+
+    /**
+     * add a comment, inform the listener of the result
+     *
+     * @param comment  the comment to add
+     * @param poiName  the name of the POI
+     * @param listener the listener
+     */
+    public abstract void addComment(Comment comment, String poiName, AddCommentListener listener);
+
+    /**
+     * get the comments of a poi, inform the listener of the results
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void getComments(String poiName, GetCommentsListener listener);
 }
