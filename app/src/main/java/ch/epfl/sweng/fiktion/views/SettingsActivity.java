@@ -381,7 +381,6 @@ public class SettingsActivity extends MenuDrawerActivity {
      * @param view The caller view
      */
     public void redirectToLogin(View view) {
-        System.out.print("redirecting");
         Intent i = new Intent(this, SignInActivity.class);
         startActivityForResult(i, SIGNIN_REQUEST);
     }
