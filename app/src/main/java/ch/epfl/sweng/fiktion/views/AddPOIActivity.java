@@ -1,8 +1,11 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -17,9 +20,11 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.CollectionsUtils;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LONGITUDE;
@@ -34,6 +39,9 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private static final int LOCATION_RESULT = 1;
     // this activity's context
     private Context ctx = this;
+    // activities codes
+    private final int SIGNIN_REQUEST = 0;
+
 
     // this activity can either add or edit POIs
     private enum Action {
@@ -114,6 +122,13 @@ public class AddPOIActivity extends MenuDrawerActivity {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        AuthenticationChecks.checkAuthState(this);
+    }
+
+
     /**
      * Triggered when an activity launched from here returns a value
      *
@@ -124,17 +139,25 @@ public class AddPOIActivity extends MenuDrawerActivity {
     @Override
     @SuppressLint("SetTextI18n") // latitude and longitude are inputs, not hardcoded
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LOCATION_RESULT) {
-            if (resultCode == RESULT_OK) {
-                Double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
-                Double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
+        switch (requestCode) {
+            case LOCATION_RESULT:
+                if (resultCode == RESULT_OK) {
+                    Double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
+                    Double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
 
 
-                ((EditText) findViewById(R.id.add_poi_latitude)).setText(latitude.toString());
-                ((EditText) findViewById(R.id.add_poi_longitude)).setText(longitude.toString());
+                    ((EditText) findViewById(R.id.add_poi_latitude)).setText(latitude.toString());
+                    ((EditText) findViewById(R.id.add_poi_longitude)).setText(longitude.toString());
+                }
+            case SIGNIN_REQUEST: {
+                if (resultCode == RESULT_OK) {
+                    this.recreate();
+                }
+                break;
             }
         }
     }
+
 
     /**
      * Triggered when the "From Map" button is clicked
@@ -324,4 +347,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private static boolean isNumeric(String str) {
         return str.matches("-?\\d+(\\.\\d+)?");
     }
+
+
 }
