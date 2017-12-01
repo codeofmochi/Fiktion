@@ -43,11 +43,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -63,10 +65,12 @@ import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
     private final int MAXIMUM_SIZE = 1000;
+    public static final String POI_NAME = "POI_NAME";
+    public static final String USER_ID = "USER_ID";
     private final int SEARCH_RADIUS = 20;
 
     public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
-        private String[] data;
+        private ArrayList<String> data;
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public TextView text;
@@ -77,7 +81,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         }
 
-        public ReviewsAdapter(String[] data) {
+        public ReviewsAdapter(ArrayList<String> data) {
             this.data = data;
         }
 
@@ -89,12 +93,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.text.setText(data[position]);
+            holder.text.setText(data.get(position));
         }
 
         @Override
         public int getItemCount() {
-            return data.length;
+            return data.size();
         }
     }
 
@@ -111,12 +115,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private ImageView noImages;
     private ImageView mainImage;
     private MapView map;
-    private String[] reviewsData = {
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue dolor at auctor scelerisque. Duis sodales eros velit, sit amet tincidunt ex pharetra ac. Pellentesque pellentesque et augue ut pellentesque. Suspendisse in lacinia nunc. Integer consequat sollicitudin ligula sed finibus.",
-            "Curabitur condimentum ligula eu diam maximus porttitor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse metus urna, tincidunt sed augue ac, consectetur congue felis. Pellentesque efficitur enim et ultrices pellentesque.",
-            "Curabitur quis lectus eu ex volutpat eleifend. Sed iaculis orci ut odio sodales, id lobortis est volutpat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae",
-            "Proin suscipit, mauris quis ullamcorper fringilla, mi nibh cursus felis, aliquet aliquam est ligula ut lacus. Suspendisse in lacus vitae urna ornare posuere ut nec massa. Curabitur maximus ullamcorper venenatis. Nulla pulvinar arcu a purus pulvinar rhoncus. ",
-    };
+    private RecyclerView.Adapter reviewsAdapter;
+    private ArrayList<String> reviewsData = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +181,14 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
 
+        // get recycler view for reviews
+        RecyclerView reviewsView = (RecyclerView) findViewById(R.id.reviews);
+        RecyclerView.LayoutManager reviewsLayout = new LinearLayoutManager(this);
+        reviewsView.setLayoutManager(reviewsLayout);
+        reviewsAdapter = new ReviewsAdapter(reviewsData);
+        reviewsView.setAdapter(reviewsAdapter);
+
+
         // get POI from database
         DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
@@ -189,6 +197,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 downloadPhotos();
                 callMap();
                 displayNearPois();
+                downloadComments();
                 setPOIInformation();
                 // hide loading spinner
                 ProgressBar spinner = (ProgressBar) findViewById(R.id.loadingSpinner);
@@ -211,13 +220,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 Snackbar.make(findViewById(R.id.title), R.string.failed_to_fetch_data, Snackbar.LENGTH_INDEFINITE).show();
             }
         });
-
-        // get recycler view for reviews
-        RecyclerView reviewsView = (RecyclerView) findViewById(R.id.reviews);
-        RecyclerView.LayoutManager reviewsLayout = new LinearLayoutManager(this);
-        reviewsView.setLayoutManager(reviewsLayout);
-        RecyclerView.Adapter reviewsAdapter = new ReviewsAdapter(reviewsData);
-        reviewsView.setAdapter(reviewsAdapter);
 
         // get nearby pois views
         nearbyPoisList = (LinearLayout) findViewById(R.id.nearbyPoisList);
@@ -359,7 +361,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         upvotes.setText(poi.rating() + " upvotes");
     }
 
-    public void downloadPhotos() {
+    private void downloadComments() {
+        DatabaseProvider.getInstance().getComments(poi.name(), new DatabaseProvider.GetCommentsListener() {
+
+            @Override
+            public void onNewValue(Comment comment) {
+                reviewsData.add(comment.getText());
+                reviewsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+    }
+
+    private void downloadPhotos() {
 
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
 
@@ -411,7 +428,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
     }
 
-    public void displayNearPois() {
+    private void displayNearPois() {
         // find nearby pois
         DatabaseProvider.getInstance().findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
             @Override
@@ -447,10 +464,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //photo and gallery
 
-    private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
+    private final int REQUEST_CAMERA = 0, SELECT_FILE = 1;
 
     // string to pass to onRequestPerm to know if camera or gallery was chosen
-    String userChoice;
+    private String userChoice;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -604,6 +621,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 uploadProgressBar.setProgress((int) progress);
             }
         });
+    }
+
+    public void startWriteCommentActivity(View view) {
+        Intent i = new Intent(ctx, WriteCommentActivity.class);
+        i.putExtra(POI_NAME, poiName);
+        i.putExtra(USER_ID, user.getID());
+        startActivity(i);
     }
 
     /**
