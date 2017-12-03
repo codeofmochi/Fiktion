@@ -1,10 +1,12 @@
 package ch.epfl.sweng.fiktion;
 
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,6 +64,12 @@ public class NotSignedInPoiPageActivity {
     public void resetProviders() {
         AuthProvider.destroyInstance();
         AuthProvider.getInstance().signOut();
+    }
+
+    @AfterClass
+    public static void finish(){
+        AuthProvider.destroyInstance();
+        DatabaseProvider.destroyInstance();
     }
 
     @Test

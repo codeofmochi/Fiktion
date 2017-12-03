@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,7 +67,6 @@ import static org.hamcrest.core.IsNot.not;
 
 public class POIPageActivityTest {
 
-    private PhotoProvider photoProvider = PhotoProvider.getInstance();
 
     @Rule
     public final IntentsTestRule<POIPageActivity> toastRule =
@@ -124,9 +124,63 @@ public class POIPageActivityTest {
         });
     }
 
+
+    @Before
+    public void beforeReset(){
+        DatabaseProvider.destroyInstance();
+        AuthProvider.destroyInstance();
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onAlreadyExists() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+        AuthProvider.getInstance().signIn("default@email.ch", "testing", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+            }
+
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+        AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+    }
     @After
     public void resetPhotoProvider() {
         PhotoProvider.destroyInstance();
+        DatabaseProvider.destroyInstance();
+        AuthProvider.destroyInstance();
     }
 
     @AfterClass
@@ -174,7 +228,7 @@ public class POIPageActivityTest {
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
-        photoProvider.downloadPOIBitmaps("poiTest", ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().downloadPOIBitmaps("poiTest", ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
                 bitmaps.add(b);
@@ -194,7 +248,7 @@ public class POIPageActivityTest {
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
-        photoProvider.uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -209,7 +263,7 @@ public class POIPageActivityTest {
         });
 
         b = BitmapFactory.decodeResource(InstrumentationRegistry.getTargetContext().getResources(), R.mipmap.ic_launcher_round);
-        photoProvider.uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -346,7 +400,7 @@ public class POIPageActivityTest {
         onView(withText("Wishlist"))
                 .inRoot(withDecorView(not(is(toastRule.getActivity().getWindow().getDecorView()))))
                 .perform(click());
-        assertTrue(user.getFavourites().contains("poiTest"));
+        assertTrue(user.getWishlist().contains("poiTest"));
 
     }
 
