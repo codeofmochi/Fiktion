@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
-import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 
 import static android.support.test.espresso.Espresso.onData;
@@ -43,20 +42,7 @@ public class NotSignedInAuthCheckAddPoiTest {
     private final ViewInteraction homeMainLayout = onView(withId(R.id.home_main_layout));
     private final ViewInteraction menuDrawer = onView(withId(R.id.menu_drawer));
 
-
-    private final AuthProvider.AuthListener emptyListener = new AuthProvider.AuthListener() {
-        @Override
-        public void onSuccess() {
-
-        }
-
-        @Override
-        public void onFailure() {
-
-        }
-    };
-
-        @Rule
+    @Rule
     public final ActivityTestRule<HomeActivity> mActivityRule =
             new ActivityTestRule<>(HomeActivity.class);
 
@@ -68,8 +54,8 @@ public class NotSignedInAuthCheckAddPoiTest {
     @BeforeClass
     public static void setConfig() {
         Config.TEST_MODE = true;
+        AuthProvider.destroyInstance();
         AuthProvider.getInstance().signOut();
-
     }
 
     @After
@@ -92,10 +78,6 @@ public class NotSignedInAuthCheckAddPoiTest {
         onView(withId(R.id.User_Email)).perform(typeText("default@email.ch"), closeSoftKeyboard());
         onView(withId(R.id.User_Password)).perform(typeText("testing"), closeSoftKeyboard());
         onView(withId(R.id.SignInButton)).perform(click());
-
-        onView(withText("Verify"))
-                .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
-                .check(matches(isDisplayed()));
 
     }
 

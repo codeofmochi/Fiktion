@@ -177,8 +177,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             @Override
             public void onSuccess(User user) {
                 setUser(user);
-
-
                 if (user.getUpvoted().contains(poiName)) {
                     upvoted = true;
                     upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -676,13 +674,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.favorite:
+                    case R.id.favourite:
                         // check if user is connected and has a valid account
                         AuthenticationChecks.checkAuthState((Activity)ctx);
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
-                            return false;
+                            return true;
                         }
                         user.addFavourite(poiName, new DatabaseProvider.ModifyUserListener() {
                             @Override
@@ -707,7 +705,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
-                            return false;
+                            return true;
                         }
                         user.addToWishlist(poiName, new DatabaseProvider.ModifyUserListener() {
                             @Override
@@ -732,7 +730,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
-                            return false;
+                            return true;
                         }
                         Intent i = new Intent(ctx, AddPOIActivity.class);
                         i.putExtra("EDIT_POI_NAME", poiName);
@@ -744,6 +742,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
         popup.show();
+
     }
 
 

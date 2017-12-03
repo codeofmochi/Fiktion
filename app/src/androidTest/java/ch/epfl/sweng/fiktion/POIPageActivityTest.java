@@ -287,6 +287,70 @@ public class POIPageActivityTest {
     }
 
     @Test
+    public void testFavourite(){
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setUser(user);
+            }
+
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Favourite"))
+                .inRoot(withDecorView(not(is(toastRule.getActivity().getWindow().getDecorView()))))
+                .check(matches(isDisplayed()));
+        onView(withText("Favourite"))
+                .inRoot(withDecorView(not(is(toastRule.getActivity().getWindow().getDecorView()))))
+                .perform(click());
+        assertTrue(user.getFavourites().contains("poiTest"));
+
+    }
+
+    @Test
+    public void testWishlist(){
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setUser(user);
+            }
+
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Wishlist"))
+                .inRoot(withDecorView(not(is(toastRule.getActivity().getWindow().getDecorView()))))
+                .check(matches(isDisplayed()));
+        onView(withText("Wishlist"))
+                .inRoot(withDecorView(not(is(toastRule.getActivity().getWindow().getDecorView()))))
+                .perform(click());
+        assertTrue(user.getFavourites().contains("poiTest"));
+
+    }
+
+    @Test
     public void testModifyExistingPoi() {
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
