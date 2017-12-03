@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.util.Log;
-
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -13,7 +11,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.Comment;
@@ -83,6 +80,12 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                 .replace("%H", "#")
                 .replace("%S", "/");
     }
+
+    /*
+     * --------------------------------------------------------------------------------
+     * ----------------------------------POI methods-----------------------------------
+     * --------------------------------------------------------------------------------
+     */
 
     /**
      * {@inheritDoc}
@@ -242,18 +245,24 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    // get the rating value of the poi
                     Object value = dataSnapshot.child("rating").getValue();
-                    // if value is null, then the poi was created before pois had rating, set it to 0
-                    long rating = value == null ? 0 : (long) value;
-                    poiRef.child("rating").setValue(rating + 1);
+
+                    // if the poi doesn't have the field rating, set it to 0 (+1 for the upvote)
+                    long newRating = value == null ? 1 : (long) value + 1;
+                    poiRef.child("rating").setValue(newRating);
+
+                    // inform the listener that the upvote succeeded
                     listener.onSuccess();
                 } else {
+                    // inform the listener that the poi doesn't exist
                     listener.onDoesntExist();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the upvote failed
                 listener.onFailure();
             }
         });
@@ -268,18 +277,37 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    // get the rating value of the poi
                     Object value = dataSnapshot.child("rating").getValue();
-                    long rating = value == null ? 0 : (long) value;
-                    // if value is null, then the poi was created before pois had rating, set it to 0
-                    poiRef.child("rating").setValue(rating - 1);
+
+                    long newRating;
+                    if (value == null) {
+                        // if the poi doesn't have the field rating, set it to 0
+                        newRating = 0;
+                    } else {
+                        // decrement the rating value
+                        newRating = (long) value - 1;
+                        if (newRating < 0) {
+                            // this should not happen since we are removing a vote from someone who
+                            // upvoted but if the rating is negative, set it to 0
+                            newRating = 0;
+                        }
+                    }
+
+                    // set the new rating
+                    poiRef.child("rating").setValue(newRating);
+
+                    // inform the listener that the downvote succeeded
                     listener.onSuccess();
                 } else {
+                    // inform the listener that the poi doesn't exist
                     listener.onDoesntExist();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
                 listener.onFailure();
             }
         });
@@ -381,6 +409,12 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             }
         });
     }
+
+    /*
+     * --------------------------------------------------------------------------------
+     * ----------------------------------User methods----------------------------------
+     * --------------------------------------------------------------------------------
+     */
 
     /**
      * {@inheritDoc}
@@ -508,6 +542,12 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             }
         });
     }
+
+    /*
+     * --------------------------------------------------------------------------------
+     * --------------------------------Comment methods---------------------------------
+     * --------------------------------------------------------------------------------
+     */
 
     /**
      * {@inheritDoc}

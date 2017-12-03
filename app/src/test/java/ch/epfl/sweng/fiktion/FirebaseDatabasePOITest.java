@@ -278,7 +278,7 @@ public class FirebaseDatabasePOITest {
 
         when(snapshot.getValue()).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
-        assertThat(value.getValue(), is((long) -1));
+        assertThat(value.getValue(), is((long) 0));
         assertThat(result.get(), is("SUCCESS"));
 
         when(snapshot.exists()).thenReturn(false);
