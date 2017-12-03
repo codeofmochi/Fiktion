@@ -130,11 +130,11 @@ public class LocalDatabaseTest {
         assertThat(result.get(), is("D"));
 
         db.addPoi(poi, emptyAddPOIListener);
-
-        db.getPoi("poi", listener);
         assertThat(result.get(), is("S"));
+
         db.getPoi("poi2", listener);
         assertThat(result.get(), is("D"));
+
         String s = "GETPOIS";
         String m = "GETPOIM";
         String d = "GETPOID";

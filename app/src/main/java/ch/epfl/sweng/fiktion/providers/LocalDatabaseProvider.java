@@ -56,6 +56,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private Map<String, List<Comment>> comments = new TreeMap<>();
 
     private Map<String, Set<GetCommentsListener>> getCommentsListeners = new TreeMap<>();
+    private Map<String, Set<GetPoiListener>> getPOIListeners = new TreeMap();
 
     /**
      * {@inheritDoc}
@@ -81,6 +82,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         } else {
             // add the poi
             poiList.add(poi);
+
+            // inform the listeners that listen the retrieval of a poi with poi.name that it now exists
+            if (getPOIListeners.containsKey(poi.name())) {
+                for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                    getPOIListener.onSuccess(poi);
+                }
+            }
+
             // inform the listener that the operation succeeded
             listener.onSuccess();
         }
@@ -119,6 +128,12 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             return;
         }
 
+
+        if (!getPOIListeners.containsKey(name)) {
+            getPOIListeners.put(name, new HashSet<GetPoiListener>());
+        }
+        getPOIListeners.get(name).add(listener);
+
         for (PointOfInterest poi : poiList) {
             if (poi.name().equals(name)) {
                 // inform the listener that we have the poi
@@ -126,6 +141,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 return;
             }
         }
+
         // inform the listener that the poi doesnt exist
         listener.onDoesntExist();
     }
@@ -152,6 +168,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             if (poi.equals(poiList.get(i))) {
                 poiList.set(i, poi);
                 listener.onSuccess();
+
+                // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
+                if (getPOIListeners.containsKey(poi.name())) {
+                    for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                        getPOIListener.onModified(poi);
+                    }
+                }
+
                 return;
             }
         }
@@ -182,6 +206,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 PointOfInterest poiPlus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
                         poi.description(), poi.rating() + 1, poi.country(), poi.city());
                 poiList.set(i, poiPlus);
+
+                // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
+                if (getPOIListeners.containsKey(poi.name())) {
+                    for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                        getPOIListener.onModified(poiPlus);
+                    }
+                }
+
                 listener.onSuccess();
                 return;
             }
@@ -213,6 +245,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 PointOfInterest poiMinus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
                         poi.description(), poi.rating() - 1, poi.country(), poi.city());
                 poiList.set(i, poiMinus);
+
+                // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
+                if (getPOIListeners.containsKey(poi.name())) {
+                    for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                        getPOIListener.onModified(poiMinus);
+                    }
+                }
+
                 listener.onSuccess();
                 return;
             }
