@@ -113,6 +113,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private User user;
     private Button upvoteButton;
     private Button addPictureButton;
+    private Button addReviewButton;
     private boolean upvoted = false;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
@@ -142,13 +143,15 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 selectImage();
             }
         });
-        addPictureButton.setAlpha(.5f);
-        addPictureButton.setClickable(false);
+
         // upvote button
         upvoteButton = (Button) findViewById(R.id.upvoteButton);
 
-        upvoteButton.setAlpha(.5f);
-        upvoteButton.setClickable(false);
+
+
+        addReviewButton = (Button) findViewById(R.id.addReviewButton);
+
+
         // Obtain the SupportMapFragment
         map = (MapView) findViewById(R.id.map);
         map.onCreate(savedInstanceState);
@@ -174,10 +177,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             @Override
             public void onSuccess(User user) {
                 setUser(user);
-                upvoteButton.setAlpha(1);
-                upvoteButton.setClickable(true);
-                addPictureButton.setAlpha(1);
-                addPictureButton.setClickable(true);
+
+
                 if (user.getUpvoted().contains(poiName)) {
                     upvoted = true;
                     upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -250,14 +251,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     public void vote(View view) {
-        AuthenticationChecks.checkAuthState((Activity) ctx);
-        if (!AuthProvider.getInstance().isConnected()) {
+        // check if user is connected and has a valid account
+        AuthenticationChecks.checkAuthState((Activity)ctx);
+        // check if user's account is verified, otherwise prompt verification and/or refresh
+        // this 'if' code is required in case the user dismisses the dialog
+        if (!AuthProvider.getInstance().isEmailVerified()) {
             return;
-        } else {
-            // check if user's account is verified, otherwise prompt verification and/or refresh
-            if (!AuthProvider.getInstance().isEmailVerified()) {
-                return;
-            }
         }
         if (user != null && poi != null) {
             // disable the button
@@ -594,7 +593,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void onCameraResult(Intent data) {
 
-        if(data==null){
+        if (data == null) {
             return;
         }
         Bitmap image = (Bitmap) data.getExtras().get("data");
@@ -652,6 +651,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     public void startWriteCommentActivity(View view) {
+        // check if user is connected and has a valid account
+        AuthenticationChecks.checkAuthState((Activity)ctx);
+        // check if user's account is verified, otherwise prompt verification and/or refresh
+        // this 'if' code is required in case the user dismisses the dialog
+        if (!AuthProvider.getInstance().isEmailVerified()) {
+            return;
+        }
         Intent i = new Intent(ctx, WriteCommentActivity.class);
         i.putExtra(POI_NAME, poiName);
         i.putExtra(USER_ID, user.getID());
@@ -671,15 +677,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.favorite:
-                        // do stuff on click favorite
-                        AuthenticationChecks.checkAuthState((Activity) ctx);
-                        if (!AuthProvider.getInstance().isConnected()) {
-                            return true;
-                        } else {
-                            // check if user's account is verified, otherwise prompt verification and/or refresh
-                            if (!AuthProvider.getInstance().isEmailVerified()) {
-                                return true;
-                            }
+                        // check if user is connected and has a valid account
+                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        // check if user's account is verified, otherwise prompt verification and/or refresh
+                        // this 'if' code is required in case the user dismisses the dialog
+                        if (!AuthProvider.getInstance().isEmailVerified()) {
+                            return false;
                         }
                         user.addFavourite(poiName, new DatabaseProvider.ModifyUserListener() {
                             @Override
@@ -699,15 +702,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         });
                         return true;
                     case R.id.wishlist:
-                        // do stuff on click wishlist
-                        AuthenticationChecks.checkAuthState((Activity) ctx);
-                        if (!AuthProvider.getInstance().isConnected()) {
-                            return true;
-                        } else {
-                            // check if user's account is verified, otherwise prompt verification and/or refresh
-                            if (!AuthProvider.getInstance().isEmailVerified()) {
-                                return true;
-                            }
+                        // check if user is connected and has a valid account
+                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        // check if user's account is verified, otherwise prompt verification and/or refresh
+                        // this 'if' code is required in case the user dismisses the dialog
+                        if (!AuthProvider.getInstance().isEmailVerified()) {
+                            return false;
                         }
                         user.addToWishlist(poiName, new DatabaseProvider.ModifyUserListener() {
                             @Override
@@ -727,15 +727,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         });
                         return true;
                     case R.id.edit:
-                        // do stuff on click edit
-                        AuthenticationChecks.checkAuthState((Activity) ctx);
-                        if (!AuthProvider.getInstance().isConnected()) {
-                            return true;
-                        } else {
-                            // check if user's account is verified, otherwise prompt verification and/or refresh
-                            if (!AuthProvider.getInstance().isEmailVerified()) {
-                                return true;
-                            }
+                        // check if user is connected and has a valid account
+                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        // check if user's account is verified, otherwise prompt verification and/or refresh
+                        // this 'if' code is required in case the user dismisses the dialog
+                        if (!AuthProvider.getInstance().isEmailVerified()) {
+                            return false;
                         }
                         Intent i = new Intent(ctx, AddPOIActivity.class);
                         i.putExtra("EDIT_POI_NAME", poiName);
@@ -749,7 +746,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         popup.show();
     }
 
-    
 
 }
 

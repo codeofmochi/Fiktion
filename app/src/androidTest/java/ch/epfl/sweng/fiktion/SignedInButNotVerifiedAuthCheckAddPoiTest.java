@@ -84,7 +84,7 @@ public class SignedInButNotVerifiedAuthCheckAddPoiTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        onView(withId(R.id.menu_drawer)).check(matches(isDisplayed()));
+        onView(withId(R.id.add_poi_fiction_button)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class SignedInButNotVerifiedAuthCheckAddPoiTest {
         menuDrawer.check(matches(isDisplayed()));
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
 
-        onView(withText("Cancel"))
+        onView(withText("Return"))
                 .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
                 .perform(click());
         try {
@@ -102,6 +102,6 @@ public class SignedInButNotVerifiedAuthCheckAddPoiTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        onView(withId(R.id.menu_drawer)).check(matches(isDisplayed()));
+        onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
     }
 }

@@ -72,11 +72,21 @@ public class POIPageActivityTest {
     public final IntentsTestRule<POIPageActivity> toastRule =
             new IntentsTestRule<>(POIPageActivity.class, true, false);
 
-
     @BeforeClass
     public static void setProviders() {
         //providers.getInstance will return localProviders
         Config.TEST_MODE = true;
+        AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
         DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
             @Override
             public void onSuccess() {

@@ -103,15 +103,6 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
             case "Contribute": {
                 // add POI activity
                 // check authentication state
-                AuthenticationChecks.checkAuthState(this);
-                if (!AuthProvider.getInstance().isConnected()) {
-                    return;
-                } else {
-                    // check if user's account is verified, otherwise prompt verification and/or refresh
-                    if (!AuthProvider.getInstance().isEmailVerified()) {
-                        return;
-                    }
-                }
                 if (this.getClass().equals(AddPOIActivity.class)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
