@@ -145,7 +145,7 @@ public class NotSignedInPoiPageActivity {
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
         mActivityRule.launchActivity(i);
-        onView(withId(R.id.addPictureButton)).perform(click());
+        onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
         onView(withText("Sign In"))
                 .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
                 .check(matches(isDisplayed()));
