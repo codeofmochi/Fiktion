@@ -34,5 +34,6 @@ public class LocalPhotoProvider extends PhotoProvider {
         for (int i = 0; (numberOfPhotos == ALL_PHOTOS || i < numberOfPhotos) && i < poiBitmaps.size(); ++i) {
             listener.onNewPhoto(poiBitmaps.get(i));
         }
+
     }
 }

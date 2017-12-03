@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +40,10 @@ import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -66,17 +69,26 @@ import static org.hamcrest.core.IsNot.not;
 
 public class POIPageActivityTest {
 
-    private PhotoProvider photoProvider = PhotoProvider.getInstance();
 
     @Rule
     public final IntentsTestRule<POIPageActivity> toastRule =
             new IntentsTestRule<>(POIPageActivity.class, true, false);
 
-
     @BeforeClass
     public static void setProviders() {
         //providers.getInstance will return localProviders
         Config.TEST_MODE = true;
+        AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
         DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
             @Override
             public void onSuccess() {
@@ -112,17 +124,75 @@ public class POIPageActivityTest {
             public void onFailure() {
             }
         });
+
+
     }
 
+
+    @Before
+    public void beforeReset(){
+
+        DatabaseProvider.destroyInstance();
+        AuthProvider.destroyInstance();
+        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onAlreadyExists() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+        AuthProvider.getInstance().signIn("default@email.ch", "testing", new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+            }
+
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+        AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+    }
     @After
-    public void resetPhotoProvider() {
+    public void resetProviders() {
         PhotoProvider.destroyInstance();
+        DatabaseProvider.destroyInstance();
+        AuthProvider.destroyInstance();
     }
 
     @AfterClass
     public static void clean() {
         DatabaseProvider.destroyInstance();
         AuthProvider.destroyInstance();
+        PhotoProvider.destroyInstance();
     }
 
     @Test
@@ -164,7 +234,7 @@ public class POIPageActivityTest {
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
-        photoProvider.downloadPOIBitmaps("poiTest", ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().downloadPOIBitmaps("poiTest", ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
                 bitmaps.add(b);
@@ -184,7 +254,7 @@ public class POIPageActivityTest {
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
-        photoProvider.uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -199,7 +269,7 @@ public class POIPageActivityTest {
         });
 
         b = BitmapFactory.decodeResource(InstrumentationRegistry.getTargetContext().getResources(), R.mipmap.ic_launcher_round);
-        photoProvider.uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -275,7 +345,65 @@ public class POIPageActivityTest {
     private static ViewAction swipeUpCenterTopFast() {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.TOP_CENTER, Press.FINGER);
     }
+/*
+    @Test
+    public void testFavourite(){
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setUser(user);
+            }
 
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        onView(withId(R.id.moreMenu)).perform(click());
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        onView(withText("Favourite")).perform(click());
+
+        assertTrue(user.getFavourites().contains("poiTest"));
+
+    }
+
+    @Test
+    public void testWishlist(){
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                setUser(user);
+            }
+
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withId(R.id.moreMenu)).perform(click());
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        onView(withText("Wishlist")).perform(click());
+        assertTrue(user.getWishlist().contains("poiTest"));
+
+    }
+*/
     @Test
     public void testModifyExistingPoi() {
         Intent i = new Intent();

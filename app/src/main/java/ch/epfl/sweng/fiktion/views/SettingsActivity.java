@@ -16,6 +16,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
 
@@ -382,7 +383,7 @@ public class SettingsActivity extends MenuDrawerActivity {
      */
     public void redirectToLogin(View view) {
         Intent i = new Intent(this, SignInActivity.class);
-        startActivityForResult(i, SIGNIN_REQUEST);
+        startActivityForResult(i, ActivityCodes.SIGNIN_REQUEST);
     }
 
     /**
