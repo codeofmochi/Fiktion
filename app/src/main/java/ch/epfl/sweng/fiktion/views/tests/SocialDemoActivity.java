@@ -10,17 +10,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 
 public class SocialDemoActivity extends AppCompatActivity {
@@ -70,15 +66,15 @@ public class SocialDemoActivity extends AppCompatActivity {
         friendsListView = (ListView) findViewById(R.id.user_friends_list);
         requestsListView = (ListView) findViewById(R.id.user_requests_list);
 
-        if (AuthSingleton.auth.isConnected()) {
-            AuthSingleton.auth.getCurrentUser(DatabaseSingleton.database, new DatabaseProvider.GetUserListener() {
+        if (AuthProvider.getInstance().isConnected()) {
+            AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User currentUser) {
                     user = currentUser;
                     userName.setText(user.getName());
 
-                    friendsAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, new ArrayList<String>(user.getFriendlist()));
-                    requestsAdapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, new ArrayList<String>(user.getRequests()));
+                    friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(user.getFriendlist()));
+                    requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(user.getRequests()));
 
                     friendsListView.setAdapter(friendsAdapter);
                     requestsListView.setAdapter(requestsAdapter);
@@ -111,6 +107,7 @@ public class SocialDemoActivity extends AppCompatActivity {
     public void clickAddFriend(View v) {
         sendRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
+        /*
         user.sendFriendRequest(DatabaseSingleton.database, friendID, new User.userListener() {
             @Override
             public void onSuccess() {
@@ -136,11 +133,13 @@ public class SocialDemoActivity extends AppCompatActivity {
                 Toast.makeText(ctx, "Failed to send friend request", Toast.LENGTH_SHORT).show();
             }
         });
+        */
     }
 
     public void clickRemoveFriend(View v){
         removeFriendButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
+        /*
         user.removeFromFriendlist(DatabaseSingleton.database, friendID, new User.userListener() {
             @Override
             public void onSuccess() {
@@ -166,12 +165,13 @@ public class SocialDemoActivity extends AppCompatActivity {
                 Toast.makeText(ctx, "Failed to remove the friend", Toast.LENGTH_SHORT).show();
             }
         });
-
+        */
     }
 
     public void clickAcceptRequest(View v) {
         acceptRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
+        /*
         user.acceptFriendRequest(DatabaseSingleton.database, friendID, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
@@ -193,11 +193,13 @@ public class SocialDemoActivity extends AppCompatActivity {
                 Toast.makeText(ctx, "Failed to accept friend request", Toast.LENGTH_SHORT).show();
             }
         });
+        */
     }
 
     public void clickIgnoreRequest(View v) {
         ignoreRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
+        /*
         user.ignoreFriendRequest(DatabaseSingleton.database, friendID, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
@@ -212,6 +214,7 @@ public class SocialDemoActivity extends AppCompatActivity {
                 Toast.makeText(ctx, "Failed to ignore friend request", Toast.LENGTH_SHORT).show();
             }
         });
+        */
     }
 
 }
