@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.R;
@@ -53,9 +54,12 @@ public class CommentsDisplayer {
             this.data = new ArrayList<>();
             this.chunkSize = chunkSize;
             this.max = chunkSize;
+            this.shown = 0;
             this.ctx = ctx;
             this.empty = new TextView(ctx);
             this.empty.setText(R.string.no_reviews_yet);
+            this.empty.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            this.empty.setPadding(0, 20, 0, 10);
             this.display.addView(this.empty);
             this.loadMore = new Button(ctx);
             this.loadMore.setText(R.string.load_more);
@@ -90,9 +94,12 @@ public class CommentsDisplayer {
          */
         private void show() {
             // use the collection iterator to know where to start
+            Iterator<Comment> it = data.iterator();
+            // skip already shown comments
+            for (int i = 0; i < shown; i++) it.next();
             // display the remaining comments until max
-            while (data.iterator().hasNext() && shown <= max) {
-                Comment next = data.iterator().next();
+            while (it.hasNext() && shown < max) {
+                Comment next = it.next();
                 display.addView(CommentsDisplayer.createCommentCard(next, ctx));
                 shown++;
             }
@@ -100,6 +107,7 @@ public class CommentsDisplayer {
             this.empty.setVisibility(View.GONE);
             // show load more button if needed
             if (data.size() > shown) {
+                display.removeView(loadMore);
                 display.addView(loadMore);
             } else {
                 display.removeView(loadMore);
