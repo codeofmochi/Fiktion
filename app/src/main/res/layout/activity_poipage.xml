@@ -35,11 +35,12 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:textSize="24sp"
+            app:layout_constraintEnd_toStartOf="@+id/upvoteButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mainImage"
             tools:ignore="HardcodedText" /> <!-- dynamically updated -->
@@ -103,9 +104,10 @@
             android:drawablePadding="10dp"
             android:drawableStart="@drawable/thumb_up_icon"
             android:drawableTint="@android:color/white"
+            android:onClick="vote"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="@string/upvote"
+            android:text="@string/vote"
             android:textColor="@android:color/white"
             app:layout_constraintEnd_toStartOf="@+id/moreMenu"
             app:layout_constraintTop_toBottomOf="@+id/mainImage"
@@ -212,6 +214,7 @@
             android:textColor="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imgSlider"
+            android:onClick="startWriteCommentActivity"
             tools:targetApi="m" />
 
         <android.support.v7.widget.RecyclerView

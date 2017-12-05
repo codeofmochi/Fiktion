@@ -25,6 +25,9 @@ public class FirebaseAuthProvider extends AuthProvider {
     private final FirebaseAuth auth;
     // firebase user that we authenticate
     private FirebaseUser user;
+
+    private DatabaseProvider database;
+
     // firebase status
     /*
     private FirebaseAuth.AuthStateListener state;
@@ -63,11 +66,14 @@ public class FirebaseAuthProvider extends AuthProvider {
 
     public FirebaseAuthProvider() {
         auth = FirebaseAuth.getInstance();
+        database = DatabaseProvider.getInstance();
     }
 
-    public FirebaseAuthProvider(FirebaseAuth fbAuth) {
+    public FirebaseAuthProvider(FirebaseAuth fbAuth, DatabaseProvider db) {
         auth = fbAuth;
+        database = db;
     }
+
 
     /**
      * Signs in a user with an email, a password and what to do afterwards
@@ -148,8 +154,7 @@ public class FirebaseAuthProvider extends AuthProvider {
      * @param password used to create the account
      */
     @Override
-    public void createUserWithEmailAndPassword(final DatabaseProvider database,
-                                               String email, String password,
+    public void createUserWithEmailAndPassword(String email, String password,
                                                final AuthListener listener) {
         //create user in FirebaseAuthentication
         auth.createUserWithEmailAndPassword(email, password)
@@ -160,27 +165,26 @@ public class FirebaseAuthProvider extends AuthProvider {
                             // Account creation was successful in FirebaseAuthentication
                             //need to create user in our database
 
-                            database
-                                    .addUser(new User("", auth.getUid(), new TreeSet<String>(),
-                                                    new TreeSet<String>(), new LinkedList<String>()),
-                                            new DatabaseProvider.AddUserListener() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    user = auth.getCurrentUser();
-                                                    listener.onSuccess();
-                                                }
+                            database.addUser(new User("", auth.getUid(), new TreeSet<String>(),
+                                            new TreeSet<String>(), new LinkedList<String>()),
+                                    new DatabaseProvider.AddUserListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            user = auth.getCurrentUser();
+                                            listener.onSuccess();
+                                        }
 
-                                                @Override
-                                                public void onAlreadyExists() {
-                                                    listener.onFailure();
-                                                }
+                                        @Override
+                                        public void onAlreadyExists() {
+                                            listener.onFailure();
+                                        }
 
 
-                                                @Override
-                                                public void onFailure() {
-                                                    listener.onFailure();
-                                                }
-                                            });
+                                        @Override
+                                        public void onFailure() {
+                                            listener.onFailure();
+                                        }
+                                    });
 
                         } else {
                             // Account creation failed
@@ -261,7 +265,7 @@ public class FirebaseAuthProvider extends AuthProvider {
      * Starts request to retrieve currently signed in User or null if there is not any
      */
     @Override
-    public void getCurrentUser(DatabaseProvider database, final DatabaseProvider.GetUserListener listener) {
+    public void getCurrentUser(final DatabaseProvider.GetUserListener listener) {
         user = auth.getCurrentUser();
         if (user != null) {
             database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
@@ -328,7 +332,7 @@ public class FirebaseAuthProvider extends AuthProvider {
                             if (task.isSuccessful()) {
                                 listener.onSuccess();
                                 //delete user in our database
-                                DatabaseSingleton.database.deleterUserById(user.getUid(), delListener);
+                                DatabaseProvider.getInstance().deleterUserById(user.getUid(), delListener);
                             } else {
                                 listener.onFailure();
                             }

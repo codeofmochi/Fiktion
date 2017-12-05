@@ -2,9 +2,9 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/favorite"
+        android:id="@+id/favourite"
         android:icon="@drawable/star_icon_24"
-        android:title="@string/Favorite" />
+        android:title="@string/Favourite" />
     <item
         android:id="@+id/wishlist"
         android:icon="@drawable/check_icon_24"

@@ -10,10 +10,10 @@ import android.widget.Toast;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
 
 /**
  * This activity prompts a sign in or sign up if the user is not already connected
+ *
  * @author Rodrigo
  */
 public class SignInActivity extends AppCompatActivity {
@@ -38,7 +38,7 @@ public class SignInActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // If User is signed in we advance to the next activity, if User is null , UI will prompt a sign in
-        updateUI(AuthSingleton.auth.isConnected());
+        updateUI(AuthProvider.getInstance().isConnected());
     }
 
 
@@ -52,7 +52,7 @@ public class SignInActivity extends AppCompatActivity {
     public void signIn(String email, String password) {
         //we need to check if the credentials are valid before attempting to sign in
         //first we check if the email is valid, do not proceed if it is not valid
-        String emailErr = AuthSingleton.auth.validateEmail(email);
+        String emailErr = AuthProvider.getInstance().validateEmail(email);
         if (!emailErr.isEmpty()) {
 
             //Log.d(TAG, "Email is not valid");
@@ -62,7 +62,7 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         //after making sure the email is valid we check if the password is valid and if not we do not proceed
-        String passwordErr = AuthSingleton.auth.validatePassword(password);
+        String passwordErr = AuthProvider.getInstance().validatePassword(password);
         if (!passwordErr.isEmpty()) {
 
             //Log.d(TAG, "Password is not valid");
@@ -74,7 +74,7 @@ public class SignInActivity extends AppCompatActivity {
         Log.d(TAG, "Credentials are valid");
         Log.d(TAG, "signIn:" + email);
         */
-        AuthSingleton.auth.signIn(email, password, new AuthProvider.AuthListener() {
+        AuthProvider.getInstance().signIn(email, password, new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
                 //sign in was successful

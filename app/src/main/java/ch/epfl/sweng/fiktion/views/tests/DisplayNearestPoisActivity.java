@@ -11,8 +11,6 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 
-import static ch.epfl.sweng.fiktion.providers.DatabaseSingleton.database;
-
 public class DisplayNearestPoisActivity extends AppCompatActivity {
 
     @Override
@@ -29,8 +27,7 @@ public class DisplayNearestPoisActivity extends AppCompatActivity {
         // Creates a new ListView and adapter to display the research results
         ListView resultsListView = (ListView) findViewById(R.id.displayResultPois);
         resultsListView.setAdapter(adapter);
-        database.findNearPois(position, radius, new DatabaseProvider.FindNearPoisListener() {
-
+        DatabaseProvider.getInstance().findNearPois(position, radius, new DatabaseProvider.FindNearPoisListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 // add the poi name to the adapter

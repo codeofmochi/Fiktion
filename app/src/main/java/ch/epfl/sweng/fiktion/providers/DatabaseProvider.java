@@ -1,8 +1,10 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.utils.Config;
 
 
 /**
@@ -11,6 +13,39 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author Pedro Da Cunha
  */
 public abstract class DatabaseProvider {
+
+    private static DatabaseProvider database;
+
+    /**
+     * return the database provider
+     *
+     * @return the database provider
+     */
+    public static DatabaseProvider getInstance() {
+        if (database == null) {
+            if (Config.TEST_MODE)
+                database = new LocalDatabaseProvider();
+            else
+                database = new FirebaseDatabaseProvider();
+        }
+        return database;
+    }
+
+    /**
+     * Sets the current instance to the given database instance
+     *
+     * @param dbInstance database instance
+     */
+    public static void setInstance(DatabaseProvider dbInstance) {
+        database = dbInstance;
+    }
+
+    /**
+     * Destroys the current database instance
+     */
+    public static void destroyInstance() {
+        database = null;
+    }
 
     /**
      * Listener that listens the result of the addition of a point of interest
@@ -86,7 +121,7 @@ public abstract class DatabaseProvider {
     /**
      * parent listener for searching points of interest
      */
-    public interface SearchPOIsListener {
+    private interface SearchPOIsListener {
 
         /**
          * what to do when we get a new near point of interest
@@ -136,6 +171,22 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void modifyPOI(PointOfInterest poi, ModifyPOIListener listener);
+
+    /**
+     * increases by 1 the rating of a point of interest, inform the listener of the result
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void upvote(String poiName, ModifyPOIListener listener);
+
+    /**
+     * decreases by 1 the rating of a point of interest, inform the listener of the result
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void downvote(String poiName, ModifyPOIListener listener);
 
     /**
      * find the points of interest that are within radius range from a position and inform the
@@ -200,7 +251,7 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
-    public interface OperationOnExistingUserListener {
+    private interface OperationOnExistingUserListener {
 
         /**
          * what to do if the deletion succeeded
@@ -261,4 +312,43 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void modifyUser(User user, ModifyUserListener listener);
+
+    /**
+     * Listener that listens the result of the add
+     */
+    public interface AddCommentListener {
+
+        /**
+         * what to do if the addition succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the addition failed
+         */
+        void onFailure();
+    }
+
+    public interface GetCommentsListener {
+        void onNewValue(Comment comment);
+
+        void onFailure();
+    }
+
+    /**
+     * add a comment, inform the listener of the result
+     *
+     * @param comment  the comment to add
+     * @param poiName  the name of the POI
+     * @param listener the listener
+     */
+    public abstract void addComment(Comment comment, String poiName, AddCommentListener listener);
+
+    /**
+     * get the comments of a poi, inform the listener of the results
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void getComments(String poiName, GetCommentsListener listener);
 }

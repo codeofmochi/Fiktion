@@ -1,17 +1,22 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import android.util.Log;
+
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -27,6 +32,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private SearchProvider searchProvider;
     private final String poisRefName = "Points of interest";
     private final String usersRefName = "Users";
+    private final String commentsRef = "Comments";
 
     /**
      * Constructs a firebase database class that provides database methods
@@ -222,6 +228,58 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void upvote(String poiName, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Object value = dataSnapshot.child("rating").getValue();
+                    // if value is null, then the poi was created before pois had rating, set it to 0
+                    long rating = value == null ? 0 : (long) value;
+                    poiRef.child("rating").setValue(rating + 1);
+                    listener.onSuccess();
+                } else {
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void downvote(String poiName, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Object value = dataSnapshot.child("rating").getValue();
+                    long rating = value == null ? 0 : (long) value;
+                    // if value is null, then the poi was created before pois had rating, set it to 0
+                    poiRef.child("rating").setValue(rating - 1);
+                    listener.onSuccess();
+                } else {
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
                 listener.onFailure();
             }
         });
@@ -441,6 +499,73 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     // inform the listener that the user doesn't exist
                     listener.onDoesntExist();
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addComment(final Comment comment, String poiName, final AddCommentListener listener) {
+        // get the poi comments reference
+        final DatabaseReference cPOIRef = dbRef.child(commentsRef).child(poiName);
+        cPOIRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // append the new comment to the list of comments of the point of interest
+                String index = String.valueOf(dataSnapshot.getChildrenCount());
+                FirebaseComment fComment = new FirebaseComment(comment);
+                cPOIRef.child(index).setValue(fComment);
+
+                // inform to the listener that the operation succeeded
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getComments(String poiName, final GetCommentsListener listener) {
+        // get the poi comments reference
+        final DatabaseReference cPOIRef = dbRef.child(commentsRef).child(poiName);
+
+        cPOIRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // convert into a comment
+                FirebaseComment fComment = dataSnapshot.getValue(FirebaseComment.class);
+                if (fComment != null) {
+                    // send the comment to the listener
+                    listener.onNewValue(fComment.toComment());
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
             }
 
             @Override

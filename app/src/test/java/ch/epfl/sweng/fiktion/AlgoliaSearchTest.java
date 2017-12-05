@@ -14,9 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,11 +31,8 @@ import ch.epfl.sweng.fiktion.utils.Mutable;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -82,26 +77,26 @@ public class AlgoliaSearchTest {
         AddPoiListener listener = new AddPoiListener() {
             @Override
             public void onSuccess() {
-                result.value = "SUCCESS";
+                result.set("SUCCESS");
             }
 
             @Override
             public void onAlreadyExists() {
-                result.value = "ALREADYEXISTS";
+                result.set("ALREADYEXISTS");
             }
 
             @Override
             public void onFailure() {
-                result.value = "FAILURE";
+                result.set("FAILURE");
             }
         };
 
         algolia.addPoi(poi, listener);
         handler.getValue().requestCompleted(null, null);
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
 
         algolia.addPoi(poiFail, listener);
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
     }
 
     @Test
@@ -112,25 +107,25 @@ public class AlgoliaSearchTest {
         DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
             @Override
             public void onSuccess() {
-                result.value = "SUCCESS";
+                result.set("SUCCESS");
             }
 
             @Override
             public void onDoesntExist() {
-                result.value = "DOESNTEXIST";
+                result.set("DOESNTEXIST");
             }
 
             @Override
             public void onFailure() {
-                result.value = "FAILURE";
+                result.set("FAILURE");
             }
         };
 
         algolia.modifyPOI(poi, listener);
         handler.getValue().requestCompleted(null, null);
-        assertThat(result.value, is("SUCCESS"));
+        assertThat(result.get(), is("SUCCESS"));
         algolia.modifyPOI(poiFail, listener);
-        assertThat(result.value, is("FAILURE"));
+        assertThat(result.get(), is("FAILURE"));
     }
 
     @Test
@@ -144,13 +139,13 @@ public class AlgoliaSearchTest {
 
             @Override
             public void onSuccess(List<String> poiIDs) {
-                for (String id: poiIDs)
+                for (String id : poiIDs)
                     poiNames.add(id);
             }
 
             @Override
             public void onFailure() {
-                failure.value = true;
+                failure.set(true);
             }
         };
 
@@ -163,7 +158,7 @@ public class AlgoliaSearchTest {
 
         handler.getValue().requestCompleted(json, null);
         assertThat(poiNames.size(), is(2));
-        assertThat(failure.value, is(false));
+        assertThat(failure.get(), is(false));
         poiNames.clear();
 
         JSONObject emptyJSON = new JSONObject()
@@ -171,7 +166,7 @@ public class AlgoliaSearchTest {
 
         handler.getValue().requestCompleted(emptyJSON, null);
         assertThat(poiNames.size(), is(0));
-        assertThat(failure.value, is(false));
+        assertThat(failure.get(), is(false));
         poiNames.clear();
 
         JSONObject nohitJSON = new JSONObject()
@@ -190,14 +185,14 @@ public class AlgoliaSearchTest {
 
         handler.getValue().requestCompleted(weirdJSON, null);
         assertThat(poiNames.size(), is(2));
-        assertThat(failure.value, is(false));
+        assertThat(failure.get(), is(false));
         poiNames.clear();
 
         AlgoliaException e = mock(AlgoliaException.class);
 
         handler.getValue().requestCompleted(json, e);
         assertThat(poiNames.size(), is(0));
-        assertThat(failure.value, is(true));
+        assertThat(failure.get(), is(true));
 
     }
 
