@@ -3,8 +3,10 @@ package ch.epfl.sweng.fiktion;
 import org.junit.After;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -470,6 +472,89 @@ public class LocalDatabaseTest {
         assertThat(result.get(), is("D"));
         db.modifyUser(f, listener);
         assertThat(result.get(), is("F"));
+    }
 
+    private Comment commentWithText(String text) {
+        return new Comment(text, "author", new Date(0), 0);
+    }
+
+    @Test
+    public void addCommentTest() {
+        final Mutable<String> result = new Mutable<>("");
+        DatabaseProvider.AddCommentListener listener = new DatabaseProvider.AddCommentListener() {
+            @Override
+            public void onSuccess() {
+                result.set("S");
+            }
+
+            @Override
+            public void onFailure() {
+                result.set("F");
+            }
+        };
+
+        db.addComment(commentWithText("text1"), "poi1", listener);
+        assertThat(result.get(), is("S"));
+        result.set("");
+
+        db.addComment(commentWithText("text2"), "poi1", listener);
+        assertThat(result.get(), is("S"));
+        result.set("");
+
+        db.addComment(commentWithText("text3"), "ADDCOMMENTS", listener);
+        assertThat(result.get(), is("S"));
+
+        db.addComment(commentWithText("text4"), "ADDCOMMENTF", listener);
+        assertThat(result.get(), is("F"));
+    }
+
+    @Test
+    public void getCommentsTest() {
+        DatabaseProvider.AddCommentListener emptyAddCommentListener = new DatabaseProvider.AddCommentListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        };
+        final Mutable<String> result = new Mutable<>("good");
+        final Mutable<Integer> count = new Mutable<>(0);
+
+        DatabaseProvider.GetCommentsListener listener = new DatabaseProvider.GetCommentsListener() {
+            @Override
+            public void onNewValue(Comment comment) {
+                count.set(count.get() + 1);
+            }
+
+            @Override
+            public void onFailure() {
+                result.set("F");
+            }
+        };
+
+        db.getComments("poi1", listener);
+        assertThat(result.get(), is("good"));
+        assertThat(count.get(), is(0));
+
+        db.addComment(commentWithText("text"), "poi1", emptyAddCommentListener);
+        assertThat(result.get(), is("good"));
+        assertThat(count.get(), is(1));
+        count.set(0);
+
+        db.addComment(commentWithText("text"), "poi2", emptyAddCommentListener);
+        db.getComments("poi2", listener);
+        assertThat(result.get(), is("good"));
+        assertThat(count.get(), is(1));
+        count.set(0);
+
+        db.getComments("GETCOMMENTN", listener);
+        assertThat(result.get(), is("good"));
+        assertThat(count.get(), is(1));
+
+        db.getComments("GETCOMMENTF", listener);
+        assertThat(result.get(), is("F"));
+        assertThat(count.get(), is(1));
     }
 }

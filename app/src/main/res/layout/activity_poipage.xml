@@ -100,11 +100,10 @@
             android:layout_height="35dp"
             android:layout_marginEnd="5dp"
             android:layout_marginTop="15dp"
-            android:background="@color/colorText"
+            android:background="@color/colorPrimary"
             android:drawablePadding="10dp"
             android:drawableStart="@drawable/thumb_up_icon"
             android:drawableTint="@android:color/white"
-            android:enabled="false"
             android:onClick="vote"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
@@ -215,6 +214,7 @@
             android:textColor="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imgSlider"
+            android:onClick="startWriteCommentActivity"
             tools:targetApi="m" />
 
         <android.support.v7.widget.RecyclerView

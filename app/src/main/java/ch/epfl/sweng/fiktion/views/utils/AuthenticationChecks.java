@@ -5,10 +5,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
@@ -32,18 +36,63 @@ public class AuthenticationChecks {
     }
 
     private static void goHome(Activity ctx) {
-        Intent home = new Intent(ctx, HomeActivity.class);
-        home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        ctx.startActivity(home);
-        ctx.finish();
+        // we only leave the context if we want to contribute in add poi activity (edit also)
+        if (ctx instanceof AddPOIActivity) {
+            Intent home = new Intent(ctx, HomeActivity.class);
+            home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            ctx.startActivity(home);
+            ctx.finish();
+        }
     }
 
-    /**
-     * Takes the user to a sign in activity where he can sign in or register a new account
-     */
+        /**
+         * Takes the user to a sign in activity where he can sign in or register a new account
+         */
+
     private static void promptConnection(final Activity ctx) {
+        /*
         Intent i = new Intent(ctx, SignInActivity.class);
         ctx.startActivityForResult(i, ActivityCodes.SIGNIN_REQUEST);
+   */
+        // create dialog for sign in prompt
+        // Instantiate an AlertDialog.Builder with its constructor
+        final AlertDialog.Builder promptBuilder = new AlertDialog.Builder(ctx);
+        // user cannot proceed if not email verified
+        promptBuilder.setCancelable(false);
+
+
+        // Sets up the dialog builder
+        promptBuilder.setMessage("You need to be connected to Fiktion if you want to proceed!")
+                .setTitle("Fiktion")
+                .setNegativeButton("Return", null)
+                .setPositiveButton("Sign In", null);
+        // Get the dialog that confirms if user wants to permanently delete his account
+        final AlertDialog verifyDialog;
+        verifyDialog = promptBuilder.create();
+        verifyDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        goHome(ctx);
+                        verifyDialog.cancel();
+                    }
+                });
+                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(ctx,SignInActivity.class);
+                        ctx.startActivityForResult(i, ActivityCodes.SIGNIN_REQUEST);
+                    }
+                });
+            }
+        });
+        verifyDialog.show();
+        verifyDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+        verifyDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextColor(Color.BLUE);
+
     }
 
     private static void promptRetry(final Activity ctx) {
@@ -54,9 +103,9 @@ public class AuthenticationChecks {
 
 
         // Sets up the dialog builder
-        refreshBuilder.setMessage("You need to verify your account before contributing to Fiktion!")
+        refreshBuilder.setMessage("You need to verify your Fiktion account!")
                 .setTitle("Fiktion")
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Return", null)
                 .setPositiveButton("Verify", null)
                 .setNeutralButton("Refresh", null);
         // Get the dialog that confirms if user wants to permanently delete his account

@@ -15,12 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 import ch.epfl.sweng.fiktion.views.ProfileActivity;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
 import ch.epfl.sweng.fiktion.views.TextSearchActivity;
+import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 
 /**
  * A parent class for activities that implement the left menu drawer
@@ -100,6 +102,7 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
                 break;
             case "Contribute": {
                 // add POI activity
+                // check authentication state
                 if (this.getClass().equals(AddPOIActivity.class)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
