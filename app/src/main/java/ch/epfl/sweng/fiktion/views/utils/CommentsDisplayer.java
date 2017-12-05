@@ -2,13 +2,15 @@ package ch.epfl.sweng.fiktion.views.utils;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
@@ -39,7 +41,7 @@ public class CommentsDisplayer {
         // empty text view
         private TextView empty;
         // button to load more
-        private Button loadMore;
+        private TextView loadMore;
         // activity context of creation
         private Context ctx;
 
@@ -56,19 +58,35 @@ public class CommentsDisplayer {
             this.max = chunkSize;
             this.shown = 0;
             this.ctx = ctx;
-            this.empty = new TextView(ctx);
-            this.empty.setText(R.string.no_reviews_yet);
-            this.empty.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            this.empty.setPadding(0, 20, 0, 10);
+            this.empty = createDefaultText(ctx);
             this.display.addView(this.empty);
-            this.loadMore = new Button(ctx);
-            this.loadMore.setText(R.string.load_more);
-            this.loadMore.setOnClickListener(new View.OnClickListener() {
+            this.loadMore = createLoadMoreButton(ctx);
+        }
+
+        // helper to create an empty default text view
+        private TextView createDefaultText(Context ctx) {
+            TextView tv = new TextView(ctx);
+            tv.setText(R.string.no_reviews_yet);
+            tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            tv.setPadding(0, 20, 0, 10);
+            return tv;
+        }
+
+        // helper to create a load more button
+        private TextView createLoadMoreButton(Context ctx) {
+            TextView b = new TextView(ctx);
+            b.setText(R.string.load_more);
+            b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     loadMore();
                 }
             });
+            b.setTextColor(ctx.getResources().getColor(R.color.colorPrimary));
+            b.setTextSize(15);
+            b.setPadding(0, 20, 10, 0);
+            b.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            return b;
         }
 
         /**
@@ -159,9 +177,18 @@ public class CommentsDisplayer {
 
         // comment text
         TextView comment = new TextView(ctx);
-        comment.setTextSize(16);
+        comment.setTextSize(15);
         comment.setText(c.getText());
+        comment.setPadding(0, 10, 0, 10);
         v.addView(comment);
+
+        // date text
+        TextView date = new TextView(ctx);
+        date.setTextSize(14);
+        DateFormat df = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+        date.setText(df.format(c.getDate()));
+        date.setTextColor(ctx.getResources().getColor(R.color.colorText));
+        v.addView(date);
 
         // return the whole view
         return v;
