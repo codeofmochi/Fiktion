@@ -57,6 +57,14 @@ public class AddPOIActivity extends MenuDrawerActivity {
         includeLayout = R.layout.activity_add_poi;
         super.onCreate(savedInstanceState);
 
+        // check if user is connected and has a valid account
+        AuthenticationChecks.checkAuthState(this);
+        // check if user's account is verified, otherwise prompt verification and/or refresh
+        if (!AuthProvider.getInstance().isEmailVerified()) {
+            return;
+        }
+
+
         // check if it is an edit request
         Intent from = getIntent();
         editName = from.getStringExtra("EDIT_POI_NAME");
@@ -125,7 +133,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
     @Override
     public void onStart() {
         super.onStart();
-        AuthenticationChecks.checkAuthState(this);
     }
 
 

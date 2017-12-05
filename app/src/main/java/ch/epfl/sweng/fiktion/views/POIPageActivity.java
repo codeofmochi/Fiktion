@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -58,6 +59,8 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
+import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
@@ -109,6 +112,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private PointOfInterest poi;
     private User user;
     private Button upvoteButton;
+    private Button addPictureButton;
+    private Button addReviewButton;
     private boolean upvoted = false;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
@@ -125,17 +130,27 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         super.onCreate(savedInstanceState);
 
         //picture button
-        Button addPictureButton = (Button) findViewById(R.id.addPictureButton);
+        addPictureButton = (Button) findViewById(R.id.addPictureButton);
+
         addPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                AuthenticationChecks.checkAuthState((Activity) ctx);
+                // check if user's account is verified, otherwise prompt verification and/or refresh
+                if (!AuthProvider.getInstance().isEmailVerified()) {
+                    return;
+                }
                 selectImage();
             }
         });
 
         // upvote button
         upvoteButton = (Button) findViewById(R.id.upvoteButton);
-        upvoteButton.setEnabled(false);
+
+
+
+        addReviewButton = (Button) findViewById(R.id.addReviewButton);
+
 
         // Obtain the SupportMapFragment
         map = (MapView) findViewById(R.id.map);
@@ -162,7 +177,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             @Override
             public void onSuccess(User user) {
                 setUser(user);
-                upvoteButton.setEnabled(true);
                 if (user.getUpvoted().contains(poiName)) {
                     upvoted = true;
                     upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -235,6 +249,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     public void vote(View view) {
+        // check if user is connected and has a valid account
+        AuthenticationChecks.checkAuthState((Activity)ctx);
+        // check if user's account is verified, otherwise prompt verification and/or refresh
+        // this 'if' code is required in case the user dismisses the dialog
+        if (!AuthProvider.getInstance().isEmailVerified()) {
+            return;
+        }
         if (user != null && poi != null) {
             // disable the button
             upvoteButton.setEnabled(false);
@@ -464,8 +485,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //photo and gallery
 
-    private final int REQUEST_CAMERA = 0, SELECT_FILE = 1;
-
     // string to pass to onRequestPerm to know if camera or gallery was chosen
     private String userChoice;
 
@@ -530,7 +549,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     //camera intent
     private void intentCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, REQUEST_CAMERA);
+        startActivityForResult(intent, ActivityCodes.REQUEST_CAMERA);
     }
 
 
@@ -539,18 +558,21 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         Intent gallery = new Intent();
         gallery.setType("image/*");
         gallery.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(gallery, "Select File"), SELECT_FILE);
+        startActivityForResult(Intent.createChooser(gallery, "Select File"), ActivityCodes.SELECT_FILE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE) {
+            if (requestCode == ActivityCodes.SELECT_FILE) {
                 onGalleryResult(data);
-            } else if (requestCode == REQUEST_CAMERA) {
+            } else if (requestCode == ActivityCodes.REQUEST_CAMERA) {
                 onCameraResult(data);
+            } else if (requestCode == ActivityCodes.SIGNIN_REQUEST) {
+                recreate();
             }
+
         }
     }
 
@@ -569,6 +591,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void onCameraResult(Intent data) {
 
+        if (data == null) {
+            return;
+        }
         Bitmap image = (Bitmap) data.getExtras().get("data");
         if (image == null) {
             return;
@@ -624,6 +649,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     public void startWriteCommentActivity(View view) {
+        // check if user is connected and has a valid account
+        AuthenticationChecks.checkAuthState((Activity)ctx);
+        // check if user's account is verified, otherwise prompt verification and/or refresh
+        // this 'if' code is required in case the user dismisses the dialog
+        if (!AuthProvider.getInstance().isEmailVerified()) {
+            return;
+        }
         Intent i = new Intent(ctx, WriteCommentActivity.class);
         i.putExtra(POI_NAME, poiName);
         i.putExtra(USER_ID, user.getID());
@@ -642,14 +674,64 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.favorite:
-                        // do stuff on click favorite
+                    case R.id.favourite:
+                        // check if user is connected and has a valid account
+                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        // check if user's account is verified, otherwise prompt verification and/or refresh
+                        // this 'if' code is required in case the user dismisses the dialog
+                        if (!AuthProvider.getInstance().isEmailVerified()) {
+                            return true;
+                        }
+                        user.addFavourite(poiName, new DatabaseProvider.ModifyUserListener() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(ctx, poiName + " was added to favourites!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                Toast.makeText(ctx, "User does not exist in database!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Toast.makeText(ctx, "Failed to add to favourites", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         return true;
                     case R.id.wishlist:
-                        // do stuff on click wishlist
+                        // check if user is connected and has a valid account
+                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        // check if user's account is verified, otherwise prompt verification and/or refresh
+                        // this 'if' code is required in case the user dismisses the dialog
+                        if (!AuthProvider.getInstance().isEmailVerified()) {
+                            return true;
+                        }
+                        user.addToWishlist(poiName, new DatabaseProvider.ModifyUserListener() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(ctx, poiName + " was added to the wishlist!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                Toast.makeText(ctx, "User does not exist in database!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Toast.makeText(ctx, "Failed to add to wishlist", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         return true;
                     case R.id.edit:
-                        // do stuff on click edit
+                        // check if user is connected and has a valid account
+                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        // check if user's account is verified, otherwise prompt verification and/or refresh
+                        // this 'if' code is required in case the user dismisses the dialog
+                        if (!AuthProvider.getInstance().isEmailVerified()) {
+                            return true;
+                        }
                         Intent i = new Intent(ctx, AddPOIActivity.class);
                         i.putExtra("EDIT_POI_NAME", poiName);
                         startActivity(i);
@@ -660,7 +742,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
         popup.show();
+
     }
+
 
 }
 
