@@ -84,6 +84,7 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     /**
      * Triggered by the Places action button
+     *
      * @param view caller view
      */
     public void startUserPlacesActivity(View view) {
@@ -94,6 +95,7 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     /**
      * Triggered by the Pictures action button
+     *
      * @param view caller view
      */
     public void startUserPicturesActivity(View view) {
@@ -104,6 +106,7 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     /**
      * Triggered by the Friends action button
+     *
      * @param view caller view
      */
     public void startUserFriendsActivity(View view) {
@@ -114,6 +117,7 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     /**
      * Triggered by the Achievement action button
+     *
      * @param view caller view
      */
     public void startUserAchievementsActivity(View view) {
