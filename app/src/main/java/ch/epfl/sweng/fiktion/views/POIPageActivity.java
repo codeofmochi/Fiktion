@@ -82,6 +82,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private ImageView mainImage;
     private MapView map;
     private CommentsDisplayer.LoadableList reviewsList;
+    private DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            dialog.dismiss();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +101,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         addPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AuthenticationChecks.checkAuthState((Activity) ctx);
+                AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                 // check if user's account is verified, otherwise prompt verification and/or refresh
                 if (!AuthProvider.getInstance().isEmailVerified()) {
                     return;
@@ -201,7 +207,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     public void vote(View view) {
         // check if user is connected and has a valid account
-        AuthenticationChecks.checkAuthState((Activity) ctx);
+        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
         // check if user's account is verified, otherwise prompt verification and/or refresh
         // this 'if' code is required in case the user dismisses the dialog
         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -601,7 +607,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     public void startWriteCommentActivity(View view) {
         // check if user is connected and has a valid account
-        AuthenticationChecks.checkAuthState((Activity) ctx);
+        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
         // check if user's account is verified, otherwise prompt verification and/or refresh
         // this 'if' code is required in case the user dismisses the dialog
         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -627,7 +633,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 switch (item.getItemId()) {
                     case R.id.favourite:
                         // check if user is connected and has a valid account
-                        AuthenticationChecks.checkAuthState((Activity) ctx);
+                        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -652,7 +658,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         return true;
                     case R.id.wishlist:
                         // check if user is connected and has a valid account
-                        AuthenticationChecks.checkAuthState((Activity) ctx);
+                        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -677,7 +683,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         return true;
                     case R.id.edit:
                         // check if user is connected and has a valid account
-                        AuthenticationChecks.checkAuthState((Activity) ctx);
+                        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
