@@ -116,6 +116,23 @@
             tools:targetApi="m" /><!-- text will change dynamically -->
 
         <TextView
+            android:id="@+id/friendsLink"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:drawableTint="@color/colorPrimary"
+            android:drawableTop="@drawable/person_icon_24"
+            android:onClick="startUserFriendsActivity"
+            android:text="Friends"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" /><!-- text will change dynamically -->
+
+        <TextView
             android:id="@+id/achievementsLink"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -125,7 +142,7 @@
             android:drawableTint="@color/colorPrimary"
             android:drawableTop="@drawable/star_icon_24"
             android:onClick="startUserAchievementsActivity"
-            android:text="Achievements"
+            android:text="Points"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary"
             android:textSize="16sp"

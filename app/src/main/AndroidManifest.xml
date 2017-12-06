@@ -121,6 +121,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
         </activity>
+        <activity
+            android:name=".views.UserFriendsActivity"
+            android:label="@string/title_activity_user_friends"
+            android:parentActivityName=".views.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
+        </activity>
     </application>
 
 </manifest>

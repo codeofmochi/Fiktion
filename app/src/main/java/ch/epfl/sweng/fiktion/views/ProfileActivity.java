@@ -103,6 +103,16 @@ public class ProfileActivity extends MenuDrawerActivity {
     }
 
     /**
+     * Triggered by the Friends action button
+     * @param view caller view
+     */
+    public void startUserFriendsActivity(View view) {
+        Intent i = new Intent(this, UserFriendsActivity.class);
+        i.putExtra(USER_ID_KEY, userId);
+        startActivity(i);
+    }
+
+    /**
      * Triggered by the Achievement action button
      * @param view caller view
      */

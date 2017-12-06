@@ -104,4 +104,5 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_user_pictures">Pictures</string>
     <string name="title_activity_user_achievements">Achievements</string>
+    <string name="title_activity_user_friends">Friends</string>
 </resources>
