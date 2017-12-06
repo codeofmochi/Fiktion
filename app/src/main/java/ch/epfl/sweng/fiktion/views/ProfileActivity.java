@@ -49,7 +49,7 @@ public class ProfileActivity extends MenuDrawerActivity {
         profileBanner = (ImageView) findViewById(R.id.userBanner);
 
         // set default images
-        profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.default_image), 900, 370));
+        profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.default_image), 500, 200));
         profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(BitmapFactory.decodeResource(getResources(), R.drawable.default_user)));
 
         // get user infos
