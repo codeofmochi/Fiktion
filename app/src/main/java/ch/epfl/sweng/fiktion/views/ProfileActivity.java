@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,6 +27,11 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     public static String USER_ID_KEY = "USER_ID";
 
+    private enum Action {
+        MY_PROFILE,
+        ANOTHER_PROFILE
+    }
+
     private User user, me;
     private String userId, myUserId;
     private TextView username, realInfos, country;
@@ -34,6 +40,7 @@ public class ProfileActivity extends MenuDrawerActivity {
     private int bannerWidth = 500;
     private int bannerHeight = 270;
     private Activity ctx = this;
+    private Action state;
 
 
     @Override
@@ -72,7 +79,11 @@ public class ProfileActivity extends MenuDrawerActivity {
                 // assume my profile if no userId set or if it is my own id
                 if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
                     user = currUser;
+                    // don't forget to set userId in case it was actually empty
+                    userId = myUserId;
                     showMyProfile();
+                } else {
+                    showAnotherProfile();
                 }
             }
 
@@ -99,14 +110,34 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     private void showMyProfile() {
         // display profile
+        this.state = Action.MY_PROFILE;
         updateInfos();
     }
 
     private void showAnotherProfile() {
+        // display another user's profile
+        this.state = Action.ANOTHER_PROFILE;
+
         // get profile from DB
+        DatabaseProvider.getInstance().getUserById(userId, new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User u) {
+                // assign user
+                user = u;
+                // display profile
+                updateInfos();
+            }
 
+            @Override
+            public void onDoesntExist() {
+                Snackbar.make(profileBanner, R.string.user_not_found, Snackbar.LENGTH_INDEFINITE).show();
+            }
 
-            // display profile
+            @Override
+            public void onFailure() {
+                Snackbar.make(profileBanner, R.string.failed_to_fetch_data, Snackbar.LENGTH_INDEFINITE).show();
+            }
+        });
     }
 
     /**
@@ -123,7 +154,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      * Triggered when an activity called here returns with a result
      *
      * @param requestCode the request code
-     * @param resultCode the result code
+     * @param resultCode  the result code
      * @param data
      */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

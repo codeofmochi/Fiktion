@@ -109,4 +109,5 @@
     <string name="user_places_tab_wishlisted">Wishlist</string>
     <string name="user_places_tab_favourites">Favorites</string>
     <string name="no_places_yet_add_some">No places yet. Add some?</string>
+    <string name="user_not_found">User not found</string>
 </resources>
