@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/tab_visited"
         android:icon="@drawable/location_icon_24"
         android:title="@string/user_places_tab_visited" />
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/tab_wishlist"
         android:icon="@drawable/explore_icon_24"
         android:title="@string/user_places_tab_wishlisted" />
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/tab_favorites"
         android:icon="@drawable/star_icon_24"
         android:title="@string/user_places_tab_favourites" />
 

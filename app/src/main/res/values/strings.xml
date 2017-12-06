@@ -108,4 +108,5 @@
     <string name="user_places_tab_visited">Visited</string>
     <string name="user_places_tab_wishlisted">Wishlist</string>
     <string name="user_places_tab_favourites">Favorites</string>
+    <string name="no_places_yet_add_some">No places yet. Add some?</string>
 </resources>

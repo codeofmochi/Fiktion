@@ -20,7 +20,7 @@ import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
  */
 public class ProfileActivity extends MenuDrawerActivity {
 
-    public String USER_ID_KEY = "USER_ID";
+    public static String USER_ID_KEY = "USER_ID";
 
     private User user;
     private String userId;
