@@ -1,5 +1,7 @@
 package ch.epfl.sweng.fiktion.controllers;
 
+import android.util.Log;
+
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -13,9 +15,12 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 public class UserController {
 
     private User localUser;
+    private DatabaseProvider.GetUserListener getListener;
+    private ConstructStateListener listener;
 
     public UserController(final ConstructStateListener listener) {
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+        this.listener = listener;
+        getListener = new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 localUser = user;
@@ -24,6 +29,7 @@ public class UserController {
 
             @Override
             public void onModified(User user) {
+                Log.d("mylogs", "usercontroller: onModified");
                 localUser = user;
                 listener.onModified();
             }
@@ -41,7 +47,8 @@ public class UserController {
                 listener.onFailure();
                 throw new IllegalStateException("The was an error fetching local user");
             }
-        });
+        };
+        AuthProvider.getInstance().getCurrentUser(getListener);
     }
 
     /**
@@ -59,6 +66,8 @@ public class UserController {
      * @param listener The listener handling every DB responses
      */
     public void sendFriendResquest(final String friendID, final RequestListener listener) {
+        Log.d("mylogs", "sendFriendResquest: " + (this.listener == null) + (getListener == null));
+        this.listener.onFailure();
         if(localUser.getID() == friendID) {
             // do nothing, should never happen in our implementation
         } else if(localUser.getFriendlist().contains(friendID)) {
@@ -148,6 +157,7 @@ public class UserController {
                         DatabaseProvider.getInstance().modifyUser(user.addRequestAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
                             @Override
                             public void onSuccess() {
+                                Log.d("mylogs", "onSuccess: friend request sent");
                                 listener.onSuccess();
                             }
 

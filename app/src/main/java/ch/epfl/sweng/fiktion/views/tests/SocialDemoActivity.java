@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -71,6 +72,7 @@ public class SocialDemoActivity extends AppCompatActivity {
                 uc = new UserController(new UserController.ConstructStateListener() {
                     @Override
                     public void onSuccess() {
+                        Log.d("mylogs", "onSuccess: user controller");
                         friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
                         requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
 
@@ -81,6 +83,7 @@ public class SocialDemoActivity extends AppCompatActivity {
 
                     @Override
                     public void onModified() {
+                        Log.d("mylogs", "onModified: user controller");
                         friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
                         requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
 
@@ -91,6 +94,7 @@ public class SocialDemoActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure() {
+                        Log.d("mylogs", "onFailure: wain");
                     }
                 });
             } catch (IllegalStateException ise) {
