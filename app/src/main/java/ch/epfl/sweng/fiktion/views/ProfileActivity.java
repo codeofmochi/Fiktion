@@ -27,11 +27,13 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     // keys for extra data
     public static String USER_ID_KEY = "USER_ID";
+
     // define possible actions
     public enum Action {
         MY_PROFILE,
         ANOTHER_PROFILE
     }
+
     // define current action
     private Action state;
 
@@ -88,6 +90,7 @@ public class ProfileActivity extends MenuDrawerActivity {
                     userId = myUserId;
                     showMyProfile();
                 } else {
+                    // user is logged in but it is not his profile
                     showAnotherProfile();
                 }
             }
@@ -103,9 +106,10 @@ public class ProfileActivity extends MenuDrawerActivity {
                 // user is not auth'd but it is his profile, show login
                 if (userId == null || userId.isEmpty()) {
                     redirectToLogin();
+                } else {
+                    // user may not be auth'd, but proceed here to show another user's profile without the need of being logged in
+                    showAnotherProfile();
                 }
-                // user may not be auth'd, but proceed here to show another user's profile without the need of being logged in
-                showAnotherProfile();
             }
         });
     }
