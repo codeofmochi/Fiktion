@@ -1,11 +1,10 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -58,7 +57,12 @@ public class AddPOIActivity extends MenuDrawerActivity {
         super.onCreate(savedInstanceState);
 
         // check if user is connected and has a valid account
-        AuthenticationChecks.checkAuthState(this);
+        AuthenticationChecks.checkVerifieddAuth(this, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                AuthenticationChecks.goHome((Activity)ctx);
+            }
+        });
         // check if user's account is verified, otherwise prompt verification and/or refresh
         if (!AuthProvider.getInstance().isEmailVerified()) {
             return;
