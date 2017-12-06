@@ -25,26 +25,34 @@ import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
  */
 public class ProfileActivity extends MenuDrawerActivity {
 
+    // keys for extra data
     public static String USER_ID_KEY = "USER_ID";
-
-    private enum Action {
+    // define possible actions
+    public enum Action {
         MY_PROFILE,
         ANOTHER_PROFILE
     }
+    // define current action
+    private Action state;
 
+    // load own user and eventually the correct profile
     private User user, me;
+    // load profile id and user's own id
     private String userId, myUserId;
+    // views
     private TextView username, realInfos, country;
     private ImageView profilePicture, profileBanner;
     private ImageButton action;
+    // image display const
     private int bannerWidth = 500;
     private int bannerHeight = 270;
+    // this activity's context
     private Activity ctx = this;
-    private Action state;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // pass layout to parent
         includeLayout = R.layout.activity_profile;
         super.onCreate(savedInstanceState);
 
@@ -56,9 +64,6 @@ public class ProfileActivity extends MenuDrawerActivity {
         profilePicture = (ImageView) findViewById(R.id.userProfilePicture);
         profileBanner = (ImageView) findViewById(R.id.userBanner);
         action = (ImageButton) findViewById(R.id.userAction);
-
-        // set action text
-        action.setImageDrawable(getResources().getDrawable(R.drawable.person_add_icon_24));
 
         // set default images
         profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
@@ -111,12 +116,16 @@ public class ProfileActivity extends MenuDrawerActivity {
     private void showMyProfile() {
         // display profile
         this.state = Action.MY_PROFILE;
+        // set action button
+        action.setImageDrawable(getResources().getDrawable(R.drawable.pencil_icon_24));
         updateInfos();
     }
 
     private void showAnotherProfile() {
         // display another user's profile
         this.state = Action.ANOTHER_PROFILE;
+        // set action button
+        action.setImageDrawable(getResources().getDrawable(R.drawable.person_add_icon_24));
 
         // get profile from DB
         DatabaseProvider.getInstance().getUserById(userId, new DatabaseProvider.GetUserListener() {
