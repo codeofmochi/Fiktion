@@ -3,6 +3,7 @@ package ch.epfl.sweng.fiktion.views;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,13 +20,14 @@ import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
  */
 public class ProfileActivity extends MenuDrawerActivity {
 
+    public String USER_ID_KEY = "USER_ID";
+
     private User user;
-
+    private String userId;
     private TextView username, realInfos, country;
-
     private ImageView profilePicture, profileBanner;
-
-    private final int SIGNIN_REQUEST = 0;
+    private int bannerWidth = 500;
+    private int bannerHeight = 270;
 
 
     @Override
@@ -35,10 +37,6 @@ public class ProfileActivity extends MenuDrawerActivity {
 
         // check if user is connected and has a valid account
         AuthenticationChecks.checkAuthState(this);
-        // check if user's account is verified, otherwise prompt verification and/or refresh
-        if (!AuthProvider.getInstance().isEmailVerified()) {
-            return;
-        }
 
         //create user infos fields
         username = (TextView) findViewById(R.id.username);
@@ -49,7 +47,7 @@ public class ProfileActivity extends MenuDrawerActivity {
         profileBanner = (ImageView) findViewById(R.id.userBanner);
 
         // set default images
-        profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.default_image), 500, 200));
+        profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
         profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(BitmapFactory.decodeResource(getResources(), R.drawable.default_user)));
 
         // get user infos
@@ -57,6 +55,7 @@ public class ProfileActivity extends MenuDrawerActivity {
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
+                userId = currUser.getID();
                 username.setText(user.getName());
                 //TODO : implement these in class User and retrieve them here
                 realInfos.setText("John Doe, 21");
@@ -80,7 +79,36 @@ public class ProfileActivity extends MenuDrawerActivity {
      * Prompt the User with a sign in
      */
     public void redirectToLogin() {
-        Intent i = new Intent(this, SignInActivity.class);
-        startActivityForResult(i, SIGNIN_REQUEST);
+        AuthenticationChecks.checkAuthState(this);
+    }
+
+    /**
+     * Triggered by the Places action button
+     * @param view caller view
+     */
+    public void startUserPlacesActivity(View view) {
+        Intent i = new Intent(this, UserPlacesActivity.class);
+        i.putExtra(USER_ID_KEY, userId);
+        startActivity(i);
+    }
+
+    /**
+     * Triggered by the Pictures action button
+     * @param view caller view
+     */
+    public void startUserPicturesActivity(View view) {
+        Intent i = new Intent(this, UserPicturesActivity.class);
+        i.putExtra(USER_ID_KEY, userId);
+        startActivity(i);
+    }
+
+    /**
+     * Triggered by the Achievement action button
+     * @param view caller view
+     */
+    public void startUserAchievementsActivity(View view) {
+        Intent i = new Intent(this, UserAchievementsActivity.class);
+        i.putExtra(USER_ID_KEY, userId);
+        startActivity(i);
     }
 }

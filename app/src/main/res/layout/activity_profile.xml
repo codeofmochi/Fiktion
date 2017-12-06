@@ -49,7 +49,7 @@
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="dialexo"
+            android:text="Profile"
             android:textSize="20sp"
             android:textStyle="bold"
             tools:ignore="HardcodedText" /><!-- text will change dynamically -->
@@ -58,14 +58,12 @@
             android:id="@+id/userRealInfos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="John Doe, 21"
             tools:ignore="HardcodedText" /><!-- text will change dynamically -->
 
         <TextView
             android:id="@+id/userCountry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Switzerland"
             tools:ignore="HardcodedText" /><!-- text will change dynamically -->
     </LinearLayout>
 
@@ -92,6 +90,7 @@
             android:layout_weight="1"
             android:drawableTint="@color/colorPrimary"
             android:drawableTop="@drawable/location_icon_24"
+            android:onClick="startUserPlacesActivity"
             android:text="Places"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary"
@@ -108,6 +107,7 @@
             android:layout_weight="1"
             android:drawableTint="@color/colorPrimary"
             android:drawableTop="@drawable/camera_icon_24"
+            android:onClick="startUserPicturesActivity"
             android:text="Pictures"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary"
@@ -124,6 +124,7 @@
             android:layout_weight="1"
             android:drawableTint="@color/colorPrimary"
             android:drawableTop="@drawable/star_icon_24"
+            android:onClick="startUserAchievementsActivity"
             android:text="Achievements"
             android:textAlignment="center"
             android:textColor="@color/colorPrimary"
