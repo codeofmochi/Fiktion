@@ -217,7 +217,8 @@
             android:onClick="startWriteCommentActivity"
             tools:targetApi="m" />
 
-        <android.support.v7.widget.RecyclerView
+        <LinearLayout
+            android:orientation="vertical"
             android:id="@+id/reviews"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
