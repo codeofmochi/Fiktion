@@ -41,7 +41,8 @@ public class AuthenticationChecks {
 
     /**
      * This methods checks only if the user is connected
-     * @param ctx Activity context where this check is requested
+     *
+     * @param ctx            Activity context where this check is requested
      * @param cancelListener WHat to do if user clicks return button
      */
     public static void checkLoggedAuth(Activity ctx, DialogInterface.OnCancelListener cancelListener) {
@@ -53,6 +54,7 @@ public class AuthenticationChecks {
 
     /**
      * Takes the user to the home activity
+     *
      * @param ctx Activity context where the user calls this function
      */
     public static void goHome(Activity ctx) {
@@ -66,7 +68,8 @@ public class AuthenticationChecks {
 
     /**
      * Prompts the user with a dialog where he can go to a sign in activity
-     * @param ctx Activity context where the dialog will popup
+     *
+     * @param ctx           Activity context where the dialog will popup
      * @param clickListener Listener that knows what to when user clicks on return button
      */
     private static void promptConnection(final Activity ctx, final DialogInterface.OnCancelListener clickListener) {
@@ -118,7 +121,8 @@ public class AuthenticationChecks {
 
     /**
      * Prompts the user with a dialog where he can send an email verification , refresh or dismiss dialog
-     * @param ctx Activity context where the dialog will popup
+     *
+     * @param ctx           Activity context where the dialog will popup
      * @param clickListener Listener that knows what to when user clicks on return button
      */
     private static void promptRetry(final Activity ctx, final DialogInterface.OnCancelListener clickListener) {
