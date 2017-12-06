@@ -153,6 +153,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      * Update visible infos
      */
     private void updateInfos() {
+        action.setVisibility(View.VISIBLE);
         username.setText(user.getName());
         //TODO : implement these in class User and retrieve them here
         realInfos.setText("John Doe, 21");
