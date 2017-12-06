@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:clipToPadding="false"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    android:paddingBottom="10dp"
+    android:paddingBottom="20dp"
     tools:context="ch.epfl.sweng.fiktion.views.WriteCommentActivity">
 
     <ImageView
@@ -42,16 +42,18 @@
         app:layout_constraintTop_toBottomOf="@id/poiTitle" />
 
     <LinearLayout
+        android:id="@+id/box"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="30dp"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:background="@color/white"
+        android:clipToPadding="false"
         android:elevation="5dp"
         android:orientation="vertical"
-        android:paddingBottom="10dp"
+        android:paddingBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/reviewDescription"
@@ -84,5 +86,13 @@
             android:textColor="@color/white" />
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/box"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text=" "
+        tools:ignore="HardcodedText" />
 
 </android.support.constraint.ConstraintLayout>

@@ -15,14 +15,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import ch.epfl.sweng.fiktion.R;
-import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 import ch.epfl.sweng.fiktion.views.ProfileActivity;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
 import ch.epfl.sweng.fiktion.views.TextSearchActivity;
-import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 
 /**
  * A parent class for activities that implement the left menu drawer
@@ -89,6 +87,13 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
             case "Profile":
                 // profile activity
                 if (this.getClass().equals(ProfileActivity.class)) {
+                    // special case : check if not in state of menu access (not my profile), then allow to show my profile
+                    if (((ProfileActivity) this).getState() == ProfileActivity.Action.ANOTHER_PROFILE) {
+                        Intent i = new Intent(this, ProfileActivity.class);
+                        // clear the activity stack
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
+                    }
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
                     Intent i = new Intent(this, ProfileActivity.class);
@@ -104,6 +109,13 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
                 // add POI activity
                 // check authentication state
                 if (this.getClass().equals(AddPOIActivity.class)) {
+                    // special case : check if in contribute state, then allow to add
+                    if (((AddPOIActivity) this).getState() == AddPOIActivity.Action.EDIT) {
+                        Intent i = new Intent(this, AddPOIActivity.class);
+                        // clear the activity stack
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
+                    }
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
                     Intent i = new Intent(this, AddPOIActivity.class);
