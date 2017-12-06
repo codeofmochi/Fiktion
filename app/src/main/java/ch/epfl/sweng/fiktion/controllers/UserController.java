@@ -48,6 +48,7 @@ public class UserController {
         return localUser;
     }
 
+    //TODO: remove request on double request sending
     /**
      * Sends a friend request from localUser to friendID
      *
@@ -166,6 +167,7 @@ public class UserController {
         }
     }
 
+    //TODO: check if user is in friendlist before accepting // check why user adds himself to friend on accepting request that is in friendlist
     /**
      * Accepts the friend request requestID received by localUser
      * (In case of onDoesntexist(), does not remove request, should ask user to ignore it)
