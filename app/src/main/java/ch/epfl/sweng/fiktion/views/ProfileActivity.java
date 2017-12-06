@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ public class ProfileActivity extends MenuDrawerActivity {
     private String userId;
     private TextView username, realInfos, country;
     private ImageView profilePicture, profileBanner;
+    private ImageButton action;
     private int bannerWidth = 500;
     private int bannerHeight = 270;
 
@@ -45,6 +47,10 @@ public class ProfileActivity extends MenuDrawerActivity {
         //create user profile images fields
         profilePicture = (ImageView) findViewById(R.id.userProfilePicture);
         profileBanner = (ImageView) findViewById(R.id.userBanner);
+        action = (ImageButton) findViewById(R.id.userAction);
+
+        // set action text
+        action.setImageDrawable(getResources().getDrawable(R.drawable.person_add_icon_24));
 
         // set default images
         profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
