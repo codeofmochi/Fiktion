@@ -1,5 +1,7 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -30,15 +32,13 @@ public class ProfileActivity extends MenuDrawerActivity {
     private ImageButton action;
     private int bannerWidth = 500;
     private int bannerHeight = 270;
+    private Activity ctx = this;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         includeLayout = R.layout.activity_profile;
         super.onCreate(savedInstanceState);
-
-        // check if user is connected and has a valid account
-        AuthenticationChecks.checkAuthState(this);
 
         //create user infos fields
         username = (TextView) findViewById(R.id.username);
@@ -55,6 +55,27 @@ public class ProfileActivity extends MenuDrawerActivity {
         // set default images
         profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
         profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(BitmapFactory.decodeResource(getResources(), R.drawable.default_user)));
+
+        // assume my profile if no userId set or TODO if it is my id
+        Intent from = getIntent();
+        userId = from.getStringExtra(USER_ID_KEY);
+        if (userId == null || userId.isEmpty()) {
+            showMyProfile();
+        }
+    }
+
+    /**
+     * Show my own profile
+     */
+    private void showMyProfile() {
+
+        // check if user is connected and has a valid account
+        AuthenticationChecks.checkLoggedAuth(this, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                AuthenticationChecks.goHome(ctx);
+            }
+        });
 
         // get user infos
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
@@ -85,7 +106,13 @@ public class ProfileActivity extends MenuDrawerActivity {
      * Prompt the User with a sign in
      */
     public void redirectToLogin() {
-        AuthenticationChecks.checkAuthState(this);
+        // check if user is connected and has a valid account
+        AuthenticationChecks.checkLoggedAuth(this, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                AuthenticationChecks.goHome(ctx);
+            }
+        });
     }
 
     /**
