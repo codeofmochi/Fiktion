@@ -1,36 +1,62 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 
-public class WriteCommentActivity extends AppCompatActivity {
+public class WriteCommentActivity extends MenuDrawerActivity {
 
     private String poiName;
     private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // pass layout to parent
+        this.includeLayout = R.layout.activity_write_comment;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_write_comment);
 
         Intent i = getIntent();
         poiName = i.getStringExtra(POIPageActivity.POI_NAME);
         userId = i.getStringExtra(POIPageActivity.USER_ID);
+
+        // set title
+        ((TextView) findViewById(R.id.poiTitle)).setText(poiName);
+        // set bg
+        findViewById(R.id.menu_scroll).setBackgroundColor(getResources().getColor(R.color.bgLightGray));
+
+        // get image
+        final ImageView img = (ImageView) findViewById(R.id.mainImage);
+        final int imgWidth = 900;
+        final int imgHeight = 400;
+        img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.default_image), imgWidth, imgHeight));
+        PhotoProvider.getInstance().downloadPOIBitmaps(poiName, 1, new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onNewPhoto(Bitmap b) {
+                img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(b, imgWidth, imgHeight));
+            }
+
+            @Override
+            public void onFailure() { /* nothing */ }
+        });
     }
 
     public void uploadComment(View view) {
 
         String text = ((EditText) findViewById(R.id.comment)).getText().toString();
-        if(text.isEmpty()) {
+        if (text.isEmpty()) {
             ((EditText) findViewById(R.id.comment)).setError("You can't add an empty comment");
         } else {
             Comment review = new Comment(text, userId, java.util.Calendar.getInstance().getTime(), 0);
