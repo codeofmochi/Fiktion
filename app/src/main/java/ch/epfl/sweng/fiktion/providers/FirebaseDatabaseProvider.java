@@ -190,7 +190,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         final DatabaseReference poiRef = dbRef.child(poisRefName).child(poi.name());
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
 
                     // modify the poi in the search provider
@@ -199,6 +199,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         public void onSuccess() {
                             // if it succeeds, replace the poi value in firebase
                             FirebasePointOfInterest fPOI = new FirebasePointOfInterest(poi);
+                            // don't change the rating
+                            fPOI.rating = dataSnapshot.getValue(FirebasePointOfInterest.class).rating;
                             poiRef.setValue(fPOI);
 
                             // update the position for geofire

@@ -165,14 +165,17 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
 
         for (int i = 0; i < poiList.size(); ++i) {
-            if (poi.equals(poiList.get(i))) {
-                poiList.set(i, poi);
+            PointOfInterest aPOI = poiList.get(i);
+            if (poi.equals(aPOI)) {
+                PointOfInterest mPOI = new PointOfInterest(poi.name(),poi.position(),poi.fictions(),
+                        poi.description(),aPOI.rating(),poi.country(), poi.city());
+                poiList.set(i, mPOI);
                 listener.onSuccess();
 
                 // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
                 if (getPOIListeners.containsKey(poi.name())) {
                     for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
-                        getPOIListener.onModified(poi);
+                        getPOIListener.onModified(mPOI);
                     }
                 }
 

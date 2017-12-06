@@ -165,7 +165,8 @@ public abstract class DatabaseProvider {
     public abstract void getPoi(String name, final GetPoiListener listener);
 
     /**
-     * Modify an existing point of interest and inform the listener of the result
+     * Modify an existing point of interest and inform the listener of the result, the modification
+     * doesn't change the rating -> call upvote/downvote if you want to change the rating
      *
      * @param poi      the new point of interest
      * @param listener the listener
