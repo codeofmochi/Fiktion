@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.views.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.views.ProfileActivity;
 
 /**
  * Created by dialexo on 06.12.17.
@@ -139,7 +141,7 @@ public class CommentsDisplayer {
      * @param c a comment to display
      * @return a comment card view to be added to a parent view
      */
-    public static View createCommentCard(Comment c, Context ctx) {
+    public static View createCommentCard(Comment c, final Context ctx) {
         // create new view for the comment
         LinearLayout v = new LinearLayout(ctx);
         v.setOrientation(LinearLayout.VERTICAL);
@@ -163,8 +165,17 @@ public class CommentsDisplayer {
         author.setTextColor(ctx.getResources().getColor(R.color.colorPrimary));
         DatabaseProvider.getInstance().getUserById(c.getAuthorId(), new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onSuccess(final User user) {
                 author.setText(user.getName());
+                author.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // show profile of user on name click
+                        Intent i = new Intent(ctx, ProfileActivity.class);
+                        i.putExtra(ProfileActivity.USER_ID_KEY, user.getID());
+                        ctx.startActivity(i);
+                    }
+                });
             }
 
             @Override

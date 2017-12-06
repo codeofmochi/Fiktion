@@ -96,7 +96,7 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     /**
-     * If User is signed in, user is taken to the user details screen
+     * If User is signed in, user is taken to the settings
      *
      * @param isConnected true, if there is a user signed in, false otherwise
      */

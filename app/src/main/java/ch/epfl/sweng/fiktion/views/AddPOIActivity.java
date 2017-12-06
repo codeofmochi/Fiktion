@@ -43,7 +43,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
 
 
     // this activity can either add or edit POIs
-    private enum Action {
+    public enum Action {
         ADD, EDIT
     }
 
@@ -60,7 +60,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
         AuthenticationChecks.checkVerifieddAuth(this, new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                AuthenticationChecks.goHome((Activity)ctx);
+                AuthenticationChecks.goHome((Activity) ctx);
             }
         });
         // check if user's account is verified, otherwise prompt verification and/or refresh
@@ -359,5 +359,12 @@ public class AddPOIActivity extends MenuDrawerActivity {
         return str.matches("-?\\d+(\\.\\d+)?");
     }
 
-
+    /**
+     * Get the current state of the activity
+     *
+     * @return the state of the activity
+     */
+    public Action getState() {
+        return this.action;
+    }
 }

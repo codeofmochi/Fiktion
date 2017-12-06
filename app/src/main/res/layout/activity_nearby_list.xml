@@ -6,10 +6,17 @@
 
     <LinearLayout
         android:id="@+id/nearbyList"
+        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
+        <TextView
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_nearby_places_found"
+            android:textAlignment="center"
+            android:paddingTop="20dp"/>
     </LinearLayout>
 
 </ScrollView>
