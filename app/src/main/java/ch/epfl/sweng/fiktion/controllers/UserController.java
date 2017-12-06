@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.controllers;
 
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 
 /**
@@ -11,14 +12,49 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 
 public class UserController {
 
+    private User localUser;
+    private BinaryListener listener;
+
+    public UserController(final BinaryListener listener) {
+        this.listener = listener;
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                localUser = user;
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                localUser = null;
+                listener.onFailure();
+                throw new IllegalStateException("The local user does not exist");
+            }
+
+            @Override
+            public void onFailure() {
+                localUser = null;
+                listener.onFailure();
+                throw new IllegalStateException("The was an error fetching local user");
+            }
+        });
+    }
+
+    /**
+     *
+     * @return the local user
+     */
+    public User getLocalUser() {
+        return localUser;
+    }
+
     /**
      * Sends a friend request from localUser to friendID
      *
-     * @param localUser The local user
      * @param friendID The ID of the user receiving the request
      * @param listener The listener handling every DB responses
      */
-    public void sendFriendResquest(final User localUser, final String friendID, final RequestListener listener) {
+    public void sendFriendResquest(final String friendID, final RequestListener listener) {
         if(localUser.getFriendlist().contains(friendID)) {
             listener.onAlreadyFriend();
         } else if(localUser.getRequests().contains(friendID)) {
@@ -134,11 +170,10 @@ public class UserController {
      * Accepts the friend request requestID received by localUser
      * (In case of onDoesntexist(), does not remove request, should ask user to ignore it)
      *
-     * @param localUser The local user
      * @param requestID The ID of the user that the local user wants to accept
      * @param listener The listener handling every DB responses
      */
-    public void acceptFriendRequest(final User localUser, final String requestID, final DatabaseProvider.ModifyUserListener listener) {
+    public void acceptFriendRequest(final String requestID, final DatabaseProvider.ModifyUserListener listener) {
         DatabaseProvider.getInstance().getUserById(requestID, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
@@ -194,11 +229,10 @@ public class UserController {
     /**
      * Ignores the friend request requestID received by localUser
      *
-     * @param localUser The local user
      * @param requestID The user ID that the local user wants to ignore
      * @param listener The listener handling every DB responses
      */
-    public void ignoreFriendRequest(final User localUser, final String requestID, final BinaryListener listener) {
+    public void ignoreFriendRequest(final String requestID, final BinaryListener listener) {
         DatabaseProvider.getInstance().modifyUser(localUser.removeRequestAndGet(requestID), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
@@ -224,23 +258,22 @@ public class UserController {
      * (In case of failure, it can happen that localUser is not in friend's friendlist but has friendID in his list,
      *  the problem can be fixed by repeating the action)
      *
-     * @param localUser The local user
      * @param friendID The id of the friend that the local user wants to remove
      * @param listener The listener handling every DB responses
      */
-    public void removeFromFriendList(final User localUser, final String friendID, final BinaryListener listener) {
+    public void removeFromFriendList(final String friendID, final BinaryListener listener) {
         DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 DatabaseProvider.getInstance().modifyUser(user.removeFriendAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
                     @Override
                     public void onSuccess() {
-                        removeFromLocalUserFriendList(localUser, friendID, listener);
+                        removeFromLocalUserFriendList(friendID, listener);
                     }
 
                     @Override
                     public void onDoesntExist() {
-                        removeFromLocalUserFriendList(localUser, friendID, listener);
+                        removeFromLocalUserFriendList(friendID, listener);
                     }
 
                     @Override
@@ -252,7 +285,7 @@ public class UserController {
 
             @Override
             public void onDoesntExist() {
-                removeFromLocalUserFriendList(localUser, friendID, listener);
+                removeFromLocalUserFriendList(friendID, listener);
             }
 
             @Override
@@ -266,11 +299,10 @@ public class UserController {
      * Removes user with id friendID from localUser's friendList
      * (helper method for removeFromFriendList)
      *
-     * @param localUser The local user
      * @param friendID The id of the friend that the local user wants to remove
      * @param listener The listener handling every DB responses
      */
-    private void removeFromLocalUserFriendList(final User localUser, final String friendID, final BinaryListener listener) {
+    private void removeFromLocalUserFriendList(final String friendID, final BinaryListener listener) {
         DatabaseProvider.getInstance().modifyUser(localUser.removeFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {

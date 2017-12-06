@@ -10,10 +10,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -22,10 +24,9 @@ import ch.epfl.sweng.fiktion.views.HomeActivity;
 public class SocialDemoActivity extends AppCompatActivity {
 
     // user
-    private User user;
+    private UserController uc;
 
     // text views
-    private TextView userName;
     private EditText userInput;
 
     // list adapters
@@ -50,7 +51,6 @@ public class SocialDemoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_social_demo);
 
         // initialize views
-        userName = (TextView) findViewById(R.id.display_user_name);
         userInput = (EditText) findViewById(R.id.user_input);
         sendRequestButton = (Button) findViewById(R.id.send_request_button);
         removeFriendButton = (Button) findViewById(R.id.remove_friend_button);
@@ -67,31 +67,25 @@ public class SocialDemoActivity extends AppCompatActivity {
         requestsListView = (ListView) findViewById(R.id.user_requests_list);
 
         if (AuthProvider.getInstance().isConnected()) {
-            AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User currentUser) {
-                    user = currentUser;
-                    userName.setText(user.getName());
+            try {
+                uc = new UserController(new UserController.BinaryListener() {
+                    @Override
+                    public void onSuccess() {
+                        friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
+                        requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
 
-                    friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(user.getFriendlist()));
-                    requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(user.getRequests()));
 
-                    friendsListView.setAdapter(friendsAdapter);
-                    requestsListView.setAdapter(requestsAdapter);
-                }
+                        friendsListView.setAdapter(friendsAdapter);
+                        requestsListView.setAdapter(requestsAdapter);
+                    }
 
-                @Override
-                public void onDoesntExist() {
-                    user = null;
-                    goHome();
-                }
-
-                @Override
-                public void onFailure() {
-                    user = null;
-                    goHome();
-                }
-            });
+                    @Override
+                    public void onFailure() {
+                    }
+                });
+            } catch (IllegalStateException ise) {
+                goHome();
+            }
         } else {
             goHome();
         }
@@ -107,18 +101,12 @@ public class SocialDemoActivity extends AppCompatActivity {
     public void clickAddFriend(View v) {
         sendRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
-        /*
-        user.sendFriendRequest(DatabaseSingleton.database, friendID, new User.userListener() {
+
+        uc.sendFriendResquest(friendID, new UserController.RequestListener() {
             @Override
             public void onSuccess() {
                 sendRequestButton.setEnabled(true);
                 Toast.makeText(ctx, "Friend request sent to " + friendID, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFriendlistException() {
-                sendRequestButton.setEnabled(true);
-                Toast.makeText(ctx, friendID + " is already your friend!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -132,15 +120,26 @@ public class SocialDemoActivity extends AppCompatActivity {
                 sendRequestButton.setEnabled(true);
                 Toast.makeText(ctx, "Failed to send friend request", Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onAlreadyFriend() {
+                sendRequestButton.setEnabled(true);
+                Toast.makeText(ctx, friendID + " is already your friend!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNewFriend() {
+                sendRequestButton.setEnabled(true);
+                Toast.makeText(ctx, friendID + " is now your friend!", Toast.LENGTH_SHORT).show();
+            }
         });
-        */
     }
 
     public void clickRemoveFriend(View v){
         removeFriendButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
-        /*
-        user.removeFromFriendlist(DatabaseSingleton.database, friendID, new User.userListener() {
+
+        uc.removeFromFriendList(friendID, new UserController.BinaryListener() {
             @Override
             public void onSuccess() {
                 removeFriendButton.setEnabled(true);
@@ -149,30 +148,18 @@ public class SocialDemoActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFriendlistException() {
-                removeFriendButton.setEnabled(true);
-                Toast.makeText(ctx, friendID+" is not in your friend list", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDoesntExist() {
-                removeFriendButton.setEnabled(true);
-            }
-
-            @Override
             public void onFailure() {
                 removeFriendButton.setEnabled(true);
                 Toast.makeText(ctx, "Failed to remove the friend", Toast.LENGTH_SHORT).show();
             }
         });
-        */
     }
 
     public void clickAcceptRequest(View v) {
         acceptRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
-        /*
-        user.acceptFriendRequest(DatabaseSingleton.database, friendID, new DatabaseProvider.ModifyUserListener() {
+
+        uc.acceptFriendRequest(friendID, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
                 requestsAdapter.remove(friendID);
@@ -193,14 +180,13 @@ public class SocialDemoActivity extends AppCompatActivity {
                 Toast.makeText(ctx, "Failed to accept friend request", Toast.LENGTH_SHORT).show();
             }
         });
-        */
     }
 
     public void clickIgnoreRequest(View v) {
         ignoreRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
-        /*
-        user.ignoreFriendRequest(DatabaseSingleton.database, friendID, new AuthProvider.AuthListener() {
+
+        uc.ignoreFriendRequest(friendID, new UserController.BinaryListener() {
             @Override
             public void onSuccess() {
                 requestsAdapter.remove(friendID);
@@ -214,7 +200,6 @@ public class SocialDemoActivity extends AppCompatActivity {
                 Toast.makeText(ctx, "Failed to ignore friend request", Toast.LENGTH_SHORT).show();
             }
         });
-        */
     }
 
 }

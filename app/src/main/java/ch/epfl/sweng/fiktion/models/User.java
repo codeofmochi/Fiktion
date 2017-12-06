@@ -207,7 +207,9 @@ public class User {
      * @param userID The ID of the sender
      */
     public void removeRequest(final String userID) {
-        friendRequests.remove(userID);
+        if(friendRequests.contains(userID)) {
+            friendRequests.remove(userID);
+        }
     }
 
     /**
@@ -215,7 +217,9 @@ public class User {
      * @return The user without userID in his requests
      */
     public User removeRequestAndGet(final String userID) {
-        friendRequests.remove(userID);
+        if(friendRequests.contains(userID)) {
+            friendRequests.remove(userID);
+        }
         return this;
     }
 
@@ -243,7 +247,9 @@ public class User {
      * @param userID The ID of the friend we want to remove
      */
     public void removeFriend(final String userID) {
-        friendlist.remove(userID);
+        if(friendlist.contains(userID)) {
+            friendlist.remove(userID);
+        }
     }
 
     /**
@@ -251,7 +257,9 @@ public class User {
      * @return The user without userID in his friendlist
      */
     public User removeFriendAndGet(final String userID) {
-        friendlist.remove(userID);
+        if(friendlist.contains(userID)) {
+            friendlist.remove(userID);
+        }
         return this;
     }
 
