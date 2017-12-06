@@ -5,14 +5,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
-import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.SignInActivity;
 
@@ -23,33 +19,47 @@ import ch.epfl.sweng.fiktion.views.SignInActivity;
 
 public class AuthenticationChecks {
 
-    public static void checkAuthState(Activity ctx) {
+    /**
+     * This method will check the authentication state of the current user,
+     * if he is connected and has a valid account and prompt the appropriate dialog
+     *
+     * @param ctx            Activity context where this method is called
+     * @param cancelListener Listener that will do a precise action if the user cancels the prompted dialog
+     */
+    public static void checkVerifieddAuth(Activity ctx, DialogInterface.OnCancelListener cancelListener) {
         //check if user is logged in, otherwise prompt sign in
         if (!AuthProvider.getInstance().isConnected()) {
-            promptConnection(ctx);
+            promptConnection(ctx, cancelListener);
         } else {
             // check if user's account is verified, otherwise prompt verification and/or refresh
             if (!AuthProvider.getInstance().isEmailVerified()) {
-                promptRetry(ctx);
+                promptRetry(ctx, cancelListener);
             }
         }
+
     }
 
-    private static void goHome(Activity ctx) {
-        // we only leave the context if we want to contribute in add poi activity (edit also)
-        if (ctx instanceof AddPOIActivity) {
-            Intent home = new Intent(ctx, HomeActivity.class);
-            home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            ctx.startActivity(home);
-            ctx.finish();
+    public static void checkLoggedAuth(Activity ctx, DialogInterface.OnCancelListener cancelListener) {
+        //check if user is logged in, otherwise prompt sign in
+        if (!AuthProvider.getInstance().isConnected()) {
+            promptConnection(ctx, cancelListener);
         }
     }
 
-        /**
-         * Takes the user to a sign in activity where he can sign in or register a new account
-         */
+    public static void goHome(Activity ctx) {
+        // we only leave the context if we want to contribute in add poi activity (edit also)
+        Intent home = new Intent(ctx, HomeActivity.class);
+        home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        ctx.startActivity(home);
+        ctx.finish();
 
-    private static void promptConnection(final Activity ctx) {
+    }
+
+    /**
+     * Takes the user to a sign in activity where he can sign in or register a new account
+     */
+
+    private static void promptConnection(final Activity ctx, final DialogInterface.OnCancelListener clickListener) {
         /*
         Intent i = new Intent(ctx, SignInActivity.class);
         ctx.startActivityForResult(i, ActivityCodes.SIGNIN_REQUEST);
@@ -71,18 +81,18 @@ public class AuthenticationChecks {
         verifyDialog = promptBuilder.create();
         verifyDialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-            public void onShow(DialogInterface dialog) {
+            public void onShow(final DialogInterface dialog) {
                 ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        goHome(ctx);
+                        clickListener.onCancel(dialog);
                         verifyDialog.cancel();
                     }
                 });
                 ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent i = new Intent(ctx,SignInActivity.class);
+                        Intent i = new Intent(ctx, SignInActivity.class);
                         ctx.startActivityForResult(i, ActivityCodes.SIGNIN_REQUEST);
                     }
                 });
@@ -95,7 +105,7 @@ public class AuthenticationChecks {
 
     }
 
-    private static void promptRetry(final Activity ctx) {
+    private static void promptRetry(final Activity ctx, final DialogInterface.OnCancelListener clickListener) {
         // Instantiate an AlertDialog.Builder with its constructor
         final AlertDialog.Builder refreshBuilder = new AlertDialog.Builder(ctx);
         // user cannot proceed if not email verified
@@ -113,11 +123,11 @@ public class AuthenticationChecks {
         verifyDialog = refreshBuilder.create();
         verifyDialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-            public void onShow(DialogInterface dialog) {
+            public void onShow(final DialogInterface dialog) {
                 ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        goHome(ctx);
+                        clickListener.onCancel(dialog);
                         verifyDialog.cancel();
                     }
                 });
