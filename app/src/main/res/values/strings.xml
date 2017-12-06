@@ -105,4 +105,7 @@
     <string name="title_activity_user_pictures">Pictures</string>
     <string name="title_activity_user_achievements">Achievements</string>
     <string name="title_activity_user_friends">Friends</string>
+    <string name="user_places_tab_visited">Visited</string>
+    <string name="user_places_tab_wishlisted">Wishlist</string>
+    <string name="user_places_tab_favourites">Favorites</string>
 </resources>
