@@ -39,6 +39,11 @@ public class AuthenticationChecks {
 
     }
 
+    /**
+     * This methods checks only if the user is connected
+     * @param ctx Activity context where this check is requested
+     * @param cancelListener WHat to do if user clicks return button
+     */
     public static void checkLoggedAuth(Activity ctx, DialogInterface.OnCancelListener cancelListener) {
         //check if user is logged in, otherwise prompt sign in
         if (!AuthProvider.getInstance().isConnected()) {
@@ -46,6 +51,10 @@ public class AuthenticationChecks {
         }
     }
 
+    /**
+     * Takes the user to the home activity
+     * @param ctx Activity context where the user calls this function
+     */
     public static void goHome(Activity ctx) {
         // we only leave the context if we want to contribute in add poi activity (edit also)
         Intent home = new Intent(ctx, HomeActivity.class);
@@ -56,9 +65,10 @@ public class AuthenticationChecks {
     }
 
     /**
-     * Takes the user to a sign in activity where he can sign in or register a new account
+     * Prompts the user with a dialog where he can go to a sign in activity
+     * @param ctx Activity context where the dialog will popup
+     * @param clickListener Listener that knows what to when user clicks on return button
      */
-
     private static void promptConnection(final Activity ctx, final DialogInterface.OnCancelListener clickListener) {
         /*
         Intent i = new Intent(ctx, SignInActivity.class);
@@ -105,6 +115,12 @@ public class AuthenticationChecks {
 
     }
 
+
+    /**
+     * Prompts the user with a dialog where he can send an email verification , refresh or dismiss dialog
+     * @param ctx Activity context where the dialog will popup
+     * @param clickListener Listener that knows what to when user clicks on return button
+     */
     private static void promptRetry(final Activity ctx, final DialogInterface.OnCancelListener clickListener) {
         // Instantiate an AlertDialog.Builder with its constructor
         final AlertDialog.Builder refreshBuilder = new AlertDialog.Builder(ctx);
