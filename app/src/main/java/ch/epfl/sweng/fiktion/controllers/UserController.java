@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.controllers;
 
-import android.util.Log;
-
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -15,12 +13,9 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 public class UserController {
 
     private User localUser;
-    private DatabaseProvider.GetUserListener getListener;
-    private ConstructStateListener listener;
 
     public UserController(final ConstructStateListener listener) {
-        this.listener = listener;
-        getListener = new DatabaseProvider.GetUserListener() {
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 localUser = user;
@@ -29,7 +24,6 @@ public class UserController {
 
             @Override
             public void onModified(User user) {
-                Log.d("mylogs", "usercontroller: onModified");
                 localUser = user;
                 listener.onModified();
             }
@@ -47,12 +41,10 @@ public class UserController {
                 listener.onFailure();
                 throw new IllegalStateException("The was an error fetching local user");
             }
-        };
-        AuthProvider.getInstance().getCurrentUser(getListener);
+        });
     }
 
     /**
-     *
      * @return the local user
      */
     public User getLocalUser() {
@@ -66,13 +58,11 @@ public class UserController {
      * @param listener The listener handling every DB responses
      */
     public void sendFriendResquest(final String friendID, final RequestListener listener) {
-        Log.d("mylogs", "sendFriendResquest: " + (this.listener == null) + (getListener == null));
-        this.listener.onFailure();
-        if(localUser.getID() == friendID) {
+        if (localUser.getID() == friendID) {
             // do nothing, should never happen in our implementation
-        } else if(localUser.getFriendlist().contains(friendID)) {
+        } else if (localUser.getFriendlist().contains(friendID)) {
             listener.onAlreadyFriend();
-        } else if(localUser.getRequests().contains(friendID)) {
+        } else if (localUser.getRequests().contains(friendID)) {
             // set each other as friend and remove from requests
             DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
@@ -133,7 +123,7 @@ public class UserController {
                 @Override
                 public void onSuccess(User user) {
                     // if the sender is in user friend list (caused by a previous database modification error)
-                    if(user.getFriendlist().contains(localUser.getID())) {
+                    if (user.getFriendlist().contains(localUser.getID())) {
                         // add friend to sender's friendlist
                         DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
                             @Override
@@ -157,7 +147,6 @@ public class UserController {
                         DatabaseProvider.getInstance().modifyUser(user.addRequestAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
                             @Override
                             public void onSuccess() {
-                                Log.d("mylogs", "onSuccess: friend request sent");
                                 listener.onSuccess();
                             }
 
@@ -197,7 +186,7 @@ public class UserController {
      * (In case of onDoesntexist(), does not remove request, should ask user to ignore it)
      *
      * @param requestID The ID of the user that the local user wants to accept
-     * @param listener The listener handling every DB responses
+     * @param listener  The listener handling every DB responses
      */
     public void acceptFriendRequest(final String requestID, final DatabaseProvider.ModifyUserListener listener) {
         DatabaseProvider.getInstance().getUserById(requestID, new DatabaseProvider.GetUserListener() {
@@ -261,7 +250,7 @@ public class UserController {
      * Ignores the friend request requestID received by localUser
      *
      * @param requestID The user ID that the local user wants to ignore
-     * @param listener The listener handling every DB responses
+     * @param listener  The listener handling every DB responses
      */
     public void ignoreFriendRequest(final String requestID, final BinaryListener listener) {
         DatabaseProvider.getInstance().modifyUser(localUser.removeRequestAndGet(requestID), new DatabaseProvider.ModifyUserListener() {
@@ -287,7 +276,7 @@ public class UserController {
     /**
      * Removes localUser and user with id friendID from each other's friendlist
      * (In case of failure, it can happen that localUser is not in friend's friendlist but has friendID in his list,
-     *  the problem can be fixed by repeating the action)
+     * the problem can be fixed by repeating the action)
      *
      * @param friendID The id of the friend that the local user wants to remove
      * @param listener The listener handling every DB responses

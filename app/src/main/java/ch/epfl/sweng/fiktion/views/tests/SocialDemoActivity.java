@@ -4,20 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.controllers.UserController;
-import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
@@ -60,6 +57,8 @@ public class SocialDemoActivity extends AppCompatActivity {
 
     }
 
+    private UserController.ConstructStateListener constructStateListener;
+
     @Override
     public void onStart() {
         super.onStart();
@@ -68,35 +67,34 @@ public class SocialDemoActivity extends AppCompatActivity {
         requestsListView = (ListView) findViewById(R.id.user_requests_list);
 
         if (AuthProvider.getInstance().isConnected()) {
+            constructStateListener = new UserController.ConstructStateListener() {
+                @Override
+                public void onSuccess() {
+                    friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
+                    requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
+
+
+                    friendsListView.setAdapter(friendsAdapter);
+                    requestsListView.setAdapter(requestsAdapter);
+                }
+
+                @Override
+                public void onModified() {
+                    friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
+                    requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
+
+
+                    friendsListView.setAdapter(friendsAdapter);
+                    requestsListView.setAdapter(requestsAdapter);
+                }
+
+                @Override
+                public void onFailure() {
+                }
+            };
+
             try {
-                uc = new UserController(new UserController.ConstructStateListener() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d("mylogs", "onSuccess: user controller");
-                        friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
-                        requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
-
-
-                        friendsListView.setAdapter(friendsAdapter);
-                        requestsListView.setAdapter(requestsAdapter);
-                    }
-
-                    @Override
-                    public void onModified() {
-                        Log.d("mylogs", "onModified: user controller");
-                        friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
-                        requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
-
-
-                        friendsListView.setAdapter(friendsAdapter);
-                        requestsListView.setAdapter(requestsAdapter);
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        Log.d("mylogs", "onFailure: wain");
-                    }
-                });
+                uc = new UserController(constructStateListener);
             } catch (IllegalStateException ise) {
                 goHome();
             }
@@ -149,7 +147,7 @@ public class SocialDemoActivity extends AppCompatActivity {
         });
     }
 
-    public void clickRemoveFriend(View v){
+    public void clickRemoveFriend(View v) {
         removeFriendButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
@@ -158,7 +156,7 @@ public class SocialDemoActivity extends AppCompatActivity {
             public void onSuccess() {
                 removeFriendButton.setEnabled(true);
                 //friendsAdapter.remove(friendID);
-                Toast.makeText(ctx, friendID+" was successfully removed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, friendID + " was successfully removed", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -179,13 +177,13 @@ public class SocialDemoActivity extends AppCompatActivity {
                 //requestsAdapter.remove(friendID);
                 //friendsAdapter.add(friendID);
                 acceptRequestButton.setEnabled(true);
-                Toast.makeText(ctx, friendID+" is now your friend!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, friendID + " is now your friend!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onDoesntExist() {
                 acceptRequestButton.setEnabled(true);
-                Toast.makeText(ctx, "the user "+friendID+" does no longer exist", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "the user " + friendID + " does no longer exist", Toast.LENGTH_SHORT).show();
             }
 
             @Override

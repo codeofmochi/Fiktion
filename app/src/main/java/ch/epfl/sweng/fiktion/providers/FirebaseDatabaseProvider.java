@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.util.Log;
-
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -13,7 +11,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.Comment;
@@ -427,22 +424,17 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("mylogs", "onDataChange: ");
                 if (dataSnapshot.exists()) {
                     FirebaseUser fUser = dataSnapshot.getValue(FirebaseUser.class);
                     if (fUser == null) {
-                        Log.d("mylogs", "onDataChange: if");
                         // we found the id but conversion failed, error of data handling probably
                         listener.onFailure();
                     } else {
-                        Log.d("mylogs", "onDataChange: else");
                         if (firstCall) {
-                            Log.d("mylogs", "onDataChange: elseif");
                             // inform the listener that we got the matching user
                             listener.onSuccess(fUser.toUser());
                             firstCall = false;
                         } else {
-                            Log.d("mylogs", "onDataChange: elseelse");
                             // inform the listener that the user has been modified
                             listener.onModified(fUser.toUser());
                         }
