@@ -15,6 +15,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
@@ -25,8 +26,8 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     public static String USER_ID_KEY = "USER_ID";
 
-    private User user;
-    private String userId;
+    private User user, me;
+    private String userId, myUserId;
     private TextView username, realInfos, country;
     private ImageView profilePicture, profileBanner;
     private ImageButton action;
@@ -56,50 +57,84 @@ public class ProfileActivity extends MenuDrawerActivity {
         profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
         profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(BitmapFactory.decodeResource(getResources(), R.drawable.default_user)));
 
-        // assume my profile if no userId set or TODO if it is my id
+        // get userID from intent
         Intent from = getIntent();
         userId = from.getStringExtra(USER_ID_KEY);
-        if (userId == null || userId.isEmpty()) {
-            showMyProfile();
-        }
+
+        // get my user infos
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User currUser) {
+                // set my infos
+                me = currUser;
+                myUserId = currUser.getID();
+
+                // assume my profile if no userId set or if it is my own id
+                if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
+                    user = currUser;
+                    showMyProfile();
+                }
+            }
+
+            @Override
+            public void onDoesntExist() {
+                // wrong login
+                redirectToLogin();
+            }
+
+            @Override
+            public void onFailure() {
+                // user is not auth'd but it is his profile, show login
+                if (userId == null || userId.isEmpty()) {
+                    redirectToLogin();
+                }
+                // user may not be auth'd, but proceed here to show another user's profile without the need of being logged in
+                showAnotherProfile();
+            }
+        });
     }
 
     /**
      * Show my own profile
      */
     private void showMyProfile() {
+        // display profile
+        updateInfos();
+    }
 
-        // check if user is connected and has a valid account
-        AuthenticationChecks.checkLoggedAuth(this, new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                AuthenticationChecks.goHome(ctx);
+    private void showAnotherProfile() {
+        // get profile from DB
+
+
+            // display profile
+    }
+
+    /**
+     * Update visible infos
+     */
+    private void updateInfos() {
+        username.setText(user.getName());
+        //TODO : implement these in class User and retrieve them here
+        realInfos.setText("John Doe, 21");
+        country.setText("Switzerland");
+    }
+
+    /**
+     * Triggered when an activity called here returns with a result
+     *
+     * @param requestCode the request code
+     * @param resultCode the result code
+     * @param data
+     */
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case ActivityCodes.SIGNIN_REQUEST: {
+                if (resultCode == RESULT_OK) {
+                    this.recreate();
+                }
+                break;
             }
-        });
-
-        // get user infos
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User currUser) {
-                user = currUser;
-                userId = currUser.getID();
-                username.setText(user.getName());
-                //TODO : implement these in class User and retrieve them here
-                realInfos.setText("John Doe, 21");
-                country.setText("Switzerland");
-
-            }
-
-            @Override
-            public void onDoesntExist() {
-                redirectToLogin();
-            }
-
-            @Override
-            public void onFailure() {
-                redirectToLogin();
-            }
-        });
+        }
     }
 
     /**
