@@ -50,7 +50,7 @@
             android:onClick="triggerSearch"
             android:padding="7dp"
             android:tint="@color/white"
-            app:srcCompat="@drawable/search_icon" />
+            app:srcCompat="@drawable/search_icon_24" />
 
     </LinearLayout>
 
