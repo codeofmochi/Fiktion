@@ -106,6 +106,8 @@ public class UserPlacesActivity extends AppCompatActivity {
 
         // remove any child
         poiList.removeAllViews();
+        // display title
+        poiList.addView(title);
         // display empty message
         poiList.addView(empty);
         empty.setVisibility(View.VISIBLE);
