@@ -68,9 +68,19 @@ public class SocialDemoActivity extends AppCompatActivity {
 
         if (AuthProvider.getInstance().isConnected()) {
             try {
-                uc = new UserController(new UserController.BinaryListener() {
+                uc = new UserController(new UserController.ConstructStateListener() {
                     @Override
                     public void onSuccess() {
+                        friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
+                        requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
+
+
+                        friendsListView.setAdapter(friendsAdapter);
+                        requestsListView.setAdapter(requestsAdapter);
+                    }
+
+                    @Override
+                    public void onModified() {
                         friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
                         requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
 
@@ -143,7 +153,7 @@ public class SocialDemoActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 removeFriendButton.setEnabled(true);
-                friendsAdapter.remove(friendID);
+                //friendsAdapter.remove(friendID);
                 Toast.makeText(ctx, friendID+" was successfully removed", Toast.LENGTH_SHORT).show();
             }
 
@@ -162,8 +172,8 @@ public class SocialDemoActivity extends AppCompatActivity {
         uc.acceptFriendRequest(friendID, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onSuccess() {
-                requestsAdapter.remove(friendID);
-                friendsAdapter.add(friendID);
+                //requestsAdapter.remove(friendID);
+                //friendsAdapter.add(friendID);
                 acceptRequestButton.setEnabled(true);
                 Toast.makeText(ctx, friendID+" is now your friend!", Toast.LENGTH_SHORT).show();
             }
@@ -189,7 +199,7 @@ public class SocialDemoActivity extends AppCompatActivity {
         uc.ignoreFriendRequest(friendID, new UserController.BinaryListener() {
             @Override
             public void onSuccess() {
-                requestsAdapter.remove(friendID);
+                //requestsAdapter.remove(friendID);
                 ignoreRequestButton.setEnabled(true);
                 Toast.makeText(ctx, "The friend request was ignored", Toast.LENGTH_SHORT).show();
             }

@@ -13,15 +13,19 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 public class UserController {
 
     private User localUser;
-    private BinaryListener listener;
 
-    public UserController(final BinaryListener listener) {
-        this.listener = listener;
+    public UserController(final ConstructStateListener listener) {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 localUser = user;
                 listener.onSuccess();
+            }
+
+            @Override
+            public void onModified(User user) {
+                localUser = user;
+                listener.onModified();
             }
 
             @Override
@@ -48,7 +52,6 @@ public class UserController {
         return localUser;
     }
 
-    //TODO: remove request on double request sending
     /**
      * Sends a friend request from localUser to friendID
      *
@@ -56,17 +59,19 @@ public class UserController {
      * @param listener The listener handling every DB responses
      */
     public void sendFriendResquest(final String friendID, final RequestListener listener) {
-        if(localUser.getFriendlist().contains(friendID)) {
+        if(localUser.getID() == friendID) {
+            // do nothing, should never happen in our implementation
+        } else if(localUser.getFriendlist().contains(friendID)) {
             listener.onAlreadyFriend();
         } else if(localUser.getRequests().contains(friendID)) {
             // set each other as friend and remove from requests
             DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess(User user) {
-                    DatabaseProvider.getInstance().modifyUser(user.addFriendAndGet(user.getID()), new DatabaseProvider.ModifyUserListener() {
+                public void onSuccess(final User user) {
+                    DatabaseProvider.getInstance().modifyUser(user.addFriendAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
                         @Override
                         public void onSuccess() {
-                            DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
+                            DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID).removeRequestAndGet(user.getID()), new DatabaseProvider.ModifyUserListener() {
                                 @Override
                                 public void onSuccess() {
                                     listener.onNewFriend();
@@ -96,6 +101,11 @@ public class UserController {
                             listener.onFailure();
                         }
                     });
+                }
+
+                @Override
+                public void onModified(User user) {
+                    // do nothing
                 }
 
                 @Override
@@ -155,6 +165,11 @@ public class UserController {
                 }
 
                 @Override
+                public void onModified(User user) {
+                    // do nothing
+                }
+
+                @Override
                 public void onDoesntExist() {
                     listener.onDoesntExist();
                 }
@@ -167,7 +182,6 @@ public class UserController {
         }
     }
 
-    //TODO: check if user is in friendlist before accepting // check why user adds himself to friend on accepting request that is in friendlist
     /**
      * Accepts the friend request requestID received by localUser
      * (In case of onDoesntexist(), does not remove request, should ask user to ignore it)
@@ -214,6 +228,11 @@ public class UserController {
                         listener.onFailure();
                     }
                 });
+            }
+
+            @Override
+            public void onModified(User user) {
+                // do nothing
             }
 
             @Override
@@ -286,6 +305,11 @@ public class UserController {
             }
 
             @Override
+            public void onModified(User user) {
+                // do nothing
+            }
+
+            @Override
             public void onDoesntExist() {
                 removeFromLocalUserFriendList(friendID, listener);
             }
@@ -335,6 +359,24 @@ public class UserController {
          * what to do if the action fails
          */
         void onFailure();
+    }
+
+    public interface ConstructStateListener {
+        /**
+         * what to do if action succeed
+         */
+        void onSuccess();
+
+        /**
+         * what to do on object update
+         */
+        void onModified();
+
+        /**
+         * what to do if the action fails
+         */
+        void onFailure();
+
     }
 
     public interface RequestListener {

@@ -275,6 +275,11 @@ public class FirebaseAuthProvider extends AuthProvider {
                 }
 
                 @Override
+                public void onModified(User user) {
+
+                }
+
+                @Override
                 public void onDoesntExist() {
                     listener.onDoesntExist();
                 }

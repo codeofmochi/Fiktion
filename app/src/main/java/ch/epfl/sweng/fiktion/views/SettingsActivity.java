@@ -69,6 +69,11 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
 
             @Override
+            public void onModified(User user) {
+
+            }
+
+            @Override
             public void onDoesntExist() {
                 //TODO: decide what to do if user does not exist in database
                 user = null;
