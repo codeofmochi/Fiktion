@@ -422,7 +422,9 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     public void getUserById(String id, final GetUserListener listener) {
         // get the reference of the user associated with the id
         DatabaseReference userRef = dbRef.child(usersRefName).child(id);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -431,8 +433,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         // we found the id but conversion failed, error of data handling probably
                         listener.onFailure();
                     } else {
-                        // inform the listener that we got the matching user
-                        listener.onSuccess(fUser.toUser());
+                        if (firstCall) {
+                            // inform the listener that we got the matching user
+                            listener.onSuccess(fUser.toUser());
+                            firstCall = false;
+                        } else {
+                            // inform the listener that the user has been modified
+                            listener.onModified(fUser.toUser());
+                        }
                     }
                 } else {
                     // inform the listener that the user (id) doesnt exist
