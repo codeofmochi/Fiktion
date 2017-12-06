@@ -238,4 +238,13 @@ public class ProfileActivity extends MenuDrawerActivity {
         i.putExtra(USER_ID_KEY, userId);
         startActivity(i);
     }
+
+    /**
+     * Activity state getter
+     *
+     * @return the current state of the activity
+     */
+    public Action getState() {
+        return this.state;
+    }
 }
