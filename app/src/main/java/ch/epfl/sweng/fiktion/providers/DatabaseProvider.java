@@ -368,6 +368,16 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    public enum Vote {
+        UPVOTE, DOWNVOTE, NOVOTE
+    }
+
+    public interface GetVoteListener {
+        void onSuccess(Vote vote);
+
+        void onFailure();
+    }
+
     /**
      * add a comment, inform the listener of the result
      *
@@ -402,4 +412,6 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void downvoteComment(String poiName, String userID, Comment comment, VoteListener listener);
+
+    public abstract void getCommentVoteOfUser(String userID, Comment comment, GetVoteListener listener);
 }

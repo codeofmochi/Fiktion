@@ -19,4 +19,20 @@ public class CollectionsUtils {
         return sb.toString();
     }
 
+    /**
+     * converts an array of bytes into a string, each byte is converted with its hexadecimal
+     * representation
+     *
+     * @param bytes the bytes to convert
+     * @return the string of the resulting conversion
+     */
+    public static String bytesToHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
+
 }

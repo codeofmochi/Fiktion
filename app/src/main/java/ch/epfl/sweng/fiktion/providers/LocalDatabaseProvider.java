@@ -438,7 +438,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     @Override
     public void getComments(String poiName, GetCommentsListener listener) {
         if (poiName.contains("GETCOMMENTN")) {
-            listener.onNewValue(new Comment("GETCOMMENTN", "author", new Date(0), 0));
+            listener.onNewValue(new Comment("GETCOMMENTN", "GETCOMMENTN", "author", new Date(0), 0));
             return;
         }
         if (poiName.contains("GETCOMMENTF")) {
@@ -464,5 +464,10 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     @Override
     public void downvoteComment(String poiName, String userID, Comment comment, VoteListener listener) {
 
+    }
+
+    @Override
+    public void getCommentVoteOfUser(String userID, Comment comment, GetVoteListener listener) {
+        
     }
 }

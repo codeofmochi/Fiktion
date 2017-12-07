@@ -513,7 +513,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void addComment(final Comment comment, String poiName, final AddCommentListener listener) {
         // get the comment reference
-        final DatabaseReference commentRef = dbRef.child(commentsRef).child(poiName).child(String.valueOf(comment.getDate().getTime()));
+        final DatabaseReference commentRef = dbRef.child(commentsRef).child(poiName).child(comment.getId());
         commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -589,9 +589,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         DatabaseReference poiRef = dbRef.child(commentsRef).child(poiName);
 
         // get the comment reference
-        final String index = String.valueOf(comment.getDate().getTime());
-        final DatabaseReference commentRef = poiRef.child(index);
-        
+        final DatabaseReference commentRef = poiRef.child(comment.getId());
+
         commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -604,7 +603,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     commentRef.child("rating").setValue(rating - 1);
 
                     // add to the database the fact that the user voted
-                    dbRef.child(commentVotersRef).child(poiName).child(index).child(userID).setValue(1);
+                    dbRef.child(commentVotersRef).child(comment.getId()).child(userID).setValue(1);
 
                     // inform the listener that the upvote succeeded
                     listener.onSuccess();
@@ -631,8 +630,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         DatabaseReference poiRef = dbRef.child(commentsRef).child(poiName);
 
         // get the comment reference
-        final String index = String.valueOf(comment.getDate().getTime());
-        final DatabaseReference commentRef = poiRef.child(index);
+        final DatabaseReference commentRef = poiRef.child(comment.getId());
 
         commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -646,7 +644,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     commentRef.child("rating").setValue(rating + 1);
 
                     // add to the database the fact that the user voted
-                    dbRef.child(commentVotersRef).child(poiName).child(index).child(userID).setValue(-1);
+                    dbRef.child(commentVotersRef).child(comment.getId()).child(userID).setValue(-1);
 
                     // inform the listener that the upvote succeeded
                     listener.onSuccess();
@@ -659,6 +657,37 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    @Override
+    public void getCommentVoteOfUser(String userID, Comment comment, final GetVoteListener listener) {
+        DatabaseReference voteRef = dbRef.child(commentVotersRef).child(comment.getId()).child(userID);
+
+        voteRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Vote vote;
+                if (dataSnapshot.exists()) {
+                    Object voteValue = dataSnapshot.getValue();
+                    long longVoteValue = voteValue == null ? 0 : (long) voteValue;
+                    if (longVoteValue < 0) {
+                        vote = Vote.DOWNVOTE;
+                    } else if (longVoteValue > 0) {
+                        vote = Vote.UPVOTE;
+                    } else {
+                        vote = Vote.NOVOTE;
+                    }
+                } else {
+                    vote = Vote.NOVOTE;
+                }
+                listener.onSuccess(vote);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
                 listener.onFailure();
             }
         });
