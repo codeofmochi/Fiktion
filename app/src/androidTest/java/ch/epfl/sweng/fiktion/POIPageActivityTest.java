@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.NoMatchingViewException;
-import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.ViewInteraction;
@@ -21,7 +20,6 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -42,10 +40,8 @@ import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -55,7 +51,6 @@ import static android.support.test.espresso.intent.matcher.IntentMatchers.toPack
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
@@ -134,7 +129,7 @@ public class POIPageActivityTest {
 
 
     @Before
-    public void beforeReset(){
+    public void beforeReset() {
 
         DatabaseProvider.destroyInstance();
         AuthProvider.destroyInstance();
@@ -185,6 +180,7 @@ public class POIPageActivityTest {
             }
         });
     }
+
     @After
     public void resetProviders() {
         PhotoProvider.destroyInstance();
@@ -346,71 +342,71 @@ public class POIPageActivityTest {
     }
 
 
-
     // edit a POI
 
     private static ViewAction swipeUpCenterTopFast() {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.TOP_CENTER, Press.FINGER);
     }
-/*
-    @Test
-    public void testFavourite(){
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User user) {
-                setUser(user);
-            }
 
-            @Override
-            public void onDoesntExist() {
-            }
+    /*
+        @Test
+        public void testFavourite(){
+            AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+                @Override
+                public void onSuccess(User user) {
+                    setUser(user);
+                }
 
-            @Override
-            public void onFailure() {
-            }
-        });
+                @Override
+                public void onDoesntExist() {
+                }
 
-        Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
-        toastRule.launchActivity(i);
+                @Override
+                public void onFailure() {
+                }
+            });
 
-        onView(withId(R.id.moreMenu)).perform(click());
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-        onView(withText("Favourite")).perform(click());
+            Intent i = new Intent();
+            i.putExtra("POI_NAME", "poiTest");
+            toastRule.launchActivity(i);
 
-        assertTrue(user.getFavourites().contains("poiTest"));
+            onView(withId(R.id.moreMenu)).perform(click());
+            openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+            onView(withText("Favourite")).perform(click());
 
-    }
+            assertTrue(user.getFavourites().contains("poiTest"));
 
-    @Test
-    public void testWishlist(){
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User user) {
-                setUser(user);
-            }
+        }
 
-            @Override
-            public void onDoesntExist() {
-            }
+        @Test
+        public void testWishlist(){
+            AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+                @Override
+                public void onSuccess(User user) {
+                    setUser(user);
+                }
 
-            @Override
-            public void onFailure() {
-            }
-        });
+                @Override
+                public void onDoesntExist() {
+                }
 
-        Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
-        toastRule.launchActivity(i);
+                @Override
+                public void onFailure() {
+                }
+            });
 
-        onView(withId(R.id.moreMenu)).perform(click());
-        onView(withId(R.id.moreMenu)).perform(click());
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-        onView(withText("Wishlist")).perform(click());
-        assertTrue(user.getWishlist().contains("poiTest"));
+            Intent i = new Intent();
+            i.putExtra("POI_NAME", "poiTest");
+            toastRule.launchActivity(i);
 
-    }
-*/
+            onView(withId(R.id.moreMenu)).perform(click());
+            onView(withId(R.id.moreMenu)).perform(click());
+            openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+            onView(withText("Wishlist")).perform(click());
+            assertTrue(user.getWishlist().contains("poiTest"));
+
+        }
+    */
     @Test
     public void testModifyExistingPoi() {
         Intent i = new Intent();

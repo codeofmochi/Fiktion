@@ -569,6 +569,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         upload(image);
     }
+
     //camera result, creates the ImageFile and uploads it
     private void onCameraResult(Intent data) {
 
@@ -628,6 +629,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
     }
+
     //Button with id = AddReviewButton calls this, opens the WriteCommentActivity
     public void startWriteCommentActivity(View view) {
         // check if user is connected and has a valid account
