@@ -391,7 +391,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 imgView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String fileName = "a photo of " + poi.name();
+                        String fileName = "image";
                         try {
                             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                             b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);

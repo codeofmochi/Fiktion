@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.ViewInteraction;
@@ -20,6 +21,7 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -53,8 +55,10 @@ import static android.support.test.espresso.intent.matcher.IntentMatchers.toPack
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
+import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 import static junit.framework.Assert.assertFalse;
@@ -300,6 +304,7 @@ public class POIPageActivityTest {
         this.user = user;
     }
 
+
     @Test
     public void voteTest() {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
@@ -339,6 +344,8 @@ public class POIPageActivityTest {
         });
         assertFalse(user.getUpvoted().contains("poiTest"));
     }
+
+
 
     // edit a POI
 
@@ -463,6 +470,34 @@ public class POIPageActivityTest {
         onView(withId(R.id.uploadCommentButton)).perform(click());
         onView(withId(R.id.nearbyTitle)).perform(ViewActions.scrollTo());
         onView(withText("this is a test")).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void fullscreenTest() {
+        Bitmap b = BitmapFactory.decodeResource(
+                InstrumentationRegistry.getTargetContext().getResources(),
+                R.mipmap.ic_launcher);
+        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+            }
+        });
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+
+        onView(withId(R.id.imgSlider)).perform(ViewActions.scrollTo());
+        onView(withParent(withId(R.id.imgSlider))).perform(click());
+        onView(withId(R.id.fullScreen)).check(matches(isDisplayed()));
     }
 
 }
