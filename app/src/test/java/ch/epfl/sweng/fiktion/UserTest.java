@@ -22,6 +22,7 @@ import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -177,19 +178,19 @@ public class UserTest {
         user1 = new User("user1", "id1");
         userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(),
-                true, new TreeSet<String>());
+                true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
         userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(), new LinkedList<String>(),
-                true, new TreeSet<String>());
+                true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
         userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(),
-                true, new TreeSet<String>());
+                true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
         userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)),
                 new TreeSet<>(Arrays.asList(whishList)), new TreeSet<String>(), new TreeSet<String>(),
-                new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>());
+                new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
         userWithUpvoted = new User("userWVFav", "idwvfav", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>(),
-                true, new TreeSet<>(Arrays.asList(upvotedList)));
+                true, new TreeSet<>(Arrays.asList(upvotedList)), new Settings(Config.DEFAULT_SEARCH_RADIUS));
 
         doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
 
@@ -1253,7 +1254,8 @@ public class UserTest {
         // setUp
         String[] rL = new String[]{"id1"};
         User u = new User("u", "idu", new TreeSet<String>(), new TreeSet<String>(),
-                new TreeSet<String>(), new TreeSet<>(Arrays.asList(rL)), new LinkedList<String>(), true, new TreeSet<String>());
+                new TreeSet<String>(), new TreeSet<>(Arrays.asList(rL)), new LinkedList<String>(), true, new TreeSet<String>(),
+                new Settings(Config.DEFAULT_SEARCH_RADIUS));
 
         u.ignoreFriendRequest(user1.getID(), new AuthProvider.AuthListener() {
             @Override

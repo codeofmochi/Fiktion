@@ -40,9 +40,9 @@
             android:layout_marginTop="10dp"
             android:background="@color/colorPrimary"
             android:onClick="redirectToLogin"
-            android:visibility="gone"
             android:text="@string/login"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/accountSettings"
@@ -253,9 +253,7 @@
                     android:id="@+id/searchRadiusNum"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="$00 km$"
-                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+                    android:layout_weight="1" />
 
                 <SeekBar
                     android:id="@+id/searchRadiusSlider"

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.epfl.sweng.fiktion.R;
@@ -28,6 +30,9 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button deleteButton;
     private Button signOutButton;
     private Button resetButton;
+
+    private SeekBar radiusSlider;
+    private TextView radiusValue;
 
     private User user;
     private DatabaseProvider database = DatabaseProvider.getInstance();
@@ -52,6 +57,8 @@ public class SettingsActivity extends MenuDrawerActivity {
         deleteButton = (Button) findViewById(R.id.deleteAccountButton);
         signOutButton = (Button) findViewById(R.id.signOutButton);
         resetButton = (Button) findViewById(R.id.passwordReset);
+        radiusSlider = (SeekBar)findViewById(R.id.searchRadiusSlider);
+        radiusValue = (TextView)findViewById(R.id.searchRadiusNum);
     }
 
     @Override
@@ -65,6 +72,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 user = currUser;
                 userNewName.setHint(user.getName());
                 userNewEmail.setHint(auth.getEmail());
+                radiusValue.setText(String.valueOf(user.getSettings().getSearchRadius()));
             }
 
             @Override
