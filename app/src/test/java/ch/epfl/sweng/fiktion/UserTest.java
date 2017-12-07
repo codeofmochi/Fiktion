@@ -203,6 +203,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -239,6 +244,11 @@ public class UserTest {
                     @Override
                     public void onSuccess(User user) {
                         assertThat(user.getUpvoted().contains(poiName), is(false));
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
                     }
 
                     @Override
@@ -406,6 +416,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -449,6 +464,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -475,6 +495,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -515,6 +540,11 @@ public class UserTest {
                     @Override
                     public void onSuccess(User user) {
                         assertFalse(user.getFavourites().contains("fav POI"));
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
                     }
 
                     @Override
@@ -580,6 +610,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -620,6 +655,11 @@ public class UserTest {
                     @Override
                     public void onSuccess(User user) {
                         assertTrue(user.getWishlist().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
                     }
 
                     @Override
@@ -684,6 +724,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -727,6 +772,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -755,6 +805,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -795,6 +850,11 @@ public class UserTest {
                     @Override
                     public void onSuccess(User user) {
                         assertTrue(user.getVisited().contains("new POI"));
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
                     }
 
                     @Override
@@ -824,6 +884,11 @@ public class UserTest {
                     }
 
                     @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
                     public void onDoesntExist() {
                         Assert.fail();
                     }
@@ -864,6 +929,11 @@ public class UserTest {
                     @Override
                     public void onSuccess(User user) {
                         assertFalse(userWVFav.getVisited().contains("vis POI"));
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
                     }
 
                     @Override
