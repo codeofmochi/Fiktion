@@ -54,6 +54,7 @@ public class ProfileActivity extends MenuDrawerActivity {
     private int bannerHeight = 270;
     // this activity's context
     private Activity ctx = this;
+    private Snackbar loading;
 
 
     @Override
@@ -70,6 +71,10 @@ public class ProfileActivity extends MenuDrawerActivity {
         profilePicture = (ImageView) findViewById(R.id.userProfilePicture);
         profileBanner = (ImageView) findViewById(R.id.userBanner);
         action = (ImageButton) findViewById(R.id.userAction);
+
+        // show loading snackbar
+        loading = Snackbar.make(profileBanner, R.string.loading_text, Snackbar.LENGTH_INDEFINITE);
+        loading.show();
 
         // set default images
         profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
@@ -163,6 +168,9 @@ public class ProfileActivity extends MenuDrawerActivity {
      * Update visible infos
      */
     private void updateInfos() {
+        // hide loading
+        loading.dismiss();
+        // display infos
         action.setVisibility(View.VISIBLE);
         username.setText(user.getName());
         //TODO : implement these in class User and retrieve them here
