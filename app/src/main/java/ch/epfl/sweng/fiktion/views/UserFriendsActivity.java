@@ -6,6 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.views.utils.UserDisplayer;
 
 public class UserFriendsActivity extends AppCompatActivity {
 
@@ -26,5 +27,10 @@ public class UserFriendsActivity extends AppCompatActivity {
         friendsListTitle = (TextView) findViewById(R.id.friends_list_title);
         friendsList = (LinearLayout) findViewById(R.id.friends_list);
         friendsListEmpty = (TextView) findViewById(R.id.friends_list_empty);
+
+        friendsList.addView(UserDisplayer.withX((LinearLayout) UserDisplayer.createUserListElement(null, this), this));
+        friendsList.addView(UserDisplayer.withX((LinearLayout) UserDisplayer.createUserListElement(null, this), this));
+        friendsList.addView(UserDisplayer.withV((LinearLayout) UserDisplayer.createUserListElement(null, this), this));
+        friendsList.addView(UserDisplayer.withX((LinearLayout) UserDisplayer.withV((LinearLayout) UserDisplayer.createUserListElement(null, this), this), this));
     }
 }
