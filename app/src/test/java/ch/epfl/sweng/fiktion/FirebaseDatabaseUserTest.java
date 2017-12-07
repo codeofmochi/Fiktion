@@ -135,6 +135,11 @@ public class FirebaseDatabaseUserTest {
             }
 
             @Override
+            public void onModified(User user) {
+
+            }
+
+            @Override
             public void onDoesntExist() {
                 setResult(DOESNTEXIST);
             }

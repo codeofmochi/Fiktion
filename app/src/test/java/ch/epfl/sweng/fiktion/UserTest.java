@@ -993,7 +993,7 @@ public class UserTest {
     @Test
     public void testAddRequestAndGet() {
         String someUserID = "someUserID";
-        User u = user.addFriendAndGet(someUserID);
+        User u = user.addRequestAndGet(someUserID);
         assertTrue(u.getRequests().contains(someUserID));
     }
 
