@@ -27,9 +27,11 @@ import static junit.framework.Assert.assertTrue;
 
 public class UserControllerTest {
 
+    private AuthProvider auth;
     private User user;
     private User user1;
     private User userFR;
+    private User userFakeR;
     @BeforeClass
     public static void setConfig() {
         Config.TEST_MODE = true;
@@ -38,9 +40,11 @@ public class UserControllerTest {
     @Before
     public void setUp() {
 
+        auth = AuthProvider.getInstance();
         // Initiating friendlists and friendRequests
         String[] frList = new String[]{"defaultID"};
         String[] rList = new String[]{"id1"};
+        String[] fakeRList = new String[]{"idfake"};
 
         // Initiating users
         user = new User("default", "defaultID");
@@ -48,6 +52,9 @@ public class UserControllerTest {
         userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(),
                 true, new TreeSet<String>());
+        userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
+                new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true, new TreeSet<String>());
+
     }
 
     @After
@@ -234,9 +241,9 @@ public class UserControllerTest {
         });
     }
 
-    /*
     @Test
     public void testSendFriendRequestOnAlreadyFriendLogic() {
+        ((LocalAuthProvider)auth).currUser = userFR;
         UserController uc = new UserController(new UserController.ConstructStateListener() {
             @Override
             public void onSuccess() {
@@ -254,8 +261,321 @@ public class UserControllerTest {
             }
         });
 
+        uc.sendFriendResquest(user.getID(), new UserController.RequestListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
 
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onAlreadyFriend() {
+                assertTrue(userFR.getFriendlist().contains(user.getID()));
+            }
+
+            @Override
+            public void onNewFriend() {
+                Assert.fail();
+            }
+        });
     }
-    */
+
+    @Test
+    public void testSendFriendRequestOnNewFriendLogic() {
+        ((LocalAuthProvider)auth).currUser = userFR;
+        UserController uc = new UserController(new UserController.ConstructStateListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onModified() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        uc.sendFriendResquest(user1.getID(), new UserController.RequestListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onAlreadyFriend() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onNewFriend() {
+                DatabaseProvider.getInstance().getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User u) {
+                        assertTrue(u.getFriendlist().contains(userFR.getID()));
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+        });
+    }
+
+    @Test
+    public void testAcceptFriendRequestLogic() {
+        ((LocalAuthProvider)auth).currUser = userFR;
+        UserController uc = new UserController(new UserController.ConstructStateListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onModified() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        uc.acceptFriendRequest(user1.getID(), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                DatabaseProvider.getInstance().getUserById(userFR.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User u) {
+                        assertTrue(u.getFriendlist().contains(user1.getID()));
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testAcceptFriendRequestOnDoesntExistLogic() {
+        ((LocalAuthProvider)auth).currUser = userFakeR;
+        UserController uc = new UserController(new UserController.ConstructStateListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onModified() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        uc.acceptFriendRequest("idfake", new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                DatabaseProvider.getInstance().getUserById(userFakeR.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User u) {
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testIgnoreFriendRequestLogic() {
+        ((LocalAuthProvider)auth).currUser = userFR;
+        UserController uc = new UserController(new UserController.ConstructStateListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onModified() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        uc.ignoreFriendRequest(user1.getID(), new UserController.BinaryListener() {
+            @Override
+            public void onSuccess() {
+                DatabaseProvider.getInstance().getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User u) {
+                        assertTrue(u.getRequests().isEmpty());
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void testRemoveFromFriendListLogic() {
+        ((LocalAuthProvider)auth).currUser = userFR;
+        UserController uc = new UserController(new UserController.ConstructStateListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onModified() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+        uc.removeFromFriendList(user.getID(), new UserController.BinaryListener() {
+            @Override
+            public void onSuccess() {
+                DatabaseProvider.getInstance().getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User u) {
+                        assertTrue(u.getFriendlist().isEmpty());
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
 
 }
