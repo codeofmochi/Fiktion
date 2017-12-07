@@ -129,6 +129,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
         </activity>
+        <activity android:name=".views.FullscreenPictureActivity"></activity>
     </application>
 
 </manifest>
