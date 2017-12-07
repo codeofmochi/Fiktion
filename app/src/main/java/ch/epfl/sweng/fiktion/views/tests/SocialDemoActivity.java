@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class SocialDemoActivity extends AppCompatActivity {
 
     // text views
     private EditText userInput;
+    private TextView userName;
 
     // list adapters
     private ArrayAdapter<String> friendsAdapter;
@@ -49,6 +51,7 @@ public class SocialDemoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_social_demo);
 
         // initialize views
+        userName = (TextView) findViewById(R.id.display_user_name);
         userInput = (EditText) findViewById(R.id.user_input);
         sendRequestButton = (Button) findViewById(R.id.send_request_button);
         removeFriendButton = (Button) findViewById(R.id.remove_friend_button);
@@ -70,6 +73,7 @@ public class SocialDemoActivity extends AppCompatActivity {
             constructStateListener = new UserController.ConstructStateListener() {
                 @Override
                 public void onSuccess() {
+                    userName.setText(uc.getLocalUser().getName());
                     friendsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getFriendlist()));
                     requestsAdapter = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1, new ArrayList<>(uc.getLocalUser().getRequests()));
 
@@ -111,10 +115,10 @@ public class SocialDemoActivity extends AppCompatActivity {
     }
 
     public void clickAddFriend(View v) {
-        sendRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
         if(!friendID.equals("")) {
+            sendRequestButton.setEnabled(false);
             uc.sendFriendResquest(friendID, new UserController.RequestListener() {
                 @Override
                 public void onSuccess() {
@@ -150,10 +154,10 @@ public class SocialDemoActivity extends AppCompatActivity {
     }
 
     public void clickRemoveFriend(View v) {
-        removeFriendButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
         if(!friendID.equals("")) {
+            removeFriendButton.setEnabled(false);
             uc.removeFromFriendList(friendID, new UserController.BinaryListener() {
                 @Override
                 public void onSuccess() {
@@ -172,10 +176,10 @@ public class SocialDemoActivity extends AppCompatActivity {
     }
 
     public void clickAcceptRequest(View v) {
-        acceptRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
         if(!friendID.equals("")) {
+            acceptRequestButton.setEnabled(false);
             uc.acceptFriendRequest(friendID, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
@@ -201,10 +205,10 @@ public class SocialDemoActivity extends AppCompatActivity {
     }
 
     public void clickIgnoreRequest(View v) {
-        ignoreRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
         if(!friendID.equals("")) {
+            ignoreRequestButton.setEnabled(false);
             uc.ignoreFriendRequest(friendID, new UserController.BinaryListener() {
                 @Override
                 public void onSuccess() {
