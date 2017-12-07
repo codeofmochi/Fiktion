@@ -3,6 +3,7 @@ package ch.epfl.sweng.fiktion.views.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -142,22 +143,32 @@ public class CommentsDisplayer {
      * @return a comment card view to be added to a parent view
      */
     public static View createCommentCard(Comment c, final Context ctx) {
-        // create new view for the comment
-        LinearLayout v = new LinearLayout(ctx);
-        v.setOrientation(LinearLayout.VERTICAL);
+
+        // create a new view for the comment
+        LinearLayout commentContainer = new LinearLayout(ctx);
+        commentContainer.setOrientation(LinearLayout.HORIZONTAL);
 
         /* styles */
 
         // background color
-        v.setBackgroundColor(ctx.getResources().getColor(R.color.white));
+        commentContainer.setBackgroundColor(ctx.getResources().getColor(R.color.white));
+
         // margin
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(2, 10, 2, 10);
-        v.setLayoutParams(params);
+        LinearLayout.LayoutParams commentContainerParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        commentContainerParams.setMargins(2, 10, 2, 10);
+        commentContainer.setLayoutParams(commentContainerParams);
+
         // padding
-        v.setPadding(20, 20, 20, 20);
+        commentContainer.setPadding(20, 20, 20, 20);
         // shadow
-        v.setElevation(2);
+        commentContainer.setElevation(2);
+
+        // create a layout for the comment information
+        LinearLayout left = new LinearLayout(ctx);
+        left.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout.LayoutParams leftParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 9);
+        left.setLayoutParams(leftParams);
 
         // author text
         final TextView author = new TextView(ctx);
@@ -184,14 +195,14 @@ public class CommentsDisplayer {
             @Override
             public void onFailure() { /* nothing */ }
         });
-        v.addView(author);
+        left.addView(author);
 
         // comment text
         TextView comment = new TextView(ctx);
         comment.setTextSize(15);
         comment.setText(c.getText());
         comment.setPadding(0, 10, 0, 10);
-        v.addView(comment);
+        left.addView(comment);
 
         // date text
         TextView date = new TextView(ctx);
@@ -199,9 +210,36 @@ public class CommentsDisplayer {
         DateFormat df = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
         date.setText(df.format(c.getDate()));
         date.setTextColor(ctx.getResources().getColor(R.color.colorText));
-        v.addView(date);
+        left.addView(date);
+
+
+        // create a layout for the voting
+        LinearLayout votingLayout = new LinearLayout(ctx);
+        votingLayout.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout.LayoutParams votingLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        votingLayout.setLayoutParams(votingLayoutParams);
+
+        // add a upvote button
+        ImageView upArrowButton = new ImageView(ctx);
+        upArrowButton.setImageDrawable(ctx.getResources().getDrawable(R.drawable.up_arrow_icon_30));
+        votingLayout.addView(upArrowButton);
+
+        TextView ratingText = new TextView(ctx);
+        ratingText.setText(String.valueOf(c.getRating()));
+        ratingText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        votingLayout.addView(ratingText);
+
+        // add a downvote button
+        ImageView downArrowButton = new ImageView(ctx);
+        downArrowButton.setImageDrawable(ctx.getResources().getDrawable(R.drawable.down_arrow_icon_30));
+        votingLayout.addView(downArrowButton);
+
+        // add the two layouts to the comment view
+        commentContainer.addView(left);
+        commentContainer.addView(votingLayout);
 
         // return the whole view
-        return v;
+        return commentContainer;
     }
 }
