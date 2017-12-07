@@ -8,22 +8,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,7 +39,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
@@ -61,6 +55,7 @@ import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
+import ch.epfl.sweng.fiktion.views.utils.CommentsDisplayer;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
@@ -72,39 +67,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     public static final String USER_ID = "USER_ID";
     private final int SEARCH_RADIUS = 20;
 
-    public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
-        private ArrayList<String> data;
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView text;
-
-            public ViewHolder(TextView v) {
-                super(v);
-                text = v;
-            }
-        }
-
-        public ReviewsAdapter(ArrayList<String> data) {
-            this.data = data;
-        }
-
-        @Override
-        public ReviewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            TextView v = (TextView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_card, parent, false);
-            return new ViewHolder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.text.setText(data.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return data.size();
-        }
-    }
-
     private String poiName;
     private final Context ctx = this;
     private LinearLayout nearbyPoisList;
@@ -113,15 +75,19 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private User user;
     private Button upvoteButton;
     private Button addPictureButton;
-    private Button addReviewButton;
     private boolean upvoted = false;
     private ProgressBar uploadProgressBar;
     private LinearLayout imageLayout;
     private ImageView noImages;
     private ImageView mainImage;
     private MapView map;
-    private RecyclerView.Adapter reviewsAdapter;
-    private ArrayList<String> reviewsData = new ArrayList<>();
+    private CommentsDisplayer.LoadableList reviewsList;
+    private DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            dialog.dismiss();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,11 +97,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         //picture button
         addPictureButton = (Button) findViewById(R.id.addPictureButton);
-
         addPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AuthenticationChecks.checkAuthState((Activity) ctx);
+                AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                 // check if user's account is verified, otherwise prompt verification and/or refresh
                 if (!AuthProvider.getInstance().isEmailVerified()) {
                     return;
@@ -146,11 +111,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // upvote button
         upvoteButton = (Button) findViewById(R.id.upvoteButton);
-
-
-
-        addReviewButton = (Button) findViewById(R.id.addReviewButton);
-
 
         // Obtain the SupportMapFragment
         map = (MapView) findViewById(R.id.map);
@@ -167,12 +127,16 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         noImages.setImageBitmap(bm);
         imageLayout.addView(noImages);
 
+        // reviews
+        reviewsList = new CommentsDisplayer.LoadableList((LinearLayout) findViewById(R.id.reviews), 5, this);
+
         // get POI name
         Intent from = getIntent();
         poiName = from.getStringExtra("POI_NAME");
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
+        // check if user upvoted this poi
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
@@ -194,14 +158,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             public void onFailure() {
             }
         });
-
-        // get recycler view for reviews
-        RecyclerView reviewsView = (RecyclerView) findViewById(R.id.reviews);
-        RecyclerView.LayoutManager reviewsLayout = new LinearLayoutManager(this);
-        reviewsView.setLayoutManager(reviewsLayout);
-        reviewsAdapter = new ReviewsAdapter(reviewsData);
-        reviewsView.setAdapter(reviewsAdapter);
-
 
         // get POI from database
         DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
@@ -250,7 +206,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     public void vote(View view) {
         // check if user is connected and has a valid account
-        AuthenticationChecks.checkAuthState((Activity)ctx);
+        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
         // check if user's account is verified, otherwise prompt verification and/or refresh
         // this 'if' code is required in case the user dismisses the dialog
         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -387,8 +343,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             @Override
             public void onNewValue(Comment comment) {
-                reviewsData.add(comment.getText());
-                reviewsAdapter.notifyDataSetChanged();
+                // add to reviewsList
+                reviewsList.add(comment);
             }
 
             @Override
@@ -418,10 +374,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // download the photos of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewPhoto(final Bitmap b) {
 
                 // create a new ImageView which will hold the photo
-                ImageView imgView = new ImageView(getApplicationContext());
+                final ImageView imgView = new ImageView(getApplicationContext());
 
                 // set the content and the parameters
                 imgView.setImageBitmap(b);
@@ -431,6 +387,27 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 params.setMarginEnd(10);
                 imgView.setLayoutParams(params);
                 imgView.setContentDescription("a photo of " + poi.name());
+                //renders each image clickable. Calls FullscreenPictureActivity
+                imgView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String fileName = "image";
+                        try {
+                            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                            b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                            FileOutputStream fo = openFileOutput(fileName, Context.MODE_PRIVATE);
+                            fo.write(bytes.toByteArray());
+                            //close file
+                            fo.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            fileName = null;
+                        }
+                        Intent intent = new Intent(ctx, FullscreenPictureActivity.class);
+                        intent.putExtra("Photo", fileName);
+                        startActivity(intent);
+                    }
+                });
 
                 // add the ImageView to the pictures
                 imageLayout.addView(imgView);
@@ -448,6 +425,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
     }
+
 
     private void displayNearPois() {
         // find nearby pois
@@ -505,7 +483,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
 
-    //method to open a pop up window
+    //method to open a pop up window for Image
     private void selectImage() {
 
         if (poi == null) {
@@ -561,6 +539,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         startActivityForResult(Intent.createChooser(gallery, "Select File"), ActivityCodes.SELECT_FILE);
     }
 
+
+    //method for what do to when we got the camera/gallery result
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -576,6 +556,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
+    //gallery result which uploads the image
     private void onGalleryResult(Intent data) {
         Bitmap image = null;
         if (data != null) {
@@ -589,6 +570,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         upload(image);
     }
 
+    //camera result, creates the ImageFile and uploads it
     private void onCameraResult(Intent data) {
 
         if (data == null) {
@@ -648,9 +630,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
     }
 
+    //Button with id = AddReviewButton calls this, opens the WriteCommentActivity
     public void startWriteCommentActivity(View view) {
         // check if user is connected and has a valid account
-        AuthenticationChecks.checkAuthState((Activity)ctx);
+        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
         // check if user's account is verified, otherwise prompt verification and/or refresh
         // this 'if' code is required in case the user dismisses the dialog
         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -661,6 +644,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         i.putExtra(USER_ID, user.getID());
         startActivity(i);
     }
+
 
     /**
      * Triggered by more menu button
@@ -676,7 +660,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 switch (item.getItemId()) {
                     case R.id.favourite:
                         // check if user is connected and has a valid account
-                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -701,7 +685,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         return true;
                     case R.id.wishlist:
                         // check if user is connected and has a valid account
-                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {
@@ -726,7 +710,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         return true;
                     case R.id.edit:
                         // check if user is connected and has a valid account
-                        AuthenticationChecks.checkAuthState((Activity)ctx);
+                        AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
                         // check if user's account is verified, otherwise prompt verification and/or refresh
                         // this 'if' code is required in case the user dismisses the dialog
                         if (!AuthProvider.getInstance().isEmailVerified()) {

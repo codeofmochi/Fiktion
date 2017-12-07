@@ -89,7 +89,7 @@
         <activity
             android:name=".views.TextSearchActivity"
             android:label="Search" />
-        <activity android:name=".views.WriteCommentActivity"></activity>
+        <activity android:name=".views.WriteCommentActivity" />
         <activity
             android:name=".views.NearbyListActivity"
             android:label="Nearby">
@@ -97,6 +97,39 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.sweng.fiktion.views.LocationActivity" />
         </activity>
+        <activity
+            android:name=".views.UserPlacesActivity"
+            android:label="@string/title_activity_user_places"
+            android:parentActivityName=".views.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
+        </activity>
+        <activity
+            android:name=".views.UserPicturesActivity"
+            android:label="@string/title_activity_user_pictures"
+            android:parentActivityName=".views.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
+        </activity>
+        <activity
+            android:name=".views.UserAchievementsActivity"
+            android:label="@string/title_activity_user_achievements"
+            android:parentActivityName=".views.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
+        </activity>
+        <activity
+            android:name=".views.UserFriendsActivity"
+            android:label="@string/title_activity_user_friends"
+            android:parentActivityName=".views.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
+        </activity>
+        <activity android:name=".views.FullscreenPictureActivity"></activity>
     </application>
 
 </manifest>

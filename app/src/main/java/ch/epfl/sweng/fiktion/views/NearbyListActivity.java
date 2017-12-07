@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -24,6 +25,7 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
     private GoogleMapsLocationProvider locationProvider = new GoogleMapsLocationProvider();
     private Context ctx = this;
     private LinearLayout list;
+    private TextView empty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
         double lon = from.getDoubleExtra("LONGITUDE", 0);
 
         list = (LinearLayout) findViewById(R.id.nearbyList);
+        empty = (TextView) findViewById(R.id.empty);
 
         searchAndDisplay(lat, lon);
     }
@@ -53,11 +56,13 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
     private void searchAndDisplay(double latitude, double longitude) {
         // trigger a search
         list.removeAllViews();
+        list.addView(empty);
         DatabaseProvider.getInstance().findNearPois(new Position(latitude, longitude), 50, new DatabaseProvider.FindNearPoisListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 View v = POIDisplayer.createPoiCard(poi, ctx);
                 list.addView(v);
+                empty.setVisibility(View.GONE);
             }
 
             @Override
