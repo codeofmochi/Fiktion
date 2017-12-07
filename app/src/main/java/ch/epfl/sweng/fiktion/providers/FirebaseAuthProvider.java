@@ -268,22 +268,7 @@ public class FirebaseAuthProvider extends AuthProvider {
     public void getCurrentUser(final DatabaseProvider.GetUserListener listener) {
         user = auth.getCurrentUser();
         if (user != null) {
-            database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User user) {
-                    listener.onSuccess(user);
-                }
-
-                @Override
-                public void onDoesntExist() {
-                    listener.onDoesntExist();
-                }
-
-                @Override
-                public void onFailure() {
-                    listener.onFailure();
-                }
-            });
+            database.getUserById(user.getUid(), listener);
         } else {
             listener.onFailure();
         }

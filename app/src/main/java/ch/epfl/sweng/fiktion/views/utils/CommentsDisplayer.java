@@ -179,6 +179,11 @@ public class CommentsDisplayer {
             }
 
             @Override
+            public void onModified(User user) {
+
+            }
+
+            @Override
             public void onDoesntExist() { /* nothing */ }
 
             @Override
