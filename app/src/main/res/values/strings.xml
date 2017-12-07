@@ -111,4 +111,7 @@
     <string name="no_places_yet_add_some">No places yet. Add some?</string>
     <string name="user_not_found">User not found</string>
     <string name="profile_action">Profile action</string>
+    <string name="friends_requests">Friends requests</string>
+    <string name="friends_list">Friends list</string>
+    <string name="no_friends_yet_add_some">No friends yet. Add some?</string>
 </resources>

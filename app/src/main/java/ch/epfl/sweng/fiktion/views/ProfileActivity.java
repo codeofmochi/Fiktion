@@ -27,15 +27,19 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     // keys for extra data
     public static String USER_ID_KEY = "USER_ID";
+    public static String PROFILE_ACTION_KEY = "PROFILE_ACTION";
 
     // define possible actions
     public enum Action {
         MY_PROFILE,
         ANOTHER_PROFILE
     }
+    public static String PROFILE_ACTION_ME = "PROFILE_ACTION_ME";
+    public static String PROFILE_ACTION_ANOTHER = "PROFILE_ACTION_ANOTHER";
 
     // define current action
     private Action state;
+    private String stateFlag;
 
     // load own user and eventually the correct profile
     private User user, me;
@@ -120,6 +124,7 @@ public class ProfileActivity extends MenuDrawerActivity {
     private void showMyProfile() {
         // display profile
         this.state = Action.MY_PROFILE;
+        this.stateFlag = PROFILE_ACTION_ME;
         // set action button
         action.setImageDrawable(getResources().getDrawable(R.drawable.pencil_icon_24));
         updateInfos();
@@ -128,6 +133,7 @@ public class ProfileActivity extends MenuDrawerActivity {
     private void showAnotherProfile() {
         // display another user's profile
         this.state = Action.ANOTHER_PROFILE;
+        this.stateFlag = PROFILE_ACTION_ANOTHER;
         // set action button
         action.setImageDrawable(getResources().getDrawable(R.drawable.person_add_icon_24));
 
@@ -201,8 +207,11 @@ public class ProfileActivity extends MenuDrawerActivity {
      * @param view caller view
      */
     public void startUserPlacesActivity(View view) {
+        // if not loaded, don't do anything
+        if (this.state == null) return;
         Intent i = new Intent(this, UserPlacesActivity.class);
         i.putExtra(USER_ID_KEY, userId);
+        i.putExtra(PROFILE_ACTION_KEY, stateFlag);
         startActivity(i);
     }
 
@@ -212,8 +221,11 @@ public class ProfileActivity extends MenuDrawerActivity {
      * @param view caller view
      */
     public void startUserPicturesActivity(View view) {
+        // if not loaded, don't do anything
+        if (this.state == null) return;
         Intent i = new Intent(this, UserPicturesActivity.class);
         i.putExtra(USER_ID_KEY, userId);
+        i.putExtra(PROFILE_ACTION_KEY, stateFlag);
         startActivity(i);
     }
 
@@ -223,8 +235,11 @@ public class ProfileActivity extends MenuDrawerActivity {
      * @param view caller view
      */
     public void startUserFriendsActivity(View view) {
+        // if not loaded, don't do anything
+        if (this.state == null) return;
         Intent i = new Intent(this, UserFriendsActivity.class);
         i.putExtra(USER_ID_KEY, userId);
+        i.putExtra(PROFILE_ACTION_KEY, stateFlag);
         startActivity(i);
     }
 
@@ -234,8 +249,11 @@ public class ProfileActivity extends MenuDrawerActivity {
      * @param view caller view
      */
     public void startUserAchievementsActivity(View view) {
+        // if not loaded, don't do anything
+        if (this.state == null) return;
         Intent i = new Intent(this, UserAchievementsActivity.class);
         i.putExtra(USER_ID_KEY, userId);
+        i.putExtra(PROFILE_ACTION_KEY, stateFlag);
         startActivity(i);
     }
 
