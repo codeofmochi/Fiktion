@@ -16,6 +16,7 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.tests.SocialDemoActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
@@ -65,6 +66,11 @@ public class SettingsActivity extends MenuDrawerActivity {
                 user = currUser;
                 userNewName.setHint(user.getName());
                 userNewEmail.setHint(auth.getEmail());
+            }
+
+            @Override
+            public void onModified(User user) {
+
             }
 
             @Override
@@ -403,5 +409,10 @@ public class SettingsActivity extends MenuDrawerActivity {
                 break;
             }
         }
+    }
+
+    public void startSocialDemo(View v){
+        Intent i = new Intent(this, SocialDemoActivity.class);
+        this.startActivity(i);
     }
 }

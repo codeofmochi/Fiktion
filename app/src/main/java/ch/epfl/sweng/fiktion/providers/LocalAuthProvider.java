@@ -20,7 +20,7 @@ public class LocalAuthProvider extends AuthProvider {
             (Collections.singletonList(defaultUser));
     private List<String> mailList = new ArrayList<>
             (Collections.singletonList(defaultEmail));
-    private User currUser = defaultUser;
+    public User currUser = defaultUser;
     private Boolean signedIn = true;
     private String currentUserEmail = defaultEmail;
     private Boolean emailVerified = false;

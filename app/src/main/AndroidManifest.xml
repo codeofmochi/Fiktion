@@ -89,6 +89,8 @@
         <activity
             android:name=".views.TextSearchActivity"
             android:label="Search" />
+
+        <activity android:name=".views.tests.SocialDemoActivity" />
         <activity android:name=".views.WriteCommentActivity" />
         <activity
             android:name=".views.NearbyListActivity"

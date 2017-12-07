@@ -365,6 +365,11 @@ public class LocalDatabaseTest {
                 result.set("S");
             }
 
+            @Override
+            public void onModified(User user) {
+
+            }
+
 
             @Override
             public void onDoesntExist() {

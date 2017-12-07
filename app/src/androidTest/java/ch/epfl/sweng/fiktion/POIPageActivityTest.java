@@ -116,6 +116,11 @@ public class POIPageActivityTest {
             }
 
             @Override
+            public void onModified(User user) {
+
+            }
+
+            @Override
             public void onDoesntExist() {
             }
 
@@ -158,6 +163,11 @@ public class POIPageActivityTest {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
+            }
+
+            @Override
+            public void onModified(User user) {
+
             }
 
             @Override
@@ -307,6 +317,11 @@ public class POIPageActivityTest {
             @Override
             public void onSuccess(User user) {
                 setUser(user);
+            }
+
+            @Override
+            public void onModified(User user) {
+
             }
 
             @Override
