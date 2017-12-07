@@ -455,4 +455,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 listener.onNewValue(c);
         }
     }
+
+    @Override
+    public void upvoteComment(String poiName, String userID, Comment comment, VoteListener listener) {
+
+    }
+
+    @Override
+    public void downvoteComment(String poiName, String userID, Comment comment, VoteListener listener) {
+
+    }
 }

@@ -32,8 +32,8 @@ public class FirebaseComment {
     public FirebaseComment(Comment comment) {
         text = encode(comment.getText());
         authorId = encode(comment.getAuthorId());
-        milliseconds = -comment.getDate().getTime();
-        rating = comment.getRating();
+        milliseconds = comment.getDate().getTime();
+        rating = -comment.getRating();
     }
 
     /**

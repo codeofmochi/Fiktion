@@ -69,7 +69,6 @@ public class FirebaseCommentTest {
         };
 
         database.addComment(new Comment("text", "author", new Date(0), 0), "poi", listener);
-        when(snapshot.getChildrenCount()).thenReturn((long) 2);
         when(dbRef.setValue(any(FirebaseComment.class))).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
         assertTrue(success.get());
@@ -81,6 +80,7 @@ public class FirebaseCommentTest {
     public void getCommentsTest() {
         ArgumentCaptor<ChildEventListener> cel = ArgumentCaptor.forClass(ChildEventListener.class);
         when(dbRef.addChildEventListener(cel.capture())).thenReturn(null);
+        when(dbRef.orderByChild(anyString())).thenReturn(dbRef);
         final List<Comment> comments = new ArrayList<>();
         final Mutable<Boolean> isFailure = new Mutable<>(false);
         DatabaseProvider.GetCommentsListener listener = new DatabaseProvider.GetCommentsListener() {
