@@ -49,9 +49,6 @@ public class User {
         friendRequests = fRequests;
         isPublicProfile = isPublic;
         upvoted = upVotes;
-        for(String word : wishlist){
-
-        }
     }
 
     /**

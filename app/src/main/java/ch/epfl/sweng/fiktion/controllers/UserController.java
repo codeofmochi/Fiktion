@@ -58,19 +58,73 @@ public class UserController {
      * @param listener The listener handling every DB responses
      */
     public void sendFriendResquest(final String friendID, final RequestListener listener) {
-        if (localUser.getID() == friendID) {
-            // do nothing, should never happen in our implementation
-        } else if (localUser.getFriendlist().contains(friendID)) {
-            listener.onAlreadyFriend();
-        } else if (localUser.getRequests().contains(friendID)) {
-            // set each other as friend and remove from requests
-            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(final User user) {
-                    DatabaseProvider.getInstance().modifyUser(user.addFriendAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
-                        @Override
-                        public void onSuccess() {
-                            DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID).removeRequestAndGet(user.getID()), new DatabaseProvider.ModifyUserListener() {
+        if (!localUser.getID().equals(friendID)) {
+            if (localUser.getFriendlist().contains(friendID)) {
+                listener.onAlreadyFriend();
+            } else if (localUser.getRequests().contains(friendID)) {
+                // set each other as friend and remove from requests
+                DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(final User user) {
+                        DatabaseProvider.getInstance().modifyUser(user.addFriendAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
+                            @Override
+                            public void onSuccess() {
+                                DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID).removeRequestAndGet(user.getID()), new DatabaseProvider.ModifyUserListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        listener.onNewFriend();
+                                    }
+
+                                    @Override
+                                    public void onDoesntExist() {
+                                        localUser.removeFriend(friendID);
+                                        listener.onFailure();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        localUser.removeFriend(friendID);
+                                        listener.onFailure();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                listener.onDoesntExist();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                listener.onFailure();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                        listener.onDoesntExist();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        listener.onFailure();
+                    }
+                });
+            } else {
+                // add user id in friend's requestList
+                DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        // if the sender is in user friend list (caused by a previous database modification error)
+                        if (user.getFriendlist().contains(localUser.getID())) {
+                            // add friend to sender's friendlist
+                            DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
                                 @Override
                                 public void onSuccess() {
                                     listener.onNewFriend();
@@ -88,96 +142,42 @@ public class UserController {
                                     listener.onFailure();
                                 }
                             });
+                        } else {
+                            DatabaseProvider.getInstance().modifyUser(user.addRequestAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
+                                @Override
+                                public void onSuccess() {
+                                    listener.onSuccess();
+                                }
+
+                                @Override
+                                public void onDoesntExist() {
+                                    listener.onDoesntExist();
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    listener.onFailure();
+                                }
+                            });
                         }
-
-                        @Override
-                        public void onDoesntExist() {
-                            listener.onDoesntExist();
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            listener.onFailure();
-                        }
-                    });
-                }
-
-                @Override
-                public void onModified(User user) {
-                    // do nothing
-                }
-
-                @Override
-                public void onDoesntExist() {
-                    listener.onDoesntExist();
-                }
-
-                @Override
-                public void onFailure() {
-                    listener.onFailure();
-                }
-            });
-        } else {
-            // add user id in friend's requestList
-            DatabaseProvider.getInstance().getUserById(friendID, new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User user) {
-                    // if the sender is in user friend list (caused by a previous database modification error)
-                    if (user.getFriendlist().contains(localUser.getID())) {
-                        // add friend to sender's friendlist
-                        DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(friendID), new DatabaseProvider.ModifyUserListener() {
-                            @Override
-                            public void onSuccess() {
-                                listener.onNewFriend();
-                            }
-
-                            @Override
-                            public void onDoesntExist() {
-                                localUser.removeFriend(friendID);
-                                listener.onFailure();
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                localUser.removeFriend(friendID);
-                                listener.onFailure();
-                            }
-                        });
-                    } else {
-                        DatabaseProvider.getInstance().modifyUser(user.addRequestAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
-                            @Override
-                            public void onSuccess() {
-                                listener.onSuccess();
-                            }
-
-                            @Override
-                            public void onDoesntExist() {
-                                listener.onDoesntExist();
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                listener.onFailure();
-                            }
-                        });
                     }
-                }
 
-                @Override
-                public void onModified(User user) {
-                    // do nothing
-                }
+                    @Override
+                    public void onModified(User user) {
+                        // do nothing
+                    }
 
-                @Override
-                public void onDoesntExist() {
-                    listener.onDoesntExist();
-                }
+                    @Override
+                    public void onDoesntExist() {
+                        listener.onDoesntExist();
+                    }
 
-                @Override
-                public void onFailure() {
-                    listener.onFailure();
-                }
-            });
+                    @Override
+                    public void onFailure() {
+                        listener.onFailure();
+                    }
+                });
+            }
         }
     }
 
@@ -189,7 +189,7 @@ public class UserController {
      * @param listener  The listener handling every DB responses
      */
     public void acceptFriendRequest(final String requestID, final DatabaseProvider.ModifyUserListener listener) {
-        if(localUser.getRequests().contains(requestID)) {
+        if (localUser.getRequests().contains(requestID)) {
             DatabaseProvider.getInstance().getUserById(requestID, new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
