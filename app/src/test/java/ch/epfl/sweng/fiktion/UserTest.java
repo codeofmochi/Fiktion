@@ -1,9 +1,5 @@
 package ch.epfl.sweng.fiktion;
 
-import com.firebase.geofire.GeoFire;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -108,15 +104,7 @@ public class UserTest {
     };
 
     @Mock
-    DatabaseReference dbRef, usersRef, userRef;
-    @Mock
     DatabaseProvider mockDB;
-    @Mock
-    GeoFire geofire;
-    @Mock
-    DataSnapshot snapshot;
-    @Captor
-    ArgumentCaptor<DatabaseProvider.GetUserListener> getUserListenerArgumentCaptor;
     @Captor
     ArgumentCaptor<DatabaseProvider.ModifyUserListener> modifyUserListenerArgumentCaptor;
 

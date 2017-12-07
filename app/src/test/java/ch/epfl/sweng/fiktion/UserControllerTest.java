@@ -15,7 +15,6 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
-import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 
 import static junit.framework.Assert.assertTrue;
@@ -32,6 +31,7 @@ public class UserControllerTest {
     private User user1;
     private User userFR;
     private User userFakeR;
+
     @BeforeClass
     public static void setConfig() {
         Config.TEST_MODE = true;
@@ -54,7 +54,6 @@ public class UserControllerTest {
                 true, new TreeSet<String>());
         userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(), true, new TreeSet<String>());
-
     }
 
     @After
