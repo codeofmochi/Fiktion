@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.util.Log;
-
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -13,7 +11,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.Comment;
@@ -515,14 +512,20 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void addComment(final Comment comment, String poiName, final AddCommentListener listener) {
         // get the poi comments reference
-        final DatabaseReference cPOIRef = dbRef.child(commentsRef).child(poiName);
-        cPOIRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        final DatabaseReference commentRef = dbRef.child(commentsRef).child(poiName).child(String.valueOf(comment.getDate().getTime()));
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // append the new comment to the list of comments of the point of interest
-                String index = String.valueOf(dataSnapshot.getChildrenCount());
+                if (dataSnapshot.exists()) {
+                    // if the reference already exists, then another comment is created at the same millisecond
+                    // for the same poi. -> count it as a failure
+                    listener.onFailure();
+                    return;
+                }
+
+                // add the new comment to the list of comments of the point of interest
                 FirebaseComment fComment = new FirebaseComment(comment);
-                cPOIRef.child(index).setValue(fComment);
+                commentRef.setValue(fComment);
 
                 // inform to the listener that the operation succeeded
                 listener.onSuccess();
@@ -545,7 +548,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         // get the poi comments reference
         final DatabaseReference cPOIRef = dbRef.child(commentsRef).child(poiName);
 
-        cPOIRef.addChildEventListener(new ChildEventListener() {
+        cPOIRef.orderByChild("rating").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // convert into a comment
