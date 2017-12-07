@@ -991,10 +991,24 @@ public class UserTest {
     }
 
     @Test
+    public void testAddRequestAndGet() {
+        String someUserID = "someUserID";
+        User u = user.addFriendAndGet(someUserID);
+        assertTrue(u.getRequests().contains(someUserID));
+    }
+
+    @Test
     public void testRemoveRequest() {
         String id = "id1";
         userFR.removeRequest(id);
         assertFalse(userFR.getRequests().contains(id));
+    }
+
+    @Test
+    public void testRemoveRequestAndGet() {
+        String id = "id1";
+        User u = userFR.removeRequestAndGet(id);
+        assertFalse(u.getRequests().contains(id));
     }
 
     @Test
@@ -1005,9 +1019,23 @@ public class UserTest {
     }
 
     @Test
+    public void testAddFriendAndGet() {
+        String someUserID = "someUserID";
+        User u = user.addFriendAndGet(someUserID);
+        assertTrue(u.getFriendlist().contains(someUserID));
+    }
+
+    @Test
     public void testRemoveFriend() {
         String id = "defaultID";
         userFR.removeFriend(id);
         assertFalse(userFR.getFriendlist().contains(id));
+    }
+
+    @Test
+    public void testRemoveFriendAndGet() {
+        String id = "defaultID";
+        User u = userFR.removeFriendAndGet(id);
+        assertFalse(u.getFriendlist().contains(id));
     }
 }
