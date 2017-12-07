@@ -241,6 +241,13 @@ public abstract class DatabaseProvider {
         void onSuccess(User user);
 
         /**
+         * what to do if the user is modified
+         *
+         * @param user the modified user
+         */
+        void onModified(User user);
+
+        /**
          * what to do if no mathing user id is found
          */
         void onDoesntExist();

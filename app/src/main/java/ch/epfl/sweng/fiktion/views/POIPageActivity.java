@@ -150,6 +150,11 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
 
             @Override
+            public void onModified(User user) {
+
+            }
+
+            @Override
             public void onDoesntExist() {
 
             }

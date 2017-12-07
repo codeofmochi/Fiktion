@@ -59,6 +59,11 @@ public class ProfileSettingsActivityTest {
             }
 
             @Override
+            public void onModified(User user) {
+                user = null;
+            }
+
+            @Override
             public void onDoesntExist() {
                 user = null;
             }
@@ -94,6 +99,11 @@ public class ProfileSettingsActivityTest {
             }
 
             @Override
+            public void onModified(User user) {
+                Assert.fail();
+            }
+
+            @Override
             public void onDoesntExist() {
                 Assert.fail();
             }
@@ -117,6 +127,11 @@ public class ProfileSettingsActivityTest {
             public void onSuccess(User user) {
                 //assert that we can only write 15 characters
                 assertThat(AuthProvider.getInstance().getEmail(), is("default@email.ch"));
+            }
+
+            @Override
+            public void onModified(User user) {
+                Assert.fail();
             }
 
             @Override
@@ -147,6 +162,11 @@ public class ProfileSettingsActivityTest {
             public void onSuccess(User user) {
                 //assert that we can only write 15 characters
                 assertThat(user.getName(), is("thishasmorethan"));
+            }
+
+            @Override
+            public void onModified(User user) {
+                Assert.fail();
             }
 
             @Override
@@ -184,6 +204,11 @@ public class ProfileSettingsActivityTest {
             public void onSuccess(User user) {
                 assertThat(user.getName(), is(newName));
                 assertThat(AuthProvider.getInstance().getEmail(), is(newEmail));
+            }
+
+            @Override
+            public void onModified(User user) {
+                Assert.fail();
             }
 
             @Override

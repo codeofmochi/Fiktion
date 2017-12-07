@@ -96,6 +96,10 @@ public class ProfileActivity extends MenuDrawerActivity {
             }
 
             @Override
+            public void onModified(User user) {
+            }
+
+            @Override
             public void onDoesntExist() {
                 // wrong login
                 redirectToLogin();
@@ -139,6 +143,11 @@ public class ProfileActivity extends MenuDrawerActivity {
                 user = u;
                 // display profile
                 updateInfos();
+            }
+
+            @Override
+            public void onModified(User user) {
+                
             }
 
             @Override
