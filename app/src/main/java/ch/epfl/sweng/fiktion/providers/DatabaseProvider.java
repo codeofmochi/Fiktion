@@ -329,9 +329,42 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    /**
+     * Listener that listens the retrieving of comments
+     */
     public interface GetCommentsListener {
+
+        /**
+         * what to do when a comment is retrieved
+         *
+         * @param comment
+         */
         void onNewValue(Comment comment);
 
+        /**
+         * what to do when the operation fails
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the result of a vote
+     */
+    public interface VoteListener {
+
+        /**
+         * what to do if the voting succeeds
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the comment doesn't exist
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the voting fails
+         */
         void onFailure();
     }
 
@@ -351,4 +384,22 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void getComments(String poiName, GetCommentsListener listener);
+
+    /**
+     * upvotes a comment, inform the listener of the operation result
+     *
+     * @param poiName  the name of the point of interest associated to the comment
+     * @param comment  the comment
+     * @param listener the listener
+     */
+    public abstract void upvoteComment(String poiName, String userID, Comment comment, VoteListener listener);
+
+    /**
+     * downvotes a comment, inform the listener of the operation result
+     *
+     * @param poiName  the name of the point of interest associated to the comment
+     * @param comment  the comment
+     * @param listener the listener
+     */
+    public abstract void downvoteComment(String poiName, String userID, Comment comment, VoteListener listener);
 }

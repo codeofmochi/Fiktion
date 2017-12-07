@@ -30,6 +30,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private final String poisRefName = "Points of interest";
     private final String usersRefName = "Users";
     private final String commentsRef = "Comments";
+    private final String commentVotersRef = "Comment voters";
 
     /**
      * Constructs a firebase database class that provides database methods
@@ -511,7 +512,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void addComment(final Comment comment, String poiName, final AddCommentListener listener) {
-        // get the poi comments reference
+        // get the comment reference
         final DatabaseReference commentRef = dbRef.child(commentsRef).child(poiName).child(String.valueOf(comment.getDate().getTime()));
         commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -569,6 +570,90 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void upvoteComment(final String poiName, final String userID, final Comment comment, final VoteListener listener) {
+        // get the poi comments reference
+        DatabaseReference poiRef = dbRef.child(commentsRef).child(poiName);
+
+        // get the comment reference
+        final String index = String.valueOf(comment.getDate().getTime());
+        final DatabaseReference commentRef = poiRef.child(index);
+        
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // get the rating
+                    Object value = dataSnapshot.child("rating").getValue();
+                    long rating = value == null ? 0 : (long) value;
+
+                    // decrement the rating (this is not an error, the rating is stored negatively)
+                    commentRef.child("rating").setValue(rating - 1);
+
+                    // add to the database the fact that the user voted
+                    dbRef.child(commentVotersRef).child(poiName).child(index).child(userID).setValue(1);
+
+                    // inform the listener that the upvote succeeded
+                    listener.onSuccess();
+                } else {
+                    // if there is no comment at the reference, inform the listener that the comment doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void downvoteComment(final String poiName, final String userID, final Comment comment, final VoteListener listener) {
+        // get the poi comments reference
+        DatabaseReference poiRef = dbRef.child(commentsRef).child(poiName);
+
+        // get the comment reference
+        final String index = String.valueOf(comment.getDate().getTime());
+        final DatabaseReference commentRef = poiRef.child(index);
+
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // get the rating
+                    Object value = dataSnapshot.child("rating").getValue();
+                    long rating = value == null ? 0 : (long) value;
+
+                    // increment the rating (this is not an error, the rating is stored negatively)
+                    commentRef.child("rating").setValue(rating + 1);
+
+                    // add to the database the fact that the user voted
+                    dbRef.child(commentVotersRef).child(poiName).child(index).child(userID).setValue(-1);
+
+                    // inform the listener that the upvote succeeded
+                    listener.onSuccess();
+                } else {
+                    // if there is no comment at the reference, inform the listener that the comment doesn't exist
+                    listener.onDoesntExist();
+                }
             }
 
             @Override
