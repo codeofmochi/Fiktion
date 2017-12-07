@@ -114,104 +114,112 @@ public class SocialDemoActivity extends AppCompatActivity {
         sendRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
-        uc.sendFriendResquest(friendID, new UserController.RequestListener() {
-            @Override
-            public void onSuccess() {
-                sendRequestButton.setEnabled(true);
-                Toast.makeText(ctx, "Friend request sent to " + friendID, Toast.LENGTH_SHORT).show();
-            }
+        if(!friendID.equals("")) {
+            uc.sendFriendResquest(friendID, new UserController.RequestListener() {
+                @Override
+                public void onSuccess() {
+                    sendRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, "Friend request sent to " + friendID, Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onDoesntExist() {
-                sendRequestButton.setEnabled(true);
-                Toast.makeText(ctx, friendID + " does not exist", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onDoesntExist() {
+                    sendRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, friendID + " does not exist", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onFailure() {
-                sendRequestButton.setEnabled(true);
-                Toast.makeText(ctx, "Failed to send friend request", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onFailure() {
+                    sendRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, "Failed to send friend request", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onAlreadyFriend() {
-                sendRequestButton.setEnabled(true);
-                Toast.makeText(ctx, friendID + " is already your friend!", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onAlreadyFriend() {
+                    sendRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, friendID + " is already your friend!", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onNewFriend() {
-                sendRequestButton.setEnabled(true);
-                Toast.makeText(ctx, friendID + " is now your friend!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onNewFriend() {
+                    sendRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, friendID + " is now your friend!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     public void clickRemoveFriend(View v) {
         removeFriendButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
-        uc.removeFromFriendList(friendID, new UserController.BinaryListener() {
-            @Override
-            public void onSuccess() {
-                removeFriendButton.setEnabled(true);
-                //friendsAdapter.remove(friendID);
-                Toast.makeText(ctx, friendID + " was successfully removed", Toast.LENGTH_SHORT).show();
-            }
+        if(!friendID.equals("")) {
+            uc.removeFromFriendList(friendID, new UserController.BinaryListener() {
+                @Override
+                public void onSuccess() {
+                    removeFriendButton.setEnabled(true);
+                    //friendsAdapter.remove(friendID);
+                    Toast.makeText(ctx, friendID + " was successfully removed", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onFailure() {
-                removeFriendButton.setEnabled(true);
-                Toast.makeText(ctx, "Failed to remove the friend", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure() {
+                    removeFriendButton.setEnabled(true);
+                    Toast.makeText(ctx, "Failed to remove the friend", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     public void clickAcceptRequest(View v) {
         acceptRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
-        uc.acceptFriendRequest(friendID, new DatabaseProvider.ModifyUserListener() {
-            @Override
-            public void onSuccess() {
-                //requestsAdapter.remove(friendID);
-                //friendsAdapter.add(friendID);
-                acceptRequestButton.setEnabled(true);
-                Toast.makeText(ctx, friendID + " is now your friend!", Toast.LENGTH_SHORT).show();
-            }
+        if(!friendID.equals("")) {
+            uc.acceptFriendRequest(friendID, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+                    //requestsAdapter.remove(friendID);
+                    //friendsAdapter.add(friendID);
+                    acceptRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, friendID + " is now your friend!", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onDoesntExist() {
-                acceptRequestButton.setEnabled(true);
-                Toast.makeText(ctx, "the user " + friendID + " does no longer exist", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onDoesntExist() {
+                    acceptRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, "the user " + friendID + " does no longer exist", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onFailure() {
-                acceptRequestButton.setEnabled(true);
-                Toast.makeText(ctx, "Failed to accept friend request", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure() {
+                    acceptRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, "Failed to accept friend request", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     public void clickIgnoreRequest(View v) {
         ignoreRequestButton.setEnabled(false);
         final String friendID = userInput.getText().toString();
 
-        uc.ignoreFriendRequest(friendID, new UserController.BinaryListener() {
-            @Override
-            public void onSuccess() {
-                //requestsAdapter.remove(friendID);
-                ignoreRequestButton.setEnabled(true);
-                Toast.makeText(ctx, "The friend request was ignored", Toast.LENGTH_SHORT).show();
-            }
+        if(!friendID.equals("")) {
+            uc.ignoreFriendRequest(friendID, new UserController.BinaryListener() {
+                @Override
+                public void onSuccess() {
+                    //requestsAdapter.remove(friendID);
+                    ignoreRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, "The friend request was ignored", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onFailure() {
-                ignoreRequestButton.setEnabled(true);
-                Toast.makeText(ctx, "Failed to ignore friend request", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure() {
+                    ignoreRequestButton.setEnabled(true);
+                    Toast.makeText(ctx, "Failed to ignore friend request", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
 }

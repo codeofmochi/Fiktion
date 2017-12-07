@@ -189,61 +189,63 @@ public class UserController {
      * @param listener  The listener handling every DB responses
      */
     public void acceptFriendRequest(final String requestID, final DatabaseProvider.ModifyUserListener listener) {
-        DatabaseProvider.getInstance().getUserById(requestID, new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User user) {
-                DatabaseProvider.getInstance().modifyUser(user.addFriendAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
-                    @Override
-                    public void onSuccess() {
-                        DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(requestID).removeRequestAndGet(requestID), new DatabaseProvider.ModifyUserListener() {
-                            @Override
-                            public void onSuccess() {
-                                listener.onSuccess();
-                            }
+        if(localUser.getRequests().contains(requestID)) {
+            DatabaseProvider.getInstance().getUserById(requestID, new DatabaseProvider.GetUserListener() {
+                @Override
+                public void onSuccess(User user) {
+                    DatabaseProvider.getInstance().modifyUser(user.addFriendAndGet(localUser.getID()), new DatabaseProvider.ModifyUserListener() {
+                        @Override
+                        public void onSuccess() {
+                            DatabaseProvider.getInstance().modifyUser(localUser.addFriendAndGet(requestID).removeRequestAndGet(requestID), new DatabaseProvider.ModifyUserListener() {
+                                @Override
+                                public void onSuccess() {
+                                    listener.onSuccess();
+                                }
 
-                            @Override
-                            public void onDoesntExist() {
-                                localUser.removeFriend(requestID);
-                                localUser.addRequest(requestID);
-                                listener.onFailure();
-                            }
+                                @Override
+                                public void onDoesntExist() {
+                                    localUser.removeFriend(requestID);
+                                    localUser.addRequest(requestID);
+                                    listener.onFailure();
+                                }
 
-                            @Override
-                            public void onFailure() {
-                                localUser.removeFriend(requestID);
-                                localUser.addRequest(requestID);
-                                listener.onFailure();
-                            }
-                        });
-                    }
+                                @Override
+                                public void onFailure() {
+                                    localUser.removeFriend(requestID);
+                                    localUser.addRequest(requestID);
+                                    listener.onFailure();
+                                }
+                            });
+                        }
 
-                    @Override
-                    public void onDoesntExist() {
-                        listener.onDoesntExist();
-                    }
+                        @Override
+                        public void onDoesntExist() {
+                            listener.onDoesntExist();
+                        }
 
-                    @Override
-                    public void onFailure() {
-                        listener.onFailure();
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure() {
+                            listener.onFailure();
+                        }
+                    });
+                }
 
-            @Override
-            public void onModified(User user) {
-                // do nothing
-            }
+                @Override
+                public void onModified(User user) {
+                    // do nothing
+                }
 
-            @Override
-            public void onDoesntExist() {
-                listener.onDoesntExist();
-            }
+                @Override
+                public void onDoesntExist() {
+                    listener.onDoesntExist();
+                }
 
-            @Override
-            public void onFailure() {
-                listener.onFailure();
-            }
-        });
+                @Override
+                public void onFailure() {
+                    listener.onFailure();
+                }
+            });
+        }
     }
 
     /**
