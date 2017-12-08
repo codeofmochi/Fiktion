@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.utils.Config;
 
 /**
  * A user implementation for Firebase
@@ -23,6 +25,7 @@ public class FirebaseUser {
     public Map<String, Boolean> friendRequests = new TreeMap<>();
     public Boolean isPublicProfile = true;
     public Map<String, Boolean> upvotes = new TreeMap<>();
+    public FirebaseSettings settings = new FirebaseSettings(new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebaseUser.class)
@@ -59,6 +62,8 @@ public class FirebaseUser {
         for (String upvote : user.getUpvoted()) {
             upvotes.put(upvote, true);
         }
+
+        settings = new FirebaseSettings(user.getSettings());
     }
 
     /**
@@ -73,6 +78,7 @@ public class FirebaseUser {
                 new TreeSet<>(friendRequests.keySet()),
                 new LinkedList<>(visited.keySet()),
                 isPublicProfile,
-                new TreeSet<>(upvotes.keySet()));
+                new TreeSet<>(upvotes.keySet()),
+                settings.toSettings());
     }
 }

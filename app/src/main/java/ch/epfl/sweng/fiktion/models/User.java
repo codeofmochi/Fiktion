@@ -26,6 +26,7 @@ public class User {
     private Set<String> friendlist;
     private Set<String> friendRequests;
     private Set<String> upvoted;
+    private Settings settings;
 
     /**
      * Creates a new User with given parameters
@@ -39,7 +40,8 @@ public class User {
      */
     public User(String input_name, String input_id, Set<String> favs,
                 Set<String> wishes, Set<String> friends, Set<String> fRequests,
-                LinkedList<String> visits, Boolean isPublic, Set<String> upVotes) {
+                LinkedList<String> visits, Boolean isPublic, Set<String> upVotes,
+                Settings settings) {
         name = input_name;
         id = input_id;
         favourites = favs;
@@ -49,6 +51,7 @@ public class User {
         friendRequests = fRequests;
         isPublicProfile = isPublic;
         upvoted = upVotes;
+        this.settings = settings;
     }
 
     /**
@@ -70,6 +73,8 @@ public class User {
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
         upvoted = new TreeSet<>();
+        settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
+
     }
 
     /**
@@ -88,6 +93,7 @@ public class User {
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
         upvoted = new TreeSet<>();
+        settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
     }
 
     /**
@@ -554,5 +560,14 @@ public class User {
      */
     public Set<String> getUpvoted() {
         return Collections.unmodifiableSet(new TreeSet<>(upvoted));
+    }
+
+    public void updateSettingsRadius(int radius, final DatabaseProvider.ModifyUserListener listener){
+        settings.updateSearchRadius(radius);
+        DatabaseProvider.getInstance().modifyUser(this, listener);
+    }
+
+    public Settings getSettings(){
+        return settings;
     }
 }
