@@ -794,8 +794,9 @@ public class User {
         return Collections.unmodifiableSet(new TreeSet<>(upvoted));
     }
 
-    public void updateSettingsRadius(int radius){
+    public void updateSettingsRadius(int radius, final DatabaseProvider.ModifyUserListener listener){
         settings.updateSearchRadius(radius);
+        DatabaseProvider.getInstance().modifyUser(this, listener);
     }
 
     public Settings getSettings(){

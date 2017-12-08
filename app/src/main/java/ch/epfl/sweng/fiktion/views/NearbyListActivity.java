@@ -17,6 +17,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
 public class NearbyListActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -53,7 +54,8 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
     private void searchAndDisplay(double latitude, double longitude) {
         // trigger a search
         list.removeAllViews();
-        DatabaseProvider.getInstance().findNearPois(new Position(latitude, longitude), 50, new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPois(new Position(latitude, longitude),
+                Config.settings.getSearchRadius(), new DatabaseProvider.FindNearPoisListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 View v = POIDisplayer.createPoiCard(poi, ctx);

@@ -16,7 +16,6 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
-import ch.epfl.sweng.fiktion.utils.Config;
 
 
 /**
@@ -39,22 +38,22 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     // user has "fav POI" as favourite, "vis POI" in visited and "wish POI" in wishlist
     private final User userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
             new TreeSet<String>(), new TreeSet<String>(),
-            new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
+            new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
     // user is friend with defaultUser and has user1 in his requests
     private final User userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
             new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)),
-            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
+            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
     // user with a friend that is not stored in the database
     private final User userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
             new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(),
-            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
+            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
     // user has request from fake friend
     private final User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
             new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)),
-            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Config.DEFAULT_SEARCH_RADIUS));
+            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     public List<PointOfInterest> poiList = new ArrayList<>();

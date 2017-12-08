@@ -25,7 +25,7 @@ public class FirebaseUser {
     public Map<String, Boolean> friendRequests = new TreeMap<>();
     public Boolean isPublicProfile = true;
     public Map<String, Boolean> upvotes = new TreeMap<>();
-    public FirebaseSettings settings = new FirebaseSettings(new Settings(Config.DEFAULT_SEARCH_RADIUS));
+    public FirebaseSettings settings = new FirebaseSettings(new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebaseUser.class)

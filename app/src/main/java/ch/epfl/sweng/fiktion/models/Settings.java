@@ -5,6 +5,12 @@ package ch.epfl.sweng.fiktion.models;
  */
 
 public class Settings {
+
+    //SearchRadius values
+    public static final int DEFAULT_SEARCH_RADIUS = 20;
+    public static final int MIN_SEARCH_RADIUS = 1;
+    public static final int MAX_SEARCH_RADIUS = 200;
+
     private int searchRadius;
 
     public Settings(int searchRad){

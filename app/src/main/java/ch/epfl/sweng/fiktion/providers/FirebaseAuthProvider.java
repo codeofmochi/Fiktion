@@ -11,7 +11,9 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.utils.Config;
 
 
 /**
@@ -106,6 +108,7 @@ public class FirebaseAuthProvider extends AuthProvider {
      */
     @Override
     public void signOut() {
+        Config.settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
         auth.signOut();
         user = null;
     }
@@ -271,6 +274,7 @@ public class FirebaseAuthProvider extends AuthProvider {
             database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
                 @Override
                 public void onSuccess(User user) {
+                    Config.settings = user.getSettings();
                     listener.onSuccess(user);
                 }
 
@@ -325,11 +329,13 @@ public class FirebaseAuthProvider extends AuthProvider {
         user = auth.getCurrentUser();
 
         if (user != null) {
+
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
+                                Config.settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
                                 listener.onSuccess();
                                 //delete user in our database
                                 DatabaseProvider.getInstance().deleterUserById(user.getUid(), delListener);

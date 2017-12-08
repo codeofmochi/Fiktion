@@ -18,6 +18,7 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MapLocationActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
@@ -74,7 +75,7 @@ public class LocationActivity extends MapLocationActivity {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
-        gmaps.showNearPOIs(50);
+        gmaps.showNearPOIs(Config.settings.getSearchRadius());
 
         /*
          * Shows a summary of the marker if clicked on

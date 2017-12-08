@@ -7,7 +7,7 @@ import ch.epfl.sweng.fiktion.utils.Config;
  */
 
 public class FirebaseSettings {
-    public int searchRadius = Config.DEFAULT_SEARCH_RADIUS;
+    public int searchRadius = Settings.DEFAULT_SEARCH_RADIUS;
 
     public FirebaseSettings(){}
 
