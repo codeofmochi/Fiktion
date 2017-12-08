@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
@@ -19,12 +20,19 @@ public class FullscreenPictureActivity extends AppCompatActivity {
 
     private ImageView fullScreen;
     private Bitmap bitmap;
+    private android.support.v7.app.ActionBar actionBar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_picture);
+
+        // find action bar
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         fullScreen = (ImageView) findViewById(R.id.fullScreen);
         Intent from = getIntent();
@@ -35,7 +43,23 @@ public class FullscreenPictureActivity extends AppCompatActivity {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
 
-
+    /**
+     * Triggered by action bar
+     *
+     * @param item the caller item
+     * @return parent value
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // close this activity
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
