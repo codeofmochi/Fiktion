@@ -17,7 +17,9 @@ import java.util.Locale;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.utils.Mutable;
 import ch.epfl.sweng.fiktion.views.ProfileActivity;
 
 /**
@@ -142,7 +144,7 @@ public class CommentsDisplayer {
      * @param c a comment to display
      * @return a comment card view to be added to a parent view
      */
-    public static View createCommentCard(Comment c, final Context ctx) {
+    public static View createCommentCard(final Comment c, final Context ctx) {
 
         // create a new view for the comment
         LinearLayout commentContainer = new LinearLayout(ctx);
@@ -235,8 +237,10 @@ public class CommentsDisplayer {
         votingLayout.setLayoutParams(votingLayoutParams);
 
         // add a upvote button
-        ImageView upArrowButton = new ImageView(ctx);
+        final ImageView upArrowButton = new ImageView(ctx);
         upArrowButton.setImageDrawable(ctx.getResources().getDrawable(R.drawable.up_arrow_icon_30));
+        upArrowButton.setEnabled(false);
+        upArrowButton.setColorFilter(ctx.getResources().getColor(R.color.gray));
         votingLayout.addView(upArrowButton);
 
         TextView ratingText = new TextView(ctx);
@@ -245,9 +249,182 @@ public class CommentsDisplayer {
         votingLayout.addView(ratingText);
 
         // add a downvote button
-        ImageView downArrowButton = new ImageView(ctx);
+        final ImageView downArrowButton = new ImageView(ctx);
         downArrowButton.setImageDrawable(ctx.getResources().getDrawable(R.drawable.down_arrow_icon_30));
+        downArrowButton.setEnabled(false);
+        downArrowButton.setColorFilter(ctx.getResources().getColor(R.color.gray));
         votingLayout.addView(downArrowButton);
+
+        final Mutable<Integer> voteState = new Mutable<>();
+
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            private void setButtons(int color1, int color2, boolean enable) {
+                upArrowButton.setColorFilter(ctx.getResources().getColor(color1));
+                upArrowButton.setEnabled(enable);
+                downArrowButton.setColorFilter(ctx.getResources().getColor(color2));
+                downArrowButton.setEnabled(enable);
+            }
+
+            @Override
+            public void onSuccess(final User user) {
+                DatabaseProvider.getInstance().getCommentVoteOfUser(c.getId(), user.getID(), new DatabaseProvider.GetVoteListener() {
+
+                    @Override
+                    public void onSuccess(int vote) {
+                        voteState.set(vote);
+                        switch (voteState.get()) {
+                            case DatabaseProvider.UPVOTE:
+                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                break;
+
+
+                            case DatabaseProvider.NOVOTE:
+                                setButtons(R.color.colorText, R.color.colorText, true);
+                                break;
+
+                            case DatabaseProvider.DOWNVOTE:
+                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        upArrowButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                setButtons(R.color.gray, R.color.gray, false);
+
+                                switch (voteState.get()) {
+                                    case DatabaseProvider.UPVOTE:
+                                        DatabaseProvider.getInstance().voteComment(c.getId(), user.getID(), DatabaseProvider.NOVOTE, DatabaseProvider.UPVOTE, new DatabaseProvider.VoteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                voteState.set(DatabaseProvider.NOVOTE);
+                                                setButtons(R.color.colorText, R.color.colorText, true);
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                            }
+                                        });
+                                        break;
+
+                                    case DatabaseProvider.NOVOTE:
+                                        DatabaseProvider.getInstance().voteComment(c.getId(), user.getID(), DatabaseProvider.UPVOTE, DatabaseProvider.NOVOTE, new DatabaseProvider.VoteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                voteState.set(DatabaseProvider.UPVOTE);
+                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                setButtons(R.color.colorText, R.color.colorText, true);
+                                            }
+                                        });
+                                        break;
+
+                                    case DatabaseProvider.DOWNVOTE:
+                                        DatabaseProvider.getInstance().voteComment(c.getId(), user.getID(), DatabaseProvider.UPVOTE, DatabaseProvider.DOWNVOTE, new DatabaseProvider.VoteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                voteState.set(DatabaseProvider.UPVOTE);
+                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                            }
+                                        });
+                                        break;
+
+                                    default:
+                                        break;
+
+                                }
+                            }
+                        });
+
+                        downArrowButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                setButtons(R.color.gray, R.color.gray, false);
+
+                                switch (voteState.get()) {
+                                    case DatabaseProvider.UPVOTE:
+                                        DatabaseProvider.getInstance().voteComment(c.getId(), user.getID(), DatabaseProvider.DOWNVOTE, DatabaseProvider.UPVOTE, new DatabaseProvider.VoteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                voteState.set(DatabaseProvider.DOWNVOTE);
+                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                            }
+                                        });
+                                        break;
+
+                                    case DatabaseProvider.NOVOTE:
+                                        DatabaseProvider.getInstance().voteComment(c.getId(), user.getID(), DatabaseProvider.DOWNVOTE, DatabaseProvider.NOVOTE, new DatabaseProvider.VoteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                voteState.set(DatabaseProvider.DOWNVOTE);
+                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                setButtons(R.color.colorText, R.color.colorText, true);
+                                            }
+                                        });
+                                        break;
+
+                                    case DatabaseProvider.DOWNVOTE:
+                                        DatabaseProvider.getInstance().voteComment(c.getId(), user.getID(), DatabaseProvider.NOVOTE, DatabaseProvider.DOWNVOTE, new DatabaseProvider.VoteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                voteState.set(DatabaseProvider.NOVOTE);
+                                                setButtons(R.color.colorText, R.color.colorText, true);
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                            }
+                                        });
+                                        break;
+
+                                    default:
+                                        break;
+
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                });
+            }
+
+            @Override
+            public void onModified(User user) {
+            }
+
+            @Override
+            public void onDoesntExist() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
 
         // add the two layouts to the comment view
         commentContainer.addView(left);

@@ -344,12 +344,17 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     private void downloadComments() {
-        DatabaseProvider.getInstance().getComments(poi.name(), new DatabaseProvider.GetCommentsListener() {
+        DatabaseProvider.getInstance().getPOIComments(poi.name(), new DatabaseProvider.GetCommentsListener() {
 
             @Override
             public void onNewValue(Comment comment) {
                 // add to reviewsList
                 reviewsList.add(comment);
+            }
+
+            @Override
+            public void onModifiedValue(Comment comment) {
+
             }
 
             @Override

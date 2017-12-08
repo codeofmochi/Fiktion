@@ -336,6 +336,16 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    public interface GetCommentListener {
+        void onSuccess(Comment comment);
+
+        void onModified(Comment comment);
+
+        void onDoesntExist();
+
+        void onFailure();
+    }
+
     /**
      * Listener that listens the retrieving of comments
      */
@@ -347,6 +357,8 @@ public abstract class DatabaseProvider {
          * @param comment
          */
         void onNewValue(Comment comment);
+
+        void onModifiedValue(Comment comment);
 
         /**
          * what to do when the operation fails
@@ -365,22 +377,18 @@ public abstract class DatabaseProvider {
         void onSuccess();
 
         /**
-         * what to do if the comment doesn't exist
-         */
-        void onDoesntExist();
-
-        /**
          * what to do if the voting fails
          */
         void onFailure();
     }
 
-    public enum Vote {
-        UPVOTE, DOWNVOTE, NOVOTE
-    }
+    public final static int UPVOTE = 1;
+    public final static int NOVOTE = 0;
+    public final static int DOWNVOTE = -1;
+
 
     public interface GetVoteListener {
-        void onSuccess(Vote vote);
+        void onSuccess(int vote);
 
         void onFailure();
     }
@@ -394,31 +402,17 @@ public abstract class DatabaseProvider {
      */
     public abstract void addComment(Comment comment, String poiName, AddCommentListener listener);
 
+    public abstract void getComment(String commentId, GetCommentListener listener);
+
     /**
      * get the comments of a poi, inform the listener of the results
      *
      * @param poiName  the name of the poi
      * @param listener the listener
      */
-    public abstract void getComments(String poiName, GetCommentsListener listener);
+    public abstract void getPOIComments(String poiName, GetCommentsListener listener);
 
-    /**
-     * upvotes a comment, inform the listener of the operation result
-     *
-     * @param poiName  the name of the point of interest associated to the comment
-     * @param comment  the comment
-     * @param listener the listener
-     */
-    public abstract void upvoteComment(String poiName, String userID, Comment comment, VoteListener listener);
+    public abstract void voteComment(String commentId, String userID, int vote, int previousVote, VoteListener listener);
 
-    /**
-     * downvotes a comment, inform the listener of the operation result
-     *
-     * @param poiName  the name of the point of interest associated to the comment
-     * @param comment  the comment
-     * @param listener the listener
-     */
-    public abstract void downvoteComment(String poiName, String userID, Comment comment, VoteListener listener);
-
-    public abstract void getCommentVoteOfUser(String userID, Comment comment, GetVoteListener listener);
+    public abstract void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener);
 }

@@ -432,11 +432,16 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         listener.onSuccess();
     }
 
+    @Override
+    public void getComment(String commentId, GetCommentListener listener) {
+
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void getComments(String poiName, GetCommentsListener listener) {
+    public void getPOIComments(String poiName, GetCommentsListener listener) {
         if (poiName.contains("GETCOMMENTN")) {
             listener.onNewValue(new Comment("GETCOMMENTN", "GETCOMMENTN", "author", new Date(0), 0));
             return;
@@ -457,17 +462,12 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     }
 
     @Override
-    public void upvoteComment(String poiName, String userID, Comment comment, VoteListener listener) {
-
-    }
-
-    @Override
-    public void downvoteComment(String poiName, String userID, Comment comment, VoteListener listener) {
-
-    }
-
-    @Override
-    public void getCommentVoteOfUser(String userID, Comment comment, GetVoteListener listener) {
+    public void voteComment(String commentId, String userID, int vote, int previousVote, VoteListener listener) {
         
+    }
+
+    @Override
+    public void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener) {
+
     }
 }
