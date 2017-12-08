@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -176,6 +177,7 @@ public class ProfileActivity extends MenuDrawerActivity {
     /**
      * Update visible infos
      */
+    @SuppressLint("SetTextI18n") // sample content that will be dynamically modified later
     private void updateInfos() {
         // hide loading
         loading.dismiss();
