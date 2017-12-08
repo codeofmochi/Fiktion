@@ -28,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -129,5 +130,86 @@ public class FirebaseCommentTest {
         cel.getValue().onCancelled(null);
         assertTrue(isFailure.get());
 
+    }
+
+    @Test
+    public void voteCommentTest() {
+        ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+        when(dbRef.removeValue()).thenReturn(null);
+        when(dbRef.setValue(anyInt())).thenReturn(null);
+
+        final Mutable<String> result = new Mutable<>("");
+
+        DatabaseProvider.VoteListener listener = new DatabaseProvider.VoteListener() {
+            @Override
+            public void onSuccess() {
+                result.set("S");
+            }
+
+            @Override
+            public void onFailure() {
+                result.set("F");
+            }
+        };
+
+        database.voteComment("cid", "uid", DatabaseProvider.UPVOTE,DatabaseProvider.NOVOTE,listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.child(anyString())).thenReturn(snapshot);
+        when(snapshot.getValue()).thenReturn((long)10);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("S"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("F"));
+
+        database.voteComment("cid", "uid", DatabaseProvider.NOVOTE,DatabaseProvider.UPVOTE,listener);
+        when(snapshot.exists()).thenReturn(true);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("S"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("F"));
+    }
+
+    @Test
+    public void getCommentVoteOfUserTest() {
+        ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
+
+        final Mutable<String> result = new Mutable<>("");
+
+        DatabaseProvider.GetVoteListener listener = new DatabaseProvider.GetVoteListener() {
+            @Override
+            public void onSuccess(int vote) {
+                result.set(String.valueOf(vote));
+            }
+
+            @Override
+            public void onFailure() {
+                result.set("F");
+            }
+        };
+
+        database.getCommentVoteOfUser("cid", "uid", listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.getValue()).thenReturn((long)-1);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("-1"));
+
+        when(snapshot.getValue()).thenReturn((long)0);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("0"));
+
+        when(snapshot.getValue()).thenReturn((long)1);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("1"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("0"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("F"));
     }
 }
