@@ -12,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -52,7 +54,7 @@ public class FirebaseCommentTest {
     }
 
     @Test
-    public void addCommentTest() {
+    public void addCommentTest() throws NoSuchAlgorithmException {
         ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
         doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
         final Mutable<Boolean> success = new Mutable<>();
@@ -69,7 +71,6 @@ public class FirebaseCommentTest {
         };
 
         database.addComment(new Comment("text", "author", new Date(0), 0), "poi", listener);
-        when(snapshot.getChildrenCount()).thenReturn((long) 2);
         when(dbRef.setValue(any(FirebaseComment.class))).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
         assertTrue(success.get());
@@ -78,15 +79,22 @@ public class FirebaseCommentTest {
     }
 
     @Test
-    public void getCommentsTest() {
+    public void getCommentsTest() throws NoSuchAlgorithmException {
         ArgumentCaptor<ChildEventListener> cel = ArgumentCaptor.forClass(ChildEventListener.class);
+        ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
         when(dbRef.addChildEventListener(cel.capture())).thenReturn(null);
+        when(dbRef.addValueEventListener(vel.capture())).thenReturn(null);
         final List<Comment> comments = new ArrayList<>();
         final Mutable<Boolean> isFailure = new Mutable<>(false);
         DatabaseProvider.GetCommentsListener listener = new DatabaseProvider.GetCommentsListener() {
             @Override
             public void onNewValue(Comment comment) {
                 comments.add(comment);
+            }
+
+            @Override
+            public void onModifiedValue(Comment comment) {
+
             }
 
             @Override
@@ -97,9 +105,12 @@ public class FirebaseCommentTest {
 
         Comment c1 = new Comment("text", "author", new Date(42), 84);
 
-        database.getComments("poi", listener);
+        database.getPOIComments("poi", listener);
         when(snapshot.getValue(FirebaseComment.class)).thenReturn(new FirebaseComment(c1));
+        when(snapshot.getKey()).thenReturn(" ");
+        when(snapshot.exists()).thenReturn(true);
         cel.getValue().onChildAdded(snapshot, "");
+        vel.getValue().onDataChange(snapshot);
         assertThat(comments.size(), is(1));
         assertFalse(isFailure.get());
         Comment rc = comments.get(0);
@@ -108,7 +119,6 @@ public class FirebaseCommentTest {
         assertThat(rc.getRating(), is(c1.getRating()));
         assertThat(rc.getText(), is(c1.getText()));
 
-        when(snapshot.getValue(FirebaseComment.class)).thenReturn(null);
         cel.getValue().onChildAdded(snapshot, "");
         assertThat(comments.size(), is(1));
         assertFalse(isFailure.get());
@@ -120,5 +130,87 @@ public class FirebaseCommentTest {
         cel.getValue().onCancelled(null);
         assertTrue(isFailure.get());
 
+    }
+
+    @Test
+    public void voteCommentTest() {
+        ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+        when(dbRef.removeValue()).thenReturn(null);
+        when(dbRef.setValue(anyInt())).thenReturn(null);
+
+        final Mutable<String> result = new Mutable<>("");
+
+        DatabaseProvider.VoteListener listener = new DatabaseProvider.VoteListener() {
+            @Override
+            public void onSuccess() {
+                result.set("S");
+            }
+
+            @Override
+            public void onFailure() {
+                result.set("F");
+            }
+        };
+
+        database.voteComment("cid", "uid", DatabaseProvider.UPVOTE,DatabaseProvider.NOVOTE,listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.child(anyString())).thenReturn(snapshot);
+        when(snapshot.getValue()).thenReturn((long)10);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("S"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("F"));
+
+        database.voteComment("cid", "uid", DatabaseProvider.NOVOTE,DatabaseProvider.UPVOTE,listener);
+        when(snapshot.exists()).thenReturn(true);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("S"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("F"));
+    }
+
+    @Test
+    public void getCommentVoteOfUserTest() {
+        ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+
+        final Mutable<String> result = new Mutable<>("");
+
+        DatabaseProvider.GetVoteListener listener = new DatabaseProvider.GetVoteListener() {
+            @Override
+            public void onSuccess(int vote) {
+                result.set(String.valueOf(vote));
+            }
+
+            @Override
+            public void onFailure() {
+                result.set("F");
+            }
+        };
+
+        database.getCommentVoteOfUser("cid", "uid", listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.getValue()).thenReturn((long)-1);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("-1"));
+
+        when(snapshot.getValue()).thenReturn((long)0);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("0"));
+
+        when(snapshot.getValue()).thenReturn((long)1);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("1"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("0"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("F"));
     }
 }

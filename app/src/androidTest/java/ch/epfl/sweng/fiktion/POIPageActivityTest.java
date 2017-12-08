@@ -20,6 +20,8 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,6 +38,7 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
@@ -108,6 +111,10 @@ public class POIPageActivityTest {
             public void onSuccess() {
             }
 
+            public void onModified(User user) {
+
+            }
+
             @Override
             public void onFailure() {
             }
@@ -144,19 +151,7 @@ public class POIPageActivityTest {
             public void onFailure() {
             }
         });
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User user) {
-            }
 
-            @Override
-            public void onDoesntExist() {
-            }
-
-            @Override
-            public void onFailure() {
-            }
-        });
         AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
@@ -299,6 +294,11 @@ public class POIPageActivityTest {
             }
 
             @Override
+            public void onModified(User user) {
+
+            }
+
+            @Override
             public void onDoesntExist() {
             }
 
@@ -342,65 +342,6 @@ public class POIPageActivityTest {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER, GeneralLocation.TOP_CENTER, Press.FINGER);
     }
 
-    /*
-        @Test
-        public void testFavourite(){
-            AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User user) {
-                    setUser(user);
-                }
-
-                @Override
-                public void onDoesntExist() {
-                }
-
-                @Override
-                public void onFailure() {
-                }
-            });
-
-            Intent i = new Intent();
-            i.putExtra("POI_NAME", "poiTest");
-            toastRule.launchActivity(i);
-
-            onView(withId(R.id.moreMenu)).perform(click());
-            openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-            onView(withText("Favourite")).perform(click());
-
-            assertTrue(user.getFavourites().contains("poiTest"));
-
-        }
-
-        @Test
-        public void testWishlist(){
-            AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-                @Override
-                public void onSuccess(User user) {
-                    setUser(user);
-                }
-
-                @Override
-                public void onDoesntExist() {
-                }
-
-                @Override
-                public void onFailure() {
-                }
-            });
-
-            Intent i = new Intent();
-            i.putExtra("POI_NAME", "poiTest");
-            toastRule.launchActivity(i);
-
-            onView(withId(R.id.moreMenu)).perform(click());
-            onView(withId(R.id.moreMenu)).perform(click());
-            openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-            onView(withText("Wishlist")).perform(click());
-            assertTrue(user.getWishlist().contains("poiTest"));
-
-        }
-    */
     @Test
     public void testModifyExistingPoi() {
         Intent i = new Intent();
@@ -489,5 +430,113 @@ public class POIPageActivityTest {
         onView(withParent(withId(R.id.imgSlider))).perform(click());
         onView(withId(R.id.fullScreen)).check(matches(isDisplayed()));
     }
+
+    @Test
+    public void addFavouriteSuccessTest() {
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Favourite")).perform(click());
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                assertThat(user.getFavourites().contains("poiTest"), is(true));
+            }
+
+            @Override
+            public void onModified(User user) {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+
+    }
+
+    @Test
+    public void addFavouriteDoesntExistsTest() {
+
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("FAVOURITE", "MODIFYUSERD");
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Favourite")).perform(click());
+    }
+
+    @Test
+    public void addFavouriteFailureTest() {
+
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("FAVOURITE", "MODIFYUSERF");
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Favourite")).perform(click());
+    }
+
+    @Test
+    public void addWishlistSuccessTest() {
+
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Wishlist")).perform(click());
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onSuccess(User user) {
+                assertThat(user.getWishlist().contains("poiTest"), is(true));
+            }
+
+            @Override
+            public void onModified(User user) {
+                Assert.fail();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+        });
+    }
+
+    @Test
+    public void addWishlistDoesntExistsTest() {
+
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("WISHLIST", "MODIFYUSERD");
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Wishlist")).perform(click());
+    }
+
+    @Test
+    public void addWishlistFailureTest() {
+
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("WISHLIST", "MODIFYUSERF");
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withId(R.id.moreMenu)).perform(click());
+        onView(withText("Wishlist")).perform(click());
+    }
+
 
 }

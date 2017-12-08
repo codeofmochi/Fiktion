@@ -40,9 +40,9 @@
             android:layout_marginTop="10dp"
             android:background="@color/colorPrimary"
             android:onClick="redirectToLogin"
-            android:visibility="gone"
             android:text="@string/login"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/accountSettings"
@@ -211,6 +211,18 @@
                 android:onClick="clickSignOut"
                 android:text="@string/sign_out_button"
                 android:textColor="@color/white" />
+            <Button
+                android:id="@+id/socialDemoButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="startSocialDemo"
+                android:text="Social Demo"
+                android:textColor="@color/white"
+                tools:ignore="HardcodedText" />
+                <!-- Hardcoded text will be removed-->
 
         </LinearLayout>
 
@@ -253,9 +265,7 @@
                     android:id="@+id/searchRadiusNum"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="$00 km$"
-                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+                    android:layout_weight="1" />
 
                 <SeekBar
                     android:id="@+id/searchRadiusSlider"
