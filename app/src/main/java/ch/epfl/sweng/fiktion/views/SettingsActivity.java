@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,18 +10,24 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.tests.SocialDemoActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
 
+    private Activity ctx = this;
     private EditText userNewName;
     private EditText userNewEmail;
 
@@ -30,7 +37,11 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button signOutButton;
     private Button resetButton;
 
+    private SeekBar radiusSlider;
+    private TextView radiusValue;
+
     private User user;
+    private Settings settings;
     private DatabaseProvider database = DatabaseProvider.getInstance();
 
     private AuthProvider auth = AuthProvider.getInstance();
@@ -53,19 +64,83 @@ public class SettingsActivity extends MenuDrawerActivity {
         deleteButton = (Button) findViewById(R.id.deleteAccountButton);
         signOutButton = (Button) findViewById(R.id.signOutButton);
         resetButton = (Button) findViewById(R.id.passwordReset);
+        //search radius slider and text set up
+
+        radiusValue = (TextView) findViewById(R.id.searchRadiusNum);
+        radiusValue.setText(String.valueOf(Config.settings.getSearchRadius()));
+        radiusSlider = (SeekBar) findViewById(R.id.searchRadiusSlider);
+        radiusSlider.setMax(199);
+        radiusSlider.setProgress(Config.settings.getSearchRadius() - 1);
+
+        radiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int radius = progress + 1;
+                radiusValue.setText(String.valueOf(radius));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Config.settings = new Settings(Integer.parseInt(radiusValue.getText().toString()));
+            }
+        });
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
 
+        auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User currUser) {
                 user = currUser;
                 userNewName.setHint(user.getName());
                 userNewEmail.setHint(auth.getEmail());
+                settings = user.getSettings();
+                int progress = settings.getSearchRadius();
+                radiusValue.setText(String.valueOf(progress));
+                radiusSlider.setProgress(progress - 1);
+                radiusSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        int radius = progress + 1;
+                        radiusValue.setText(String.valueOf(radius));
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                        user.updateSettingsRadius(Integer.parseInt(radiusValue.getText().toString()), new DatabaseProvider.ModifyUserListener() {
+                            @Override
+                            public void onSuccess() {
+                                Config.settings = settings;
+                                Toast.makeText(ctx, "Updated search radius value!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onDoesntExist() {
+                                Toast.makeText(ctx, "User does not exist in database!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Toast.makeText(ctx, "Failed to updated search radius value!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
             }
 
             @Override
@@ -173,11 +248,12 @@ public class SettingsActivity extends MenuDrawerActivity {
 
 
                 @Override
-                public void onDoesntExist(){
+                public void onDoesntExist() {
                     Toast.makeText(context,
                             "User no longer exists in database",
                             Toast.LENGTH_SHORT).show();
                 }
+
                 @Override
                 public void onFailure() {
                     Toast.makeText(context,
