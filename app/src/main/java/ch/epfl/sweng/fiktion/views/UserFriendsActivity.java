@@ -101,7 +101,6 @@ public class UserFriendsActivity extends AppCompatActivity {
         if (state == ProfileActivity.Action.MY_PROFILE) {
             for (final String r : u.getRequests()) {
                 // show friend requests since there are some
-                // TODO dont forget to hide again when the list gets empty
                 friendsRequestsTitle.setVisibility(View.VISIBLE);
                 friendsRequests.setVisibility(View.VISIBLE);
 
@@ -166,7 +165,6 @@ public class UserFriendsActivity extends AppCompatActivity {
 
         for (final String f : u.getFriendlist()) {
             // hide empty message since there are some
-            // TODO dont forget to show it again if user delete all friends
             friendsListEmpty.setVisibility(View.GONE);
 
             // find infos of friend
@@ -176,7 +174,7 @@ public class UserFriendsActivity extends AppCompatActivity {
                     View v = UserDisplayer.createUserListElement(friend, ctx);
                     // put delete button if my profile
                     if (state == ProfileActivity.Action.MY_PROFILE) {
-                        v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
+                        v = UserDisplayer.withX((LinearLayout) v, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(ctx);

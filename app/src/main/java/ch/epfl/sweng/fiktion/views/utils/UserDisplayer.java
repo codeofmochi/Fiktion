@@ -50,7 +50,7 @@ public class UserDisplayer {
 
         // nickname
         TextView nickname = new TextView(ctx);
-        nickname.setText("dialexo");
+        nickname.setText(u.getName());
         nickname.setTextColor(ctx.getResources().getColor(R.color.colorPrimary));
         nickname.setTextSize(16);
         nickname.setTypeface(null, Typeface.BOLD);
