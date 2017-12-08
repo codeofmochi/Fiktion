@@ -336,9 +336,96 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    /**
+     * Listener that listens the result of the retrieval of a comment
+     */
+    public interface GetCommentListener {
+
+        /**
+         * what to do with the retrieved comment
+         *
+         * @param comment the comment
+         */
+        void onSuccess(Comment comment);
+
+        /**
+         * what to do if the comment is modified
+         *
+         * @param comment the modified comment
+         */
+        void onModified(Comment comment);
+
+        /**
+         * what to do if the comment doesn't exist
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the retrieval fails
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the retrieving of comments
+     */
     public interface GetCommentsListener {
+
+        /**
+         * what to do when a comment is retrieved
+         *
+         * @param comment a retrieved comment
+         */
         void onNewValue(Comment comment);
 
+        /**
+         * what to do when an already retrieved comment is modified
+         *
+         * @param comment the modified comment
+         */
+        void onModifiedValue(Comment comment);
+
+        /**
+         * what to do when the operation fails
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the result of a vote
+     */
+    public interface VoteListener {
+
+        /**
+         * what to do if the voting succeeds
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the voting fails
+         */
+        void onFailure();
+    }
+
+    public final static int UPVOTE = 1;
+    public final static int NOVOTE = 0;
+    public final static int DOWNVOTE = -1;
+
+    /**
+     * Listener that listens the result of the retrieval of a vote
+     */
+    public interface GetVoteListener {
+
+        /**
+         * what to do with the retrieved vote
+         *
+         * @param vote the vote
+         */
+        void onSuccess(int vote);
+
+        /**
+         * what to do if the retrieval fails
+         */
         void onFailure();
     }
 
@@ -352,10 +439,40 @@ public abstract class DatabaseProvider {
     public abstract void addComment(Comment comment, String poiName, AddCommentListener listener);
 
     /**
+     * get the comment associated to the provided id, inform the listener of the result of the retrieval
+     *
+     * @param commentId the comment id
+     * @param listener  the listener
+     */
+    public abstract void getComment(String commentId, GetCommentListener listener);
+
+    /**
      * get the comments of a poi, inform the listener of the results
      *
      * @param poiName  the name of the poi
      * @param listener the listener
      */
-    public abstract void getComments(String poiName, GetCommentsListener listener);
+    public abstract void getPOIComments(String poiName, GetCommentsListener listener);
+
+    /**
+     * This will change the vote of an user for a comment:
+     * upvote(UPVOTE), downvote(DOWNVOTE) or remove a vote(NOVOTE)
+     *
+     * @param commentId    the id of the comment
+     * @param userID       the id of the user
+     * @param vote         the desired vote
+     * @param previousVote the previous vote
+     * @param listener     a listener that listens the result of the operation
+     */
+    public abstract void voteComment(String commentId, String userID, int vote, int previousVote, VoteListener listener);
+
+    /**
+     * get the vote of a user given to a comment, inform the listener of the result:
+     * upvoted(UPVOTE), downvoted(DOWNVOTE) or no vote(NOVOTE)
+     *
+     * @param commentId the id of the comment
+     * @param userID    the id of the user
+     * @param listener  the listener
+     */
+    public abstract void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener);
 }

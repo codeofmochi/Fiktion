@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.security.NoSuchAlgorithmException;
+
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -16,10 +18,11 @@ import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
-/** Activity which writes the comments, called from the POIPageActivity
- *  Needs to receive the name of the point of interest and the userId
- *  Button verifies if the field is empty
- *  After successfully uploading the comment, it closes this Activity
+/**
+ * Activity which writes the comments, called from the POIPageActivity
+ * Needs to receive the name of the point of interest and the userId
+ * Button verifies if the field is empty
+ * After successfully uploading the comment, it closes this Activity
  */
 
 public class WriteCommentActivity extends MenuDrawerActivity {
@@ -64,20 +67,21 @@ public class WriteCommentActivity extends MenuDrawerActivity {
         if (text.isEmpty()) {
             ((EditText) findViewById(R.id.comment)).setError("You can't add an empty comment");
         } else {
-            Comment review = new Comment(text, userId, java.util.Calendar.getInstance().getTime(), 0);
+            try {
+                Comment review = new Comment(text, userId, java.util.Calendar.getInstance().getTime(), 0);
+                DatabaseProvider.getInstance().addComment(review, poiName, new DatabaseProvider.AddCommentListener() {
+                    @Override
+                    public void onSuccess() {
+                        finish();
+                    }
 
-            DatabaseProvider.getInstance().addComment(review, poiName, new DatabaseProvider.AddCommentListener() {
-                @Override
-                public void onSuccess() {
-                    finish();
-                }
-
-                @Override
-                public void onFailure() {
-                }
-            });
-
-
+                    @Override
+                    public void onFailure() {
+                    }
+                });
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

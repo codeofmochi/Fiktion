@@ -18,6 +18,7 @@ import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -138,13 +139,13 @@ public class UserTest {
         user = new User("default", "defaultID");
         userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(),
-                true, new TreeSet<String>());
+                true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
         userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)),
                 new TreeSet<>(Arrays.asList(whishList)), new TreeSet<String>(), new TreeSet<String>(),
-                new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>());
+                new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
         userWithUpvoted = new User("userWVFav", "idwvfav", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>(),
-                true, new TreeSet<>(Arrays.asList(upvotedList)));
+                true, new TreeSet<>(Arrays.asList(upvotedList)), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
         doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
 

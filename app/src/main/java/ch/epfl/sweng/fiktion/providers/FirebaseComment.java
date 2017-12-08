@@ -13,6 +13,7 @@ import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;
  * @author pedro
  */
 public class FirebaseComment {
+    public String id = "";
     public String text = "";
     public String authorId = "";
     public long milliseconds = 0;
@@ -30,6 +31,7 @@ public class FirebaseComment {
      * @param comment a comment
      */
     public FirebaseComment(Comment comment) {
+        id = comment.getId();
         text = encode(comment.getText());
         authorId = encode(comment.getAuthorId());
         milliseconds = comment.getDate().getTime();
@@ -42,6 +44,6 @@ public class FirebaseComment {
      * @return the comment
      */
     public Comment toComment() {
-        return new Comment(decode(text), decode(authorId), new Date(milliseconds), rating);
+        return new Comment(id, decode(text), decode(authorId), new Date(milliseconds), rating);
     }
 }
