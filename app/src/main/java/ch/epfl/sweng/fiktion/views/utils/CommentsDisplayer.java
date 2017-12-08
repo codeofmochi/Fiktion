@@ -190,8 +190,17 @@ public class CommentsDisplayer {
             }
 
             @Override
-            public void onModified(User user) {
-
+            public void onModified(final User user) {
+                author.setText(user.getName());
+                author.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // show profile of user on name click
+                        Intent i = new Intent(ctx, ProfileActivity.class);
+                        i.putExtra(ProfileActivity.USER_ID_KEY, user.getID());
+                        ctx.startActivity(i);
+                    }
+                });
             }
 
             @Override
