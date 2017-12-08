@@ -63,7 +63,7 @@ public class LocationActivity extends MapLocationActivity {
                     }
                 })
                 .setIcon(R.drawable.list_icon_40)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return true;
     }
 

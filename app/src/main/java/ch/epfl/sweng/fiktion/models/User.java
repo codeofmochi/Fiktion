@@ -23,7 +23,6 @@ public class User {
     private Set<String> favourites;
     private Set<String> wishlist;
     private LinkedList<String> visited;
-    //private Set<String> rated;
     private Set<String> friendlist;
     private Set<String> friendRequests;
     private Set<String> upvoted;

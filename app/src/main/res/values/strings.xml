@@ -92,4 +92,23 @@
     <string name="loading_data">Loading data …</string>
     <string name="data_not_found">Data not found.</string>
     <string name="failed_to_fetch_data">Failed to fetch data.</string>
+    <string name="no_reviews_yet">No reviews yet. Write some?</string>
+    <string name="load_more">Load more …</string>
+    <string name="background">Background</string>
+    <string name="review_text_input">Write an inspired review describing this place. Can be several lines long, don\'t be shy, but please stay courteous :)</string>
+    <string name="add_review">Add review</string>
+    <string name="write_a_review_for_this_place">Write a review for this place</string>
+    <string name="title_activity_user_places">Places</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_user_pictures">Pictures</string>
+    <string name="title_activity_user_achievements">Achievements</string>
+    <string name="title_activity_user_friends">Friends</string>
+    <string name="user_places_tab_visited">Visited</string>
+    <string name="user_places_tab_wishlisted">Wishlist</string>
+    <string name="user_places_tab_favourites">Favorites</string>
+    <string name="no_places_yet_add_some">No places yet. Add some?</string>
+    <string name="user_not_found">User not found</string>
+    <string name="profile_action">Profile action</string>
 </resources>
