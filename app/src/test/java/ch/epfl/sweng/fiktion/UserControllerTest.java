@@ -244,7 +244,7 @@ public class UserControllerTest {
 
     @Test
     public void testSendFriendRequestOnAlreadyFriendLogic() {
-        ((LocalAuthProvider)auth).currUser = userFR;
+        ((LocalAuthProvider) auth).currUser = userFR;
         UserController uc = new UserController(new UserController.ConstructStateListener() {
             @Override
             public void onSuccess() {
@@ -292,7 +292,7 @@ public class UserControllerTest {
 
     @Test
     public void testSendFriendRequestOnNewFriendLogic() {
-        ((LocalAuthProvider)auth).currUser = userFR;
+        ((LocalAuthProvider) auth).currUser = userFR;
         UserController uc = new UserController(new UserController.ConstructStateListener() {
             @Override
             public void onSuccess() {
@@ -360,7 +360,7 @@ public class UserControllerTest {
 
     @Test
     public void testAcceptFriendRequestLogic() {
-        ((LocalAuthProvider)auth).currUser = userFR;
+        ((LocalAuthProvider) auth).currUser = userFR;
         UserController uc = new UserController(new UserController.ConstructStateListener() {
             @Override
             public void onSuccess() {
@@ -418,7 +418,7 @@ public class UserControllerTest {
 
     @Test
     public void testAcceptFriendRequestOnDoesntExistLogic() {
-        ((LocalAuthProvider)auth).currUser = userFakeR;
+        ((LocalAuthProvider) auth).currUser = userFakeR;
         UserController uc = new UserController(new UserController.ConstructStateListener() {
             @Override
             public void onSuccess() {
@@ -475,7 +475,7 @@ public class UserControllerTest {
 
     @Test
     public void testIgnoreFriendRequestLogic() {
-        ((LocalAuthProvider)auth).currUser = userFR;
+        ((LocalAuthProvider) auth).currUser = userFR;
         UserController uc = new UserController(new UserController.ConstructStateListener() {
             @Override
             public void onSuccess() {
@@ -528,7 +528,7 @@ public class UserControllerTest {
 
     @Test
     public void testRemoveFromFriendListLogic() {
-        ((LocalAuthProvider)auth).currUser = userFR;
+        ((LocalAuthProvider) auth).currUser = userFR;
         UserController uc = new UserController(new UserController.ConstructStateListener() {
             @Override
             public void onSuccess() {
