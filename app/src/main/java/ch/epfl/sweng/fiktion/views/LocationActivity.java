@@ -51,7 +51,7 @@ public class LocationActivity extends MapLocationActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 0, 0, "List")
+        menu.add(0, R.id.nearbyListAcessButton, 0, "List")
                 .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
