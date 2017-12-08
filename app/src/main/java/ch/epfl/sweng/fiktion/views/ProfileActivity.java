@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -35,6 +36,7 @@ public class ProfileActivity extends MenuDrawerActivity {
         MY_PROFILE,
         ANOTHER_PROFILE
     }
+
     public static String PROFILE_ACTION_ME = "PROFILE_ACTION_ME";
     public static String PROFILE_ACTION_ANOTHER = "PROFILE_ACTION_ANOTHER";
 
@@ -44,6 +46,7 @@ public class ProfileActivity extends MenuDrawerActivity {
 
     // load own user and eventually the correct profile
     private User user, me;
+    private UserController userCtrl;
     // load profile id and user's own id
     private String userId, myUserId;
     // views
@@ -91,6 +94,7 @@ public class ProfileActivity extends MenuDrawerActivity {
             public void onSuccess(User currUser) {
                 // set my infos
                 me = currUser;
+                userCtrl = new UserController(me);
                 myUserId = currUser.getID();
 
                 // assume my profile if no userId set or if it is my own id
@@ -106,7 +110,22 @@ public class ProfileActivity extends MenuDrawerActivity {
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModified(User currUser) {
+                // reset my infos
+                me = currUser;
+                userCtrl = new UserController(me);
+                myUserId = currUser.getID();
+
+                // assume my profile if no userId set or if it is my own id
+                if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
+                    user = currUser;
+                    // don't forget to set userId in case it was actually empty
+                    userId = myUserId;
+                    showMyProfile();
+                } else {
+                    // user is logged in but it is not his profile
+                    showAnotherProfile();
+                }
             }
 
             @Override
@@ -137,6 +156,15 @@ public class ProfileActivity extends MenuDrawerActivity {
         this.stateFlag = PROFILE_ACTION_ME;
         // set action button
         action.setImageDrawable(getResources().getDrawable(R.drawable.pencil_icon_24));
+        action.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // go to settings
+                Intent i = new Intent(ctx, SettingsActivity.class);
+                startActivity(i);
+            }
+        });
+
         updateInfos();
     }
 
@@ -144,8 +172,53 @@ public class ProfileActivity extends MenuDrawerActivity {
         // display another user's profile
         this.state = Action.ANOTHER_PROFILE;
         this.stateFlag = PROFILE_ACTION_ANOTHER;
+
         // set action button
         action.setImageDrawable(getResources().getDrawable(R.drawable.person_add_icon_24));
+        if (AuthProvider.getInstance().isConnected()) {
+            // if user is logged in, check if in friend list, if not allow friend request
+            if (me.getFriendlist().contains(userId)) action.setVisibility(View.GONE);
+            else action.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // trigger user controller to send friend request
+                    userCtrl.sendFriendRequest(userId, new UserController.RequestListener() {
+                        @Override
+                        public void onSuccess() {
+                            Snackbar.make(profileBanner, R.string.friend_request_sent, Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            Snackbar.make(profileBanner, R.string.user_not_found, Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Snackbar.make(profileBanner, R.string.request_failed, Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onAlreadyFriend() {
+                            Snackbar.make(profileBanner, R.string.already_in_friend_list, Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onNewFriend() {
+                            Snackbar.make(profileBanner, R.string.friend_added, Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+        } else {
+            // if user not connected, prompt with dialog to allow login
+            AuthenticationChecks.checkVerifieddAuth(ctx, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    dialog.dismiss();
+                }
+            });
+        }
 
         // get profile from DB
         DatabaseProvider.getInstance().getUserById(userId, new DatabaseProvider.GetUserListener() {
@@ -158,8 +231,11 @@ public class ProfileActivity extends MenuDrawerActivity {
             }
 
             @Override
-            public void onModified(User user) {
-                
+            public void onModified(User u) {
+                // reassign user
+                user = u;
+                // redisplay profile
+                updateInfos();
             }
 
             @Override
