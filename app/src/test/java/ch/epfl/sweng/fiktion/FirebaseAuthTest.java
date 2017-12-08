@@ -446,6 +446,11 @@ public class FirebaseAuthTest {
             }
 
             @Override
+            public void onModified(User user) {
+
+            }
+
+            @Override
             public void onDoesntExist() {
 
             }
@@ -544,6 +549,11 @@ public class FirebaseAuthTest {
             @Override
             public void onSuccess(User user) {
                 setResult(Result.SUCCESS);
+            }
+
+            @Override
+            public void onModified(User user) {
+
             }
 
             @Override

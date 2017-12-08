@@ -278,6 +278,16 @@ public class FirebaseAuthProvider extends AuthProvider {
                     listener.onSuccess(user);
                 }
 
+                /**
+                 * what to do if the user is modified
+                 *
+                 * @param user the modified user
+                 */
+                @Override
+                public void onModified(User user) {
+
+                }
+
                 @Override
                 public void onDoesntExist() {
                     listener.onDoesntExist();

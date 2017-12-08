@@ -58,8 +58,10 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     public List<PointOfInterest> poiList = new ArrayList<>();
     public List<User> users = new ArrayList<>(initialList);
-    private Map<String, List<Comment>> comments = new TreeMap<>();
+    private Map<String, List<String>> poiComments = new TreeMap<>();
+    private Map<String, Comment> comments = new TreeMap<>();
 
+    private Map<String, Set<GetCommentListener>> getCommentListeners = new TreeMap<>();
     private Map<String, Set<GetCommentsListener>> getCommentsListeners = new TreeMap<>();
 
     /**
@@ -420,15 +422,22 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             listener.onFailure();
             return;
         }
-        if (comments.containsKey(poiName)) {
-            List<Comment> poiComments = comments.get(poiName);
-            poiComments.add(comment);
+        if (poiComments.containsKey(poiName)) {
+            List<String> poiCommentsIds = poiComments.get(poiName);
+            poiCommentsIds.add(comment.getId());
         } else {
-            List<Comment> poiComments = new ArrayList<>();
-            poiComments.add(comment);
-            comments.put(poiName, poiComments);
+            List<String> poiCommentsIds = new ArrayList<>();
+            poiCommentsIds.add(comment.getId());
+            poiComments.put(poiName, poiCommentsIds);
         }
+        comments.put(comment.getId(), comment);
 
+
+        if (getCommentListeners.containsKey(comment.getId())) {
+            for (GetCommentListener l : getCommentListeners.get(comment.getId())) {
+                l.onSuccess(comment);
+            }
+        }
         if (getCommentsListeners.containsKey(poiName)) {
             for (GetCommentsListener l : getCommentsListeners.get(poiName)) {
                 l.onNewValue(comment);
@@ -437,13 +446,49 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         listener.onSuccess();
     }
 
+    @Override
+    public void getComment(String commentId, GetCommentListener listener) {
+        if (commentId.contains("GETCOMMENTN")) {
+            listener.onSuccess(new Comment("GETCOMMENTN", "GETCOMMENTN", "author", new Date(0), 0));
+            return;
+        }
+        if (commentId.contains("GETCOMMENTM")) {
+            listener.onSuccess(new Comment("GETCOMMENTM", "GETCOMMENTM", "author", new Date(0), 0));
+            return;
+        }
+        if (commentId.contains("GETCOMMENTD")) {
+            listener.onDoesntExist();
+            return;
+        }
+        if (commentId.contains("GETCOMMENTF")) {
+            listener.onFailure();
+            return;
+        }
+
+        if (!getCommentListeners.containsKey(commentId)) {
+            getCommentListeners.put(commentId, new HashSet<GetCommentListener>());
+        }
+        getCommentListeners.get(commentId).add(listener);
+
+
+        if (comments.containsKey(commentId)) {
+            listener.onSuccess(comments.get(commentId));
+        } else {
+            listener.onDoesntExist();
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void getComments(String poiName, GetCommentsListener listener) {
+    public void getPOIComments(String poiName, final GetCommentsListener listener) {
         if (poiName.contains("GETCOMMENTN")) {
-            listener.onNewValue(new Comment("GETCOMMENTN", "author", new Date(0), 0));
+            listener.onNewValue(new Comment("GETCOMMENTN", "GETCOMMENTN", "author", new Date(0), 0));
+            return;
+        }
+        if (poiName.contains("GETCOMMENTM")) {
+            listener.onNewValue(new Comment("GETCOMMENTM", "GETCOMMENTM", "author", new Date(0), 0));
             return;
         }
         if (poiName.contains("GETCOMMENTF")) {
@@ -455,9 +500,40 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
         getCommentsListeners.get(poiName).add(listener);
 
-        if (comments.containsKey(poiName)) {
-            for (Comment c : comments.get(poiName))
-                listener.onNewValue(c);
+
+        if (poiComments.containsKey(poiName)) {
+            for (String id : poiComments.get(poiName)) {
+                getComment(id, new GetCommentListener() {
+                    @Override
+                    public void onSuccess(Comment comment) {
+                        listener.onNewValue(comment);
+                    }
+
+                    @Override
+                    public void onModified(Comment comment) {
+                        listener.onModifiedValue(comment);
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        listener.onFailure();
+                    }
+                });
+            }
         }
+    }
+
+    @Override
+    public void voteComment(String commentId, String userID, int vote, int previousVote, VoteListener listener) {
+
+    }
+
+    @Override
+    public void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener) {
+
     }
 }

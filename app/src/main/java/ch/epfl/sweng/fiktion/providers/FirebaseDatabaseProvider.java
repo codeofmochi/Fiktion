@@ -13,7 +13,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.Comment;
@@ -33,6 +32,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private final String poisRefName = "Points of interest";
     private final String usersRefName = "Users";
     private final String commentsRef = "Comments";
+    private final String poiCommentsRef = "POI comments";
+    private final String commentVotersRef = "Comment voters";
 
     /**
      * Constructs a firebase database class that provides database methods
@@ -422,7 +423,9 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     public void getUserById(String id, final GetUserListener listener) {
         // get the reference of the user associated with the id
         DatabaseReference userRef = dbRef.child(usersRefName).child(id);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -431,8 +434,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         // we found the id but conversion failed, error of data handling probably
                         listener.onFailure();
                     } else {
-                        // inform the listener that we got the matching user
-                        listener.onSuccess(fUser.toUser());
+                        if (firstCall) {
+                            // inform the listener that we got the matching user
+                            listener.onSuccess(fUser.toUser());
+                            firstCall = false;
+                        } else {
+                            // inform the listener that the user has been modified
+                            listener.onModified(fUser.toUser());
+                        }
                     }
                 } else {
                     // inform the listener that the user (id) doesnt exist
@@ -513,16 +522,24 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void addComment(final Comment comment, String poiName, final AddCommentListener listener) {
-        // get the poi comments reference
-        final DatabaseReference cPOIRef = dbRef.child(commentsRef).child(poiName);
-        cPOIRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void addComment(final Comment comment, final String poiName, final AddCommentListener listener) {
+        // get the comment reference
+        final DatabaseReference commentRef = dbRef.child(commentsRef).child(comment.getId());
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // append the new comment to the list of comments of the point of interest
-                String index = String.valueOf(dataSnapshot.getChildrenCount());
+                if (dataSnapshot.exists()) {
+                    // if the comment already exists, inform the listener of a failure
+                    listener.onFailure();
+                    return;
+                }
+
+                // add the new comment
                 FirebaseComment fComment = new FirebaseComment(comment);
-                cPOIRef.child(index).setValue(fComment);
+                commentRef.setValue(fComment);
+
+                // add the comment id to
+                dbRef.child(poiCommentsRef).child(poiName).child(comment.getId()).setValue(true);
 
                 // inform to the listener that the operation succeeded
                 listener.onSuccess();
@@ -541,19 +558,76 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getComments(String poiName, final GetCommentsListener listener) {
-        // get the poi comments reference
-        final DatabaseReference cPOIRef = dbRef.child(commentsRef).child(poiName);
+    public void getComment(String commentId, final GetCommentListener listener) {
+        // get the comment reference
+        DatabaseReference commentRef = dbRef.child(commentsRef).child(commentId);
+        commentRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
 
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    FirebaseComment fComment = dataSnapshot.getValue(FirebaseComment.class);
+                    if (fComment == null) {
+                        listener.onFailure();
+                    } else {
+                        if (firstCall) {
+                            // inform the listener that we got the matching comment
+                            listener.onSuccess(fComment.toComment());
+                            firstCall = false;
+                        } else {
+                            // inform the listener that the comment has been modified
+                            listener.onModified(fComment.toComment());
+                        }
+                    }
+                } else {
+                    // inform the listener that the comment doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getPOIComments(String poiName, final GetCommentsListener listener) {
+        // get the poi comments reference
+        final DatabaseReference cPOIRef = dbRef.child(poiCommentsRef).child(poiName);
+
+        // get the comments ids and get the actual comments
         cPOIRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                // convert into a comment
-                FirebaseComment fComment = dataSnapshot.getValue(FirebaseComment.class);
-                if (fComment != null) {
-                    // send the comment to the listener
-                    listener.onNewValue(fComment.toComment());
-                }
+                getComment(dataSnapshot.getKey(), new GetCommentListener() {
+                    @Override
+                    public void onSuccess(Comment comment) {
+                        // inform the listener with every new comment
+                        listener.onNewValue(comment);
+                    }
+
+                    @Override
+                    public void onModified(Comment comment) {
+                        // inform the listener when an already retrieved poi has been modified
+                        listener.onModifiedValue(comment);
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                });
             }
 
             @Override
@@ -566,6 +640,88 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void voteComment(final String commentId, final String userID, final int vote, final int previousVote, final VoteListener listener) {
+
+        // get the comment reference
+        final DatabaseReference commentRef = dbRef.child(commentsRef).child(commentId);
+
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // get the rating
+                    Object value = dataSnapshot.child("rating").getValue();
+                    long rating = value == null ? 0 : (long) value;
+
+                    // make the rating modification according to the vote and the previous vote
+                    commentRef.child("rating").setValue(rating + vote - previousVote);
+
+                    // record the vote state of the user
+                    if (vote == NOVOTE ) {
+                        dbRef.child(commentVotersRef).child(commentId).child(userID).removeValue();
+                    } else {
+                        dbRef.child(commentVotersRef).child(commentId).child(userID).setValue(vote);
+                    }
+
+                    // inform the listener that the upvote succeeded
+                    listener.onSuccess();
+                } else {
+                    // if there is no comment at the reference, inform the listener that the comment doesn't exist
+                    listener.onFailure();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getCommentVoteOfUser(String commentId, String userID, final GetVoteListener listener) {
+        // get the vote reference associated to the user for the comment
+        DatabaseReference voteRef = dbRef.child(commentVotersRef).child(commentId).child(userID);
+
+        voteRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int vote;
+                if (dataSnapshot.exists()) {
+                    Object voteValue = dataSnapshot.getValue();
+                    long longVoteValue = voteValue == null ? 0 : (long) voteValue;
+                    if (longVoteValue < 0) {
+                        vote = DatabaseProvider.DOWNVOTE;
+                    } else if (longVoteValue > 0) {
+                        vote = DatabaseProvider.UPVOTE;
+                    } else {
+                        vote = DatabaseProvider.NOVOTE;
+                    }
+                } else {
+                    // if it doesn't exist, then the user hasn't voted
+                    vote = DatabaseProvider.NOVOTE;
+                }
+                // inform the listener of the vote
+                listener.onSuccess(vote);
             }
 
             @Override

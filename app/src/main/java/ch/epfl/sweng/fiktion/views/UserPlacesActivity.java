@@ -160,6 +160,11 @@ public class UserPlacesActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onModified(User user) {
+                
+            }
+
+            @Override
             public void onDoesntExist() {
                 Snackbar.make(poiList, "User does not exist", Snackbar.LENGTH_INDEFINITE).show();
             }
