@@ -97,7 +97,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         //picture button
         addPictureButton = (Button) findViewById(R.id.addPictureButton);
-
         addPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -375,10 +374,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // download the photos of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewPhoto(final Bitmap b) {
 
                 // create a new ImageView which will hold the photo
-                ImageView imgView = new ImageView(getApplicationContext());
+                final ImageView imgView = new ImageView(getApplicationContext());
 
                 // set the content and the parameters
                 imgView.setImageBitmap(b);
@@ -388,6 +387,27 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 params.setMarginEnd(10);
                 imgView.setLayoutParams(params);
                 imgView.setContentDescription("a photo of " + poi.name());
+                //renders each image clickable. Calls FullscreenPictureActivity
+                imgView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String fileName = "image";
+                        try {
+                            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                            b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                            FileOutputStream fo = openFileOutput(fileName, Context.MODE_PRIVATE);
+                            fo.write(bytes.toByteArray());
+                            //close file
+                            fo.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            fileName = null;
+                        }
+                        Intent intent = new Intent(ctx, FullscreenPictureActivity.class);
+                        intent.putExtra("Photo", fileName);
+                        startActivity(intent);
+                    }
+                });
 
                 // add the ImageView to the pictures
                 imageLayout.addView(imgView);
@@ -405,6 +425,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
     }
+
 
     private void displayNearPois() {
         // find nearby pois
@@ -462,7 +483,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
 
-    //method to open a pop up window
+    //method to open a pop up window for Image
     private void selectImage() {
 
         if (poi == null) {
@@ -518,6 +539,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         startActivityForResult(Intent.createChooser(gallery, "Select File"), ActivityCodes.SELECT_FILE);
     }
 
+
+    //method for what do to when we got the camera/gallery result
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -533,6 +556,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     }
 
+    //gallery result which uploads the image
     private void onGalleryResult(Intent data) {
         Bitmap image = null;
         if (data != null) {
@@ -546,6 +570,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         upload(image);
     }
 
+    //camera result, creates the ImageFile and uploads it
     private void onCameraResult(Intent data) {
 
         if (data == null) {
@@ -605,6 +630,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
     }
 
+    //Button with id = AddReviewButton calls this, opens the WriteCommentActivity
     public void startWriteCommentActivity(View view) {
         // check if user is connected and has a valid account
         AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
@@ -618,6 +644,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         i.putExtra(USER_ID, user.getID());
         startActivity(i);
     }
+
 
     /**
      * Triggered by more menu button
