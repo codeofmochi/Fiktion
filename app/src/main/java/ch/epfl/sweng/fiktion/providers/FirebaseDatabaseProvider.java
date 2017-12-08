@@ -554,8 +554,12 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getComment(String commentId, final GetCommentListener listener) {
+        // get the comment reference
         DatabaseReference commentRef = dbRef.child(commentsRef).child(commentId);
         commentRef.addValueEventListener(new ValueEventListener() {
             private boolean firstCall = true;
@@ -568,19 +572,23 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         listener.onFailure();
                     } else {
                         if (firstCall) {
+                            // inform the listener that we got the matching comment
                             listener.onSuccess(fComment.toComment());
                             firstCall = false;
                         } else {
+                            // inform the listener that the comment has been modified
                             listener.onModified(fComment.toComment());
                         }
                     }
                 } else {
+                    // inform the listener that the comment doesn't exist
                     listener.onDoesntExist();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
                 listener.onFailure();
             }
         });
@@ -593,17 +601,21 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     public void getPOIComments(String poiName, final GetCommentsListener listener) {
         // get the poi comments reference
         final DatabaseReference cPOIRef = dbRef.child(poiCommentsRef).child(poiName);
+
+        // get the comments ids and get the actual comments
         cPOIRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 getComment(dataSnapshot.getKey(), new GetCommentListener() {
                     @Override
                     public void onSuccess(Comment comment) {
+                        // inform the listener with every new comment
                         listener.onNewValue(comment);
                     }
 
                     @Override
                     public void onModified(Comment comment) {
+                        // inform the listener when an already retrieved poi has been modified
                         listener.onModifiedValue(comment);
                     }
 
@@ -631,6 +643,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
                 listener.onFailure();
             }
         });
@@ -658,7 +671,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     commentRef.child("rating").setValue(rating + vote - previousVote);
 
                     // record the vote state of the user
-                    if (vote == NOVOTE) {
+                    if (vote == NOVOTE ) {
                         dbRef.child(commentVotersRef).child(commentId).child(userID).removeValue();
                     } else {
                         dbRef.child(commentVotersRef).child(commentId).child(userID).setValue(vote);
@@ -680,8 +693,12 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getCommentVoteOfUser(String commentId, String userID, final GetVoteListener listener) {
+        // get the vote reference associated to the user for the comment
         DatabaseReference voteRef = dbRef.child(commentVotersRef).child(commentId).child(userID);
 
         voteRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -699,13 +716,16 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         vote = DatabaseProvider.NOVOTE;
                     }
                 } else {
+                    // if it doesn't exist, then the user hasn't voted
                     vote = DatabaseProvider.NOVOTE;
                 }
+                // inform the listener of the vote
                 listener.onSuccess(vote);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
                 listener.onFailure();
             }
         });
