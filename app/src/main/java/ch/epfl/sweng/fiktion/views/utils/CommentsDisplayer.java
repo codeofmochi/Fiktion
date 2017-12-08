@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
@@ -49,6 +51,8 @@ public class CommentsDisplayer {
         private TextView loadMore;
         // activity context of creation
         private Context ctx;
+        // map of commentIds to their textViews
+        private Map<String, TextView> ratingTexts;
 
         /**
          * LoadableList constructor
@@ -66,6 +70,7 @@ public class CommentsDisplayer {
             this.empty = createDefaultText(ctx);
             this.display.addView(this.empty);
             this.loadMore = createLoadMoreButton(ctx);
+            this.ratingTexts = new TreeMap<>();
         }
 
         // helper to create an empty default text view
@@ -104,6 +109,12 @@ public class CommentsDisplayer {
             this.show();
         }
 
+        public void updateRating(String commendId, int newRating) {
+            if (ratingTexts.containsKey(commendId)) {
+                ratingTexts.get(commendId).setText(String.valueOf(newRating));
+            }
+        }
+
         /**
          * Load next comments and show them
          */
@@ -123,7 +134,7 @@ public class CommentsDisplayer {
             // display the remaining comments until max
             while (it.hasNext() && shown < max) {
                 Comment next = it.next();
-                display.addView(CommentsDisplayer.createCommentCard(next, ctx));
+                display.addView(CommentsDisplayer.createCommentCard(next, ctx, ratingTexts));
                 shown++;
             }
             // hide empty text
@@ -144,7 +155,7 @@ public class CommentsDisplayer {
      * @param c a comment to display
      * @return a comment card view to be added to a parent view
      */
-    public static View createCommentCard(final Comment c, final Context ctx) {
+    public static View createCommentCard(final Comment c, final Context ctx, Map<String, TextView> ratingTexts) {
 
         // create a new view for the comment
         LinearLayout commentContainer = new LinearLayout(ctx);
@@ -247,6 +258,7 @@ public class CommentsDisplayer {
         ratingText.setText(String.valueOf(c.getRating()));
         ratingText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         votingLayout.addView(ratingText);
+        ratingTexts.put(c.getId(), ratingText);
 
         // add a downvote button
         final ImageView downArrowButton = new ImageView(ctx);
@@ -255,8 +267,8 @@ public class CommentsDisplayer {
         downArrowButton.setColorFilter(ctx.getResources().getColor(R.color.gray));
         votingLayout.addView(downArrowButton);
 
+        // handling of clicking, button colors and voting
         final Mutable<Integer> voteState = new Mutable<>();
-
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             private void setButtons(int color1, int color2, boolean enable) {
                 upArrowButton.setColorFilter(ctx.getResources().getColor(color1));
@@ -274,7 +286,7 @@ public class CommentsDisplayer {
                         voteState.set(vote);
                         switch (voteState.get()) {
                             case DatabaseProvider.UPVOTE:
-                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                setButtons(R.color.colorAccent, R.color.colorText, true);
                                 break;
 
 
@@ -283,7 +295,7 @@ public class CommentsDisplayer {
                                 break;
 
                             case DatabaseProvider.DOWNVOTE:
-                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                setButtons(R.color.colorText, R.color.colorAccent, true);
                                 break;
 
                             default:
@@ -306,7 +318,7 @@ public class CommentsDisplayer {
 
                                             @Override
                                             public void onFailure() {
-                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                                setButtons(R.color.colorAccent, R.color.colorText, true);
                                             }
                                         });
                                         break;
@@ -316,7 +328,7 @@ public class CommentsDisplayer {
                                             @Override
                                             public void onSuccess() {
                                                 voteState.set(DatabaseProvider.UPVOTE);
-                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                                setButtons(R.color.colorAccent, R.color.colorText, true);
                                             }
 
                                             @Override
@@ -331,12 +343,12 @@ public class CommentsDisplayer {
                                             @Override
                                             public void onSuccess() {
                                                 voteState.set(DatabaseProvider.UPVOTE);
-                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                                setButtons(R.color.colorAccent, R.color.colorText, true);
                                             }
 
                                             @Override
                                             public void onFailure() {
-                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                                setButtons(R.color.colorText, R.color.colorAccent, true);
                                             }
                                         });
                                         break;
@@ -359,12 +371,12 @@ public class CommentsDisplayer {
                                             @Override
                                             public void onSuccess() {
                                                 voteState.set(DatabaseProvider.DOWNVOTE);
-                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                                setButtons(R.color.colorText, R.color.colorAccent, true);
                                             }
 
                                             @Override
                                             public void onFailure() {
-                                                setButtons(R.color.colorPrimary, R.color.colorText, true);
+                                                setButtons(R.color.colorAccent, R.color.colorText, true);
                                             }
                                         });
                                         break;
@@ -374,7 +386,7 @@ public class CommentsDisplayer {
                                             @Override
                                             public void onSuccess() {
                                                 voteState.set(DatabaseProvider.DOWNVOTE);
-                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                                setButtons(R.color.colorText, R.color.colorAccent, true);
                                             }
 
                                             @Override
@@ -394,7 +406,7 @@ public class CommentsDisplayer {
 
                                             @Override
                                             public void onFailure() {
-                                                setButtons(R.color.colorText, R.color.colorPrimary, true);
+                                                setButtons(R.color.colorText, R.color.colorAccent, true);
                                             }
                                         });
                                         break;

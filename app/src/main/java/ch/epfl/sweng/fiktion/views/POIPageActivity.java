@@ -354,7 +354,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
             @Override
             public void onModifiedValue(Comment comment) {
-
+                reviewsList.updateRating(comment.getId(), comment.getRating());
             }
 
             @Override
