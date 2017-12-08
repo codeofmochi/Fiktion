@@ -99,9 +99,6 @@
     <string name="add_review">Add review</string>
     <string name="write_a_review_for_this_place">Write a review for this place</string>
     <string name="title_activity_user_places">Places</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
     <string name="title_activity_user_pictures">Pictures</string>
     <string name="title_activity_user_achievements">Achievements</string>
     <string name="title_activity_user_friends">Friends</string>
@@ -111,4 +108,11 @@
     <string name="no_places_yet_add_some">No places yet. Add some?</string>
     <string name="user_not_found">User not found</string>
     <string name="profile_action">Profile action</string>
+    <string name="friends_requests">Friends requests</string>
+    <string name="friends_list">Friends list</string>
+    <string name="no_friends_yet_add_some">No friends yet. Add some?</string>
+    <string name="places_visited_by">Places visited by  %s</string>
+    <string name="places_in_wishlist">Places in %s \'s wishlist</string>
+    <string name="places_in_favorites">Places in %s \'s favorites</string>
+    <string name="fullscreen_image">Fullscreen image</string>
 </resources>
