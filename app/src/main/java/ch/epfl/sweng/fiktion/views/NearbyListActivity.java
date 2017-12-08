@@ -27,7 +27,6 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
     private Context ctx = this;
     private LinearLayout list;
     private TextView empty;
-    private int searchRadius = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
         // trigger a search
         list.removeAllViews();
         list.addView(empty);
-        DatabaseProvider.getInstance().findNearPois(new Position(latitude, longitude), searchRadius, new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPois(new Position(latitude, longitude), Config.settings.getSearchRadius(), new DatabaseProvider.FindNearPoisListener() {
 
             @Override
             public void onNewValue(PointOfInterest poi) {
