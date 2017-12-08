@@ -217,7 +217,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         if (!AuthProvider.getInstance().isEmailVerified()) {
             return;
         }
-        if (user != null && poi != null) {
+        if (poi != null) {
             // disable the button
             upvoteButton.setEnabled(false);
             // set the button color to gray
