@@ -164,6 +164,8 @@ public class ProfileActivity extends MenuDrawerActivity {
                 startActivity(i);
             }
         });
+        // show action button
+        action.setVisibility(View.VISIBLE);
 
         updateInfos();
     }
@@ -177,39 +179,45 @@ public class ProfileActivity extends MenuDrawerActivity {
         action.setImageDrawable(getResources().getDrawable(R.drawable.person_add_icon_24));
         if (AuthProvider.getInstance().isConnected()) {
             // if user is logged in, check if in friend list, if not allow friend request
-            if (me.getFriendlist().contains(userId)) action.setVisibility(View.GONE);
-            else action.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // trigger user controller to send friend request
-                    userCtrl.sendFriendRequest(userId, new UserController.RequestListener() {
-                        @Override
-                        public void onSuccess() {
-                            Snackbar.make(profileBanner, R.string.friend_request_sent, Snackbar.LENGTH_SHORT).show();
-                        }
+            if (!me.getFriendlist().contains(userId)) {
+                // show action button
+                action.setVisibility(View.VISIBLE);
+                action.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // trigger user controller to send friend request
+                        userCtrl.sendFriendRequest(userId, new UserController.RequestListener() {
+                            @Override
+                            public void onSuccess() {
+                                Snackbar.make(profileBanner, R.string.friend_request_sent, Snackbar.LENGTH_SHORT).show();
+                            }
 
-                        @Override
-                        public void onDoesntExist() {
-                            Snackbar.make(profileBanner, R.string.user_not_found, Snackbar.LENGTH_SHORT).show();
-                        }
+                            @Override
+                            public void onDoesntExist() {
+                                Snackbar.make(profileBanner, R.string.user_not_found, Snackbar.LENGTH_SHORT).show();
+                            }
 
-                        @Override
-                        public void onFailure() {
-                            Snackbar.make(profileBanner, R.string.request_failed, Snackbar.LENGTH_SHORT).show();
-                        }
+                            @Override
+                            public void onFailure() {
+                                Snackbar.make(profileBanner, R.string.request_failed, Snackbar.LENGTH_SHORT).show();
+                            }
 
-                        @Override
-                        public void onAlreadyFriend() {
-                            Snackbar.make(profileBanner, R.string.already_in_friend_list, Snackbar.LENGTH_SHORT).show();
-                        }
+                            @Override
+                            public void onAlreadyFriend() {
+                                Snackbar.make(profileBanner, R.string.already_in_friend_list, Snackbar.LENGTH_SHORT).show();
+                            }
 
-                        @Override
-                        public void onNewFriend() {
-                            Snackbar.make(profileBanner, R.string.friend_added, Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
+                            @Override
+                            public void onNewFriend() {
+                                Snackbar.make(profileBanner, R.string.friend_added, Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+            } else {
+                // hide the button if user reloaded with user in friendlist
+                action.setVisibility(View.GONE);
+            }
         } else {
             // if user not connected, prompt with dialog to allow login
             AuthenticationChecks.checkVerifieddAuth(ctx, new DialogInterface.OnCancelListener() {
@@ -235,7 +243,7 @@ public class ProfileActivity extends MenuDrawerActivity {
                 // reassign user
                 user = u;
                 // redisplay profile
-                updateInfos();
+                showAnotherProfile();
             }
 
             @Override
@@ -258,7 +266,6 @@ public class ProfileActivity extends MenuDrawerActivity {
         // hide loading
         loading.dismiss();
         // display infos
-        action.setVisibility(View.VISIBLE);
         username.setText(user.getName());
         //TODO : implement these in class User and retrieve them here
         realInfos.setText("John Doe, 21");

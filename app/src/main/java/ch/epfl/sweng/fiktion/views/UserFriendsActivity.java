@@ -96,6 +96,7 @@ public class UserFriendsActivity extends AppCompatActivity {
         // reset friends list
         friendsList.removeAllViews();
         friendsList.addView(friendsListEmpty);
+        friendsListEmpty.setVisibility(View.VISIBLE);
 
         // show requests only if my profile
         if (state == ProfileActivity.Action.MY_PROFILE) {
