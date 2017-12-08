@@ -123,15 +123,15 @@ public class UserPlacesActivity extends AppCompatActivity {
                 switch (state) {
                     case VISITED:
                         collection = user.getVisited();
-                        title.setText("Places visited by " + u.getName());
+                        title.setText(getString(R.string.places_visited_by, u.getName()));
                         break;
                     case WISHLIST:
                         collection = user.getWishlist();
-                        title.setText("Places in " + u.getName() + "'s wishlist");
+                        title.setText(getString(R.string.places_in_wishlist, u.getName()));
                         break;
                     case FAVORITES:
                         collection = user.getFavourites();
-                        title.setText("Places in " + u.getName() + "'s favorites");
+                        title.setText(getString(R.string.places_in_favorites, u.getName()));
                         break;
                 }
 
