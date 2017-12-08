@@ -67,21 +67,22 @@ public class SettingsActivityTest {
     }
 
     @Test
-    public void updateSearchRadiusWhileConnected(){
+    public void updateMaxSearchRadiusWhileConnected(){
+
         Intent i = new Intent();
         testRule.launchActivity(i);
 
         assertThat(Config.settings.getSearchRadius(), is(20));
 
         onView(withId(R.id.searchRadiusSlider)).perform(
-                new GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER_LEFT, Press.FINGER));
-        onView(withId(R.id.searchRadiusNum)).check(matches(withText("1")));
+                new GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER_RIGHT, Press.FINGER));
+        onView(withId(R.id.searchRadiusNum)).check(matches(withText("200")));
 
-        assertThat(Config.settings.getSearchRadius(), is(1));
+        assertThat(Config.settings.getSearchRadius(), is(200));
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
-                assertThat(user.getSettings().getSearchRadius(), is(1));
+                assertThat(user.getSettings().getSearchRadius(), is(200));
             }
 
             @Override
@@ -100,15 +101,24 @@ public class SettingsActivityTest {
             }
         });
 
-        onView(withId(R.id.searchRadiusSlider)).perform(
-                new GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER_RIGHT, Press.FINGER));
-        onView(withId(R.id.searchRadiusNum)).check(matches(withText("200")));
+    }
 
-        assertThat(Config.settings.getSearchRadius(), is(200));
+    @Test
+    public void updateMinSearchRadiusWhileConnected(){
+        Intent i = new Intent();
+        testRule.launchActivity(i);
+
+        assertThat(Config.settings.getSearchRadius(), is(20));
+
+        onView(withId(R.id.searchRadiusSlider)).perform(
+                new GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER_LEFT, Press.FINGER));
+        onView(withId(R.id.searchRadiusNum)).check(matches(withText("1")));
+
+        assertThat(Config.settings.getSearchRadius(), is(1));
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
-                assertThat(user.getSettings().getSearchRadius(), is(200));
+                assertThat(user.getSettings().getSearchRadius(), is(1));
             }
 
             @Override
