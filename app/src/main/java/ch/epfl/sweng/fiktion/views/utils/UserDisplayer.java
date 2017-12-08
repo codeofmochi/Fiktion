@@ -67,6 +67,14 @@ public class UserDisplayer {
         return v;
     }
 
+    /**
+     * Adds a V button on the right of a linear layout, made for a UserListElement View
+     *
+     * @param view the previously created linear layout in which we want to add a V button
+     * @param onClickListener what happens on the button press
+     * @param ctx the context where the view is created
+     * @return a view with the original layout and a V button added
+     */
     public static View withV(LinearLayout view, View.OnClickListener onClickListener, Context ctx) {
         // v button
         ImageButton v = new ImageButton(ctx);
@@ -80,6 +88,14 @@ public class UserDisplayer {
         return view;
     }
 
+    /**
+     * Adds a X button on the right of a linear layout, made for a UserListElement View
+     *
+     * @param view the previously created linear layout in which we want to add a X button
+     * @param onClickListener what happens on the button press
+     * @param ctx the context where the view is created
+     * @return a view with the original layout and a X button added
+     */
     public static View withX(LinearLayout view, View.OnClickListener onClickListener, Context ctx) {
         // x button
         ImageButton v = new ImageButton(ctx);
