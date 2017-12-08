@@ -99,8 +99,18 @@ public class UserFriendsActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(User requester) {
                         View v = UserDisplayer.createUserListElement(requester, ctx);
-                        v = UserDisplayer.withV((LinearLayout) v, ctx);
-                        v = UserDisplayer.withX((LinearLayout) v, ctx);
+                        v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // TODO accept friend request here
+                            }
+                        }, ctx);
+                        v = UserDisplayer.withX((LinearLayout) v, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // TODO deny friend request here
+                            }
+                        }, ctx);
                         friendsRequests.addView(v);
                     }
 
@@ -128,7 +138,12 @@ public class UserFriendsActivity extends AppCompatActivity {
                     View v = UserDisplayer.createUserListElement(friend, ctx);
                     // put delete button if my profile
                     if (state == ProfileActivity.Action.MY_PROFILE) {
-                        v = UserDisplayer.withV((LinearLayout) v, ctx);
+                        v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // TODO pop alertbox to remove friend
+                            }
+                        }, ctx);
                     }
                     friendsList.addView(v);
                 }

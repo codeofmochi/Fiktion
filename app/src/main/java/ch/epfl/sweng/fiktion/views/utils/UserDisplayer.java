@@ -67,25 +67,27 @@ public class UserDisplayer {
         return v;
     }
 
-    public static View withV(LinearLayout view, Context ctx) {
+    public static View withV(LinearLayout view, View.OnClickListener onClickListener, Context ctx) {
         // v button
         ImageButton v = new ImageButton(ctx);
         v.setImageDrawable(ctx.getResources().getDrawable(R.drawable.v_icon_20));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
         params.setMargins(0, 15, 0, 0);
         v.setLayoutParams(params);
+        v.setOnClickListener(onClickListener);
         view.addView(v);
 
         return view;
     }
 
-    public static View withX(LinearLayout view, Context ctx) {
+    public static View withX(LinearLayout view, View.OnClickListener onClickListener, Context ctx) {
         // x button
         ImageButton v = new ImageButton(ctx);
         v.setImageDrawable(ctx.getResources().getDrawable(R.drawable.x_icon_20));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
         params.setMargins(0, 15, 0, 0);
         v.setLayoutParams(params);
+        v.setOnClickListener(onClickListener);
         view.addView(v);
 
         return view;
