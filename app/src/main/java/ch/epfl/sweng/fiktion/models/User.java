@@ -73,6 +73,8 @@ public class User {
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
         upvoted = new TreeSet<>();
+        settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
+
     }
 
     /**
@@ -91,6 +93,7 @@ public class User {
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
         upvoted = new TreeSet<>();
+        settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
     }
 
     /**
