@@ -1,15 +1,18 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.utils.UserDisplayer;
@@ -23,6 +26,7 @@ public class UserFriendsActivity extends AppCompatActivity {
     private LinearLayout friendsList;
     private TextView friendsListEmpty;
     private User user;
+    private UserController userCtrl;
 
     // flags data
     private String userId;
@@ -84,7 +88,14 @@ public class UserFriendsActivity extends AppCompatActivity {
     private void updateContent(User u) {
         // assign user
         user = u;
-        // update lists
+        userCtrl = new UserController(user);
+        // update lists : reset friends requests
+        friendsRequestsTitle.setVisibility(View.GONE);
+        friendsRequests.setVisibility(View.GONE);
+        friendsRequests.removeAllViews();
+        // reset friends list
+        friendsList.removeAllViews();
+        friendsList.addView(friendsListEmpty);
 
         // show requests only if my profile
         if (state == ProfileActivity.Action.MY_PROFILE) {
@@ -102,13 +113,40 @@ public class UserFriendsActivity extends AppCompatActivity {
                         v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // TODO accept friend request here
+                                // accept friend request
+                                userCtrl.acceptFriendRequest(r, new DatabaseProvider.ModifyUserListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Snackbar.make(friendsListTitle, R.string.friend_added, Snackbar.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onDoesntExist() {
+                                        Snackbar.make(friendsListTitle, R.string.user_not_found, Snackbar.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Snackbar.make(friendsListTitle, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                         }, ctx);
                         v = UserDisplayer.withX((LinearLayout) v, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // TODO deny friend request here
+                                // deny friend request
+                                userCtrl.ignoreFriendRequest(r, new UserController.BinaryListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Snackbar.make(friendsListTitle, R.string.friend_request_ignored, Snackbar.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Snackbar.make(friendsListTitle, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                         }, ctx);
                         friendsRequests.addView(v);
@@ -141,7 +179,31 @@ public class UserFriendsActivity extends AppCompatActivity {
                         v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // TODO pop alertbox to remove friend
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                                builder.setMessage(getString(R.string.deletion_confirmation_of, friend.getName()))
+                                        .setCancelable(true)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                userCtrl.removeFromFriendList(f, new UserController.BinaryListener() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        Snackbar.make(friendsListTitle, R.string.friend_deleted, Snackbar.LENGTH_LONG).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure() {
+                                                        Snackbar.make(friendsListTitle, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
                             }
                         }, ctx);
                     }

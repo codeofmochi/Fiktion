@@ -44,6 +44,10 @@ public class UserController {
         });
     }
 
+    public UserController(User u) {
+        this.localUser = u;
+    }
+
     /**
      * @return the local user
      */
@@ -57,7 +61,7 @@ public class UserController {
      * @param friendID The ID of the user receiving the request
      * @param listener The listener handling every DB responses
      */
-    public void sendFriendResquest(final String friendID, final RequestListener listener) {
+    public void sendFriendRequest(final String friendID, final RequestListener listener) {
         if (!localUser.getID().equals(friendID)) {
             if (localUser.getFriendlist().contains(friendID)) {
                 listener.onAlreadyFriend();
