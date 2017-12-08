@@ -12,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,7 +53,7 @@ public class FirebaseCommentTest {
     }
 
     @Test
-    public void addCommentTest() {
+    public void addCommentTest() throws NoSuchAlgorithmException {
         ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
         doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
         final Mutable<Boolean> success = new Mutable<>();
@@ -77,16 +78,22 @@ public class FirebaseCommentTest {
     }
 
     @Test
-    public void getCommentsTest() {
+    public void getCommentsTest() throws NoSuchAlgorithmException {
         ArgumentCaptor<ChildEventListener> cel = ArgumentCaptor.forClass(ChildEventListener.class);
+        ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
         when(dbRef.addChildEventListener(cel.capture())).thenReturn(null);
-        when(dbRef.orderByChild(anyString())).thenReturn(dbRef);
+        when(dbRef.addValueEventListener(vel.capture())).thenReturn(null);
         final List<Comment> comments = new ArrayList<>();
         final Mutable<Boolean> isFailure = new Mutable<>(false);
         DatabaseProvider.GetCommentsListener listener = new DatabaseProvider.GetCommentsListener() {
             @Override
             public void onNewValue(Comment comment) {
                 comments.add(comment);
+            }
+
+            @Override
+            public void onModifiedValue(Comment comment) {
+
             }
 
             @Override
@@ -97,9 +104,12 @@ public class FirebaseCommentTest {
 
         Comment c1 = new Comment("text", "author", new Date(42), 84);
 
-        database.getComments("poi", listener);
+        database.getPOIComments("poi", listener);
         when(snapshot.getValue(FirebaseComment.class)).thenReturn(new FirebaseComment(c1));
+        when(snapshot.getKey()).thenReturn(" ");
+        when(snapshot.exists()).thenReturn(true);
         cel.getValue().onChildAdded(snapshot, "");
+        vel.getValue().onDataChange(snapshot);
         assertThat(comments.size(), is(1));
         assertFalse(isFailure.get());
         Comment rc = comments.get(0);
@@ -108,7 +118,6 @@ public class FirebaseCommentTest {
         assertThat(rc.getRating(), is(c1.getRating()));
         assertThat(rc.getText(), is(c1.getText()));
 
-        when(snapshot.getValue(FirebaseComment.class)).thenReturn(null);
         cel.getValue().onChildAdded(snapshot, "");
         assertThat(comments.size(), is(1));
         assertFalse(isFailure.get());

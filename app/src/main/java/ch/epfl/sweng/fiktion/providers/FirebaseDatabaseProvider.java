@@ -567,6 +567,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+
                     FirebaseComment fComment = dataSnapshot.getValue(FirebaseComment.class);
                     if (fComment == null) {
                         listener.onFailure();

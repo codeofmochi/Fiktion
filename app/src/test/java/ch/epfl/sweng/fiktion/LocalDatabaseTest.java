@@ -3,6 +3,7 @@ package ch.epfl.sweng.fiktion;
 import org.junit.After;
 import org.junit.Test;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.TreeSet;
 
@@ -479,12 +480,12 @@ public class LocalDatabaseTest {
         assertThat(result.get(), is("F"));
     }
 
-    private Comment commentWithText(String text) {
+    private Comment commentWithText(String text) throws NoSuchAlgorithmException {
         return new Comment(text, "author", new Date(0), 0);
     }
 
     @Test
-    public void addCommentTest() {
+    public void addCommentTest() throws NoSuchAlgorithmException {
         final Mutable<String> result = new Mutable<>("");
         DatabaseProvider.AddCommentListener listener = new DatabaseProvider.AddCommentListener() {
             @Override
@@ -514,7 +515,7 @@ public class LocalDatabaseTest {
     }
 
     @Test
-    public void getCommentsTest() {
+    public void getCommentsTest() throws NoSuchAlgorithmException {
         DatabaseProvider.AddCommentListener emptyAddCommentListener = new DatabaseProvider.AddCommentListener() {
             @Override
             public void onSuccess() {
@@ -534,12 +535,17 @@ public class LocalDatabaseTest {
             }
 
             @Override
+            public void onModifiedValue(Comment comment) {
+
+            }
+
+            @Override
             public void onFailure() {
                 result.set("F");
             }
         };
 
-        db.getComments("poi1", listener);
+        db.getPOIComments("poi1", listener);
         assertThat(result.get(), is("good"));
         assertThat(count.get(), is(0));
 
@@ -549,16 +555,16 @@ public class LocalDatabaseTest {
         count.set(0);
 
         db.addComment(commentWithText("text"), "poi2", emptyAddCommentListener);
-        db.getComments("poi2", listener);
+        db.getPOIComments("poi2", listener);
         assertThat(result.get(), is("good"));
         assertThat(count.get(), is(1));
         count.set(0);
 
-        db.getComments("GETCOMMENTN", listener);
+        db.getPOIComments("GETCOMMENTN", listener);
         assertThat(result.get(), is("good"));
         assertThat(count.get(), is(1));
 
-        db.getComments("GETCOMMENTF", listener);
+        db.getPOIComments("GETCOMMENTF", listener);
         assertThat(result.get(), is("F"));
         assertThat(count.get(), is(1));
     }
