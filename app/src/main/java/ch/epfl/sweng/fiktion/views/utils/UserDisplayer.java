@@ -38,7 +38,6 @@ public class UserDisplayer {
         RoundedBitmapDrawable round = RoundedBitmapDrawableFactory.create(ctx.getResources(), src);
         round.setCornerRadius(Math.max(src.getWidth(), src.getHeight()) / 2.0f);
         pic.setImageDrawable(round);
-        src.recycle();
         v.addView(pic);
 
         // user infos layout
