@@ -176,6 +176,7 @@ public class FirebaseCommentTest {
     @Test
     public void getCommentVoteOfUserTest() {
         ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
 
         final Mutable<String> result = new Mutable<>("");
 
