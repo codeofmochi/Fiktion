@@ -99,7 +99,7 @@ public class UserFriendsActivity extends AppCompatActivity {
 
         // show requests only if my profile
         if (state == ProfileActivity.Action.MY_PROFILE) {
-            for (String r : u.getRequests()) {
+            for (final String r : u.getRequests()) {
                 // show friend requests since there are some
                 // TODO dont forget to hide again when the list gets empty
                 friendsRequestsTitle.setVisibility(View.VISIBLE);
@@ -164,7 +164,7 @@ public class UserFriendsActivity extends AppCompatActivity {
             }
         }
 
-        for (String f : u.getFriendlist()) {
+        for (final String f : u.getFriendlist()) {
             // hide empty message since there are some
             // TODO dont forget to show it again if user delete all friends
             friendsListEmpty.setVisibility(View.GONE);
@@ -172,7 +172,7 @@ public class UserFriendsActivity extends AppCompatActivity {
             // find infos of friend
             DatabaseProvider.getInstance().getUserById(f, new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess(User friend) {
+                public void onSuccess(final User friend) {
                     View v = UserDisplayer.createUserListElement(friend, ctx);
                     // put delete button if my profile
                     if (state == ProfileActivity.Action.MY_PROFILE) {
