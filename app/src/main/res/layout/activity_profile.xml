@@ -6,8 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/bgLightGray"
+    android:clipToPadding="false"
     android:paddingBottom="20dp"
-    tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity">
+    tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity"
+    tools:ignore="Overdraw">
 
     <ImageView
         android:id="@+id/userBanner"
@@ -17,23 +19,38 @@
         android:contentDescription="@string/user_banner"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/dialexo_banner" />
+        app:srcCompat="@drawable/default_image" />
+
+    <ImageButton
+        android:id="@+id/userAction"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorPrimary"
+        android:contentDescription="@string/profile_action"
+        android:elevation="5dp"
+        android:tint="@color/white"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userBanner"
+        tools:targetApi="m" />
 
     <ImageView
         android:id="@+id/userProfilePicture"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="100dp"
         android:adjustViewBounds="true"
         android:background="@color/white"
         android:contentDescription="@string/user_profile_picture"
         android:cropToPadding="true"
-        android:elevation="10dp"
+        android:elevation="5dp"
         android:padding="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/userInfos"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/dialexo_user_picture" />
+        app:srcCompat="@drawable/default_user" />
 
     <LinearLayout
         android:id="@+id/userInfos"
@@ -49,7 +66,6 @@
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="dialexo"
             android:textSize="20sp"
             android:textStyle="bold"
             tools:ignore="HardcodedText" /><!-- text will change dynamically -->
@@ -58,14 +74,12 @@
             android:id="@+id/userRealInfos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Alexandre Chau, 21"
             tools:ignore="HardcodedText" /><!-- text will change dynamically -->
 
         <TextView
             android:id="@+id/userCountry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Switzerland"
             tools:ignore="HardcodedText" /><!-- text will change dynamically -->
     </LinearLayout>
 
@@ -73,8 +87,10 @@
         android:id="@+id/stats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="#DDDDDD"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/white"
+        android:elevation="1dp"
         android:orientation="horizontal"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -82,44 +98,70 @@
         app:layout_constraintTop_toBottomOf="@+id/userInfos">
 
         <TextView
-            android:id="@+id/visitedCount"
+            android:id="@+id/placesLink"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:drawableStart="@drawable/location_icon"
-            android:drawableTint="@color/darkGray"
-            android:text="126 visited"
+            android:drawableTint="@color/colorPrimary"
+            android:drawableTop="@drawable/location_icon_24"
+            android:onClick="startUserPlacesActivity"
+            android:text="Places"
             android:textAlignment="center"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
             tools:ignore="HardcodedText"
             tools:targetApi="m" /><!-- text will change dynamically -->
 
         <TextView
-            android:id="@+id/savedCount"
+            android:id="@+id/picturesLink"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:drawableStart="@drawable/star_icon_24"
-            android:drawableTint="@color/darkGray"
-            android:text="213 saved"
+            android:drawableTint="@color/colorPrimary"
+            android:drawableTop="@drawable/camera_icon_24"
+            android:onClick="startUserPicturesActivity"
+            android:text="Pictures"
             android:textAlignment="center"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
             tools:ignore="HardcodedText"
             tools:targetApi="m" /><!-- text will change dynamically -->
 
         <TextView
-            android:id="@+id/photosCount"
+            android:id="@+id/friendsLink"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:drawableStart="@drawable/camera_icon"
-            android:drawableTint="@color/darkGray"
-            android:text="319 pictures"
+            android:drawableTint="@color/colorPrimary"
+            android:drawableTop="@drawable/person_icon_24"
+            android:onClick="startUserFriendsActivity"
+            android:text="Friends"
             android:textAlignment="center"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText"
+            tools:targetApi="m" /><!-- text will change dynamically -->
+
+        <TextView
+            android:id="@+id/achievementsLink"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:drawableTint="@color/colorPrimary"
+            android:drawableTop="@drawable/star_icon_24"
+            android:onClick="startUserAchievementsActivity"
+            android:text="Points"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
             tools:ignore="HardcodedText"
             tools:targetApi="m" /><!-- text will change dynamically -->
 
@@ -157,7 +199,7 @@
                 android:id="@+id/locationPostComment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/location_icon"
+                android:drawableStart="@drawable/location_icon_24"
                 android:drawableTint="@color/darkGray"
                 android:text="dialexo visited this place :"
                 tools:ignore="HardcodedText"
@@ -249,7 +291,7 @@
                 android:id="@+id/reviewPostComment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/rate_review_icon"
+                android:drawableStart="@drawable/rate_review_icon_20"
                 android:drawableTint="@color/darkGray"
                 android:text=" dialexo wrote a review for Shinjuku, Tokyo :"
                 tools:ignore="HardcodedText"
@@ -296,7 +338,7 @@
                 android:id="@+id/photoPostComment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/camera_icon"
+                android:drawableStart="@drawable/camera_icon_20"
                 android:drawableTint="@color/darkGray"
                 android:text=" dialexo took a picture in Akihabara, Tokyo :"
                 tools:ignore="HardcodedText"

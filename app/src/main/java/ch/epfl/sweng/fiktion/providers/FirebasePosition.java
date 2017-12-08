@@ -7,6 +7,7 @@ import ch.epfl.sweng.fiktion.models.Position;
  *
  * @author pedro
  */
+@SuppressWarnings("WeakerAccess") // fields need to be public so that firebase can access them
 public class FirebasePosition {
     public double latitude;
     public double longitude;

@@ -1,9 +1,12 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import android.util.Log;
+
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -12,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -25,17 +29,60 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private DatabaseReference dbRef;
     private GeoFire geofire;
     private SearchProvider searchProvider;
+    private final String poisRefName = "Points of interest";
+    private final String usersRefName = "Users";
+    private final String commentsRef = "Comments";
+    private final String poiCommentsRef = "POI comments";
+    private final String commentVotersRef = "Comment voters";
 
+    /**
+     * Constructs a firebase database class that provides database methods
+     */
     public FirebaseDatabaseProvider() {
         dbRef = FirebaseDatabase.getInstance().getReference();
         geofire = new GeoFire(dbRef.child("geofire"));
         searchProvider = new AlgoliaSearchProvider();
     }
 
+    /**
+     * Constructs a firebase database class with the given fields. Mainly used for testing
+     */
     public FirebaseDatabaseProvider(DatabaseReference dbRef, GeoFire geofire, SearchProvider searchProvider) {
         this.dbRef = dbRef;
         this.geofire = geofire;
         this.searchProvider = searchProvider;
+    }
+
+    /**
+     * encodes a String so that firebase can store it, use decode to decode it
+     *
+     * @param s the String to encode
+     * @return the encoded String
+     */
+    public static String encode(String s) {
+        return s.replace("%", "%%")
+                .replace(".", "%P")
+                .replace("$", "%D")
+                .replace("[", "%O")
+                .replace("]", "%C")
+                .replace("#", "%H")
+                .replace("/", "%S");
+    }
+
+    /**
+     * decodes an encoded String to get back is value
+     *
+     * @param s the encoded String
+     * @return the decoded String
+     */
+    public static String decode(String s) {
+        return s.replace("%%", "%")
+                .replace("%P", ".")
+                .replace("%D", "$")
+                .replace("%O", "[")
+                .replace("%C", "]")
+                .replace("%H", "#")
+                .replace("%S", "/");
     }
 
     /**
@@ -46,7 +93,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         final String poiName = poi.name();
 
         // get/create the reference of the point of interest
-        final DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
 
         // add only if the reference doesn't exist
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -99,8 +146,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void getPoi(String poiName, final GetPoiListener listener) {
         // get the reference of the poi
-        DatabaseReference poiRef = dbRef.child("Points of interest").child(poiName);
-        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -108,8 +157,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     if (fPoi == null) {
                         listener.onFailure();
                     } else {
-                        // inform the listener that we got the matching poi
-                        listener.onSuccess(fPoi.toPoi());
+                        if (firstCall) {
+                            // inform the listener that we got the matching poi
+                            listener.onSuccess(fPoi.toPoi());
+                            firstCall = false;
+                        } else {
+                            //inform the listener that the poi has been modified
+                            listener.onModified(fPoi.toPoi());
+                        }
                     }
                 } else {
                     // inform the listener that the poi doesn't exist
@@ -120,6 +175,112 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void modifyPOI(final PointOfInterest poi, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poi.name());
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    // modify the poi in the search provider
+                    searchProvider.modifyPOI(poi, new ModifyPOIListener() {
+                        @Override
+                        public void onSuccess() {
+                            // if it succeeds, replace the poi value in firebase
+                            FirebasePointOfInterest fPOI = new FirebasePointOfInterest(poi);
+                            poiRef.setValue(fPOI);
+
+                            // update the position for geofire
+                            Position pos = poi.position();
+                            final GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
+                            geofire.setLocation(poi.name(), geoLocation);
+
+                            // and inform the listener of the success of the modification
+                            listener.onSuccess();
+                        }
+
+                        @Override
+                        public void onDoesntExist() {
+                            // if it doesn't exist in the search provider, we got a coherence problem -> failure
+                            listener.onFailure();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            // inform the listener that the operation failed
+                            listener.onFailure();
+                        }
+                    });
+                } else {
+                    // inform the listener that the point of interest doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void upvote(String poiName, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Object value = dataSnapshot.child("rating").getValue();
+                    // if value is null, then the poi was created before pois had rating, set it to 0
+                    long rating = value == null ? 0 : (long) value;
+                    poiRef.child("rating").setValue(rating + 1);
+                    listener.onSuccess();
+                } else {
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void downvote(String poiName, final ModifyPOIListener listener) {
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
+        poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Object value = dataSnapshot.child("rating").getValue();
+                    long rating = value == null ? 0 : (long) value;
+                    // if value is null, then the poi was created before pois had rating, set it to 0
+                    poiRef.child("rating").setValue(rating - 1);
+                    listener.onSuccess();
+                } else {
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
                 listener.onFailure();
             }
         });
@@ -141,6 +302,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     public void onSuccess(PointOfInterest poi) {
                         // inform the listener that we got a new poi
                         listener.onNewValue(poi);
+                    }
+
+                    @Override
+                    public void onModified(PointOfInterest poi) {
+
                     }
 
                     @Override
@@ -196,6 +362,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         }
 
                         @Override
+                        public void onModified(PointOfInterest poi) {
+                        }
+
+                        @Override
                         public void onDoesntExist() {
                         }
 
@@ -219,7 +389,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void addUser(final User user, final AddUserListener listener) {
         // get/create the reference of the user
-        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+        final DatabaseReference userRef = dbRef.child(usersRefName).child(user.getID());
 
         // add only if the reference doesn't exist
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -252,8 +422,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void getUserById(String id, final GetUserListener listener) {
         // get the reference of the user associated with the id
-        DatabaseReference userRef = dbRef.child("Users").child(id);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference userRef = dbRef.child(usersRefName).child(id);
+        userRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -262,8 +434,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         // we found the id but conversion failed, error of data handling probably
                         listener.onFailure();
                     } else {
-                        // inform the listener that we got the matching user
-                        listener.onSuccess(fUser.toUser());
+                        if (firstCall) {
+                            // inform the listener that we got the matching user
+                            listener.onSuccess(fUser.toUser());
+                            firstCall = false;
+                        } else {
+                            // inform the listener that the user has been modified
+                            listener.onModified(fUser.toUser());
+                        }
                     }
                 } else {
                     // inform the listener that the user (id) doesnt exist
@@ -285,7 +463,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void deleterUserById(String id, final DeleteUserListener listener) {
         // get the reference of the user associated with the id
-        final DatabaseReference userRef = dbRef.child("Users").child(id);
+        final DatabaseReference userRef = dbRef.child(usersRefName).child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -315,7 +493,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
         // get the reference of the user
-        final DatabaseReference userRef = dbRef.child("Users").child(user.getID());
+        final DatabaseReference userRef = dbRef.child(usersRefName).child(user.getID());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -330,6 +508,220 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     // inform the listener that the user doesn't exist
                     listener.onDoesntExist();
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addComment(final Comment comment, final String poiName, final AddCommentListener listener) {
+        // get the comment reference
+        final DatabaseReference commentRef = dbRef.child(commentsRef).child(comment.getId());
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // if the comment already exists, inform the listener of a failure
+                    listener.onFailure();
+                    return;
+                }
+
+                // add the new comment
+                FirebaseComment fComment = new FirebaseComment(comment);
+                commentRef.setValue(fComment);
+
+                // add the comment id to
+                dbRef.child(poiCommentsRef).child(poiName).child(comment.getId()).setValue(true);
+
+                // inform to the listener that the operation succeeded
+                listener.onSuccess();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getComment(String commentId, final GetCommentListener listener) {
+        // get the comment reference
+        DatabaseReference commentRef = dbRef.child(commentsRef).child(commentId);
+        commentRef.addValueEventListener(new ValueEventListener() {
+            private boolean firstCall = true;
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    FirebaseComment fComment = dataSnapshot.getValue(FirebaseComment.class);
+                    if (fComment == null) {
+                        listener.onFailure();
+                    } else {
+                        if (firstCall) {
+                            // inform the listener that we got the matching comment
+                            listener.onSuccess(fComment.toComment());
+                            firstCall = false;
+                        } else {
+                            // inform the listener that the comment has been modified
+                            listener.onModified(fComment.toComment());
+                        }
+                    }
+                } else {
+                    // inform the listener that the comment doesn't exist
+                    listener.onDoesntExist();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getPOIComments(String poiName, final GetCommentsListener listener) {
+        // get the poi comments reference
+        final DatabaseReference cPOIRef = dbRef.child(poiCommentsRef).child(poiName);
+
+        // get the comments ids and get the actual comments
+        cPOIRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                getComment(dataSnapshot.getKey(), new GetCommentListener() {
+                    @Override
+                    public void onSuccess(Comment comment) {
+                        // inform the listener with every new comment
+                        listener.onNewValue(comment);
+                    }
+
+                    @Override
+                    public void onModified(Comment comment) {
+                        // inform the listener when an already retrieved poi has been modified
+                        listener.onModifiedValue(comment);
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void voteComment(final String commentId, final String userID, final int vote, final int previousVote, final VoteListener listener) {
+
+        // get the comment reference
+        final DatabaseReference commentRef = dbRef.child(commentsRef).child(commentId);
+
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // get the rating
+                    Object value = dataSnapshot.child("rating").getValue();
+                    long rating = value == null ? 0 : (long) value;
+
+                    // make the rating modification according to the vote and the previous vote
+                    commentRef.child("rating").setValue(rating + vote - previousVote);
+
+                    // record the vote state of the user
+                    if (vote == NOVOTE ) {
+                        dbRef.child(commentVotersRef).child(commentId).child(userID).removeValue();
+                    } else {
+                        dbRef.child(commentVotersRef).child(commentId).child(userID).setValue(vote);
+                    }
+
+                    // inform the listener that the upvote succeeded
+                    listener.onSuccess();
+                } else {
+                    // if there is no comment at the reference, inform the listener that the comment doesn't exist
+                    listener.onFailure();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getCommentVoteOfUser(String commentId, String userID, final GetVoteListener listener) {
+        // get the vote reference associated to the user for the comment
+        DatabaseReference voteRef = dbRef.child(commentVotersRef).child(commentId).child(userID);
+
+        voteRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int vote;
+                if (dataSnapshot.exists()) {
+                    Object voteValue = dataSnapshot.getValue();
+                    long longVoteValue = voteValue == null ? 0 : (long) voteValue;
+                    if (longVoteValue < 0) {
+                        vote = DatabaseProvider.DOWNVOTE;
+                    } else if (longVoteValue > 0) {
+                        vote = DatabaseProvider.UPVOTE;
+                    } else {
+                        vote = DatabaseProvider.NOVOTE;
+                    }
+                } else {
+                    // if it doesn't exist, then the user hasn't voted
+                    vote = DatabaseProvider.NOVOTE;
+                }
+                // inform the listener of the vote
+                listener.onSuccess(vote);
             }
 
             @Override

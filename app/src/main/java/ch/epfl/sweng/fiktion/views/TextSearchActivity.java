@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,10 +16,10 @@ import android.widget.Toast;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseSingleton;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 
+@SuppressWarnings("FieldCanBeLocal") // those fields might be used elsewhere
 public class TextSearchActivity extends MenuDrawerActivity {
 
     private EditText searchField;
@@ -89,7 +90,7 @@ public class TextSearchActivity extends MenuDrawerActivity {
         }
 
         // perform search
-        DatabaseSingleton.database.searchByText(text, new DatabaseProvider.SearchPOIByTextListener() {
+        DatabaseProvider.getInstance().searchByText(text, new DatabaseProvider.SearchPOIByTextListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 View pv = POIDisplayer.createPoiCard(poi, ctx);
@@ -111,13 +112,13 @@ public class TextSearchActivity extends MenuDrawerActivity {
         });
 
         // show loading text (will be hidden if new result, and replaced by no results if nothing shows up)
-        noResults.setText("Loading...");
+        noResults.setText(R.string.loading_text);
         if (noResults.getVisibility() == View.INVISIBLE) noResults.setVisibility(View.VISIBLE);
         new Handler().postDelayed(
                 new Runnable() {
                     @Override
                     public void run() {
-                        noResults.setText("No results found");
+                        noResults.setText(R.string.no_results_found);
                     }
                 },
                 SEARCH_TIMEOUT
@@ -126,10 +127,8 @@ public class TextSearchActivity extends MenuDrawerActivity {
 
     /**
      * Triggered by search button press
-     *
-     * @param view
      */
-    public void triggerSearch(View view) {
+    public void triggerSearch(@SuppressLint("Unused paramater") View view) {
         String searchText = searchField.getText().toString();
         // search
         search(searchText);

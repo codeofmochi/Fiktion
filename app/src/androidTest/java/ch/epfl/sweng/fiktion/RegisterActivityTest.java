@@ -9,14 +9,14 @@ import android.support.test.espresso.action.ViewActions;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
-import ch.epfl.sweng.fiktion.providers.AuthSingleton;
-import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
+import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.RegisterActivity;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -29,7 +29,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.CoreMatchers.is;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RegisterActivityTest {
 
     private final String new_email = "new@email.com";
@@ -41,11 +40,15 @@ public class RegisterActivityTest {
     public final ActivityTestRule<RegisterActivity> regActivityRule =
             new ActivityTestRule<>(RegisterActivity.class);
 
+    @BeforeClass
+    public static void setConfig() {
+        Config.TEST_MODE = true;
+    }
+
     @Before
     public void setUp() {
         //define authenticator as our local and not the firebase one
-        AuthSingleton.auth = new LocalAuthProvider();
-        AuthSingleton.auth.signOut();
+        AuthProvider.getInstance().signOut();
         //define context
         regActivity = regActivityRule.getActivity();
     }
@@ -53,12 +56,17 @@ public class RegisterActivityTest {
     @After
     public void end() {
         //we need to sign out everytime in case it fails
-        AuthSingleton.auth.signOut();
+        AuthProvider.getInstance().signOut();
         //regActivity.finish();
     }
 
+    @AfterClass
+    public static void clean() {
+        AuthProvider.destroyInstance();
+    }
+
     @Test
-    public void newAccountTest(){
+    public void newAccountTest() {
         //we type valid credentials and click on the register button
         onView(withId(R.id.register_email)).perform(typeText(new_email), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.register_password)).perform(typeText(new_password), ViewActions.closeSoftKeyboard());
@@ -66,14 +74,14 @@ public class RegisterActivityTest {
 
         onView(withId(R.id.register_click)).perform(click());
 
-        assertThat(AuthSingleton.auth.getEmail(), is(new_email));
+        assertThat(AuthProvider.getInstance().getEmail(), is(new_email));
 
     }
 
     @Test
     public void existingAccountTest() {
         //we type valid but existing credentials and click on the register button
-        String exist_email = "default@test.ch";
+        String exist_email = "default@email.ch";
         onView(withId(R.id.register_email)).perform(typeText(exist_email), ViewActions.closeSoftKeyboard());
         String exist_password = "testing";
         onView(withId(R.id.register_password)).perform(typeText(exist_password), ViewActions.closeSoftKeyboard());

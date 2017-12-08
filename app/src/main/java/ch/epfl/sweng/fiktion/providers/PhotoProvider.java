@@ -2,13 +2,41 @@ package ch.epfl.sweng.fiktion.providers;
 
 import android.graphics.Bitmap;
 
+import ch.epfl.sweng.fiktion.utils.Config;
+
 /**
  * Photo provider
  *
  * @author Pedro Da Cunha
  */
 public abstract class PhotoProvider {
+
+    private static PhotoProvider photoProvider;
+
     public static int ALL_PHOTOS = 0;
+
+    /**
+     * return the photo provider instance
+     *
+     * @return the photo provider
+     */
+    public static PhotoProvider getInstance() {
+        if (photoProvider == null) {
+            if (Config.TEST_MODE)
+                photoProvider = new LocalPhotoProvider();
+            else
+                photoProvider = new FirebasePhotoProvider();
+        }
+        return photoProvider;
+    }
+
+    public static void setInstance(PhotoProvider photoProvider) {
+        PhotoProvider.photoProvider = photoProvider;
+    }
+
+    public static void destroyInstance() {
+        photoProvider = null;
+    }
 
     /**
      * Listener that listens the status of a photo upload

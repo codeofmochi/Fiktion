@@ -47,9 +47,10 @@ public class AlgoliaSearchProvider extends SearchProvider {
     @Override
     public void addPoi(PointOfInterest poi, final DatabaseProvider.AddPoiListener listener) {
         try {
-            // add POI to Algolia asynchronously
+            // add POI to Algolia asynchronously, the ID is the name of the poi
             index.addObjectAsync(
                     serializePOI(poi),
+                    poi.name(),
                     new CompletionHandler() {
                         @Override
                         public void requestCompleted(JSONObject jsonObject, AlgoliaException e) {
@@ -57,6 +58,25 @@ public class AlgoliaSearchProvider extends SearchProvider {
                         }
                     }
             );
+        } catch (Exception e) {
+            // something went wrong
+            listener.onFailure();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void modifyPOI(PointOfInterest poi, final DatabaseProvider.ModifyPOIListener listener) {
+        try {
+            // modify the poi in algolia
+            index.saveObjectAsync(serializePOI(poi), poi.name(), new CompletionHandler() {
+                @Override
+                public void requestCompleted(JSONObject jsonObject, AlgoliaException e) {
+                    listener.onSuccess();
+                }
+            });
         } catch (Exception e) {
             // something went wrong
             listener.onFailure();
@@ -122,6 +142,7 @@ public class AlgoliaSearchProvider extends SearchProvider {
         assert (jsonObject != null);
 
         List<String> results = new ArrayList<>();
+
         JSONArray hits = jsonObject.optJSONArray("hits");
 
         // list is empty
@@ -132,7 +153,7 @@ public class AlgoliaSearchProvider extends SearchProvider {
             JSONObject hit = hits.optJSONObject(i);
             if (hit != null) {
                 String poi = hit.optString("name");
-                if (poi != null) {
+                if (poi != null && poi != "") {
                     results.add(poi);
                 }
             }

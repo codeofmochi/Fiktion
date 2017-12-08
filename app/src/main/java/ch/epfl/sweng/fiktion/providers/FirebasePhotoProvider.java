@@ -22,6 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import ch.epfl.sweng.fiktion.utils.CollectionsUtils;
+
 /**
  * Firebase photo provider
  *
@@ -40,21 +42,6 @@ public class FirebasePhotoProvider extends PhotoProvider {
     public FirebasePhotoProvider(StorageReference stRef, DatabaseReference dbRef) {
         this.stRef = stRef;
         this.dbRef = dbRef;
-    }
-
-    /**
-     * converts an array of bytes into a string, each byte is converted with its hexadecimal
-     * representation
-     *
-     * @param bytes the bytes to convert
-     * @return the string of the resulting conversion
-     */
-    private String bytesToHexString(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
     }
 
     /**
@@ -79,7 +66,7 @@ public class FirebasePhotoProvider extends PhotoProvider {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(data);
-            photoName = bytesToHexString(hash);
+            photoName = CollectionsUtils.bytesToHexString(hash);
         } catch (NoSuchAlgorithmException e) {
             listener.onFailure();
             return;
@@ -150,7 +137,6 @@ public class FirebasePhotoProvider extends PhotoProvider {
      */
     @Override
     public void downloadPOIBitmaps(final String poiName, int numberOfBitmaps, final DownloadBitmapListener listener) {
-        assert numberOfBitmaps >= 0;
 
         // first, get the reference of the poi and listen for its photo references
         Query query = dbRef.child("Photo references").child(poiName).orderByKey();

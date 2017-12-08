@@ -32,7 +32,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-/** This class tests the firebase database proxy concerning User interactions
+/**
+ * This class tests the firebase database proxy concerning User interactions
+ *
  * @author Pedro
  */
 
@@ -123,13 +125,18 @@ public class FirebaseDatabaseUserTest {
                 setVel((ValueEventListener) invocation.getArguments()[0]);
                 return null;
             }
-        }).when(userRef).addListenerForSingleValueEvent(any(ValueEventListener.class));
+        }).when(userRef).addValueEventListener(any(ValueEventListener.class));
 
 
         DatabaseProvider.GetUserListener listener = new DatabaseProvider.GetUserListener() {
             @Override
             public void onSuccess(User user) {
                 setResult(SUCCESS);
+            }
+
+            @Override
+            public void onModified(User user) {
+
             }
 
             @Override

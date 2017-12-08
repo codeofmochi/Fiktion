@@ -11,10 +11,10 @@ import com.google.firebase.database.ValueEventListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import java.util.Collections;
 import java.util.TreeSet;
@@ -25,156 +25,136 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebasePointOfInterest;
 import ch.epfl.sweng.fiktion.providers.SearchProvider;
+import ch.epfl.sweng.fiktion.utils.Mutable;
 
-import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.ALREADYEXISTS;
-import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.DOESNTEXIST;
-import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.FAILURE;
-import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.NOTHING;
-import static ch.epfl.sweng.fiktion.FirebaseDatabasePOITest.Result.SUCCESS;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by pedro on 23/10/17.
- */
-
 @RunWith(MockitoJUnitRunner.class)
 public class FirebaseDatabasePOITest {
 
-    FirebaseDatabaseProvider database;
+    private FirebaseDatabaseProvider database;
 
-    PointOfInterest poiTest = new PointOfInterest("poiName", new Position(10, 12), new TreeSet<String>(), "", 0, "", "");
-
-    ValueEventListener vel;
-
-    DatabaseProvider.AddPoiListener apl;
+    private PointOfInterest poiTest = new PointOfInterest("poiName", new Position(10, 12), new TreeSet<String>(), "", 0, "", "");
 
     @Mock
-    DatabaseReference dbRef, poisRef, poiRef;
+    private DatabaseReference dbRef;
 
     @Mock
-    GeoFire geofire;
+    private GeoFire geofire;
 
     @Mock
-    SearchProvider searchProvider;
+    private SearchProvider searchProvider;
 
     @Mock
-    DataSnapshot snapshot;
+    private DataSnapshot snapshot;
 
-    private Result result;
+    @Captor
+    private ArgumentCaptor<ValueEventListener> vel;
 
-    public enum Result {SUCCESS, ALREADYEXISTS, DOESNTEXIST, FAILURE, NOTHING}
+    @Captor
+    private ArgumentCaptor<DatabaseProvider.AddPoiListener> addPoiListener;
 
-    private void setResult(Result result) {
-        this.result = result;
-    }
+    @Captor
+    private ArgumentCaptor<GeoQueryEventListener> geoQueryEventListener;
 
-    private void setVel(ValueEventListener vel) {
-        this.vel = vel;
-    }
+    @Captor
+    private ArgumentCaptor<DatabaseProvider.GetPoiListener> getPOIListener;
 
-    private void setApl(DatabaseProvider.AddPoiListener apl) {
-        this.apl = apl;
-    }
+    @Captor
+    private ArgumentCaptor<SearchProvider.SearchPOIsByTextListener> searchPOIsByTextListener;
+
+    @Captor
+    private ArgumentCaptor<DatabaseProvider.ModifyPOIListener> modifyPOIListener;
 
     @Before
     public void initializers() {
         database = new FirebaseDatabaseProvider(dbRef, geofire, searchProvider);
-        result = NOTHING;
-        nbPOIs = 0;
     }
 
     @Test
     public void addPoiTest() {
-        when(dbRef.child("Points of interest")).thenReturn(poisRef);
-        when(poisRef.child(anyString())).thenReturn(poiRef);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setVel((ValueEventListener) invocation.getArgument(0));
-                return null;
-            }
-        }).when(poiRef).addListenerForSingleValueEvent(any(ValueEventListener.class));
+        when(dbRef.child(anyString())).thenReturn(dbRef);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setApl((DatabaseProvider.AddPoiListener) invocation.getArgument(1));
-                return null;
-            }
-        }).when(searchProvider).addPoi(any(PointOfInterest.class), any(DatabaseProvider.AddPoiListener.class));
+        doNothing().when(searchProvider).addPoi(any(PointOfInterest.class), addPoiListener.capture());
+
+        final Mutable<String> result = new Mutable<>("");
 
         DatabaseProvider.AddPoiListener listener = new DatabaseProvider.AddPoiListener() {
             @Override
             public void onSuccess() {
-                setResult(SUCCESS);
+                result.set("SUCCESS");
             }
 
             @Override
             public void onAlreadyExists() {
-                setResult(ALREADYEXISTS);
+                result.set("ALREADYEXISTS");
             }
 
             @Override
             public void onFailure() {
-                setResult(FAILURE);
+                result.set("FAILURE");
             }
         };
-        when(poiRef.setValue(any(FirebasePointOfInterest.class))).thenReturn(null);
-        when(poiRef.removeValue()).thenReturn(null);
+        when(dbRef.setValue(any(FirebasePointOfInterest.class))).thenReturn(null);
+        when(dbRef.removeValue()).thenReturn(null);
         doNothing().when(geofire).setLocation(anyString(), any(GeoLocation.class));
         doNothing().when(geofire).removeLocation(anyString());
 
         when(snapshot.exists()).thenReturn(false);
         database.addPoi(poiTest, listener);
-        vel.onDataChange(snapshot);
-        apl.onSuccess();
-        assertThat(result, is(SUCCESS));
+        vel.getValue().onDataChange(snapshot);
+        addPoiListener.getValue().onSuccess();
+        assertThat(result.get(), is("SUCCESS"));
 
-        apl.onFailure();
-        assertThat(result, is(FAILURE));
+        addPoiListener.getValue().onAlreadyExists();
+
+        addPoiListener.getValue().onFailure();
+        assertThat(result.get(), is("FAILURE"));
 
         when(snapshot.exists()).thenReturn(true);
-        vel.onDataChange(snapshot);
-        assertThat(result, is(ALREADYEXISTS));
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("ALREADYEXISTS"));
 
-        vel.onCancelled(null);
-        assertThat(result, is(FAILURE));
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("FAILURE"));
     }
 
     @Test
     public void GetPoiTest() {
-        when(dbRef.child("Points of interest")).thenReturn(poisRef);
-        when(poisRef.child(anyString())).thenReturn(poiRef);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setVel((ValueEventListener) invocation.getArguments()[0]);
-                return null;
-            }
-        }).when(poiRef).addListenerForSingleValueEvent(any(ValueEventListener.class));
+        when(dbRef.child(anyString())).thenReturn(dbRef);
+        when(dbRef.addValueEventListener(vel.capture())).thenReturn(null);
+
+        final Mutable<String> result = new Mutable<>("");
+
         DatabaseProvider.GetPoiListener listener = new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
-                setResult(SUCCESS);
+                result.set("SUCCESS");
+            }
+
+            @Override
+            public void onModified(PointOfInterest poi) {
+                result.set("MODIFIED");
             }
 
             @Override
             public void onDoesntExist() {
-                setResult(DOESNTEXIST);
+                result.set("DOESNTEXIST");
             }
 
             @Override
             public void onFailure() {
-                setResult(FAILURE);
+                result.set("FAILURE");
             }
         };
 
@@ -182,145 +162,219 @@ public class FirebaseDatabasePOITest {
 
         when(snapshot.exists()).thenReturn(true);
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(new FirebasePointOfInterest(poiTest));
-        vel.onDataChange(snapshot);
-        assertThat(result, is(SUCCESS));
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("SUCCESS"));
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("MODIFIED"));
 
         when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(null);
-        vel.onDataChange(snapshot);
-        assertThat(result, is(FAILURE));
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("FAILURE"));
 
         when(snapshot.exists()).thenReturn(false);
-        vel.onDataChange(snapshot);
-        assertThat(result, is(DOESNTEXIST));
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("DOESNTEXIST"));
 
-        vel.onCancelled(null);
-        assertThat(result, is(FAILURE));
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("FAILURE"));
     }
 
-    private GeoQueryEventListener geoQueryEventListener;
+    @Test
+    public void modifyPOITest() {
+        when(dbRef.child(anyString())).thenReturn(dbRef);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+        doNothing().when(searchProvider).modifyPOI(any(PointOfInterest.class), modifyPOIListener.capture());
+        when(dbRef.setValue(any())).thenReturn(null);
+        doNothing().when(geofire).setLocation(anyString(), any(GeoLocation.class));
+        final Mutable<String> result = new Mutable<>("");
 
-    private void setGqel(GeoQueryEventListener geoQueryEventListener) {
-        this.geoQueryEventListener = geoQueryEventListener;
+        DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
+            @Override
+            public void onSuccess() {
+                result.set("SUCCESS");
+            }
+
+            @Override
+            public void onDoesntExist() {
+                result.set("DOESNTEXIST");
+            }
+
+            @Override
+            public void onFailure() {
+                result.set("FAILURE");
+            }
+        };
+
+        database.modifyPOI(poiTest, listener);
+        when(snapshot.exists()).thenReturn(true);
+        vel.getValue().onDataChange(snapshot);
+        modifyPOIListener.getValue().onSuccess();
+        assertThat(result.get(), is("SUCCESS"));
+        modifyPOIListener.getValue().onDoesntExist();
+        assertThat(result.get(), is("FAILURE"));
+        modifyPOIListener.getValue().onFailure();
+        assertThat(result.get(), is("FAILURE"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("DOESNTEXIST"));
+        vel.getValue().onCancelled(null);
     }
 
-    private DatabaseProvider.GetPoiListener getPoiListener;
+    @Test
+    public void upvoteAndDownvoteTest() {
+        when(dbRef.child(anyString())).thenReturn(dbRef);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
+        ArgumentCaptor<Long> value = ArgumentCaptor.forClass(Long.class);
+        when(dbRef.setValue(value.capture())).thenReturn(null);
+        final Mutable<String> result = new Mutable<>("");
+        DatabaseProvider.ModifyPOIListener listener = new DatabaseProvider.ModifyPOIListener() {
+            @Override
+            public void onSuccess() {
+                result.set("SUCCESS");
+            }
 
-    private void setGPL(DatabaseProvider.GetPoiListener getPoiListener) {
-        this.getPoiListener = getPoiListener;
-    }
+            @Override
+            public void onDoesntExist() {
+                result.set("DOESNTEXIST");
+            }
 
-    private int nbPOIs = 0;
+            @Override
+            public void onFailure() {
+                result.set("FAILURE");
+            }
+        };
+        database.upvote("randomPOI", listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.child(anyString())).thenReturn(snapshot);
+        when(snapshot.getValue()).thenReturn((long) 10);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("SUCCESS"));
+        assertThat(value.getValue(), is((long) 11));
+        result.set("");
 
-    private void incr() {
-        ++nbPOIs;
+        when(snapshot.getValue()).thenReturn(null);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(value.getValue(), is((long) 1));
+        assertThat(result.get(), is("SUCCESS"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("DOESNTEXIST"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("FAILURE"));
+
+        // ---- downvote ----
+
+        database.downvote("randomPOI", listener);
+        when(snapshot.exists()).thenReturn(true);
+        when(snapshot.child(anyString())).thenReturn(snapshot);
+        when(snapshot.getValue()).thenReturn((long) 10);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("SUCCESS"));
+        assertThat(value.getValue(), is((long) 9));
+        result.set("");
+
+        when(snapshot.getValue()).thenReturn(null);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(value.getValue(), is((long) -1));
+        assertThat(result.get(), is("SUCCESS"));
+
+        when(snapshot.exists()).thenReturn(false);
+        vel.getValue().onDataChange(snapshot);
+        assertThat(result.get(), is("DOESNTEXIST"));
+
+        vel.getValue().onCancelled(null);
+        assertThat(result.get(), is("FAILURE"));
+
     }
 
     @Test
     public void findNearPoisTest() {
         GeoQuery geoQuery = mock(GeoQuery.class);
         when(geofire.queryAtLocation(any(GeoLocation.class), anyDouble())).thenReturn(geoQuery);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setGqel((GeoQueryEventListener) invocation.getArguments()[0]);
-                return null;
-            }
-        }).when(geoQuery).addGeoQueryEventListener(any(GeoQueryEventListener.class));
+        doNothing().when(geoQuery).addGeoQueryEventListener(geoQueryEventListener.capture());
+
+        final Mutable<Boolean> isFailure = new Mutable<>(false);
+        final Mutable<Integer> nbPOIs = new Mutable<>(0);
+
         DatabaseProvider.FindNearPoisListener findPoiListener = new DatabaseProvider.FindNearPoisListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
-                incr();
+                nbPOIs.set(nbPOIs.get() + 1);
             }
 
             @Override
             public void onFailure() {
-                setResult(FAILURE);
+                isFailure.set(true);
             }
         };
 
         FirebaseDatabaseProvider databaseSpy = spy(database);
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setGPL((DatabaseProvider.GetPoiListener) invocation.getArguments()[1]);
-                return null;
-            }
-        }).when(databaseSpy).getPoi(anyString(), any(DatabaseProvider.GetPoiListener.class));
+        doNothing().when(databaseSpy).getPoi(anyString(), getPOIListener.capture());
 
         databaseSpy.findNearPois(poiTest.position(), 10, findPoiListener);
-        geoQueryEventListener.onKeyEntered("key", null);
-        getPoiListener.onSuccess(poiTest);
-        assertThat(nbPOIs, is(1));
-        getPoiListener.onSuccess(poiTest);
-        getPoiListener.onSuccess(poiTest);
-        getPoiListener.onSuccess(poiTest);
-        getPoiListener.onSuccess(poiTest);
-        assertThat(nbPOIs, is(5));
-        getPoiListener.onDoesntExist();
-        getPoiListener.onFailure();
-        geoQueryEventListener.onKeyExited("key");
-        geoQueryEventListener.onKeyMoved("key", null);
-        geoQueryEventListener.onGeoQueryReady();
-        geoQueryEventListener.onGeoQueryError(null);
-        assertThat(result, is(FAILURE));
-    }
-
-    private SearchProvider.SearchPOIsByTextListener spbtl;
-
-    public void setSpbtl(SearchProvider.SearchPOIsByTextListener spbtl) {
-        this.spbtl = spbtl;
+        geoQueryEventListener.getValue().onKeyEntered("key", null);
+        getPOIListener.getValue().onSuccess(poiTest);
+        assertThat(nbPOIs.get(), is(1));
+        getPOIListener.getValue().onSuccess(poiTest);
+        getPOIListener.getValue().onSuccess(poiTest);
+        getPOIListener.getValue().onSuccess(poiTest);
+        getPOIListener.getValue().onSuccess(poiTest);
+        assertThat(nbPOIs.get(), is(5));
+        getPOIListener.getValue().onModified(poiTest);
+        getPOIListener.getValue().onDoesntExist();
+        getPOIListener.getValue().onFailure();
+        geoQueryEventListener.getValue().onKeyExited("key");
+        geoQueryEventListener.getValue().onKeyMoved("key", null);
+        geoQueryEventListener.getValue().onGeoQueryReady();
+        geoQueryEventListener.getValue().onGeoQueryError(null);
+        assertTrue(isFailure.get());
     }
 
     @Test
     public void searchByTextTest() {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setSpbtl((SearchProvider.SearchPOIsByTextListener) invocation.getArgument(1));
-                return null;
-            }
-        }).when(searchProvider).searchByText(anyString(), any(SearchProvider.SearchPOIsByTextListener.class));
+        doNothing().when(searchProvider).searchByText(anyString(), searchPOIsByTextListener.capture());
+
+        final Mutable<Boolean> isFailure = new Mutable<>(false);
+        final Mutable<Integer> nbPOIs = new Mutable<>(0);
 
         DatabaseProvider.SearchPOIByTextListener listener = new DatabaseProvider.SearchPOIByTextListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
-                incr();
+                nbPOIs.set(nbPOIs.get() + 1);
             }
 
             @Override
             public void onFailure() {
-                setResult(FAILURE);
+                isFailure.set(true);
             }
         };
 
         FirebaseDatabaseProvider databaseSpy = spy(database);
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setGPL((DatabaseProvider.GetPoiListener) invocation.getArguments()[1]);
-                return null;
-            }
-        }).when(databaseSpy).getPoi(anyString(), any(DatabaseProvider.GetPoiListener.class));
+        doNothing().when(databaseSpy).getPoi(anyString(), getPOIListener.capture());
 
         databaseSpy.searchByText("", listener);
-        spbtl.onSuccess(Collections.singletonList("poi"));
+        searchPOIsByTextListener.getValue().onSuccess(Collections.singletonList("poi"));
 
-        assertThat(nbPOIs, is(0));
-        getPoiListener.onSuccess(null);
-        assertThat(nbPOIs, is(1));
-        getPoiListener.onSuccess(null);
-        getPoiListener.onSuccess(null);
-        getPoiListener.onSuccess(null);
-        getPoiListener.onSuccess(null);
-        assertThat(nbPOIs, is(5));
-        getPoiListener.onDoesntExist();
-        getPoiListener.onFailure();
-        assertThat(nbPOIs, is(5));
+        assertThat(nbPOIs.get(), is(0));
+        getPOIListener.getValue().onSuccess(null);
+        assertThat(nbPOIs.get(), is(1));
+        getPOIListener.getValue().onSuccess(null);
+        getPOIListener.getValue().onSuccess(null);
+        getPOIListener.getValue().onSuccess(null);
+        getPOIListener.getValue().onSuccess(null);
+        assertThat(nbPOIs.get(), is(5));
+        getPOIListener.getValue().onModified(poiTest);
+        getPOIListener.getValue().onDoesntExist();
+        getPOIListener.getValue().onFailure();
+        assertThat(nbPOIs.get(), is(5));
 
-        spbtl.onFailure();
-        assertThat(result, is(FAILURE));
+        searchPOIsByTextListener.getValue().onFailure();
+        assertTrue(isFailure.get());
 
     }
 }

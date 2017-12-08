@@ -1,8 +1,10 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.utils.Config;
 
 
 /**
@@ -11,6 +13,39 @@ import ch.epfl.sweng.fiktion.models.User;
  * @author Pedro Da Cunha
  */
 public abstract class DatabaseProvider {
+
+    private static DatabaseProvider database;
+
+    /**
+     * return the database provider
+     *
+     * @return the database provider
+     */
+    public static DatabaseProvider getInstance() {
+        if (database == null) {
+            if (Config.TEST_MODE)
+                database = new LocalDatabaseProvider();
+            else
+                database = new FirebaseDatabaseProvider();
+        }
+        return database;
+    }
+
+    /**
+     * Sets the current instance to the given database instance
+     *
+     * @param dbInstance database instance
+     */
+    public static void setInstance(DatabaseProvider dbInstance) {
+        database = dbInstance;
+    }
+
+    /**
+     * Destroys the current database instance
+     */
+    public static void destroyInstance() {
+        database = null;
+    }
 
     /**
      * Listener that listens the result of the addition of a point of interest
@@ -37,13 +72,19 @@ public abstract class DatabaseProvider {
      * Listener that listens the result of the retrieval of a point of interest
      */
     public interface GetPoiListener {
-
         /**
          * what to do if the retrieval succeeds
          *
          * @param poi the retrieved point of interest
          */
         void onSuccess(PointOfInterest poi);
+
+        /**
+         * what to do if the poi is modified
+         *
+         * @param poi the modified poi
+         */
+        void onModified(PointOfInterest poi);
 
         /**
          * what to do if no mathing point of interest is found
@@ -56,11 +97,31 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
+    /**
+     * Listener that listens the result of the modification of a point of interest
+     */
+    public interface ModifyPOIListener {
+        /**
+         * what to do if the modification succeeds
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the poi doesn't exist
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the modification failed
+         */
+        void onFailure();
+    }
+
 
     /**
      * parent listener for searching points of interest
      */
-    public interface SearchPOIsListener {
+    private interface SearchPOIsListener {
 
         /**
          * what to do when we get a new near point of interest
@@ -104,6 +165,30 @@ public abstract class DatabaseProvider {
     public abstract void getPoi(String name, final GetPoiListener listener);
 
     /**
+     * Modify an existing point of interest and inform the listener of the result
+     *
+     * @param poi      the new point of interest
+     * @param listener the listener
+     */
+    public abstract void modifyPOI(PointOfInterest poi, ModifyPOIListener listener);
+
+    /**
+     * increases by 1 the rating of a point of interest, inform the listener of the result
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void upvote(String poiName, ModifyPOIListener listener);
+
+    /**
+     * decreases by 1 the rating of a point of interest, inform the listener of the result
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void downvote(String poiName, ModifyPOIListener listener);
+
+    /**
      * find the points of interest that are within radius range from a position and inform the
      * listener of the results
      *
@@ -111,7 +196,7 @@ public abstract class DatabaseProvider {
      * @param radius   the radius
      * @param listener the listener
      */
-    public abstract void findNearPois(Position pos, int radius, final FindNearPoisListener listener);
+    public abstract void findNearPois(Position pos, int radius, FindNearPoisListener listener);
 
     /**
      * seach the points of interest that contain a text in one of their fields and "send" them to
@@ -156,6 +241,13 @@ public abstract class DatabaseProvider {
         void onSuccess(User user);
 
         /**
+         * what to do if the user is modified
+         *
+         * @param user the modified user
+         */
+        void onModified(User user);
+
+        /**
          * what to do if no mathing user id is found
          */
         void onDoesntExist();
@@ -166,7 +258,7 @@ public abstract class DatabaseProvider {
         void onFailure();
     }
 
-    public interface OperationOnExistingUserListener {
+    private interface OperationOnExistingUserListener {
 
         /**
          * what to do if the deletion succeeded
@@ -202,7 +294,7 @@ public abstract class DatabaseProvider {
      * @param user     the user
      * @param listener the listener
      */
-    public abstract void addUser(final User user, final AddUserListener listener);
+    public abstract void addUser(final User user, AddUserListener listener);
 
     /**
      * get the user associated to the id, inform the listener of the result
@@ -210,7 +302,7 @@ public abstract class DatabaseProvider {
      * @param id       the id
      * @param listener the listener
      */
-    public abstract void getUserById(String id, final GetUserListener listener);
+    public abstract void getUserById(String id, GetUserListener listener);
 
     /**
      * delete the user associated to the id, inform the listener of the result
@@ -218,7 +310,7 @@ public abstract class DatabaseProvider {
      * @param id       the id
      * @param listener the listener
      */
-    public abstract void deleterUserById(String id, final DeleteUserListener listener);
+    public abstract void deleterUserById(String id, DeleteUserListener listener);
 
     /**
      * modify the user, inform the listener of the result of the modification
@@ -226,5 +318,161 @@ public abstract class DatabaseProvider {
      * @param user     the user
      * @param listener the listener
      */
-    public abstract void modifyUser(User user, final ModifyUserListener listener);
+    public abstract void modifyUser(User user, ModifyUserListener listener);
+
+    /**
+     * Listener that listens the result of the add
+     */
+    public interface AddCommentListener {
+
+        /**
+         * what to do if the addition succeeded
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the addition failed
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the result of the retrieval of a comment
+     */
+    public interface GetCommentListener {
+
+        /**
+         * what to do with the retrieved comment
+         *
+         * @param comment the comment
+         */
+        void onSuccess(Comment comment);
+
+        /**
+         * what to do if the comment is modified
+         *
+         * @param comment the modified comment
+         */
+        void onModified(Comment comment);
+
+        /**
+         * what to do if the comment doesn't exist
+         */
+        void onDoesntExist();
+
+        /**
+         * what to do if the retrieval fails
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the retrieving of comments
+     */
+    public interface GetCommentsListener {
+
+        /**
+         * what to do when a comment is retrieved
+         *
+         * @param comment a retrieved comment
+         */
+        void onNewValue(Comment comment);
+
+        /**
+         * what to do when an already retrieved comment is modified
+         *
+         * @param comment the modified comment
+         */
+        void onModifiedValue(Comment comment);
+
+        /**
+         * what to do when the operation fails
+         */
+        void onFailure();
+    }
+
+    /**
+     * Listener that listens the result of a vote
+     */
+    public interface VoteListener {
+
+        /**
+         * what to do if the voting succeeds
+         */
+        void onSuccess();
+
+        /**
+         * what to do if the voting fails
+         */
+        void onFailure();
+    }
+
+    public final static int UPVOTE = 1;
+    public final static int NOVOTE = 0;
+    public final static int DOWNVOTE = -1;
+
+    /**
+     * Listener that listens the result of the retrieval of a vote
+     */
+    public interface GetVoteListener {
+
+        /**
+         * what to do with the retrieved vote
+         *
+         * @param vote the vote
+         */
+        void onSuccess(int vote);
+
+        /**
+         * what to do if the retrieval fails
+         */
+        void onFailure();
+    }
+
+    /**
+     * add a comment, inform the listener of the result
+     *
+     * @param comment  the comment to add
+     * @param poiName  the name of the POI
+     * @param listener the listener
+     */
+    public abstract void addComment(Comment comment, String poiName, AddCommentListener listener);
+
+    /**
+     * get the comment associated to the provided id, inform the listener of the result of the retrieval
+     *
+     * @param commentId the comment id
+     * @param listener  the listener
+     */
+    public abstract void getComment(String commentId, GetCommentListener listener);
+
+    /**
+     * get the comments of a poi, inform the listener of the results
+     *
+     * @param poiName  the name of the poi
+     * @param listener the listener
+     */
+    public abstract void getPOIComments(String poiName, GetCommentsListener listener);
+
+    /**
+     * This will change the vote of an user for a comment:
+     * upvote(UPVOTE), downvote(DOWNVOTE) or remove a vote(NOVOTE)
+     *
+     * @param commentId    the id of the comment
+     * @param userID       the id of the user
+     * @param vote         the desired vote
+     * @param previousVote the previous vote
+     * @param listener     a listener that listens the result of the operation
+     */
+    public abstract void voteComment(String commentId, String userID, int vote, int previousVote, VoteListener listener);
+
+    /**
+     * get the vote of a user given to a comment, inform the listener of the result:
+     * upvoted(UPVOTE), downvoted(DOWNVOTE) or no vote(NOVOTE)
+     *
+     * @param commentId the id of the comment
+     * @param userID    the id of the user
+     * @param listener  the listener
+     */
+    public abstract void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener);
 }
