@@ -71,39 +71,32 @@ import static org.hamcrest.core.IsNot.not;
 
 public class POIPageActivityTest {
 
-
     @Rule
     public final IntentsTestRule<POIPageActivity> toastRule =
             new IntentsTestRule<>(POIPageActivity.class, true, false);
+
+    private static PointOfInterest poiTest = new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", "");
+
+    private static DatabaseProvider.AddPoiListener emptyAddPOIListener = new DatabaseProvider.AddPoiListener() {
+        @Override
+        public void onSuccess() {
+        }
+
+        @Override
+        public void onAlreadyExists() {
+        }
+
+        @Override
+        public void onFailure() {
+        }
+    };
 
     @BeforeClass
     public static void setProviders() {
         //providers.getInstance will return localProviders
         Config.TEST_MODE = true;
-        AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
-            @Override
-            public void onSuccess() {
+        DatabaseProvider.getInstance().addPoi(poiTest, emptyAddPOIListener);
 
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-        });
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
-            @Override
-            public void onSuccess() {
-            }
-
-            @Override
-            public void onAlreadyExists() {
-            }
-
-            @Override
-            public void onFailure() {
-            }
-        });
         AuthProvider.getInstance().signIn("default@email.ch", "testing", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {
@@ -113,18 +106,13 @@ public class POIPageActivityTest {
             public void onFailure() {
             }
         });
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+        AuthProvider.getInstance().sendEmailVerification(new AuthProvider.AuthListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onSuccess() {
             }
 
-            @Override
             public void onModified(User user) {
 
-            }
-
-            @Override
-            public void onDoesntExist() {
             }
 
             @Override
@@ -194,7 +182,7 @@ public class POIPageActivityTest {
     @Test
     public void buttonTest() {
         Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
+        i.putExtra("POI_NAME", poiTest.name());
         toastRule.launchActivity(i);
         onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
 
@@ -209,7 +197,7 @@ public class POIPageActivityTest {
     public void cameraTest() {
 
         Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
+        i.putExtra("POI_NAME", poiTest.name());
         toastRule.launchActivity(i);
 
         onView(withId(R.id.addPictureButton)).perform(ViewActions.scrollTo()).perform(click());
@@ -230,7 +218,7 @@ public class POIPageActivityTest {
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
-        PhotoProvider.getInstance().downloadPOIBitmaps("poiTest", ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().downloadPOIBitmaps(poiTest.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
             public void onNewPhoto(Bitmap b) {
                 bitmaps.add(b);
@@ -250,7 +238,7 @@ public class POIPageActivityTest {
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -265,7 +253,7 @@ public class POIPageActivityTest {
         });
 
         b = BitmapFactory.decodeResource(InstrumentationRegistry.getTargetContext().getResources(), R.mipmap.ic_launcher_round);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -280,7 +268,7 @@ public class POIPageActivityTest {
         });
 
         Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
+        i.putExtra("POI_NAME", poiTest.name());
         toastRule.launchActivity(i);
         onView(withId(R.id.imageLayout)).check(new ViewAssertion() {
             @Override
@@ -292,8 +280,8 @@ public class POIPageActivityTest {
 
     private User user;
 
-    private void setUser(User user) {
-        this.user = user;
+    private void setUser(User newUser) {
+        user = newUser;
     }
 
 
@@ -320,10 +308,12 @@ public class POIPageActivityTest {
         });
 
         Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
+        i.putExtra("POI_NAME", poiTest.name());
         toastRule.launchActivity(i);
 
         ViewInteraction upvoteButton = onView(withId(R.id.upvoteButton));
+        ViewInteraction upvotes = onView(withId(R.id.upvotes));
+
         upvoteButton.perform(click());
         upvoteButton.check(new ViewAssertion() {
             @Override
@@ -331,7 +321,9 @@ public class POIPageActivityTest {
                 assertTrue(view.isEnabled());
             }
         });
-        assertTrue(user.getUpvoted().contains("poiTest"));
+        assertTrue(user.getUpvoted().contains(poiTest.name()));
+        upvotes.check(matches(withText("1 upvotes")));
+
         upvoteButton.perform(click());
         upvoteButton.check(new ViewAssertion() {
             @Override
@@ -339,7 +331,8 @@ public class POIPageActivityTest {
                 assertTrue(view.isEnabled());
             }
         });
-        assertFalse(user.getUpvoted().contains("poiTest"));
+        assertFalse(user.getUpvoted().contains(poiTest.name()));
+        upvotes.check(matches(withText("0 upvotes")));
     }
 
 
@@ -352,7 +345,7 @@ public class POIPageActivityTest {
     @Test
     public void testModifyExistingPoi() {
         Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
+        i.putExtra("POI_NAME", poiTest.name());
         toastRule.launchActivity(i);
 
         // click edit button
@@ -385,7 +378,7 @@ public class POIPageActivityTest {
         closeSoftKeyboard();
         onView(withId(R.id.add_poi_finish)).perform(click());
         onView(withId(R.id.menu_scroll)).perform(swipeUpCenterTopFast());
-        onView(withId(R.id.title)).check(matches(withText("poiTest")));
+        onView(withId(R.id.title)).check(matches(withText(poiTest.name())));
         onView(withId(R.id.featured)).check(matches(withText("Featured in fiction")));
         onView(withId(R.id.cityCountry)).check(matches(withText("city, country")));
     }
@@ -394,7 +387,7 @@ public class POIPageActivityTest {
     public void writeComment() {
 
         Intent i = new Intent();
-        i.putExtra("POI_NAME", "poiTest");
+        i.putExtra("POI_NAME", poiTest.name());
         i.putExtra("USER_NAME", "default");
         toastRule.launchActivity(i);
 
@@ -439,7 +432,7 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void addFavouriteSuccessTest(){
+    public void addFavouriteSuccessTest() {
 
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
@@ -471,9 +464,9 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void addFavouriteDoesntExistsTest(){
+    public void addFavouriteDoesntExistsTest() {
 
-        ((LocalAuthProvider)AuthProvider.getInstance()).currUser = new User("FAVOURITE", "MODIFYUSERD");
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("FAVOURITE", "MODIFYUSERD");
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
         toastRule.launchActivity(i);
@@ -482,9 +475,9 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void addFavouriteFailureTest(){
+    public void addFavouriteFailureTest() {
 
-        ((LocalAuthProvider)AuthProvider.getInstance()).currUser = new User("FAVOURITE", "MODIFYUSERF");
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("FAVOURITE", "MODIFYUSERF");
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
         toastRule.launchActivity(i);
@@ -493,7 +486,7 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void addWishlistSuccessTest(){
+    public void addWishlistSuccessTest() {
 
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
@@ -524,9 +517,9 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void addWishlistDoesntExistsTest(){
+    public void addWishlistDoesntExistsTest() {
 
-        ((LocalAuthProvider)AuthProvider.getInstance()).currUser = new User("WISHLIST", "MODIFYUSERD");
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("WISHLIST", "MODIFYUSERD");
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
         toastRule.launchActivity(i);
@@ -535,9 +528,9 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void addWishlistFailureTest(){
+    public void addWishlistFailureTest() {
 
-        ((LocalAuthProvider)AuthProvider.getInstance()).currUser = new User("WISHLIST", "MODIFYUSERF");
+        ((LocalAuthProvider) AuthProvider.getInstance()).currUser = new User("WISHLIST", "MODIFYUSERF");
         Intent i = new Intent();
         i.putExtra("POI_NAME", "poiTest");
         toastRule.launchActivity(i);

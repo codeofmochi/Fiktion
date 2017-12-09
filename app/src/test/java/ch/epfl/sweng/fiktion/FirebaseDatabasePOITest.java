@@ -207,6 +207,7 @@ public class FirebaseDatabasePOITest {
 
         database.modifyPOI(poiTest, listener);
         when(snapshot.exists()).thenReturn(true);
+        when(snapshot.getValue(FirebasePointOfInterest.class)).thenReturn(new FirebasePointOfInterest());
         vel.getValue().onDataChange(snapshot);
         modifyPOIListener.getValue().onSuccess();
         assertThat(result.get(), is("SUCCESS"));
@@ -278,7 +279,7 @@ public class FirebaseDatabasePOITest {
 
         when(snapshot.getValue()).thenReturn(null);
         vel.getValue().onDataChange(snapshot);
-        assertThat(value.getValue(), is((long) -1));
+        assertThat(value.getValue(), is((long) 0));
         assertThat(result.get(), is("SUCCESS"));
 
         when(snapshot.exists()).thenReturn(false);

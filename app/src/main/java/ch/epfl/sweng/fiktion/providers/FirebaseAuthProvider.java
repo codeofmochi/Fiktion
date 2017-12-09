@@ -8,9 +8,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.LinkedList;
-import java.util.TreeSet;
-
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.utils.Config;
@@ -277,14 +274,9 @@ public class FirebaseAuthProvider extends AuthProvider {
                     listener.onSuccess(user);
                 }
 
-                /**
-                 * what to do if the user is modified
-                 *
-                 * @param user the modified user
-                 */
                 @Override
                 public void onModified(User user) {
-
+                    listener.onModified(user);
                 }
 
                 @Override

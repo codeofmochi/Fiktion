@@ -147,7 +147,7 @@ public class UserControllerTest {
             }
         });
 
-        uc.sendFriendResquest(user1.getID(), new UserController.RequestListener() {
+        uc.sendFriendRequest(user1.getID(), new UserController.RequestListener() {
             @Override
             public void onSuccess() {
                 DatabaseProvider.getInstance().getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
@@ -214,7 +214,7 @@ public class UserControllerTest {
             }
         });
 
-        uc.sendFriendResquest("someRandomID", new UserController.RequestListener() {
+        uc.sendFriendRequest("someRandomID", new UserController.RequestListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -262,7 +262,7 @@ public class UserControllerTest {
             }
         });
 
-        uc.sendFriendResquest(user.getID(), new UserController.RequestListener() {
+        uc.sendFriendRequest(user.getID(), new UserController.RequestListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
@@ -310,7 +310,7 @@ public class UserControllerTest {
             }
         });
 
-        uc.sendFriendResquest(user1.getID(), new UserController.RequestListener() {
+        uc.sendFriendRequest(user1.getID(), new UserController.RequestListener() {
             @Override
             public void onSuccess() {
                 Assert.fail();
