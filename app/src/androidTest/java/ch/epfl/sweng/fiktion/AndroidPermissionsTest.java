@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
+import ch.epfl.sweng.fiktion.android.AndroidPolicies;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
@@ -18,6 +19,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -38,6 +40,7 @@ public class AndroidPermissionsTest {
      */
     public void assertPermissionDialogExistsAndClickAllow(int destinationId) throws UiObjectNotFoundException {
         if (Build.VERSION.SDK_INT >= 23) {
+            // if doesn't pass on jenkins, may need to wait a bit here
             UiDevice device = UiDevice.getInstance(getInstrumentation());
             UiObject allowPermissions = device.findObject(new UiSelector()
                     .clickable(true)
@@ -59,6 +62,12 @@ public class AndroidPermissionsTest {
     public void testPromptCameraPermissions() throws UiObjectNotFoundException {
         AndroidPermissions.promptCameraPermission(mActivityRule.getActivity());
         assertPermissionDialogExistsAndClickAllow(R.id.home_main_layout);
+    }
+
+    @Test
+    public void testReachAndroidPolicies() {
+        AndroidPolicies ap = new AndroidPolicies();
+        assertNotNull(ap);
     }
 }
 
