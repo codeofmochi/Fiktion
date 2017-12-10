@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class UserTest {
 
     private PointOfInterest defPoi = poiWithName("poi");
 
-    private DatabaseProvider localDB = DatabaseProvider.getInstance();
+    private DatabaseProvider localDB;
 
     private DatabaseProvider.ModifyUserListener mUserListener;
 
@@ -124,6 +125,7 @@ public class UserTest {
 
     @Before
     public void setUp() {
+        localDB = DatabaseProvider.getInstance();
 
         result = NOTHING;
 
@@ -149,6 +151,11 @@ public class UserTest {
 
         doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
 
+    }
+
+    @After
+    public void destroy() {
+        DatabaseProvider.destroyInstance();
     }
 
 

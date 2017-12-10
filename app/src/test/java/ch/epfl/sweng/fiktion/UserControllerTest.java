@@ -32,6 +32,21 @@ public class UserControllerTest {
     private User user1;
     private User userFR;
     private User userFakeR;
+    private UserController.ConstructStateListener successConstrListener = new UserController.ConstructStateListener() {
+        @Override
+        public void onSuccess() {
+        }
+
+        @Override
+        public void onModified() {
+            Assert.fail();
+        }
+
+        @Override
+        public void onFailure() {
+            Assert.fail();
+        }
+    };
 
     @BeforeClass
     public static void setConfig() {
@@ -66,21 +81,7 @@ public class UserControllerTest {
 
     @Test
     public void correctlyCreatesUserController() {
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         assertTrue(uc.getLocalUser().equals(user));
     }
@@ -107,22 +108,7 @@ public class UserControllerTest {
 
     @Test
     public void testGetLocalUser() {
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         User u = uc.getLocalUser();
         assertTrue(u.equals(user));
@@ -130,22 +116,7 @@ public class UserControllerTest {
 
     @Test
     public void testSendFriendRequestLogic() {
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.sendFriendRequest(user1.getID(), new UserController.RequestListener() {
             @Override
@@ -197,22 +168,7 @@ public class UserControllerTest {
 
     @Test
     public void testSendFriendRequestLogicOnDoesntExistLogic() {
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.sendFriendRequest("someRandomID", new UserController.RequestListener() {
             @Override
@@ -245,22 +201,7 @@ public class UserControllerTest {
     @Test
     public void testSendFriendRequestOnAlreadyFriendLogic() {
         ((LocalAuthProvider) auth).currUser = userFR;
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.sendFriendRequest(user.getID(), new UserController.RequestListener() {
             @Override
@@ -293,22 +234,7 @@ public class UserControllerTest {
     @Test
     public void testSendFriendRequestOnNewFriendLogic() {
         ((LocalAuthProvider) auth).currUser = userFR;
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.sendFriendRequest(user1.getID(), new UserController.RequestListener() {
             @Override
@@ -361,22 +287,7 @@ public class UserControllerTest {
     @Test
     public void testAcceptFriendRequestLogic() {
         ((LocalAuthProvider) auth).currUser = userFR;
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.acceptFriendRequest(user1.getID(), new DatabaseProvider.ModifyUserListener() {
             @Override
@@ -419,22 +330,7 @@ public class UserControllerTest {
     @Test
     public void testAcceptFriendRequestOnDoesntExistLogic() {
         ((LocalAuthProvider) auth).currUser = userFakeR;
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.acceptFriendRequest("idfake", new DatabaseProvider.ModifyUserListener() {
             @Override
@@ -476,22 +372,7 @@ public class UserControllerTest {
     @Test
     public void testIgnoreFriendRequestLogic() {
         ((LocalAuthProvider) auth).currUser = userFR;
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.ignoreFriendRequest(user1.getID(), new UserController.BinaryListener() {
             @Override
@@ -529,22 +410,7 @@ public class UserControllerTest {
     @Test
     public void testRemoveFromFriendListLogic() {
         ((LocalAuthProvider) auth).currUser = userFR;
-        UserController uc = new UserController(new UserController.ConstructStateListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onModified() {
-                Assert.fail();
-            }
-
-            @Override
-            public void onFailure() {
-                Assert.fail();
-            }
-        });
+        UserController uc = new UserController(successConstrListener);
 
         uc.removeFromFriendList(user.getID(), new UserController.BinaryListener() {
             @Override

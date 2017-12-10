@@ -56,14 +56,16 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
 
     private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
-    public List<PointOfInterest> poiList = new ArrayList<>();
+    private List<PointOfInterest> poiList = new ArrayList<>();
     public List<User> users = new ArrayList<>(initialList);
     private Map<String, List<String>> poiComments = new TreeMap<>();
     private Map<String, Comment> comments = new TreeMap<>();
 
     private Map<String, Set<GetCommentListener>> getCommentListeners = new TreeMap<>();
     private Map<String, Set<GetCommentsListener>> getCommentsListeners = new TreeMap<>();
-    private Map<String, Set<GetPoiListener>> getPOIListeners = new TreeMap();
+    private Map<String, Set<GetPoiListener>> getPOIListeners = new TreeMap<>();
+
+    private Map<String, Set<GetUserListener>> getUserListeners = new TreeMap<>();
 
     /**
      * {@inheritDoc}
@@ -358,6 +360,11 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         if (contains) {
             listener.onAlreadyExists();
         } else {
+            if (getUserListeners.containsKey(user.getID())) {
+                for (GetUserListener l : getUserListeners.get(user.getID()))
+                    l.onSuccess(user);
+            }
+
             users.add(user);
             listener.onSuccess();
         }
@@ -380,6 +387,11 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             listener.onFailure();
             return;
         }
+
+        if (!getUserListeners.containsKey(id)) {
+            getUserListeners.put(id, new HashSet<GetUserListener>());
+        }
+        getUserListeners.get(id).add(listener);
 
         for (User u : users) {
             if (u.getID().equals(id)) {
@@ -436,6 +448,11 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         deleterUserById(user.getID(), new DeleteUserListener() {
             @Override
             public void onSuccess() {
+                if (getUserListeners.containsKey(user.getID())) {
+                    for (GetUserListener l : getUserListeners.get(user.getID()))
+                        l.onModified(user);
+                }
+
                 users.add(user);
                 listener.onSuccess();
             }
