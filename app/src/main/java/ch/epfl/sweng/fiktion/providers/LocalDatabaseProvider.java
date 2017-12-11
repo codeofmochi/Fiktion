@@ -16,6 +16,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.utils.HelperMethods;
 
 
 /**
@@ -280,7 +281,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
 
         for (PointOfInterest poi : poiList) {
-            if (dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
+            if (HelperMethods.dist(pos.latitude(), pos.longitude(), poi.position().latitude(), poi.position().longitude()) <= radius) {
                 listener.onNewValue(poi);
             }
         }
@@ -316,20 +317,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
     }
 
-    /**
-     * Returns the distance between two points with their latitude and longitude coordinates
-     *
-     * @param lat1  latitude of the first position
-     * @param long1 longitude of the first position
-     * @param lat2  latitude of the second position
-     * @param long2 longitude of the second position
-     * @return the distance
-     */
-    private double dist(double lat1, double long1, double lat2, double long2) {
-        double theta = long1 - long2;
-        double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
-        return 111.18957696 * Math.toDegrees(Math.acos(dist));
-    }
+
 
     /**
      * {@inheritDoc}

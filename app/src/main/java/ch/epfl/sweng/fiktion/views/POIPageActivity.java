@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -34,6 +35,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,9 +51,12 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.CurrentLocationProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.FusedLocationProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
+import ch.epfl.sweng.fiktion.utils.HelperMethods;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
@@ -61,6 +66,7 @@ import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
+
 
     private final int MAXIMUM_SIZE = 1000;
     public static final String POI_NAME = "POI_NAME";
@@ -136,39 +142,41 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
-        // check if user upvoted this poi
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onNewValue(User user) {
-                setUser(user);
-                if (user.getUpvoted().contains(poiName)) {
-                    upvoted = true;
-                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                } else {
-                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                }
-            }
-
-            @Override
-            public void onModifiedValue(User user) {
-
-            }
-
-            @Override
-            public void onDoesntExist() {
-
-            }
-
-            @Override
-            public void onFailure() {
-            }
-        });
-
         // get POI from database
         DatabaseProvider.getInstance().getPOI(poiName, new DatabaseProvider.GetPOIListener() {
+
             @Override
-            public void onNewValue(PointOfInterest poi) {
-                setPOI(poi);
+            public void onNewValue(PointOfInterest value) {
+                setPOI(value);
+                // initialize user if he is connected
+                AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onModifiedValue(User value) {
+
+                    }
+
+                    @Override
+                    public void onNewValue(User value) {
+                        setUser(value);
+                        // check if user has not yet visited this poi and do so otherwise
+                        visitPOI();
+                        if (user.getUpvoted().contains(poiName)) {
+                            upvoted = true;
+                            upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        } else {
+                            upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        }
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                });
                 downloadPhotos();
                 callMap();
                 displayNearPois();
@@ -199,6 +207,46 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // get nearby pois views
         nearbyPoisList = (LinearLayout) findViewById(R.id.nearbyPoisList);
         noNearbyPois = (TextView) findViewById(R.id.noNearbyPois);
+    }
+
+    /**
+     * Adds this poi to the user visited list if the user is close to it
+     */
+    private void visitPOI() {
+        // add POI to its Visited list if it is not already there
+
+        if (!user.getVisited().contains(poiName)) {
+            CurrentLocationProvider.getInstance((Activity)ctx).getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        Position poiPos = poi.position();
+                        double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
+                                , poiPos.longitude(), poiPos.latitude());
+                        if (1 > dist) {
+                            user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
+                                @Override
+                                public void onSuccess() {
+                                    Toast.makeText(ctx, "Visiting " + poiName, Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onDoesntExist() {
+                                    Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    Toast.makeText(ctx, "Failed to visit this place", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        }
+                    }
+                }
+            });
+        }
+
     }
 
     private void setPOI(PointOfInterest poi) {

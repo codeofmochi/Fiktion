@@ -20,8 +20,7 @@ public abstract class LocationProvider {
      * @return Location : current android location
      */
     public Location getLocation() {
-        if (location == null) return null;
-        else return new Location(this.location);
+        return location == null ? null : new Location(this.location);
     }
 
     /**
@@ -30,7 +29,6 @@ public abstract class LocationProvider {
      * @return Position : current position
      */
     public Position getPosition() {
-        if (location == null) return null;
-        else return new Position(this.location.getLatitude(), this.location.getLongitude());
+        return location == null ? null : new Position(this.location.getLatitude(), this.location.getLongitude());
     }
 }
