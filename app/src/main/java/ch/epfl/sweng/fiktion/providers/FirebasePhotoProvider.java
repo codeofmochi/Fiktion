@@ -132,6 +132,9 @@ public class FirebasePhotoProvider extends PhotoProvider {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getPOIPhotoNames(String poiName, int numberOfPhotos, final GetPhotoNamesListener listener) {
         // first, get the reference of the poi and listen for its photo references

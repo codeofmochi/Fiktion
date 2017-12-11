@@ -6,12 +6,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Created by pedro on 16/11/17.
+ * local photo provider for testing
+ *
+ * @author pedro
  */
-
 public class LocalPhotoProvider extends PhotoProvider {
     private Map<String, Map<String, Bitmap>> bitmaps = new TreeMap<>();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPhotoListener listener) {
         if (!bitmaps.containsKey(poiName)) {
@@ -22,6 +26,9 @@ public class LocalPhotoProvider extends PhotoProvider {
         listener.onSuccess();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getPOIPhotoNames(String poiName, int numberOfPhotos, GetPhotoNamesListener listener) {
         if (bitmaps.containsKey(poiName)) {
@@ -43,6 +50,9 @@ public class LocalPhotoProvider extends PhotoProvider {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void downloadPOIBitmap(String poiName, String photoName, DownloadBitmapListener listener) {
         if (bitmaps.containsKey(poiName)) {

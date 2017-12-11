@@ -71,10 +71,17 @@ public abstract class PhotoProvider {
      */
     public abstract void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPhotoListener listener);
 
+    /**
+     * get the names of the photos associated to a point of interest, inform the listener of the results
+     *
+     * @param poiName        the name of the poi
+     * @param numberOfPhotos the maximum number of photo names to retrieve (PhotoProvider.ALL_PHOTOS for all photos)
+     * @param listener       the listener
+     */
     public abstract void getPOIPhotoNames(String poiName, int numberOfPhotos, GetPhotoNamesListener listener);
 
     /**
-     * download the bitmaps associated to a poi and send them to the listener
+     * download a bitmap associated to a poi with the photo name, inform the listener of the results
      *
      * @param poiName   the name of the poi
      * @param photoName the name of the photo

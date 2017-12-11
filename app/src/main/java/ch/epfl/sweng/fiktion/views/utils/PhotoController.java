@@ -29,9 +29,20 @@ public class PhotoController {
         }
     };
 
+    /**
+     * Listener for the retrieval of bitmaps
+     */
     public interface GetBitmapsListener extends Get<Bitmap>, Failure {
     }
 
+    /**
+     * get the bitmaps associated to a point of interest
+     *
+     * @param ctx             the activity context
+     * @param poiName         the name of the poi
+     * @param numberOfBitmaps the maximum number of bitmaps to retrieve (PhotoProvider.ALL_PHOTOS for all photos)
+     * @param listener        a listener that listens for the results
+     */
     public static void getPOIBitmaps(final Context ctx, final String poiName, int numberOfBitmaps, final GetBitmapsListener listener) {
         // get the photo names
         PhotoProvider.getInstance().getPOIPhotoNames(poiName, numberOfBitmaps, new PhotoProvider.GetPhotoNamesListener() {
