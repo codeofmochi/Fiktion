@@ -182,6 +182,8 @@ public class FirebasePhotoProvider extends PhotoProvider {
                 if (bitmap != null) {
                     // "send" the downloaded bitmap to the listener
                     listener.onNewValue(bitmap);
+                } else {
+                    listener.onFailure();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {

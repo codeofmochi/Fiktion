@@ -53,7 +53,6 @@ import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.CurrentLocationProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.FusedLocationProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.utils.HelperMethods;
@@ -62,6 +61,7 @@ import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 import ch.epfl.sweng.fiktion.views.utils.CommentsDisplayer;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
+import ch.epfl.sweng.fiktion.views.utils.PhotoController;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 
@@ -216,7 +216,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // add POI to its Visited list if it is not already there
 
         if (!user.getVisited().contains(poiName)) {
-            CurrentLocationProvider.getInstance((Activity)ctx).getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
+            CurrentLocationProvider.getInstance((Activity) ctx).getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
                     if (location != null) {
@@ -416,7 +416,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
 
         // set the mainImage as the first photo of the poi
-        PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
+        PhotoController.getPOIBitmaps(poi.name(), 1, new PhotoController.GetBitmapsListener() {
             @Override
             public void onNewValue(Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
@@ -430,7 +430,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // download the photos of the poi
-        PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        PhotoController.getPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoController.GetBitmapsListener() {
             @Override
             public void onNewValue(final Bitmap b) {
 
