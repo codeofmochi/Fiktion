@@ -50,6 +50,7 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.GPSLocationProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
@@ -88,6 +89,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             dialog.dismiss();
         }
     };
+    // minimum distance such as if the user is at less than this distance then he visits this POI
+    private double closeDistance = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,6 +202,29 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // get nearby pois views
         nearbyPoisList = (LinearLayout) findViewById(R.id.nearbyPoisList);
         noNearbyPois = (TextView) findViewById(R.id.noNearbyPois);
+
+        // if User is connected we add POIs to its Visited list if it is not already there
+        GPSLocationProvider gpsProvider = new GPSLocationProvider();
+        double distance = gpsProvider.distanceFromMyLocation(poi.position().latitude(), poi.position().longitude());
+        if(distance <= closeDistance){
+            user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
+                @Override
+                public void onSuccess() {
+
+                    Snackbar.make(findViewById(R.id.poiName), "You are visiting "+poiName,Snackbar.LENGTH_SHORT);
+                }
+
+                @Override
+                public void onDoesntExist() {
+
+                }
+
+                @Override
+                public void onFailure() {
+
+                }
+            });
+        }
     }
 
     private void setPOI(PointOfInterest poi) {
