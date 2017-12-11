@@ -64,6 +64,7 @@ public class POIDisplayer {
         processAndPutImage(img, b);
         // Try to load a picture for this poi from DB
         PhotoController.getPOIBitmaps(
+                ctx,
                 poi.name(),
                 1,
                 new PhotoController.GetBitmapsListener() {
