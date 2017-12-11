@@ -93,10 +93,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             dialog.dismiss();
         }
     };
-    // minimum distance such as if the user is at less than this distance then he visits this POI
-    private double closeDistance = 1;
     private FusedLocationProvider mFusedProvider;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,27 +221,29 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             mFusedProvider.getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    Position poiPos = poi.position();
-                    double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
-                            , poiPos.longitude(), poiPos.latitude());
-                    if (1 > dist) {
-                        user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
-                            @Override
-                            public void onSuccess() {
-                                Toast.makeText(ctx, "Visiting " + poiName, Toast.LENGTH_SHORT).show();
-                            }
+                    if (location != null) {
+                        Position poiPos = poi.position();
+                        double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
+                                , poiPos.longitude(), poiPos.latitude());
+                        if (1 > dist) {
+                            user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
+                                @Override
+                                public void onSuccess() {
+                                    Toast.makeText(ctx, "Visiting " + poiName, Toast.LENGTH_SHORT).show();
+                                }
 
-                            @Override
-                            public void onDoesntExist() {
-                                Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
-                            }
+                                @Override
+                                public void onDoesntExist() {
+                                    Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
+                                }
 
-                            @Override
-                            public void onFailure() {
-                                Toast.makeText(ctx, "Failed to visit this place", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                                @Override
+                                public void onFailure() {
+                                    Toast.makeText(ctx, "Failed to visit this place", Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
+                        }
                     }
                 }
             });
