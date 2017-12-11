@@ -202,4 +202,17 @@ public class GoogleMapsLocationProvider extends LocationProvider {
             }
         });
     }
+
+    /**
+     * Checks if the given coordinates are close enough to the current location (if the user is visiting)
+     * @param latitude latitude of given position
+     * @param longitude longitude of given position
+     * @return true if user is close enough to visit these coordinates, false toherwise
+     */
+    public boolean checkCloseToCurrentLocation( double latitude, double longitude) {
+        Location myLocation = getLocation();
+        double theta = myLocation.getLongitude() - longitude;
+        double dist = Math.sin(Math.toRadians(myLocation.getLatitude())) * Math.sin(Math.toRadians(latitude)) + Math.cos(Math.toRadians(myLocation.getLatitude())) * Math.cos(Math.toRadians(latitude)) * Math.cos(Math.toRadians(theta));
+        return 1 > 111.18957696 * Math.toDegrees(Math.acos(dist));
+    }
 }

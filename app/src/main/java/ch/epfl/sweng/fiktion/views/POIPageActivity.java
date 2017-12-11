@@ -8,15 +8,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.pm.ActivityInfoCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -28,12 +32,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,9 +58,10 @@ import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.GPSLocationProvider;
+import ch.epfl.sweng.fiktion.providers.FusedLocationProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
+import ch.epfl.sweng.fiktion.utils.HelperMethods;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
@@ -62,6 +71,8 @@ import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
+
+    private final String TAG = "POIPageActivity";
 
     private final int MAXIMUM_SIZE = 1000;
     public static final String POI_NAME = "POI_NAME";
@@ -90,7 +101,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         }
     };
     // minimum distance such as if the user is at less than this distance then he visits this POI
-    private double closeDistance = 1000;
+    private double closeDistance = 1;
+    private FusedLocationProvider mFusedProvider;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +111,8 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         includeLayout = R.layout.activity_poipage;
         super.onCreate(savedInstanceState);
 
+        // location provider
+        mFusedProvider = new FusedLocationProvider((Activity) ctx);
         //picture button
         addPictureButton = (Button) findViewById(R.id.addPictureButton);
         addPictureButton.setOnClickListener(new View.OnClickListener() {
@@ -139,39 +154,39 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
-        // check if user upvoted this poi
-        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
-            @Override
-            public void onSuccess(User user) {
-                setUser(user);
-                if (user.getUpvoted().contains(poiName)) {
-                    upvoted = true;
-                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                } else {
-                    upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                }
-            }
-
-            @Override
-            public void onModified(User user) {
-
-            }
-
-            @Override
-            public void onDoesntExist() {
-
-            }
-
-            @Override
-            public void onFailure() {
-            }
-        });
-
         // get POI from database
         DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
             public void onSuccess(PointOfInterest poi) {
                 setPOI(poi);
+                // check if user upvoted this poi and attempt to visit this poi if not already done
+                AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onSuccess(User user) {
+                        setUser(user);
+                        visitPOI();
+                        if (user.getUpvoted().contains(poiName)) {
+                            upvoted = true;
+                            upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        } else {
+                            upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        }
+                    }
+
+                    @Override
+                    public void onModified(User user) {
+
+                    }
+
+                    @Override
+                    public void onDoesntExist() {
+
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                });
                 downloadPhotos();
                 callMap();
                 displayNearPois();
@@ -180,6 +195,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 // hide loading spinner
                 ProgressBar spinner = (ProgressBar) findViewById(R.id.loadingSpinner);
                 spinner.setVisibility(View.GONE);
+
             }
 
             @Override
@@ -202,29 +218,42 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // get nearby pois views
         nearbyPoisList = (LinearLayout) findViewById(R.id.nearbyPoisList);
         noNearbyPois = (TextView) findViewById(R.id.noNearbyPois);
+    }
 
+    private void visitPOI() {
         // if User is connected we add POIs to its Visited list if it is not already there
-        GPSLocationProvider gpsProvider = new GPSLocationProvider();
-        double distance = gpsProvider.distanceFromMyLocation(poi.position().latitude(), poi.position().longitude());
-        if(distance <= closeDistance){
-            user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
+
+        if (!user.getVisited().contains(poiName)) {
+
+
+            mFusedProvider.getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
                 @Override
-                public void onSuccess() {
+                public void onSuccess(Location location) {
+                    Position poiPos = poi.position();
+                    double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
+                            , poiPos.longitude(), poiPos.latitude());
+                    if (1 > dist) {
+                        user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(ctx, user.getName() + " visited " + poiName, Toast.LENGTH_SHORT).show();
+                            }
 
-                    Snackbar.make(findViewById(R.id.poiName), "You are visiting "+poiName,Snackbar.LENGTH_SHORT);
-                }
+                            @Override
+                            public void onDoesntExist() {
+                                Toast.makeText(ctx, poiName + "does not exist", Toast.LENGTH_SHORT).show();
+                            }
 
-                @Override
-                public void onDoesntExist() {
+                            @Override
+                            public void onFailure() {
+                            }
+                        });
 
-                }
-
-                @Override
-                public void onFailure() {
-
+                    }
                 }
             });
         }
+
     }
 
     private void setPOI(PointOfInterest poi) {
