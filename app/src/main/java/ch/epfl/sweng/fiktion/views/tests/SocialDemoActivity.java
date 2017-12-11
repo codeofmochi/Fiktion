@@ -119,7 +119,7 @@ public class SocialDemoActivity extends AppCompatActivity {
 
         if(!friendID.equals("")) {
             sendRequestButton.setEnabled(false);
-            uc.sendFriendResquest(friendID, new UserController.RequestListener() {
+            uc.sendFriendRequest(friendID, new UserController.RequestListener() {
                 @Override
                 public void onSuccess() {
                     sendRequestButton.setEnabled(true);

@@ -168,7 +168,7 @@ public class GoogleMapsLocationProvider extends LocationProvider {
                 // first update position
                 updateLocation(newLocation);
                 // find nearest pois
-                DatabaseProvider.getInstance().findNearPois(getPosition(), radius, new DatabaseProvider.FindNearPoisListener() {
+                DatabaseProvider.getInstance().findNearPOIs(getPosition(), radius, new DatabaseProvider.FindNearPOIsListener() {
                     @Override
                     public void onNewValue(PointOfInterest poi) {
                         // write new marker

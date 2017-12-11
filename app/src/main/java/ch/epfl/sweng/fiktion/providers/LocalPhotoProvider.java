@@ -32,7 +32,7 @@ public class LocalPhotoProvider extends PhotoProvider {
 
         List<Bitmap> poiBitmaps = bitmaps.containsKey(poiName) ? bitmaps.get(poiName) : new ArrayList<Bitmap>();
         for (int i = 0; (numberOfPhotos == ALL_PHOTOS || i < numberOfPhotos) && i < poiBitmaps.size(); ++i) {
-            listener.onNewPhoto(poiBitmaps.get(i));
+            listener.onNewValue(poiBitmaps.get(i));
         }
 
     }

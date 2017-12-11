@@ -226,7 +226,7 @@ public class FirebasePhotoTest {
 
         PhotoProvider.DownloadBitmapListener listener = new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewValue(Bitmap b) {
                 setResult(Result.NEWPHOTO);
             }
 

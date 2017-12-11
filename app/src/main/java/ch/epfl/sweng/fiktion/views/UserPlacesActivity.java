@@ -115,7 +115,7 @@ public class UserPlacesActivity extends AppCompatActivity {
         // fetch from database
         DatabaseProvider.getInstance().getUserById(userId, new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User u) {
+            public void onNewValue(User u) {
                 user = u;
 
                 // define action depending on state
@@ -137,9 +137,9 @@ public class UserPlacesActivity extends AppCompatActivity {
 
                 // fetch POIs from db
                 for (String poiId : collection) {
-                    DatabaseProvider.getInstance().getPoi(poiId, new DatabaseProvider.GetPoiListener() {
+                    DatabaseProvider.getInstance().getPOI(poiId, new DatabaseProvider.GetPOIListener() {
                         @Override
-                        public void onSuccess(PointOfInterest poi) {
+                        public void onNewValue(PointOfInterest poi) {
                             // display card of POI
                             View v = POIDisplayer.createPoiCard(poi, ctx);
                             poiList.addView(v);
@@ -148,7 +148,7 @@ public class UserPlacesActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onModified(PointOfInterest poi) { /*nothing */ }
+                        public void onModifiedValue(PointOfInterest poi) { /*nothing */ }
 
                         @Override
                         public void onDoesntExist() { /*nothing */ }
@@ -160,7 +160,7 @@ public class UserPlacesActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 
             }
 

@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion.providers;
 
 import java.util.List;
 
+import ch.epfl.sweng.fiktion.listeners.Failure;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 
 /**
@@ -16,7 +17,7 @@ public abstract class SearchProvider {
     /**
      * Listener that listens the results of searching by text from user
      */
-    public interface SearchPOIsByTextListener {
+    public interface SearchPOIsByTextListener extends Failure{
 
         /**
          * what to do if the retrieval succeeds
@@ -24,11 +25,6 @@ public abstract class SearchProvider {
          * @param poiIDs the retrieved points of interest
          */
         void onSuccess(List<String> poiIDs);
-
-        /**
-         * what to do if the retrieval fails
-         */
-        void onFailure();
     }
 
     /**
@@ -37,7 +33,7 @@ public abstract class SearchProvider {
      * @param poi      POI to add
      * @param listener listens the add result
      */
-    public abstract void addPoi(PointOfInterest poi, DatabaseProvider.AddPoiListener listener);
+    public abstract void addPOI(PointOfInterest poi, DatabaseProvider.AddPOIListener listener);
 
     /**
      * Modify a point of interest and inform the listener of the result

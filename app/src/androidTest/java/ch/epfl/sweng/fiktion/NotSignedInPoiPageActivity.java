@@ -1,7 +1,6 @@
 package ch.epfl.sweng.fiktion;
 
 import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 
@@ -45,7 +44,7 @@ public class NotSignedInPoiPageActivity {
     public static void setConfig() {
         AuthProvider.getInstance().signOut();
         Config.TEST_MODE = true;
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPOIListener() {
             @Override
             public void onSuccess() {
             }

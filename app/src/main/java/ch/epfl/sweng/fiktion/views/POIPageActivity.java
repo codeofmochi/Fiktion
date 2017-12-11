@@ -9,18 +9,15 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.pm.ActivityInfoCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -32,9 +29,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -154,16 +148,26 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         ((TextView) findViewById(R.id.title)).setText(poiName);
 
         // get POI from database
-        DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+        DatabaseProvider.getInstance().getPOI(poiName, new DatabaseProvider.GetPOIListener() {
+            /**
+             * What to do with the retrieved object
+             *
+             * @param value the retrieved object
+             */
             @Override
-            public void onSuccess(PointOfInterest poi) {
+            public void onNewValue(PointOfInterest value) {
                 setPOI(poi);
-                // check if user upvoted this poi and attempt to visit this poi if not already done
+                // initialize user if he is connected
                 AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User user) {
-                        //user is connected
+                    public void onModifiedValue(User value) {
+
+                    }
+
+                    @Override
+                    public void onNewValue(User value) {
                         setUser(user);
+                        // check if user has not yet visited this poi and do so otherwise
                         visitPOI();
                         if (user.getUpvoted().contains(poiName)) {
                             upvoted = true;
@@ -171,11 +175,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         } else {
                             upvoteButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                         }
-                    }
-
-                    @Override
-                    public void onModified(User user) {
-
                     }
 
                     @Override
@@ -199,7 +198,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
 
             @Override
-            public void onModified(PointOfInterest poi) {
+            public void onModifiedValue(PointOfInterest poi) {
                 setPOI(poi);
                 setPOIInformation();
             }
@@ -427,7 +426,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // set the mainImage as the first photo of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewValue(Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
                 mainImage.setImageBitmap(resized);
                 mainImage.setVisibility(View.VISIBLE);
@@ -441,7 +440,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // download the photos of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(final Bitmap b) {
+            public void onNewValue(final Bitmap b) {
 
                 // create a new ImageView which will hold the photo
                 final ImageView imgView = new ImageView(getApplicationContext());
@@ -496,7 +495,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void displayNearPois() {
         // find nearby pois
-        DatabaseProvider.getInstance().findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPOIs(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPOIsListener() {
             @Override
             public void onNewValue(PointOfInterest p) {
                 View v = POIDisplayer.createPoiCard(p, ctx);

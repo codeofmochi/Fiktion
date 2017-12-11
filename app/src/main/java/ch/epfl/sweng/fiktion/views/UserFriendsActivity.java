@@ -1,15 +1,18 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.views.utils.UserDisplayer;
@@ -23,6 +26,7 @@ public class UserFriendsActivity extends AppCompatActivity {
     private LinearLayout friendsList;
     private TextView friendsListEmpty;
     private User user;
+    private UserController userCtrl;
 
     // flags data
     private String userId;
@@ -59,12 +63,12 @@ public class UserFriendsActivity extends AppCompatActivity {
         // get the user we want to display the infos from
         DatabaseProvider.getInstance().getUserById(userId, new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User u) {
+            public void onNewValue(User u) {
                 updateContent(u);
             }
 
             @Override
-            public void onModified(User u) {
+            public void onModifiedValue(User u) {
                 updateContent(u);
             }
 
@@ -84,38 +88,72 @@ public class UserFriendsActivity extends AppCompatActivity {
     private void updateContent(User u) {
         // assign user
         user = u;
-        // update lists
+        userCtrl = new UserController(user);
+        // update lists : reset friends requests
+        friendsRequestsTitle.setVisibility(View.GONE);
+        friendsRequests.setVisibility(View.GONE);
+        friendsRequests.removeAllViews();
+        // reset friends list
+        friendsList.removeAllViews();
+        friendsList.addView(friendsListEmpty);
+        friendsListEmpty.setVisibility(View.VISIBLE);
 
         // show requests only if my profile
         if (state == ProfileActivity.Action.MY_PROFILE) {
-            for (String r : u.getRequests()) {
+            for (final String r : u.getRequests()) {
                 // show friend requests since there are some
-                // TODO dont forget to hide again when the list gets empty
                 friendsRequestsTitle.setVisibility(View.VISIBLE);
                 friendsRequests.setVisibility(View.VISIBLE);
 
                 // find infos of that request's user
                 DatabaseProvider.getInstance().getUserById(r, new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User requester) {
+                    public void onNewValue(User requester) {
                         View v = UserDisplayer.createUserListElement(requester, ctx);
                         v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // TODO accept friend request here
+                                // accept friend request
+                                userCtrl.acceptFriendRequest(r, new DatabaseProvider.ModifyUserListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Snackbar.make(friendsListTitle, R.string.friend_added, Snackbar.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onDoesntExist() {
+                                        Snackbar.make(friendsListTitle, R.string.user_not_found, Snackbar.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Snackbar.make(friendsListTitle, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                         }, ctx);
                         v = UserDisplayer.withX((LinearLayout) v, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // TODO deny friend request here
+                                // deny friend request
+                                userCtrl.ignoreFriendRequest(r, new UserController.BinaryListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Snackbar.make(friendsListTitle, R.string.friend_request_ignored, Snackbar.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Snackbar.make(friendsListTitle, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                         }, ctx);
                         friendsRequests.addView(v);
                     }
 
                     @Override
-                    public void onModified(User user) { /* nothing */ }
+                    public void onModifiedValue(User user) { /* nothing */ }
 
                     @Override
                     public void onDoesntExist() { /* nothing */ }
@@ -126,22 +164,45 @@ public class UserFriendsActivity extends AppCompatActivity {
             }
         }
 
-        for (String f : u.getFriendlist()) {
+        for (final String f : u.getFriendlist()) {
             // hide empty message since there are some
-            // TODO dont forget to show it again if user delete all friends
             friendsListEmpty.setVisibility(View.GONE);
 
             // find infos of friend
             DatabaseProvider.getInstance().getUserById(f, new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess(User friend) {
+                public void onNewValue(final User friend) {
                     View v = UserDisplayer.createUserListElement(friend, ctx);
                     // put delete button if my profile
                     if (state == ProfileActivity.Action.MY_PROFILE) {
-                        v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
+                        v = UserDisplayer.withX((LinearLayout) v, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // TODO pop alertbox to remove friend
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                                builder.setMessage(getString(R.string.deletion_confirmation_of, friend.getName()))
+                                        .setCancelable(true)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                userCtrl.removeFromFriendList(f, new UserController.BinaryListener() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        Snackbar.make(friendsListTitle, R.string.friend_deleted, Snackbar.LENGTH_LONG).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure() {
+                                                        Snackbar.make(friendsListTitle, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
                             }
                         }, ctx);
                     }
@@ -149,7 +210,7 @@ public class UserFriendsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onModified(User user) { /* nothing */ }
+                public void onModifiedValue(User user) { /* nothing */ }
 
                 @Override
                 public void onDoesntExist() { /* nothing */ }

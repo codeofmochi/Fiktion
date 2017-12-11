@@ -1,7 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.util.Log;
-
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -85,12 +83,22 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                 .replace("%S", "/");
     }
 
+    /*
+     * --------------------------------------------------------------------------------
+     * ----------------------------------POI methods-----------------------------------
+     * --------------------------------------------------------------------------------
+     */
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void addPoi(final PointOfInterest poi, final AddPoiListener listener) {
+    public void addPOI(final PointOfInterest poi, final AddPOIListener listener) {
         final String poiName = poi.name();
+
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+        }
 
         // get/create the reference of the point of interest
         final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
@@ -111,7 +119,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     geofire.setLocation(poiName, geoLocation);
 
                     // add the poi also to the search provider
-                    searchProvider.addPoi(poi, new AddPoiListener() {
+                    searchProvider.addPOI(poi, new AddPOIListener() {
                         @Override
                         public void onSuccess() {
                             listener.onSuccess();
@@ -144,7 +152,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getPoi(String poiName, final GetPoiListener listener) {
+    public void getPOI(String poiName, final GetPOIListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the reference of the poi
         DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
         poiRef.addValueEventListener(new ValueEventListener() {
@@ -159,11 +171,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     } else {
                         if (firstCall) {
                             // inform the listener that we got the matching poi
-                            listener.onSuccess(fPoi.toPoi());
+                            listener.onNewValue(fPoi.toPoi());
                             firstCall = false;
                         } else {
                             //inform the listener that the poi has been modified
-                            listener.onModified(fPoi.toPoi());
+                            listener.onModifiedValue(fPoi.toPoi());
                         }
                     }
                 } else {
@@ -185,10 +197,16 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void modifyPOI(final PointOfInterest poi, final ModifyPOIListener listener) {
-        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poi.name());
+        final String poiName = poi.name();
+
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+        }
+
+        final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
 
                     // modify the poi in the search provider
@@ -197,12 +215,15 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                         public void onSuccess() {
                             // if it succeeds, replace the poi value in firebase
                             FirebasePointOfInterest fPOI = new FirebasePointOfInterest(poi);
+                            // don't change the rating
+                            Object value = dataSnapshot.getValue(FirebasePointOfInterest.class);
+                            fPOI.rating = value == null ? 0 : ((FirebasePointOfInterest) value).rating;
                             poiRef.setValue(fPOI);
 
                             // update the position for geofire
                             Position pos = poi.position();
                             final GeoLocation geoLocation = new GeoLocation(pos.latitude(), pos.longitude());
-                            geofire.setLocation(poi.name(), geoLocation);
+                            geofire.setLocation(poiName, geoLocation);
 
                             // and inform the listener of the success of the modification
                             listener.onSuccess();
@@ -238,23 +259,33 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     public void upvote(String poiName, final ModifyPOIListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+        }
+
         final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    // get the rating value of the poi
                     Object value = dataSnapshot.child("rating").getValue();
-                    // if value is null, then the poi was created before pois had rating, set it to 0
-                    long rating = value == null ? 0 : (long) value;
-                    poiRef.child("rating").setValue(rating + 1);
+
+                    // if the poi doesn't have the field rating, set it to 0 (+1 for the upvote)
+                    long newRating = value == null ? 1 : (long) value + 1;
+                    poiRef.child("rating").setValue(newRating);
+
+                    // inform the listener that the upvote succeeded
                     listener.onSuccess();
                 } else {
+                    // inform the listener that the poi doesn't exist
                     listener.onDoesntExist();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the upvote failed
                 listener.onFailure();
             }
         });
@@ -264,23 +295,46 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     public void downvote(String poiName, final ModifyPOIListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+        }
+
         final DatabaseReference poiRef = dbRef.child(poisRefName).child(poiName);
         poiRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    // get the rating value of the poi
                     Object value = dataSnapshot.child("rating").getValue();
-                    long rating = value == null ? 0 : (long) value;
-                    // if value is null, then the poi was created before pois had rating, set it to 0
-                    poiRef.child("rating").setValue(rating - 1);
+
+                    long newRating;
+                    if (value == null) {
+                        // if the poi doesn't have the field rating, set it to 0
+                        newRating = 0;
+                    } else {
+                        // decrement the rating value
+                        newRating = (long) value - 1;
+                        if (newRating < 0) {
+                            // this should not happen since we are removing a vote from someone who
+                            // upvoted but if the rating is negative, set it to 0
+                            newRating = 0;
+                        }
+                    }
+
+                    // set the new rating
+                    poiRef.child("rating").setValue(newRating);
+
+                    // inform the listener that the downvote succeeded
                     listener.onSuccess();
                 } else {
+                    // inform the listener that the poi doesn't exist
                     listener.onDoesntExist();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // inform the listener that the operation failed
                 listener.onFailure();
             }
         });
@@ -290,22 +344,22 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void findNearPois(Position pos, int radius, final FindNearPoisListener listener) {
+    public void findNearPOIs(Position pos, int radius, final FindNearPOIsListener listener) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude(), pos.longitude()), radius);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, GeoLocation location) {
                 // for a near poi, retrieve it from the firebase
-                getPoi(key, new GetPoiListener() {
+                getPOI(key, new GetPOIListener() {
                     @Override
-                    public void onSuccess(PointOfInterest poi) {
+                    public void onNewValue(PointOfInterest poi) {
                         // inform the listener that we got a new poi
                         listener.onNewValue(poi);
                     }
 
                     @Override
-                    public void onModified(PointOfInterest poi) {
+                    public void onModifiedValue(PointOfInterest poi) {
 
                     }
 
@@ -355,14 +409,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onSuccess(List<String> poiIDs) {
                 for (String poiID : poiIDs) {
-                    getPoi(poiID, new GetPoiListener() {
+                    getPOI(poiID, new GetPOIListener() {
                         @Override
-                        public void onSuccess(PointOfInterest poi) {
+                        public void onNewValue(PointOfInterest poi) {
                             listener.onNewValue(poi);
                         }
 
                         @Override
-                        public void onModified(PointOfInterest poi) {
+                        public void onModifiedValue(PointOfInterest poi) {
                         }
 
                         @Override
@@ -383,11 +437,21 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         });
     }
 
+    /*
+     * --------------------------------------------------------------------------------
+     * ----------------------------------User methods----------------------------------
+     * --------------------------------------------------------------------------------
+     */
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void addUser(final User user, final AddUserListener listener) {
+        if (user.getID().isEmpty()) {
+            listener.onFailure();
+        }
+
         // get/create the reference of the user
         final DatabaseReference userRef = dbRef.child(usersRefName).child(user.getID());
 
@@ -421,6 +485,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getUserById(String id, final GetUserListener listener) {
+        if (id.isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the reference of the user associated with the id
         DatabaseReference userRef = dbRef.child(usersRefName).child(id);
         userRef.addValueEventListener(new ValueEventListener() {
@@ -436,11 +504,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     } else {
                         if (firstCall) {
                             // inform the listener that we got the matching user
-                            listener.onSuccess(fUser.toUser());
+                            listener.onNewValue(fUser.toUser());
                             firstCall = false;
                         } else {
                             // inform the listener that the user has been modified
-                            listener.onModified(fUser.toUser());
+                            listener.onModifiedValue(fUser.toUser());
                         }
                     }
                 } else {
@@ -462,6 +530,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void deleterUserById(String id, final DeleteUserListener listener) {
+        if (id.isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the reference of the user associated with the id
         final DatabaseReference userRef = dbRef.child(usersRefName).child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -492,6 +564,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
+        if (user.getID().isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the reference of the user
         final DatabaseReference userRef = dbRef.child(usersRefName).child(user.getID());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -518,11 +594,21 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         });
     }
 
+    /*
+     * --------------------------------------------------------------------------------
+     * --------------------------------Comment methods---------------------------------
+     * --------------------------------------------------------------------------------
+     */
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void addComment(final Comment comment, final String poiName, final AddCommentListener listener) {
+        if (comment.getId().isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the comment reference
         final DatabaseReference commentRef = dbRef.child(commentsRef).child(comment.getId());
         commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -559,6 +645,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getComment(String commentId, final GetCommentListener listener) {
+        if (commentId.isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the comment reference
         DatabaseReference commentRef = dbRef.child(commentsRef).child(commentId);
         commentRef.addValueEventListener(new ValueEventListener() {
@@ -574,11 +664,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     } else {
                         if (firstCall) {
                             // inform the listener that we got the matching comment
-                            listener.onSuccess(fComment.toComment());
+                            listener.onNewValue(fComment.toComment());
                             firstCall = false;
                         } else {
                             // inform the listener that the comment has been modified
-                            listener.onModified(fComment.toComment());
+                            listener.onModifiedValue(fComment.toComment());
                         }
                     }
                 } else {
@@ -600,6 +690,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getPOIComments(String poiName, final GetCommentsListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the poi comments reference
         final DatabaseReference cPOIRef = dbRef.child(poiCommentsRef).child(poiName);
 
@@ -609,13 +703,13 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 getComment(dataSnapshot.getKey(), new GetCommentListener() {
                     @Override
-                    public void onSuccess(Comment comment) {
+                    public void onNewValue(Comment comment) {
                         // inform the listener with every new comment
                         listener.onNewValue(comment);
                     }
 
                     @Override
-                    public void onModified(Comment comment) {
+                    public void onModifiedValue(Comment comment) {
                         // inform the listener when an already retrieved poi has been modified
                         listener.onModifiedValue(comment);
                     }
@@ -656,6 +750,9 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void voteComment(final String commentId, final String userID, final int vote, final int previousVote, final VoteListener listener) {
+        if (commentId.isEmpty()) {
+            listener.onFailure();
+        }
 
         // get the comment reference
         final DatabaseReference commentRef = dbRef.child(commentsRef).child(commentId);
@@ -672,7 +769,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     commentRef.child("rating").setValue(rating + vote - previousVote);
 
                     // record the vote state of the user
-                    if (vote == NOVOTE ) {
+                    if (vote == NOVOTE) {
                         dbRef.child(commentVotersRef).child(commentId).child(userID).removeValue();
                     } else {
                         dbRef.child(commentVotersRef).child(commentId).child(userID).setValue(vote);
@@ -699,6 +796,10 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getCommentVoteOfUser(String commentId, String userID, final GetVoteListener listener) {
+        if (commentId.isEmpty()) {
+            listener.onFailure();
+        }
+
         // get the vote reference associated to the user for the comment
         DatabaseReference voteRef = dbRef.child(commentVotersRef).child(commentId).child(userID);
 
@@ -721,7 +822,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     vote = DatabaseProvider.NOVOTE;
                 }
                 // inform the listener of the vote
-                listener.onSuccess(vote);
+                listener.onNewValue(vote);
             }
 
             @Override

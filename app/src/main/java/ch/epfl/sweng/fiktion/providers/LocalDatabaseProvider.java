@@ -64,12 +64,13 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     private Map<String, Set<GetCommentListener>> getCommentListeners = new TreeMap<>();
     private Map<String, Set<GetCommentsListener>> getCommentsListeners = new TreeMap<>();
+    private Map<String, Set<GetPOIListener>> getPOIListeners = new TreeMap();
 
     /**
      * {@inheritDoc}
      */
 
-    public void addPoi(PointOfInterest poi, AddPoiListener listener) {
+    public void addPOI(PointOfInterest poi, AddPOIListener listener) {
         if (poi.name().contains("ADDPOIS")) {
             listener.onSuccess();
             return;
@@ -89,6 +90,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         } else {
             // add the poi
             poiList.add(poi);
+
+            // inform the listeners that listen the retrieval of a poi with poi.name that it now exists
+            if (getPOIListeners.containsKey(poi.name())) {
+                for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
+                    getPOIListener.onNewValue(poi);
+                }
+            }
+
             // inform the listener that the operation succeeded
             listener.onSuccess();
         }
@@ -97,9 +106,9 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void getPoi(String name, GetPoiListener listener) {
+    public void getPOI(String name, GetPOIListener listener) {
         if (name.contains("GETPOIS")) {
-            listener.onSuccess(new PointOfInterest("SUCCESS",
+            listener.onNewValue(new PointOfInterest("SUCCESS",
                     new Position(0, 0),
                     new TreeSet<String>(),
                     "",
@@ -109,7 +118,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             return;
         }
         if (name.contains("GETPOIM")) {
-            listener.onModified(new PointOfInterest("MODIFIED",
+            listener.onModifiedValue(new PointOfInterest("MODIFIED",
                     new Position(0, 0),
                     new TreeSet<String>(),
                     "",
@@ -127,13 +136,20 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             return;
         }
 
+
+        if (!getPOIListeners.containsKey(name)) {
+            getPOIListeners.put(name, new HashSet<GetPOIListener>());
+        }
+        getPOIListeners.get(name).add(listener);
+
         for (PointOfInterest poi : poiList) {
             if (poi.name().equals(name)) {
                 // inform the listener that we have the poi
-                listener.onSuccess(poi);
+                listener.onNewValue(poi);
                 return;
             }
         }
+
         // inform the listener that the poi doesnt exist
         listener.onDoesntExist();
     }
@@ -157,9 +173,20 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
 
         for (int i = 0; i < poiList.size(); ++i) {
-            if (poi.equals(poiList.get(i))) {
-                poiList.set(i, poi);
+            PointOfInterest aPOI = poiList.get(i);
+            if (poi.equals(aPOI)) {
+                PointOfInterest mPOI = new PointOfInterest(poi.name(),poi.position(),poi.fictions(),
+                        poi.description(),aPOI.rating(),poi.country(), poi.city());
+                poiList.set(i, mPOI);
                 listener.onSuccess();
+
+                // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
+                if (getPOIListeners.containsKey(poi.name())) {
+                    for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
+                        getPOIListener.onModifiedValue(mPOI);
+                    }
+                }
+
                 return;
             }
         }
@@ -190,6 +217,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 PointOfInterest poiPlus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
                         poi.description(), poi.rating() + 1, poi.country(), poi.city());
                 poiList.set(i, poiPlus);
+
+                // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
+                if (getPOIListeners.containsKey(poi.name())) {
+                    for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
+                        getPOIListener.onModifiedValue(poiPlus);
+                    }
+                }
+
                 listener.onSuccess();
                 return;
             }
@@ -221,6 +256,14 @@ public class LocalDatabaseProvider extends DatabaseProvider {
                 PointOfInterest poiMinus = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
                         poi.description(), poi.rating() - 1, poi.country(), poi.city());
                 poiList.set(i, poiMinus);
+
+                // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
+                if (getPOIListeners.containsKey(poi.name())) {
+                    for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
+                        getPOIListener.onModifiedValue(poiMinus);
+                    }
+                }
+
                 listener.onSuccess();
                 return;
             }
@@ -231,7 +274,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
+    public void findNearPOIs(Position pos, int radius, FindNearPOIsListener listener) {
         if (pos.latitude() == 1000 && pos.longitude() == 1000) {
             listener.onFailure();
             return;
@@ -314,7 +357,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     @Override
     public void getUserById(String id, GetUserListener listener) {
         if (id.contains("GETUSERS")) {
-            listener.onSuccess(new User(id, id));
+            listener.onNewValue(new User(id, id));
             return;
         }
         if (id.contains("GETUSERD")) {
@@ -328,7 +371,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
         for (User u : users) {
             if (u.getID().equals(id)) {
-                listener.onSuccess(u);
+                listener.onNewValue(u);
                 return;
             }
         }
@@ -423,7 +466,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
         if (getCommentListeners.containsKey(comment.getId())) {
             for (GetCommentListener l : getCommentListeners.get(comment.getId())) {
-                l.onSuccess(comment);
+                l.onNewValue(comment);
             }
         }
         if (getCommentsListeners.containsKey(poiName)) {
@@ -437,11 +480,11 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     @Override
     public void getComment(String commentId, GetCommentListener listener) {
         if (commentId.contains("GETCOMMENTN")) {
-            listener.onSuccess(new Comment("GETCOMMENTN", "GETCOMMENTN", "author", new Date(0), 0));
+            listener.onNewValue(new Comment("GETCOMMENTN", "GETCOMMENTN", "author", new Date(0), 0));
             return;
         }
         if (commentId.contains("GETCOMMENTM")) {
-            listener.onSuccess(new Comment("GETCOMMENTM", "GETCOMMENTM", "author", new Date(0), 0));
+            listener.onNewValue(new Comment("GETCOMMENTM", "GETCOMMENTM", "author", new Date(0), 0));
             return;
         }
         if (commentId.contains("GETCOMMENTD")) {
@@ -460,7 +503,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
 
         if (comments.containsKey(commentId)) {
-            listener.onSuccess(comments.get(commentId));
+            listener.onNewValue(comments.get(commentId));
         } else {
             listener.onDoesntExist();
         }
@@ -493,12 +536,12 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             for (String id : poiComments.get(poiName)) {
                 getComment(id, new GetCommentListener() {
                     @Override
-                    public void onSuccess(Comment comment) {
+                    public void onNewValue(Comment comment) {
                         listener.onNewValue(comment);
                     }
 
                     @Override
-                    public void onModified(Comment comment) {
+                    public void onModifiedValue(Comment comment) {
                         listener.onModifiedValue(comment);
                     }
 

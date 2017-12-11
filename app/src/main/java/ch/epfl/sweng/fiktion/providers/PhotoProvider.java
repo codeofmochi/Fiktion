@@ -2,6 +2,9 @@ package ch.epfl.sweng.fiktion.providers;
 
 import android.graphics.Bitmap;
 
+import ch.epfl.sweng.fiktion.listeners.Failure;
+import ch.epfl.sweng.fiktion.listeners.Get;
+import ch.epfl.sweng.fiktion.listeners.Success;
 import ch.epfl.sweng.fiktion.utils.Config;
 
 /**
@@ -41,43 +44,19 @@ public abstract class PhotoProvider {
     /**
      * Listener that listens the status of a photo upload
      */
-    public interface UploadPhotoListener {
-
-        /**
-         * what to do if the upload succeeds
-         */
-        void onSuccess();
-
-        /**
-         * what to do if the upload fails
-         */
-        void onFailure();
-
+    public interface UploadPhotoListener extends Success, Failure {
         /**
          * what to do with the progress
          *
          * @param progress the progress
          */
         void updateProgress(double progress);
-
     }
 
     /**
      * Listener that listens the download of (a) bitmap(s)
      */
-    public interface DownloadBitmapListener {
-
-        /**
-         * what to do with a new downloaded bitmap
-         *
-         * @param b the downloaded bitmap
-         */
-        void onNewPhoto(Bitmap b);
-
-        /**
-         * what to do if the download fails
-         */
-        void onFailure();
+    public interface DownloadBitmapListener extends Get<Bitmap>, Failure {
     }
 
     /**

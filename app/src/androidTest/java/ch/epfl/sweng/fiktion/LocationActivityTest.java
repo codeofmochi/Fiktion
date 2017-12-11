@@ -33,8 +33,8 @@ public class LocationActivityTest {
 
     // setup UI automator
     static UiDevice device = UiDevice.getInstance(getInstrumentation());
-    private DatabaseProvider.AddPoiListener emptyAddPoiListener =
-            new DatabaseProvider.AddPoiListener() {
+    private DatabaseProvider.AddPOIListener emptyAddPoiListener =
+            new DatabaseProvider.AddPOIListener() {
                 @Override
                 public void onSuccess() {
                 }
@@ -105,9 +105,9 @@ public class LocationActivityTest {
             PointOfInterest p3 = new PointOfInterest("p3", pos3, new TreeSet<String>(), "", 0, "", "");
 
             //pois are put into the database
-            DatabaseProvider.getInstance().addPoi(p1, emptyAddPoiListener);
-            DatabaseProvider.getInstance().addPoi(p2, emptyAddPoiListener);
-            DatabaseProvider.getInstance().addPoi(p3, emptyAddPoiListener);
+            DatabaseProvider.getInstance().addPOI(p1, emptyAddPoiListener);
+            DatabaseProvider.getInstance().addPOI(p2, emptyAddPoiListener);
+            DatabaseProvider.getInstance().addPOI(p3, emptyAddPoiListener);
 
             // get marker when popped
             UiObject marker = device.findObject(new UiSelector().descriptionContains("p1"));

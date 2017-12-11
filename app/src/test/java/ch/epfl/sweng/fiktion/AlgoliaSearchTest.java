@@ -25,7 +25,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.AlgoliaSearchProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.DatabaseProvider.AddPoiListener;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider.AddPOIListener;
 import ch.epfl.sweng.fiktion.providers.SearchProvider.SearchPOIsByTextListener;
 import ch.epfl.sweng.fiktion.utils.Mutable;
 
@@ -74,7 +74,7 @@ public class AlgoliaSearchTest {
 
         final Mutable<String> result = new Mutable<>("NOTHING");
 
-        AddPoiListener listener = new AddPoiListener() {
+        AddPOIListener listener = new AddPOIListener() {
             @Override
             public void onSuccess() {
                 result.set("SUCCESS");
@@ -91,11 +91,11 @@ public class AlgoliaSearchTest {
             }
         };
 
-        algolia.addPoi(poi, listener);
+        algolia.addPOI(poi, listener);
         handler.getValue().requestCompleted(null, null);
         assertThat(result.get(), is("SUCCESS"));
 
-        algolia.addPoi(poiFail, listener);
+        algolia.addPOI(poiFail, listener);
         assertThat(result.get(), is("FAILURE"));
     }
 

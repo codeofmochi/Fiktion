@@ -115,4 +115,11 @@
     <string name="places_in_wishlist">Places in %s \'s wishlist</string>
     <string name="places_in_favorites">Places in %s \'s favorites</string>
     <string name="fullscreen_image">Fullscreen image</string>
+    <string name="request_failed">Request failed</string>
+    <string name="friend_added">Friend added</string>
+    <string name="friend_request_ignored">Friend request ignored</string>
+    <string name="deletion_confirmation_of">Do you really want to delete %s ?</string>
+    <string name="friend_deleted">Friend deleted</string>
+    <string name="friend_request_sent">Friend request sent</string>
+    <string name="already_in_friend_list">User already in friend list</string>
 </resources>
