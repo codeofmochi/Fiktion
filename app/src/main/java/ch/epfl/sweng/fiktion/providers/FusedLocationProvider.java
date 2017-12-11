@@ -18,7 +18,7 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
  * Created by Rodrigo on 11.12.2017.
  */
 
-public class FusedLocationProvider extends LocationProvider {
+public class FusedLocationProvider extends CurrentLocationProvider {
     private FusedLocationProviderClient mFuseProvider;
 
     public FusedLocationProvider(Activity ctx) {
@@ -34,12 +34,6 @@ public class FusedLocationProvider extends LocationProvider {
         mFuseProvider = mockProv;
     }
 
-    /**
-     * Checks the permissions and starts a request for a lastLocation of the device
-     *
-     * @param ctx      Activity that requests the lastLocation
-     * @param listener handles the actions after the request is successful
-     */
     public void getLastLocation(Activity ctx, final OnSuccessListener<Location> listener) {
         // check permissions
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION)

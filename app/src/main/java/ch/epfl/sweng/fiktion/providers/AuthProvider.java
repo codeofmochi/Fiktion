@@ -27,14 +27,6 @@ public abstract class AuthProvider {
         return auth;
     }
 
-    /**
-     * Sets the authentication with given instance
-     *
-     * @param authInstance Mock of the authentication instance
-     */
-    public static void setInstance(FirebaseAuthProvider authInstance) {
-        auth = authInstance;
-    }
 
     /**
      * Destroys current authentication instance

@@ -51,6 +51,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.CurrentLocationProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FusedLocationProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
@@ -93,7 +94,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             dialog.dismiss();
         }
     };
-    private FusedLocationProvider mFusedProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +101,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         includeLayout = R.layout.activity_poipage;
         super.onCreate(savedInstanceState);
 
-        // location provider
-        mFusedProvider = new FusedLocationProvider((Activity) ctx);
         //picture button
         addPictureButton = (Button) findViewById(R.id.addPictureButton);
         addPictureButton.setOnClickListener(new View.OnClickListener() {
@@ -218,7 +216,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // add POI to its Visited list if it is not already there
 
         if (!user.getVisited().contains(poiName)) {
-            mFusedProvider.getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
+            CurrentLocationProvider.getInstance((Activity)ctx).getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
                     if (location != null) {

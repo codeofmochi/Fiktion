@@ -280,6 +280,7 @@ public class AddPOIActivityTest {
         addPoiScroll.perform(swipeUpCenterTopFast());
         closeSoftKeyboard();
         addPoiFinish.perform(click());
+        closeSoftKeyboard();
         onView(withId(R.id.menu_scroll)).perform(swipeUpCenterTopFast());
         onView(withId(R.id.title)).check(matches(withText("poiTest4")));
     }
