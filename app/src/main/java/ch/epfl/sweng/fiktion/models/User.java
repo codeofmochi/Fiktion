@@ -209,7 +209,7 @@ public class User {
      * @param userID The ID of the sender
      */
     public void removeRequest(final String userID) {
-        if(friendRequests.contains(userID)) {
+        if (friendRequests.contains(userID)) {
             friendRequests.remove(userID);
         }
     }
@@ -219,7 +219,7 @@ public class User {
      * @return The user without userID in his requests
      */
     public User removeRequestAndGet(final String userID) {
-        if(friendRequests.contains(userID)) {
+        if (friendRequests.contains(userID)) {
             friendRequests.remove(userID);
         }
         return this;
@@ -249,7 +249,7 @@ public class User {
      * @param userID The ID of the friend we want to remove
      */
     public void removeFriend(final String userID) {
-        if(friendlist.contains(userID)) {
+        if (friendlist.contains(userID)) {
             friendlist.remove(userID);
         }
     }
@@ -259,7 +259,7 @@ public class User {
      * @return The user without userID in his friendlist
      */
     public User removeFriendAndGet(final String userID) {
-        if(friendlist.contains(userID)) {
+        if (friendlist.contains(userID)) {
             friendlist.remove(userID);
         }
         return this;
@@ -562,12 +562,12 @@ public class User {
         return Collections.unmodifiableSet(new TreeSet<>(upvoted));
     }
 
-    public void updateSettingsRadius(int radius, final DatabaseProvider.ModifyUserListener listener){
+    public void updateSettingsRadius(int radius, final DatabaseProvider.ModifyUserListener listener) {
         settings.updateSearchRadius(radius);
         DatabaseProvider.getInstance().modifyUser(this, listener);
     }
 
-    public Settings getSettings(){
+    public Settings getSettings() {
         return settings;
     }
 }
