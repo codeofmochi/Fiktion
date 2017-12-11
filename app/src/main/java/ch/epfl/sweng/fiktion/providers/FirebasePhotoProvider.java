@@ -147,8 +147,8 @@ public class FirebasePhotoProvider extends PhotoProvider {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // For every photo name, download the associated photo from firebase
-                String photoRef = dataSnapshot.getValue() + ".jpg";
-                listener.onNewValue(photoRef);
+                String photoName = dataSnapshot.getValue() + ".jpg";
+                listener.onNewValue(photoName);
             }
 
             @Override

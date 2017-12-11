@@ -220,15 +220,24 @@ public class POIPageActivityTest {
 
         final List<Bitmap> bitmaps = new ArrayList<>();
 
-        PhotoProvider.getInstance().downloadPOIBitmaps(poiTest.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
+        PhotoProvider.getInstance().getPOIPhotoNames(poiTest.name(), ALL_PHOTOS, new PhotoProvider.GetPhotoNamesListener() {
             @Override
-            public void onNewValue(Bitmap b) {
-                bitmaps.add(b);
+            public void onNewValue(String photoName) {
+                PhotoProvider.getInstance().downloadPOIBitmap(poiTest.name(), photoName, new PhotoProvider.DownloadBitmapListener() {
+                    @Override
+                    public void onNewValue(Bitmap b) {
+                        bitmaps.add(b);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+
+                });
             }
 
             @Override
             public void onFailure() {
-
             }
         });
 
@@ -278,6 +287,9 @@ public class POIPageActivityTest {
                 assertThat(((LinearLayout) view).getChildCount(), is(2));
             }
         });
+
+        assertTrue(toastRule.getActivity().deleteFile(poiTest.name() + "0"));
+        assertTrue(toastRule.getActivity().deleteFile(poiTest.name() + "1"));
     }
 
     private User user;

@@ -56,7 +56,7 @@ public class LocalPhotoProvider extends PhotoProvider {
     @Override
     public void downloadPOIBitmap(String poiName, String photoName, DownloadBitmapListener listener) {
         if (bitmaps.containsKey(poiName)) {
-            Map<String, Bitmap> poiPhotos = bitmaps.get(photoName);
+            Map<String, Bitmap> poiPhotos = bitmaps.get(poiName);
             if (poiPhotos.containsKey(photoName)) {
                 listener.onNewValue(poiPhotos.get(photoName));
                 return;

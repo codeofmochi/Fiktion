@@ -18,6 +18,8 @@ import com.google.firebase.storage.UploadTask;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -25,11 +27,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.io.OutputStream;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.providers.FirebasePhotoProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.utils.Mutable;
 
 import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +44,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,30 +56,18 @@ import static org.mockito.Mockito.when;
 public class FirebasePhotoTest {
 
     @Mock
-    StorageReference stRef;
+    private StorageReference stRef;
 
     @Mock
-    DatabaseReference dbRef;
+    private DatabaseReference dbRef;
+
+    @Captor
+    private ArgumentCaptor<OnSuccessListener> successListener;
+
+    @Captor
+    private ArgumentCaptor<OnFailureListener> failureListener;
 
     private FirebasePhotoProvider photoProvider;
-
-    private OnFailureListener failureListener;
-
-    private OnSuccessListener successListener;
-
-    private OnProgressListener progressListener;
-
-    private void setFailureListener(OnFailureListener failureListener) {
-        this.failureListener = failureListener;
-    }
-
-    private void setSuccessListener(OnSuccessListener successListener) {
-        this.successListener = successListener;
-    }
-
-    private void setProgressListener(OnProgressListener progressListener) {
-        this.progressListener = progressListener;
-    }
 
     enum Result {
         SUCCESS, FAILURE, NEWPHOTO, NOTHING
@@ -97,38 +93,15 @@ public class FirebasePhotoTest {
         when(dbRef.child(anyString())).thenReturn(dbRef);
     }
 
-    private ValueEventListener vel;
-
-    private void setVel(ValueEventListener vel) {
-        this.vel = vel;
-    }
-
     @Test
     public void uploadTest() {
         UploadTask uploadTask = mock(UploadTask.class);
         when(stRef.putBytes(any(byte[].class))).thenReturn(uploadTask);
         final StorageTask<UploadTask.TaskSnapshot> storageTask = mock(StorageTask.class);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setFailureListener((OnFailureListener) invocation.getArgument(0));
-                return storageTask;
-            }
-        }).when(uploadTask).addOnFailureListener(any(OnFailureListener.class));
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setSuccessListener((OnSuccessListener) invocation.getArgument(0));
-                return storageTask;
-            }
-        }).when(storageTask).addOnSuccessListener(any(OnSuccessListener.class));
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setProgressListener((OnProgressListener) invocation.getArgument(0));
-                return storageTask;
-            }
-        }).when(storageTask).addOnProgressListener(any(OnProgressListener.class));
+        when(uploadTask.addOnFailureListener(failureListener.capture())).thenReturn(storageTask);
+        when(storageTask.addOnSuccessListener(successListener.capture())).thenReturn(storageTask);
+        ArgumentCaptor<OnProgressListener> progressListener = ArgumentCaptor.forClass(OnProgressListener.class);
+        when(storageTask.addOnProgressListener(progressListener.capture())).thenReturn(storageTask);
         when(dbRef.setValue(anyString())).thenReturn(null);
 
         Bitmap bitmap = mock(Bitmap.class);
@@ -141,13 +114,8 @@ public class FirebasePhotoTest {
             }
         }).when(bitmap).compress(any(Bitmap.CompressFormat.class), anyInt(), any(OutputStream.class));
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setVel((ValueEventListener) invocation.getArgument(0));
-                return null;
-            }
-        }).when(dbRef).addListenerForSingleValueEvent(any(ValueEventListener.class));
+        ArgumentCaptor<ValueEventListener> vel = ArgumentCaptor.forClass(ValueEventListener.class);
+        doNothing().when(dbRef).addListenerForSingleValueEvent(vel.capture());
 
         DataSnapshot velSnapshot = mock(DataSnapshot.class);
         when(velSnapshot.getChildrenCount()).thenReturn((long) 2);
@@ -172,57 +140,73 @@ public class FirebasePhotoTest {
 
         photoProvider.uploadPOIBitmap(bitmap, "poiTest", listener);
         UploadTask.TaskSnapshot snapshot = mock(UploadTask.TaskSnapshot.class);
-        failureListener.onFailure(new Exception());
+        failureListener.getValue().onFailure(new Exception());
         assertThat(result, is(Result.FAILURE));
-        successListener.onSuccess(snapshot);
-        vel.onDataChange(velSnapshot);
+        successListener.getValue().onSuccess(snapshot);
+        vel.getValue().onDataChange(velSnapshot);
         assertThat(result, is(Result.SUCCESS));
-        vel.onCancelled(null);
+        vel.getValue().onCancelled(null);
         assertThat(result, is(Result.FAILURE));
 
         when(snapshot.getBytesTransferred()).thenReturn((long) 2);
         when(snapshot.getTotalByteCount()).thenReturn((long) 4);
-        progressListener.onProgress(snapshot);
+        progressListener.getValue().onProgress(snapshot);
         assertThat(progress, is(50.0));
         when(snapshot.getTotalByteCount()).thenReturn((long) 0);
-        progressListener.onProgress(snapshot);
+        progressListener.getValue().onProgress(snapshot);
         assertThat(progress, is(100.0));
     }
 
-    private ChildEventListener cel;
-
-    private void setCel(ChildEventListener cel) {
-        this.cel = cel;
-    }
-
     @Test
-    public void downloadTest() {
+    public void getPOIPhotoNamesTest() {
         when(dbRef.orderByKey()).thenReturn(dbRef);
         when(dbRef.limitToFirst(anyInt())).thenReturn(dbRef);
 
-        doAnswer(new Answer() {
+        ArgumentCaptor<ChildEventListener> cel = ArgumentCaptor.forClass(ChildEventListener.class);
+
+        when(dbRef.addChildEventListener(cel.capture())).thenReturn(null);
+
+        final Set<String> photoNames = new TreeSet<>();
+        final Mutable<Boolean> isFailure = new Mutable<>(false);
+        PhotoProvider.GetPhotoNamesListener listener = new PhotoProvider.GetPhotoNamesListener() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setCel((ChildEventListener) invocation.getArgument(0));
-                return null;
+            public void onNewValue(String photoName) {
+                photoNames.add(photoName);
             }
-        }).when(dbRef).addChildEventListener(any(ChildEventListener.class));
+
+            @Override
+            public void onFailure() {
+                isFailure.set(true);
+            }
+        };
+
+        photoProvider.getPOIPhotoNames("poi", ALL_PHOTOS, listener);
+        photoProvider.getPOIPhotoNames("poi", 3, listener);
+        DataSnapshot snapshot = mock(DataSnapshot.class);
+        when(snapshot.getValue()).thenReturn("42");
+        cel.getValue().onChildAdded(snapshot, "");
+        assertTrue(photoNames.contains("42.jpg"));
+        when(snapshot.getValue()).thenReturn("360");
+        cel.getValue().onChildAdded(snapshot, "");
+        assertTrue(photoNames.contains("360.jpg"));
+        assertThat(photoNames.size(), is(2));
+        assertFalse(isFailure.get());
+
+        cel.getValue().onChildChanged(snapshot, "");
+        cel.getValue().onChildRemoved(snapshot);
+        cel.getValue().onChildMoved(snapshot, "");
+        assertFalse(isFailure.get());
+        cel.getValue().onCancelled(null);
+        assertTrue(isFailure.get());
+
+    }
+
+    @Test
+    public void downloadPOIBitmapTest() {
         final Task<byte[]> task = mock(Task.class);
         when(stRef.getBytes(anyLong())).thenReturn(task);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setSuccessListener((OnSuccessListener) invocation.getArgument(0));
-                return task;
-            }
-        }).when(task).addOnSuccessListener(any(OnSuccessListener.class));
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                setFailureListener((OnFailureListener) invocation.getArgument(0));
-                return task;
-            }
-        }).when(task).addOnFailureListener(any(OnFailureListener.class));
+        when(task.addOnSuccessListener(successListener.capture())).thenReturn(task);
+        when(task.addOnFailureListener(failureListener.capture())).thenReturn(task);
 
         PhotoProvider.DownloadBitmapListener listener = new PhotoProvider.DownloadBitmapListener() {
             @Override
@@ -235,21 +219,9 @@ public class FirebasePhotoTest {
                 setResult(Result.FAILURE);
             }
         };
-        Mockito.mock(BitmapFactory.class);
 
-        DataSnapshot snapshot = mock(DataSnapshot.class);
-        when(snapshot.getValue()).thenReturn("value");
-
-        photoProvider.downloadPOIBitmaps("name", ALL_PHOTOS, listener);
-        photoProvider.downloadPOIBitmaps("name", 1, listener);
-
-        cel.onChildChanged(snapshot, "");
-        cel.onChildMoved(snapshot, "");
-        cel.onChildRemoved(snapshot);
-        cel.onCancelled(null);
+        photoProvider.downloadPOIBitmap("poi", "photo", listener);
+        failureListener.getValue().onFailure(new Exception());
         assertThat(result, is(Result.FAILURE));
-        cel.onChildAdded(snapshot, "");
-        failureListener.onFailure(new Exception());
-        setResult(Result.NOTHING);
     }
 }
