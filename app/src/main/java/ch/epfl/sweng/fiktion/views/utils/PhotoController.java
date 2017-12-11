@@ -3,7 +3,7 @@ package ch.epfl.sweng.fiktion.views.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
+import android.util.LruCache;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -20,6 +20,14 @@ import ch.epfl.sweng.fiktion.providers.PhotoProvider;
  * @author pedro
  */
 public class PhotoController {
+    // LRU cache
+    // only use 1/8 of memory
+    private static final int CACHE_SIZE = (int) Runtime.getRuntime().maxMemory() / 8;
+    private static LruCache<String, Bitmap> bitmapCache = new LruCache<String, Bitmap>(CACHE_SIZE) {
+        protected int sizeOf(String key, Bitmap value) {
+            return value.getByteCount();
+        }
+    };
 
     public interface GetBitmapsListener extends Get<Bitmap>, Failure {
     }
@@ -29,22 +37,33 @@ public class PhotoController {
         PhotoProvider.getInstance().getPOIPhotoNames(poiName, numberOfBitmaps, new PhotoProvider.GetPhotoNamesListener() {
             @Override
             public void onNewValue(final String photoName) {
+                // check if it is in the cache
+                Bitmap bitmap = bitmapCache.get(photoName);
+                if (bitmap != null) {
+                    listener.onNewValue(bitmap);
+                    return;
+                }
+
                 try {
                     // try to get the bitmap from storage
                     FileInputStream fileInputStream = ctx.openFileInput(photoName);
                     Bitmap b = BitmapFactory.decodeStream(fileInputStream);
                     fileInputStream.close();
                     listener.onNewValue(b);
-                    Log.d("mylogs", "onNewValue: HIT");
+
+                    // put the bitmap in the cache
+                    bitmapCache.put(photoName, b);
                 } catch (IOException e) {
-                    Log.d("mylogs", "onNewValue: MISS");
                     // download the bitmap with the photo name
                     PhotoProvider.getInstance().downloadPOIBitmap(poiName, photoName, new PhotoProvider.DownloadBitmapListener() {
                         @Override
                         public void onNewValue(Bitmap b) {
                             listener.onNewValue(b);
 
-                            // put the bitmap in storage
+                            // put the bitmap in the cache
+                            bitmapCache.put(photoName, b);
+
+                            // put the bitmap in the internal storage
                             try {
                                 ByteArrayOutputStream photoBytes = new ByteArrayOutputStream();
                                 b.compress(Bitmap.CompressFormat.JPEG, 100, photoBytes);
