@@ -149,14 +149,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
         // get POI from database
         DatabaseProvider.getInstance().getPOI(poiName, new DatabaseProvider.GetPOIListener() {
-            /**
-             * What to do with the retrieved object
-             *
-             * @param value the retrieved object
-             */
+
             @Override
             public void onNewValue(PointOfInterest value) {
-                setPOI(poi);
+                setPOI(value);
                 // initialize user if he is connected
                 AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
                     @Override
@@ -166,7 +162,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
                     @Override
                     public void onNewValue(User value) {
-                        setUser(user);
+                        setUser(value);
                         // check if user has not yet visited this poi and do so otherwise
                         visitPOI();
                         if (user.getUpvoted().contains(poiName)) {
@@ -194,7 +190,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 // hide loading spinner
                 ProgressBar spinner = (ProgressBar) findViewById(R.id.loadingSpinner);
                 spinner.setVisibility(View.GONE);
-
             }
 
             @Override
