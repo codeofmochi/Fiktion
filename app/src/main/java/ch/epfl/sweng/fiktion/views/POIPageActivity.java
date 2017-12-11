@@ -231,12 +231,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                         user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
                             @Override
                             public void onSuccess() {
-                                Toast.makeText(ctx, user.getName() + " visited " + poiName, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ctx, "Visiting " + poiName, Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onDoesntExist() {
-                                Toast.makeText(ctx, poiName + "does not exist", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override

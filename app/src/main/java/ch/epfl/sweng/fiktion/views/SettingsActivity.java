@@ -126,17 +126,16 @@ public class SettingsActivity extends MenuDrawerActivity {
                             @Override
                             public void onSuccess() {
                                 Config.settings = settings;
-                                Toast.makeText(ctx, "Updated search radius value!", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onDoesntExist() {
-                                Toast.makeText(ctx, "User does not exist in database!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onFailure() {
-                                Toast.makeText(ctx, "Failed to updated search radius value!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ctx, "Failed to updated search radius value", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
