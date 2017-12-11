@@ -274,7 +274,6 @@ public class User {
     public void visit(final String poiID, final DatabaseProvider.ModifyUserListener listener) {
         if (!visited.contains(poiID)) {
             visited.addFirst(poiID);
-            assert(visited.contains(poiID));
             DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
                 @Override
                 public void onSuccess() {
