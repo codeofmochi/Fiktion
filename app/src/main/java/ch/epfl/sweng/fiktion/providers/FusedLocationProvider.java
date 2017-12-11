@@ -8,13 +8,13 @@ import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 
-/** Provider of device's last know location using FusedLocationProviderCLient
+/**
+ * Provider of device's last know location using FusedLocationProviderCLient
  * Created by Rodrigo on 11.12.2017.
  */
 
@@ -27,6 +27,7 @@ public class FusedLocationProvider extends LocationProvider {
 
     /**
      * Constructor with a mocked instance
+     *
      * @param mockProv mocked instance
      */
     public FusedLocationProvider(FusedLocationProviderClient mockProv) {
@@ -35,7 +36,8 @@ public class FusedLocationProvider extends LocationProvider {
 
     /**
      * Checks the permissions and starts a request for a lastLocation of the device
-     * @param ctx Activity that requests the lastLocation
+     *
+     * @param ctx      Activity that requests the lastLocation
      * @param listener handles the actions after the request is successful
      */
     public void getLastLocation(Activity ctx, final OnSuccessListener<Location> listener) {
