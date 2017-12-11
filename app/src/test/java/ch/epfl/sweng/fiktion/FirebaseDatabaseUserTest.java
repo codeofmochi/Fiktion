@@ -130,12 +130,12 @@ public class FirebaseDatabaseUserTest {
 
         DatabaseProvider.GetUserListener listener = new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 setResult(SUCCESS);
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 

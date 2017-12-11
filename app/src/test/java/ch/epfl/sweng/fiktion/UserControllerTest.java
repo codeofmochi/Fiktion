@@ -152,12 +152,12 @@ public class UserControllerTest {
             public void onSuccess() {
                 DatabaseProvider.getInstance().getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User u) {
+                    public void onNewValue(User u) {
                         assertTrue(u.getRequests().contains(user.getID()));
                     }
 
                     @Override
-                    public void onModified(User user) {
+                    public void onModifiedValue(User user) {
                         Assert.fail();
                     }
 
@@ -335,12 +335,12 @@ public class UserControllerTest {
             public void onNewFriend() {
                 DatabaseProvider.getInstance().getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User u) {
+                    public void onNewValue(User u) {
                         assertTrue(u.getFriendlist().contains(userFR.getID()));
                     }
 
                     @Override
-                    public void onModified(User user) {
+                    public void onModifiedValue(User user) {
                         Assert.fail();
                     }
 
@@ -383,12 +383,12 @@ public class UserControllerTest {
             public void onSuccess() {
                 DatabaseProvider.getInstance().getUserById(userFR.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User u) {
+                    public void onNewValue(User u) {
                         assertTrue(u.getFriendlist().contains(user1.getID()));
                     }
 
                     @Override
-                    public void onModified(User user) {
+                    public void onModifiedValue(User user) {
                         Assert.fail();
                     }
 
@@ -446,11 +446,11 @@ public class UserControllerTest {
             public void onDoesntExist() {
                 DatabaseProvider.getInstance().getUserById(userFakeR.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User u) {
+                    public void onNewValue(User u) {
                     }
 
                     @Override
-                    public void onModified(User user) {
+                    public void onModifiedValue(User user) {
                         Assert.fail();
                     }
 
@@ -498,12 +498,12 @@ public class UserControllerTest {
             public void onSuccess() {
                 DatabaseProvider.getInstance().getUserById(user1.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User u) {
+                    public void onNewValue(User u) {
                         assertTrue(u.getRequests().isEmpty());
                     }
 
                     @Override
-                    public void onModified(User user) {
+                    public void onModifiedValue(User user) {
                         Assert.fail();
                     }
 
@@ -551,12 +551,12 @@ public class UserControllerTest {
             public void onSuccess() {
                 DatabaseProvider.getInstance().getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User u) {
+                    public void onNewValue(User u) {
                         assertTrue(u.getFriendlist().isEmpty());
                     }
 
                     @Override
-                    public void onModified(User user) {
+                    public void onModifiedValue(User user) {
                         Assert.fail();
                     }
 

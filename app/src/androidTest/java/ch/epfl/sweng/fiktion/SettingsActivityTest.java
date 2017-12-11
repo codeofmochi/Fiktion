@@ -76,12 +76,12 @@ public class SettingsActivityTest {
         assertThat(Config.settings.getSearchRadius(), is(200));
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(user.getSettings().getSearchRadius(), is(200));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 
@@ -114,12 +114,12 @@ public class SettingsActivityTest {
         assertThat(Config.settings.getSearchRadius(), is(1));
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(user.getSettings().getSearchRadius(), is(1));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 

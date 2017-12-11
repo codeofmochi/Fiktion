@@ -1,5 +1,11 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.listeners.AlreadyExists;
+import ch.epfl.sweng.fiktion.listeners.DoesntExist;
+import ch.epfl.sweng.fiktion.listeners.Failure;
+import ch.epfl.sweng.fiktion.listeners.Get;
+import ch.epfl.sweng.fiktion.listeners.Modify;
+import ch.epfl.sweng.fiktion.listeners.Success;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
@@ -50,102 +56,31 @@ public abstract class DatabaseProvider {
     /**
      * Listener that listens the result of the addition of a point of interest
      */
-    public interface AddPoiListener {
-
-        /**
-         * what to do if the addition succeeded
-         */
-        void onSuccess();
-
-        /**
-         * what to do if the poi already exists
-         */
-        void onAlreadyExists();
-
-        /**
-         * what to do if the addition failed
-         */
-        void onFailure();
+    public interface AddPOIListener extends Success, AlreadyExists, Failure {
     }
 
     /**
      * Listener that listens the result of the retrieval of a point of interest
      */
-    public interface GetPoiListener {
-        /**
-         * what to do if the retrieval succeeds
-         *
-         * @param poi the retrieved point of interest
-         */
-        void onSuccess(PointOfInterest poi);
-
-        /**
-         * what to do if the poi is modified
-         *
-         * @param poi the modified poi
-         */
-        void onModified(PointOfInterest poi);
-
-        /**
-         * what to do if no mathing point of interest is found
-         */
-        void onDoesntExist();
-
-        /**
-         * what to do if the retrieval failed
-         */
-        void onFailure();
+    public interface GetPOIListener extends Get<PointOfInterest>, Modify<PointOfInterest>, DoesntExist, Failure {
     }
 
     /**
      * Listener that listens the result of the modification of a point of interest
      */
-    public interface ModifyPOIListener {
-        /**
-         * what to do if the modification succeeds
-         */
-        void onSuccess();
-
-        /**
-         * what to do if the poi doesn't exist
-         */
-        void onDoesntExist();
-
-        /**
-         * what to do if the modification failed
-         */
-        void onFailure();
-    }
-
-
-    /**
-     * parent listener for searching points of interest
-     */
-    private interface SearchPOIsListener {
-
-        /**
-         * what to do when we get a new near point of interest
-         *
-         * @param poi the point of interest
-         */
-        void onNewValue(PointOfInterest poi);
-
-        /**
-         * what to do if operation failed
-         */
-        void onFailure();
+    public interface ModifyPOIListener extends Success, DoesntExist, Failure {
     }
 
     /**
      * Listener that listens the results of searching near points of interest
      */
-    public interface FindNearPoisListener extends SearchPOIsListener {
+    public interface FindNearPOIsListener extends Get<PointOfInterest>, Failure {
     }
 
     /**
      * Listener that  listens the results of searching points of interest by text
      */
-    public interface SearchPOIByTextListener extends SearchPOIsListener {
+    public interface SearchPOIByTextListener extends Get<PointOfInterest>, Failure {
     }
 
     /**
@@ -154,7 +89,7 @@ public abstract class DatabaseProvider {
      * @param poi      the point of interest
      * @param listener the listener
      */
-    public abstract void addPoi(final PointOfInterest poi, final AddPoiListener listener);
+    public abstract void addPOI(final PointOfInterest poi, final AddPOIListener listener);
 
     /**
      * get the point of interest from the database, inform the listener of the result
@@ -162,7 +97,7 @@ public abstract class DatabaseProvider {
      * @param name     the name of the desired point of interest
      * @param listener the listener
      */
-    public abstract void getPoi(String name, final GetPoiListener listener);
+    public abstract void getPOI(String name, final GetPOIListener listener);
 
     /**
      * Modify an existing point of interest and inform the listener of the result, the modification
@@ -197,7 +132,7 @@ public abstract class DatabaseProvider {
      * @param radius   the radius
      * @param listener the listener
      */
-    public abstract void findNearPois(Position pos, int radius, FindNearPoisListener listener);
+    public abstract void findNearPOIs(Position pos, int radius, FindNearPOIsListener listener);
 
     /**
      * seach the points of interest that contain a text in one of their fields and "send" them to
@@ -211,82 +146,25 @@ public abstract class DatabaseProvider {
     /**
      * Listener that listens the result of the addition of a user
      */
-    public interface AddUserListener {
-
-        /**
-         * what to do if the addition succeeded
-         */
-        void onSuccess();
-
-        /**
-         * what to do if the poi already exists
-         */
-        void onAlreadyExists();
-
-        /**
-         * what to do if the addition failed
-         */
-        void onFailure();
+    public interface AddUserListener extends Success, AlreadyExists, Failure {
     }
 
     /**
      * Listener that listens the result of the retrieval of a user
      */
-    public interface GetUserListener {
-
-        /**
-         * what to do if the retrieval succeeds
-         *
-         * @param user the retrieved user
-         */
-        void onSuccess(User user);
-
-        /**
-         * what to do if the user is modified
-         *
-         * @param user the modified user
-         */
-        void onModified(User user);
-
-        /**
-         * what to do if no mathing user id is found
-         */
-        void onDoesntExist();
-
-        /**
-         * what to do if the retrieval failed
-         */
-        void onFailure();
-    }
-
-    private interface OperationOnExistingUserListener {
-
-        /**
-         * what to do if the deletion succeeded
-         */
-        void onSuccess();
-
-        /**
-         * what to do if the user doesn't exist
-         */
-        void onDoesntExist();
-
-        /**
-         * what to do if the deletion failed
-         */
-        void onFailure();
+    public interface GetUserListener extends Get<User>, Modify<User>, DoesntExist, Failure {
     }
 
     /**
      * Listener that listens the result of the deletion of a user
      */
-    public interface DeleteUserListener extends OperationOnExistingUserListener {
+    public interface DeleteUserListener extends Success, DoesntExist, Failure {
     }
 
     /**
      * Listener that listens the result of the modification of a user
      */
-    public interface ModifyUserListener extends OperationOnExistingUserListener {
+    public interface ModifyUserListener extends Success, DoesntExist, Failure {
     }
 
     /**
@@ -324,88 +202,25 @@ public abstract class DatabaseProvider {
     /**
      * Listener that listens the result of the add
      */
-    public interface AddCommentListener {
-
-        /**
-         * what to do if the addition succeeded
-         */
-        void onSuccess();
-
-        /**
-         * what to do if the addition failed
-         */
-        void onFailure();
+    public interface AddCommentListener extends Success, Failure {
     }
 
     /**
      * Listener that listens the result of the retrieval of a comment
      */
-    public interface GetCommentListener {
-
-        /**
-         * what to do with the retrieved comment
-         *
-         * @param comment the comment
-         */
-        void onSuccess(Comment comment);
-
-        /**
-         * what to do if the comment is modified
-         *
-         * @param comment the modified comment
-         */
-        void onModified(Comment comment);
-
-        /**
-         * what to do if the comment doesn't exist
-         */
-        void onDoesntExist();
-
-        /**
-         * what to do if the retrieval fails
-         */
-        void onFailure();
+    public interface GetCommentListener extends Get<Comment>, Modify<Comment>, DoesntExist, Failure {
     }
 
     /**
      * Listener that listens the retrieving of comments
      */
-    public interface GetCommentsListener {
-
-        /**
-         * what to do when a comment is retrieved
-         *
-         * @param comment a retrieved comment
-         */
-        void onNewValue(Comment comment);
-
-        /**
-         * what to do when an already retrieved comment is modified
-         *
-         * @param comment the modified comment
-         */
-        void onModifiedValue(Comment comment);
-
-        /**
-         * what to do when the operation fails
-         */
-        void onFailure();
+    public interface GetCommentsListener extends Get<Comment>, Modify<Comment>, Failure {
     }
 
     /**
      * Listener that listens the result of a vote
      */
-    public interface VoteListener {
-
-        /**
-         * what to do if the voting succeeds
-         */
-        void onSuccess();
-
-        /**
-         * what to do if the voting fails
-         */
-        void onFailure();
+    public interface VoteListener extends Success, Failure {
     }
 
     public final static int UPVOTE = 1;
@@ -415,19 +230,7 @@ public abstract class DatabaseProvider {
     /**
      * Listener that listens the result of the retrieval of a vote
      */
-    public interface GetVoteListener {
-
-        /**
-         * what to do with the retrieved vote
-         *
-         * @param vote the vote
-         */
-        void onSuccess(int vote);
-
-        /**
-         * what to do if the retrieval fails
-         */
-        void onFailure();
+    public interface GetVoteListener extends Get<Integer>, Failure {
     }
 
     /**

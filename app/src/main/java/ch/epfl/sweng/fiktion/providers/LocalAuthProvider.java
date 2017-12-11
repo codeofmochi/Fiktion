@@ -166,7 +166,7 @@ public class LocalAuthProvider extends AuthProvider {
     @Override
     public void getCurrentUser(DatabaseProvider.GetUserListener listener) {
         if (isConnected()) {
-            listener.onSuccess(currUser);
+            listener.onNewValue(currUser);
         } else {
             listener.onFailure();
         }

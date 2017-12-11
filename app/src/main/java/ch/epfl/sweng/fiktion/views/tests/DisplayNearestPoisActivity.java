@@ -27,7 +27,7 @@ public class DisplayNearestPoisActivity extends AppCompatActivity {
         // Creates a new ListView and adapter to display the research results
         ListView resultsListView = (ListView) findViewById(R.id.displayResultPois);
         resultsListView.setAdapter(adapter);
-        DatabaseProvider.getInstance().findNearPois(position, radius, new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPOIs(position, radius, new DatabaseProvider.FindNearPOIsListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 // add the poi name to the adapter
