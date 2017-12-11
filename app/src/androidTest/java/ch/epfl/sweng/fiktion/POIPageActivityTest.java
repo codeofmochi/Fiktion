@@ -220,7 +220,7 @@ public class POIPageActivityTest {
 
         PhotoProvider.getInstance().downloadPOIBitmaps(poiTest.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewValue(Bitmap b) {
                 bitmaps.add(b);
             }
 

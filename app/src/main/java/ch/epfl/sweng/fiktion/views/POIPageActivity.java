@@ -370,7 +370,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // set the mainImage as the first photo of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewValue(Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
                 mainImage.setImageBitmap(resized);
                 mainImage.setVisibility(View.VISIBLE);
@@ -384,7 +384,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // download the photos of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(final Bitmap b) {
+            public void onNewValue(final Bitmap b) {
 
                 // create a new ImageView which will hold the photo
                 final ImageView imgView = new ImageView(getApplicationContext());

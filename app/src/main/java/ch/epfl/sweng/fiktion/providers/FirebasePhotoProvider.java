@@ -157,7 +157,7 @@ public class FirebasePhotoProvider extends PhotoProvider {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         if (bitmap != null) {
                             // "send" the new bitmap to the listener
-                            listener.onNewPhoto(bitmap);
+                            listener.onNewValue(bitmap);
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
