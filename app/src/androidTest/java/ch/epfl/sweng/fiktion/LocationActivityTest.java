@@ -21,6 +21,9 @@ import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 /**
  * Created by dialexo on 18.10.17.
@@ -116,7 +119,10 @@ public class LocationActivityTest {
             }
 
         } //end of if
+    }
 
-
+    @Test
+    public void showNearbyList() {
+        onView(withId(R.id.nearbyListAcessButton)).perform(click());
     }
 }

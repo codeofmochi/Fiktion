@@ -37,6 +37,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
+import ch.epfl.sweng.fiktion.providers.CurrentLocationProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
@@ -129,6 +130,7 @@ public class POIPageActivityTest {
 
         DatabaseProvider.destroyInstance();
         AuthProvider.destroyInstance();
+        CurrentLocationProvider.destroyInstance();
         DatabaseProvider.getInstance().addPOI(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPOIListener() {
             @Override
             public void onSuccess() {
@@ -538,5 +540,35 @@ public class POIPageActivityTest {
         onView(withText("Wishlist")).perform(click());
     }
 
+    @Test
+    public void addToVisited(){
+        PointOfInterest poiClose = new PointOfInterest("poiClose", new Position(6.56, 46.5167), new TreeSet<String>(), "", 0, "", "");
+        DatabaseProvider.getInstance().addPOI(poiClose, emptyAddPOIListener);
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiClose");
+        toastRule.launchActivity(i);
+
+        AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onNewValue(User value) {
+                assertThat(value.getVisited().contains("poiClose"), is(true));
+            }
+
+            @Override
+            public void onModifiedValue(User value) {
+                Assert.fail();
+            }
+        });
+    }
 
 }

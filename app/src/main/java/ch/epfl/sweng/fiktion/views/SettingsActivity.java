@@ -19,7 +19,6 @@ import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.tests.SocialDemoActivity;
@@ -126,17 +125,16 @@ public class SettingsActivity extends MenuDrawerActivity {
                             @Override
                             public void onSuccess() {
                                 Config.settings = settings;
-                                Toast.makeText(ctx, "Updated search radius value!", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onDoesntExist() {
-                                Toast.makeText(ctx, "User does not exist in database!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onFailure() {
-                                Toast.makeText(ctx, "Failed to updated search radius value!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ctx, "Failed to updated search radius value", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -487,7 +485,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         }
     }
 
-    public void startSocialDemo(View v){
+    public void startSocialDemo(View v) {
         Intent i = new Intent(this, SocialDemoActivity.class);
         this.startActivity(i);
     }
