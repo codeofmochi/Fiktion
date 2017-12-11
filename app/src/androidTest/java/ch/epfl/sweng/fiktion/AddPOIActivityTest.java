@@ -36,7 +36,6 @@ import ch.epfl.sweng.fiktion.providers.GoogleMapsLocationProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
 import ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity;
-import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -66,7 +65,7 @@ public class AddPOIActivityTest {
     public final ActivityTestRule<AddPOIActivity> mActivityRule =
             new ActivityTestRule<>(AddPOIActivity.class);
 
-    private final static DatabaseProvider.AddPoiListener emptyAddPoiListener = new DatabaseProvider.AddPoiListener() {
+    private final static DatabaseProvider.AddPOIListener emptyAddPoiListener = new DatabaseProvider.AddPOIListener() {
         @Override
         public void onSuccess() {
         }
@@ -94,10 +93,10 @@ public class AddPOIActivityTest {
 
             }
         });
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest5",
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("poiTest5",
                 new Position(0, 0), new TreeSet<String>(), "", 0,
                 "", ""), emptyAddPoiListener);
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest6",
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("poiTest6",
                 new Position(1, 2), new TreeSet<String>(), "", 0,
                 "", ""), emptyAddPoiListener);
     }

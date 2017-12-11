@@ -77,7 +77,7 @@ public class POIPageActivityTest {
 
     private static PointOfInterest poiTest = new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", "");
 
-    private static DatabaseProvider.AddPoiListener emptyAddPOIListener = new DatabaseProvider.AddPoiListener() {
+    private static DatabaseProvider.AddPOIListener emptyAddPOIListener = new DatabaseProvider.AddPOIListener() {
         @Override
         public void onSuccess() {
         }
@@ -95,7 +95,7 @@ public class POIPageActivityTest {
     public static void setProviders() {
         //providers.getInstance will return localProviders
         Config.TEST_MODE = true;
-        DatabaseProvider.getInstance().addPoi(poiTest, emptyAddPOIListener);
+        DatabaseProvider.getInstance().addPOI(poiTest, emptyAddPOIListener);
 
         AuthProvider.getInstance().signIn("default@email.ch", "testing", new AuthProvider.AuthListener() {
             @Override
@@ -129,7 +129,7 @@ public class POIPageActivityTest {
 
         DatabaseProvider.destroyInstance();
         AuthProvider.destroyInstance();
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPOIListener() {
             @Override
             public void onSuccess() {
             }
@@ -220,7 +220,7 @@ public class POIPageActivityTest {
 
         PhotoProvider.getInstance().downloadPOIBitmaps(poiTest.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewValue(Bitmap b) {
                 bitmaps.add(b);
             }
 
@@ -289,12 +289,12 @@ public class POIPageActivityTest {
     public void voteTest() {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 setUser(user);
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 
@@ -441,12 +441,12 @@ public class POIPageActivityTest {
         onView(withText("Favourite")).perform(click());
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(user.getFavourites().contains("poiTest"), is(true));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 
@@ -495,12 +495,12 @@ public class POIPageActivityTest {
         onView(withText("Wishlist")).perform(click());
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(user.getWishlist().contains("poiTest"), is(true));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 

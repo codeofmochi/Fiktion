@@ -91,7 +91,7 @@ public class ProfileActivity extends MenuDrawerActivity {
         // get my user infos
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User currUser) {
+            public void onNewValue(User currUser) {
                 // set my infos
                 me = currUser;
                 userCtrl = new UserController(me);
@@ -110,7 +110,7 @@ public class ProfileActivity extends MenuDrawerActivity {
             }
 
             @Override
-            public void onModified(User currUser) {
+            public void onModifiedValue(User currUser) {
                 // reset my infos
                 me = currUser;
                 userCtrl = new UserController(me);
@@ -231,7 +231,7 @@ public class ProfileActivity extends MenuDrawerActivity {
         // get profile from DB
         DatabaseProvider.getInstance().getUserById(userId, new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User u) {
+            public void onNewValue(User u) {
                 // assign user
                 user = u;
                 // display profile
@@ -239,7 +239,7 @@ public class ProfileActivity extends MenuDrawerActivity {
             }
 
             @Override
-            public void onModified(User u) {
+            public void onModifiedValue(User u) {
                 // reassign user
                 user = u;
                 // redisplay profile

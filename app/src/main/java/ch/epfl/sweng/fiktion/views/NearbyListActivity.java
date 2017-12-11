@@ -58,7 +58,7 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
         // trigger a search
         list.removeAllViews();
         list.addView(empty);
-        DatabaseProvider.getInstance().findNearPois(new Position(latitude, longitude), Config.settings.getSearchRadius(), new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPOIs(new Position(latitude, longitude), Config.settings.getSearchRadius(), new DatabaseProvider.FindNearPOIsListener() {
 
             @Override
             public void onNewValue(PointOfInterest poi) {

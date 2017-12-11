@@ -41,7 +41,7 @@ public class FindAndDisplayNearestPoisActivityTest {
     public final ActivityTestRule<FindNearestPoisActivity> mActivityRule =
             new ActivityTestRule<>(FindNearestPoisActivity.class);
 
-    private static final DatabaseProvider.AddPoiListener emptyAddPoiListener = new DatabaseProvider.AddPoiListener() {
+    private static final DatabaseProvider.AddPOIListener emptyAddPoiListener = new DatabaseProvider.AddPOIListener() {
         @Override
         public void onSuccess() {
         }
@@ -58,9 +58,9 @@ public class FindAndDisplayNearestPoisActivityTest {
     @BeforeClass
     public static void setup() {
         Config.TEST_MODE = true;
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("p1", new Position(0.05, 0.05), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("p2", new Position(0.3, 0.3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("p3", new Position(0.6, 0.6), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("p1", new Position(0.05, 0.05), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("p2", new Position(0.3, 0.3), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("p3", new Position(0.6, 0.6), new TreeSet<String>(), "", 0, "", ""), emptyAddPoiListener);
     }
 
     @AfterClass
