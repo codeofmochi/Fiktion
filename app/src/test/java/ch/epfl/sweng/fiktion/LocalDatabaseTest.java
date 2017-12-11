@@ -36,7 +36,7 @@ public class LocalDatabaseTest {
     private User user = new User("user", "user");
     private User user2 = new User("user2", "user2");
 
-    private DatabaseProvider.AddPoiListener emptyAddPOIListener = new DatabaseProvider.AddPoiListener() {
+    private DatabaseProvider.AddPOIListener emptyAddPOIListener = new DatabaseProvider.AddPOIListener() {
         @Override
         public void onSuccess() {
         }
@@ -71,7 +71,7 @@ public class LocalDatabaseTest {
     @Test
     public void addPOITest() {
         final Mutable<String> result = new Mutable<>("");
-        DatabaseProvider.AddPoiListener listener = new DatabaseProvider.AddPoiListener() {
+        DatabaseProvider.AddPOIListener listener = new DatabaseProvider.AddPOIListener() {
             @Override
             public void onSuccess() {
                 result.set("S");
@@ -88,25 +88,25 @@ public class LocalDatabaseTest {
             }
         };
 
-        db.addPoi(poi, listener);
+        db.addPOI(poi, listener);
         assertThat(result.get(), is("S"));
-        db.addPoi(poi, listener);
+        db.addPOI(poi, listener);
         assertThat(result.get(), is("A"));
         PointOfInterest s = poiWithName("ADDPOIS");
         PointOfInterest a = poiWithName("ADDPOIA");
         PointOfInterest f = poiWithName("ADDPOIF");
-        db.addPoi(s, listener);
+        db.addPOI(s, listener);
         assertThat(result.get(), is("S"));
-        db.addPoi(a, listener);
+        db.addPOI(a, listener);
         assertThat(result.get(), is("A"));
-        db.addPoi(f, listener);
+        db.addPOI(f, listener);
         assertThat(result.get(), is("F"));
     }
 
     @Test
     public void getPOITest() {
         final Mutable<String> result = new Mutable<>("");
-        DatabaseProvider.GetPoiListener listener = new DatabaseProvider.GetPoiListener() {
+        DatabaseProvider.GetPOIListener listener = new DatabaseProvider.GetPOIListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 result.set("S");
@@ -127,26 +127,26 @@ public class LocalDatabaseTest {
                 result.set("F");
             }
         };
-        db.getPoi("poi", listener);
+        db.getPOI("poi", listener);
         assertThat(result.get(), is("D"));
 
-        db.addPoi(poi, emptyAddPOIListener);
+        db.addPOI(poi, emptyAddPOIListener);
         assertThat(result.get(), is("S"));
 
-        db.getPoi("poi2", listener);
+        db.getPOI("poi2", listener);
         assertThat(result.get(), is("D"));
 
         String s = "GETPOIS";
         String m = "GETPOIM";
         String d = "GETPOID";
         String f = "GETPOIF";
-        db.getPoi(s, listener);
+        db.getPOI(s, listener);
         assertThat(result.get(), is("S"));
-        db.getPoi(m, listener);
+        db.getPOI(m, listener);
         assertThat(result.get(), is("M"));
-        db.getPoi(d, listener);
+        db.getPOI(d, listener);
         assertThat(result.get(), is("D"));
-        db.getPoi(f, listener);
+        db.getPOI(f, listener);
         assertThat(result.get(), is("F"));
     }
 
@@ -170,7 +170,7 @@ public class LocalDatabaseTest {
             }
         };
 
-        db.addPoi(poi, emptyAddPOIListener);
+        db.addPOI(poi, emptyAddPOIListener);
         db.modifyPOI(poi, listener);
         assertThat(result.get(), is("S"));
         db.modifyPOI(poi2, listener);
@@ -206,7 +206,7 @@ public class LocalDatabaseTest {
             }
         };
 
-        db.addPoi(poi, emptyAddPOIListener);
+        db.addPOI(poi, emptyAddPOIListener);
         db.upvote("poi", listener);
         assertThat(result.get(), is("S"));
         db.upvote("poi2", listener);
@@ -242,7 +242,7 @@ public class LocalDatabaseTest {
             }
         };
 
-        db.addPoi(poi, emptyAddPOIListener);
+        db.addPOI(poi, emptyAddPOIListener);
         db.downvote("poi", listener);
         assertThat(result.get(), is("S"));
         db.downvote("poi2", listener);
@@ -263,7 +263,7 @@ public class LocalDatabaseTest {
         final Mutable<String> result = new Mutable<>("good");
         final Mutable<Integer> count = new Mutable<>(0);
 
-        DatabaseProvider.FindNearPoisListener listener = new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.FindNearPOIsListener listener = new DatabaseProvider.FindNearPOIsListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 count.set(count.get() + 1);
@@ -275,14 +275,14 @@ public class LocalDatabaseTest {
             }
         };
 
-        db.addPoi(poi, emptyAddPOIListener);
+        db.addPOI(poi, emptyAddPOIListener);
         PointOfInterest farPOI = new PointOfInterest("farPOI", new Position(10, 10),
                 new TreeSet<String>(), "", 0, "", "");
-        db.addPoi(farPOI, emptyAddPOIListener);
-        db.findNearPois(new Position(1, 1), 200, listener);
+        db.addPOI(farPOI, emptyAddPOIListener);
+        db.findNearPOIs(new Position(1, 1), 200, listener);
         assertThat(result.get(), is("good"));
         assertThat(count.get(), is(1));
-        db.findNearPois(new Position(1000, 1000), 30, listener);
+        db.findNearPOIs(new Position(1000, 1000), 30, listener);
         assertThat(result.get(), is("F"));
     }
 
@@ -302,11 +302,11 @@ public class LocalDatabaseTest {
             }
         };
 
-        db.addPoi(poi, emptyAddPOIListener);
-        db.addPoi(poiWithName("iop"), emptyAddPOIListener);
+        db.addPOI(poi, emptyAddPOIListener);
+        db.addPOI(poiWithName("iop"), emptyAddPOIListener);
         PointOfInterest countryPOI = new PointOfInterest("oip", new Position(0, 0),
                 new TreeSet<String>(), "", 0, "poi", "");
-        db.addPoi(countryPOI, emptyAddPOIListener);
+        db.addPOI(countryPOI, emptyAddPOIListener);
         db.searchByText("poi", listener);
         assertThat(result.get(), is("good"));
         assertThat(count.get(), is(2));

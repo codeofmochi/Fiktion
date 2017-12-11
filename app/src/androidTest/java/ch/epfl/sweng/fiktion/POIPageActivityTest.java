@@ -77,7 +77,7 @@ public class POIPageActivityTest {
 
     private static PointOfInterest poiTest = new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", "");
 
-    private static DatabaseProvider.AddPoiListener emptyAddPOIListener = new DatabaseProvider.AddPoiListener() {
+    private static DatabaseProvider.AddPOIListener emptyAddPOIListener = new DatabaseProvider.AddPOIListener() {
         @Override
         public void onSuccess() {
         }
@@ -95,7 +95,7 @@ public class POIPageActivityTest {
     public static void setProviders() {
         //providers.getInstance will return localProviders
         Config.TEST_MODE = true;
-        DatabaseProvider.getInstance().addPoi(poiTest, emptyAddPOIListener);
+        DatabaseProvider.getInstance().addPOI(poiTest, emptyAddPOIListener);
 
         AuthProvider.getInstance().signIn("default@email.ch", "testing", new AuthProvider.AuthListener() {
             @Override
@@ -129,7 +129,7 @@ public class POIPageActivityTest {
 
         DatabaseProvider.destroyInstance();
         AuthProvider.destroyInstance();
-        DatabaseProvider.getInstance().addPoi(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPoiListener() {
+        DatabaseProvider.getInstance().addPOI(new PointOfInterest("poiTest", new Position(3, 4), new TreeSet<String>(), "", 0, "", ""), new DatabaseProvider.AddPOIListener() {
             @Override
             public void onSuccess() {
             }

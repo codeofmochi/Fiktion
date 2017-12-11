@@ -93,7 +93,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void addPoi(final PointOfInterest poi, final AddPoiListener listener) {
+    public void addPOI(final PointOfInterest poi, final AddPOIListener listener) {
         final String poiName = poi.name();
 
         if (poiName.isEmpty()) {
@@ -119,7 +119,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     geofire.setLocation(poiName, geoLocation);
 
                     // add the poi also to the search provider
-                    searchProvider.addPoi(poi, new AddPoiListener() {
+                    searchProvider.addPOI(poi, new AddPOIListener() {
                         @Override
                         public void onSuccess() {
                             listener.onSuccess();
@@ -152,7 +152,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getPoi(String poiName, final GetPoiListener listener) {
+    public void getPOI(String poiName, final GetPOIListener listener) {
         if (poiName.isEmpty()) {
             listener.onFailure();
         }
@@ -344,14 +344,14 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void findNearPois(Position pos, int radius, final FindNearPoisListener listener) {
+    public void findNearPOIs(Position pos, int radius, final FindNearPOIsListener listener) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude(), pos.longitude()), radius);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, GeoLocation location) {
                 // for a near poi, retrieve it from the firebase
-                getPoi(key, new GetPoiListener() {
+                getPOI(key, new GetPOIListener() {
                     @Override
                     public void onNewValue(PointOfInterest poi) {
                         // inform the listener that we got a new poi
@@ -409,7 +409,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onSuccess(List<String> poiIDs) {
                 for (String poiID : poiIDs) {
-                    getPoi(poiID, new GetPoiListener() {
+                    getPOI(poiID, new GetPOIListener() {
                         @Override
                         public void onNewValue(PointOfInterest poi) {
                             listener.onNewValue(poi);

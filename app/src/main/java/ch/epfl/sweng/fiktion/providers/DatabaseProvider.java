@@ -56,13 +56,13 @@ public abstract class DatabaseProvider {
     /**
      * Listener that listens the result of the addition of a point of interest
      */
-    public interface AddPoiListener extends Success, AlreadyExists, Failure {
+    public interface AddPOIListener extends Success, AlreadyExists, Failure {
     }
 
     /**
      * Listener that listens the result of the retrieval of a point of interest
      */
-    public interface GetPoiListener extends Get<PointOfInterest>, Modify<PointOfInterest>, DoesntExist, Failure {
+    public interface GetPOIListener extends Get<PointOfInterest>, Modify<PointOfInterest>, DoesntExist, Failure {
     }
 
     /**
@@ -74,7 +74,7 @@ public abstract class DatabaseProvider {
     /**
      * Listener that listens the results of searching near points of interest
      */
-    public interface FindNearPoisListener extends Get<PointOfInterest>, Failure {
+    public interface FindNearPOIsListener extends Get<PointOfInterest>, Failure {
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class DatabaseProvider {
      * @param poi      the point of interest
      * @param listener the listener
      */
-    public abstract void addPoi(final PointOfInterest poi, final AddPoiListener listener);
+    public abstract void addPOI(final PointOfInterest poi, final AddPOIListener listener);
 
     /**
      * get the point of interest from the database, inform the listener of the result
@@ -97,7 +97,7 @@ public abstract class DatabaseProvider {
      * @param name     the name of the desired point of interest
      * @param listener the listener
      */
-    public abstract void getPoi(String name, final GetPoiListener listener);
+    public abstract void getPOI(String name, final GetPOIListener listener);
 
     /**
      * Modify an existing point of interest and inform the listener of the result, the modification
@@ -132,7 +132,7 @@ public abstract class DatabaseProvider {
      * @param radius   the radius
      * @param listener the listener
      */
-    public abstract void findNearPois(Position pos, int radius, FindNearPoisListener listener);
+    public abstract void findNearPOIs(Position pos, int radius, FindNearPOIsListener listener);
 
     /**
      * seach the points of interest that contain a text in one of their fields and "send" them to

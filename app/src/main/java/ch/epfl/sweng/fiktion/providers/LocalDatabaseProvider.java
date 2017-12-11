@@ -63,13 +63,13 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     private Map<String, Set<GetCommentListener>> getCommentListeners = new TreeMap<>();
     private Map<String, Set<GetCommentsListener>> getCommentsListeners = new TreeMap<>();
-    private Map<String, Set<GetPoiListener>> getPOIListeners = new TreeMap();
+    private Map<String, Set<GetPOIListener>> getPOIListeners = new TreeMap();
 
     /**
      * {@inheritDoc}
      */
 
-    public void addPoi(PointOfInterest poi, AddPoiListener listener) {
+    public void addPOI(PointOfInterest poi, AddPOIListener listener) {
         if (poi.name().contains("ADDPOIS")) {
             listener.onSuccess();
             return;
@@ -92,7 +92,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
             // inform the listeners that listen the retrieval of a poi with poi.name that it now exists
             if (getPOIListeners.containsKey(poi.name())) {
-                for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
                     getPOIListener.onNewValue(poi);
                 }
             }
@@ -105,7 +105,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void getPoi(String name, GetPoiListener listener) {
+    public void getPOI(String name, GetPOIListener listener) {
         if (name.contains("GETPOIS")) {
             listener.onNewValue(new PointOfInterest("SUCCESS",
                     new Position(0, 0),
@@ -137,7 +137,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
 
         if (!getPOIListeners.containsKey(name)) {
-            getPOIListeners.put(name, new HashSet<GetPoiListener>());
+            getPOIListeners.put(name, new HashSet<GetPOIListener>());
         }
         getPOIListeners.get(name).add(listener);
 
@@ -181,7 +181,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
                 // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
                 if (getPOIListeners.containsKey(poi.name())) {
-                    for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                    for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
                         getPOIListener.onModifiedValue(mPOI);
                     }
                 }
@@ -219,7 +219,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
                 // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
                 if (getPOIListeners.containsKey(poi.name())) {
-                    for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                    for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
                         getPOIListener.onModifiedValue(poiPlus);
                     }
                 }
@@ -258,7 +258,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
                 // inform the listeners that listen the retrieval of a poi with poi.name that it has been modified
                 if (getPOIListeners.containsKey(poi.name())) {
-                    for (GetPoiListener getPOIListener : getPOIListeners.get(poi.name())) {
+                    for (GetPOIListener getPOIListener : getPOIListeners.get(poi.name())) {
                         getPOIListener.onModifiedValue(poiMinus);
                     }
                 }
@@ -273,7 +273,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void findNearPois(Position pos, int radius, FindNearPoisListener listener) {
+    public void findNearPOIs(Position pos, int radius, FindNearPOIsListener listener) {
         if (pos.latitude() == 1000 && pos.longitude() == 1000) {
             listener.onFailure();
             return;

@@ -137,7 +137,7 @@ public class UserPlacesActivity extends AppCompatActivity {
 
                 // fetch POIs from db
                 for (String poiId : collection) {
-                    DatabaseProvider.getInstance().getPoi(poiId, new DatabaseProvider.GetPoiListener() {
+                    DatabaseProvider.getInstance().getPOI(poiId, new DatabaseProvider.GetPOIListener() {
                         @Override
                         public void onNewValue(PointOfInterest poi) {
                             // display card of POI

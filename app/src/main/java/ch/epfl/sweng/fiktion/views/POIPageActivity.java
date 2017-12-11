@@ -165,7 +165,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // get POI from database
-        DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+        DatabaseProvider.getInstance().getPOI(poiName, new DatabaseProvider.GetPOIListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 setPOI(poi);
@@ -439,7 +439,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void displayNearPois() {
         // find nearby pois
-        DatabaseProvider.getInstance().findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPOIs(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPOIsListener() {
             @Override
             public void onNewValue(PointOfInterest p) {
                 View v = POIDisplayer.createPoiCard(p, ctx);

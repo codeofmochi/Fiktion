@@ -61,7 +61,7 @@ public class UserTest {
                 new TreeSet<String>(), "", 0, "", "");
     }
 
-    private DatabaseProvider.AddPoiListener emptyAddPOIListener = new DatabaseProvider.AddPoiListener() {
+    private DatabaseProvider.AddPOIListener emptyAddPOIListener = new DatabaseProvider.AddPOIListener() {
         @Override
         public void onSuccess() {
         }
@@ -162,7 +162,7 @@ public class UserTest {
 
     @Test
     public void testUpVotingLogic() {
-        DatabaseProvider.getInstance().addPoi(defPoi, emptyAddPOIListener);
+        DatabaseProvider.getInstance().addPOI(defPoi, emptyAddPOIListener);
         final String poiName = defPoi.name();
         userWithUpvoted.upVote(poiName, new DatabaseProvider.ModifyUserListener() {
             @Override
@@ -223,7 +223,7 @@ public class UserTest {
 
     @Test
     public void testRemovePoiVotingLogic() {
-        DatabaseProvider.getInstance().addPoi(defPoi, emptyAddPOIListener);
+        DatabaseProvider.getInstance().addPOI(defPoi, emptyAddPOIListener);
         final String poiName = defPoi.name();
         userWithUpvoted.removeVote(poiName, new DatabaseProvider.ModifyUserListener() {
             @Override

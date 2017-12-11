@@ -94,7 +94,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
             saveButton.setBackgroundColor(getResources().getColor(R.color.lightGray));
 
             // database request
-            DatabaseProvider.getInstance().getPoi(editName, new DatabaseProvider.GetPoiListener() {
+            DatabaseProvider.getInstance().getPOI(editName, new DatabaseProvider.GetPOIListener() {
                 @Override
                 public void onNewValue(PointOfInterest poi) {
                     // set fields
@@ -294,7 +294,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
 
             switch (action) {
                 case ADD: {
-                    DatabaseProvider.getInstance().addPoi(newPoi, new DatabaseProvider.AddPoiListener() {
+                    DatabaseProvider.getInstance().addPOI(newPoi, new DatabaseProvider.AddPOIListener() {
                         @Override
                         public void onSuccess() {
                             showToast("The place " + name + " was successfully added");
