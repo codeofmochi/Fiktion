@@ -189,7 +189,7 @@ public class CommentsDisplayer {
         author.setTextColor(ctx.getResources().getColor(R.color.colorPrimary));
         DatabaseProvider.getInstance().getUserById(c.getAuthorId(), new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(final User user) {
+            public void onNewValue(final User user) {
                 author.setText(user.getName());
                 author.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -203,7 +203,7 @@ public class CommentsDisplayer {
             }
 
             @Override
-            public void onModified(final User user) {
+            public void onModifiedValue(final User user) {
                 author.setText(user.getName());
                 author.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -278,11 +278,11 @@ public class CommentsDisplayer {
             }
 
             @Override
-            public void onSuccess(final User user) {
+            public void onNewValue(final User user) {
                 DatabaseProvider.getInstance().getCommentVoteOfUser(c.getId(), user.getID(), new DatabaseProvider.GetVoteListener() {
 
                     @Override
-                    public void onSuccess(int vote) {
+                    public void onNewValue(Integer vote) {
                         voteState.set(vote);
                         switch (voteState.get()) {
                             case DatabaseProvider.UPVOTE:
@@ -426,7 +426,7 @@ public class CommentsDisplayer {
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
             }
 
             @Override

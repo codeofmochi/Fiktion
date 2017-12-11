@@ -1,5 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
+import ch.epfl.sweng.fiktion.listeners.Failure;
+import ch.epfl.sweng.fiktion.listeners.Success;
 import ch.epfl.sweng.fiktion.utils.Config;
 
 /**
@@ -44,10 +46,7 @@ public abstract class AuthProvider {
     /**
      * Defines what actions to take on auth op callback
      */
-    public interface AuthListener {
-        void onSuccess();
-
-        void onFailure();
+    public interface AuthListener extends Success, Failure {
     }
 
     /**

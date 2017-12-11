@@ -139,7 +139,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // check if user upvoted this poi
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 setUser(user);
                 if (user.getUpvoted().contains(poiName)) {
                     upvoted = true;
@@ -150,7 +150,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 
@@ -165,9 +165,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // get POI from database
-        DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
+        DatabaseProvider.getInstance().getPOI(poiName, new DatabaseProvider.GetPOIListener() {
             @Override
-            public void onSuccess(PointOfInterest poi) {
+            public void onNewValue(PointOfInterest poi) {
                 setPOI(poi);
                 downloadPhotos();
                 callMap();
@@ -180,7 +180,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
 
             @Override
-            public void onModified(PointOfInterest poi) {
+            public void onModifiedValue(PointOfInterest poi) {
                 setPOI(poi);
                 setPOIInformation();
             }
@@ -370,7 +370,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // set the mainImage as the first photo of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewValue(Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
                 mainImage.setImageBitmap(resized);
                 mainImage.setVisibility(View.VISIBLE);
@@ -384,7 +384,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // download the photos of the poi
         PhotoProvider.getInstance().downloadPOIBitmaps(poi.name(), ALL_PHOTOS, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(final Bitmap b) {
+            public void onNewValue(final Bitmap b) {
 
                 // create a new ImageView which will hold the photo
                 final ImageView imgView = new ImageView(getApplicationContext());
@@ -439,7 +439,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void displayNearPois() {
         // find nearby pois
-        DatabaseProvider.getInstance().findNearPois(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPoisListener() {
+        DatabaseProvider.getInstance().findNearPOIs(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPOIsListener() {
             @Override
             public void onNewValue(PointOfInterest p) {
                 View v = POIDisplayer.createPoiCard(p, ctx);

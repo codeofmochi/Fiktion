@@ -63,12 +63,12 @@ public class UserFriendsActivity extends AppCompatActivity {
         // get the user we want to display the infos from
         DatabaseProvider.getInstance().getUserById(userId, new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User u) {
+            public void onNewValue(User u) {
                 updateContent(u);
             }
 
             @Override
-            public void onModified(User u) {
+            public void onModifiedValue(User u) {
                 updateContent(u);
             }
 
@@ -108,7 +108,7 @@ public class UserFriendsActivity extends AppCompatActivity {
                 // find infos of that request's user
                 DatabaseProvider.getInstance().getUserById(r, new DatabaseProvider.GetUserListener() {
                     @Override
-                    public void onSuccess(User requester) {
+                    public void onNewValue(User requester) {
                         View v = UserDisplayer.createUserListElement(requester, ctx);
                         v = UserDisplayer.withV((LinearLayout) v, new View.OnClickListener() {
                             @Override
@@ -153,7 +153,7 @@ public class UserFriendsActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onModified(User user) { /* nothing */ }
+                    public void onModifiedValue(User user) { /* nothing */ }
 
                     @Override
                     public void onDoesntExist() { /* nothing */ }
@@ -171,7 +171,7 @@ public class UserFriendsActivity extends AppCompatActivity {
             // find infos of friend
             DatabaseProvider.getInstance().getUserById(f, new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess(final User friend) {
+                public void onNewValue(final User friend) {
                     View v = UserDisplayer.createUserListElement(friend, ctx);
                     // put delete button if my profile
                     if (state == ProfileActivity.Action.MY_PROFILE) {
@@ -210,7 +210,7 @@ public class UserFriendsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onModified(User user) { /* nothing */ }
+                public void onModifiedValue(User user) { /* nothing */ }
 
                 @Override
                 public void onDoesntExist() { /* nothing */ }

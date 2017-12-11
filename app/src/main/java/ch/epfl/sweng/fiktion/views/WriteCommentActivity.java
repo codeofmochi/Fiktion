@@ -52,7 +52,7 @@ public class WriteCommentActivity extends MenuDrawerActivity {
         img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.default_image), imgWidth, imgHeight));
         PhotoProvider.getInstance().downloadPOIBitmaps(poiName, 1, new PhotoProvider.DownloadBitmapListener() {
             @Override
-            public void onNewPhoto(Bitmap b) {
+            public void onNewValue(Bitmap b) {
                 img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(b, imgWidth, imgHeight));
             }
 

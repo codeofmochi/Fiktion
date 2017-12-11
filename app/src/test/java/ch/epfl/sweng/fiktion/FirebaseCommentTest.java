@@ -182,7 +182,7 @@ public class FirebaseCommentTest {
 
         DatabaseProvider.GetVoteListener listener = new DatabaseProvider.GetVoteListener() {
             @Override
-            public void onSuccess(int vote) {
+            public void onNewValue(Integer vote) {
                 result.set(String.valueOf(vote));
             }
 

@@ -69,7 +69,7 @@ public class POIDisplayer {
                 1,
                 new PhotoProvider.DownloadBitmapListener() {
                     @Override
-                    public void onNewPhoto(Bitmap b) {
+                    public void onNewValue(Bitmap b) {
                         processAndPutImage(img, b);
                     }
 

@@ -39,7 +39,7 @@ public class SimpleAddPOIActivity extends AppCompatActivity {
             Position pos = new Position(rand.nextDouble(), rand.nextDouble());
             PointOfInterest poi = new PointOfInterest(poiName, pos, new TreeSet<String>(), "", 0, "", "");
             // ask the database to add the poi
-            DatabaseProvider.getInstance().addPoi(poi, new DatabaseProvider.AddPoiListener() {
+            DatabaseProvider.getInstance().addPOI(poi, new DatabaseProvider.AddPOIListener() {
                 @Override
                 @SuppressLint("SetTextI18n") // no reason to set a variable for added
                 public void onSuccess() {

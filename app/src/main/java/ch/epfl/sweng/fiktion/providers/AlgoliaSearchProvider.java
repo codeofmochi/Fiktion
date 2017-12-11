@@ -45,7 +45,7 @@ public class AlgoliaSearchProvider extends SearchProvider {
      * {@inheritDoc}
      */
     @Override
-    public void addPoi(PointOfInterest poi, final DatabaseProvider.AddPoiListener listener) {
+    public void addPOI(PointOfInterest poi, final DatabaseProvider.AddPOIListener listener) {
         try {
             // add POI to Algolia asynchronously, the ID is the name of the poi
             index.addObjectAsync(

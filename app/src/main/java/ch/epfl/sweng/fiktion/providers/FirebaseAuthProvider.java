@@ -269,14 +269,14 @@ public class FirebaseAuthProvider extends AuthProvider {
         if (user != null) {
             database.getUserById(user.getUid(), new DatabaseProvider.GetUserListener() {
                 @Override
-                public void onSuccess(User user) {
+                public void onNewValue(User user) {
                     Config.settings = user.getSettings();
-                    listener.onSuccess(user);
+                    listener.onNewValue(user);
                 }
 
                 @Override
-                public void onModified(User user) {
-                    listener.onModified(user);
+                public void onModifiedValue(User user) {
+                    listener.onModifiedValue(user);
                 }
 
                 @Override
