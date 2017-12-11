@@ -8,7 +8,6 @@ import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
-import ch.epfl.sweng.fiktion.utils.Config;
 
 /**
  * A user implementation for Firebase
@@ -55,6 +54,10 @@ public class FirebaseUser {
 
         for (String request : user.getRequests()) {
             friendRequests.put(request, true);
+        }
+
+        for (String visit : user.getVisited()){
+            visited.put(visit, true);
         }
 
         isPublicProfile = user.isPublicProfile();

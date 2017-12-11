@@ -72,7 +72,6 @@ import static ch.epfl.sweng.fiktion.providers.PhotoProvider.ALL_PHOTOS;
 
 public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCallback {
 
-    private final String TAG = "POIPageActivity";
 
     private final int MAXIMUM_SIZE = 1000;
     public static final String POI_NAME = "POI_NAME";
@@ -163,6 +162,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
                     @Override
                     public void onSuccess(User user) {
+                        //user is connected
                         setUser(user);
                         visitPOI();
                         if (user.getUpvoted().contains(poiName)) {
@@ -220,12 +220,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         noNearbyPois = (TextView) findViewById(R.id.noNearbyPois);
     }
 
+    /**
+     * Adds this poi to the user visited list if the user is close to it
+     */
     private void visitPOI() {
-        // if User is connected we add POIs to its Visited list if it is not already there
+        // add POI to its Visited list if it is not already there
 
         if (!user.getVisited().contains(poiName)) {
-
-
             mFusedProvider.getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
@@ -246,6 +247,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
                             @Override
                             public void onFailure() {
+                                Toast.makeText(ctx, "Failed to visit this place", Toast.LENGTH_SHORT).show();
                             }
                         });
 
