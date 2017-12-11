@@ -171,11 +171,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     } else {
                         if (firstCall) {
                             // inform the listener that we got the matching poi
-                            listener.onSuccess(fPoi.toPoi());
+                            listener.onNewValue(fPoi.toPoi());
                             firstCall = false;
                         } else {
                             //inform the listener that the poi has been modified
-                            listener.onModified(fPoi.toPoi());
+                            listener.onModifiedValue(fPoi.toPoi());
                         }
                     }
                 } else {
@@ -353,13 +353,13 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                 // for a near poi, retrieve it from the firebase
                 getPoi(key, new GetPoiListener() {
                     @Override
-                    public void onSuccess(PointOfInterest poi) {
+                    public void onNewValue(PointOfInterest poi) {
                         // inform the listener that we got a new poi
                         listener.onNewValue(poi);
                     }
 
                     @Override
-                    public void onModified(PointOfInterest poi) {
+                    public void onModifiedValue(PointOfInterest poi) {
 
                     }
 
@@ -411,12 +411,12 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                 for (String poiID : poiIDs) {
                     getPoi(poiID, new GetPoiListener() {
                         @Override
-                        public void onSuccess(PointOfInterest poi) {
+                        public void onNewValue(PointOfInterest poi) {
                             listener.onNewValue(poi);
                         }
 
                         @Override
-                        public void onModified(PointOfInterest poi) {
+                        public void onModifiedValue(PointOfInterest poi) {
                         }
 
                         @Override
@@ -504,11 +504,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     } else {
                         if (firstCall) {
                             // inform the listener that we got the matching user
-                            listener.onSuccess(fUser.toUser());
+                            listener.onNewValue(fUser.toUser());
                             firstCall = false;
                         } else {
                             // inform the listener that the user has been modified
-                            listener.onModified(fUser.toUser());
+                            listener.onModifiedValue(fUser.toUser());
                         }
                     }
                 } else {
@@ -664,11 +664,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     } else {
                         if (firstCall) {
                             // inform the listener that we got the matching comment
-                            listener.onSuccess(fComment.toComment());
+                            listener.onNewValue(fComment.toComment());
                             firstCall = false;
                         } else {
                             // inform the listener that the comment has been modified
-                            listener.onModified(fComment.toComment());
+                            listener.onModifiedValue(fComment.toComment());
                         }
                     }
                 } else {
@@ -703,13 +703,13 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 getComment(dataSnapshot.getKey(), new GetCommentListener() {
                     @Override
-                    public void onSuccess(Comment comment) {
+                    public void onNewValue(Comment comment) {
                         // inform the listener with every new comment
                         listener.onNewValue(comment);
                     }
 
                     @Override
-                    public void onModified(Comment comment) {
+                    public void onModifiedValue(Comment comment) {
                         // inform the listener when an already retrieved poi has been modified
                         listener.onModifiedValue(comment);
                     }
@@ -822,7 +822,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
                     vote = DatabaseProvider.NOVOTE;
                 }
                 // inform the listener of the vote
-                listener.onSuccess(vote);
+                listener.onNewValue(vote);
             }
 
             @Override

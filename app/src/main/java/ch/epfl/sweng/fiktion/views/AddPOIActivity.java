@@ -96,7 +96,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
             // database request
             DatabaseProvider.getInstance().getPoi(editName, new DatabaseProvider.GetPoiListener() {
                 @Override
-                public void onSuccess(PointOfInterest poi) {
+                public void onNewValue(PointOfInterest poi) {
                     // set fields
                     EditText addPoiName = (EditText) findViewById(R.id.add_poi_name);
                     addPoiName.setText(poi.name());
@@ -117,7 +117,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
                 }
 
                 @Override
-                public void onModified(PointOfInterest poi) {
+                public void onModifiedValue(PointOfInterest poi) {
                     // do nothing : we don't want the change to cancel the current edit
                 }
 

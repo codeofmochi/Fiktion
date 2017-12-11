@@ -54,12 +54,12 @@ public class ProfileSettingsActivityTest {
     public void setVariables() {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User currUser) {
+            public void onNewValue(User currUser) {
                 user = currUser;
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 user = null;
             }
 
@@ -94,12 +94,12 @@ public class ProfileSettingsActivityTest {
 
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(AuthProvider.getInstance().getEmail(), is(newEmail));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 
@@ -124,13 +124,13 @@ public class ProfileSettingsActivityTest {
 
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 //assert that we can only write 15 characters
                 assertThat(AuthProvider.getInstance().getEmail(), is("default@email.ch"));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 
@@ -159,13 +159,13 @@ public class ProfileSettingsActivityTest {
 
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 //assert that we can only write 15 characters
                 assertThat(user.getName(), is("thishasmorethan"));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 
@@ -201,13 +201,13 @@ public class ProfileSettingsActivityTest {
 
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(user.getName(), is(newName));
                 assertThat(AuthProvider.getInstance().getEmail(), is(newEmail));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 

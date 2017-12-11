@@ -139,7 +139,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // check if user upvoted this poi
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 setUser(user);
                 if (user.getUpvoted().contains(poiName)) {
                     upvoted = true;
@@ -150,7 +150,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 
@@ -167,7 +167,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // get POI from database
         DatabaseProvider.getInstance().getPoi(poiName, new DatabaseProvider.GetPoiListener() {
             @Override
-            public void onSuccess(PointOfInterest poi) {
+            public void onNewValue(PointOfInterest poi) {
                 setPOI(poi);
                 downloadPhotos();
                 callMap();
@@ -180,7 +180,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
 
             @Override
-            public void onModified(PointOfInterest poi) {
+            public void onModifiedValue(PointOfInterest poi) {
                 setPOI(poi);
                 setPOIInformation();
             }

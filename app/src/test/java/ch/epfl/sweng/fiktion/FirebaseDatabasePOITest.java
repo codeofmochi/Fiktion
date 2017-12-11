@@ -138,12 +138,12 @@ public class FirebaseDatabasePOITest {
 
         DatabaseProvider.GetPoiListener listener = new DatabaseProvider.GetPoiListener() {
             @Override
-            public void onSuccess(PointOfInterest poi) {
+            public void onNewValue(PointOfInterest poi) {
                 result.set("SUCCESS");
             }
 
             @Override
-            public void onModified(PointOfInterest poi) {
+            public void onModifiedValue(PointOfInterest poi) {
                 result.set("MODIFIED");
             }
 
@@ -318,14 +318,14 @@ public class FirebaseDatabasePOITest {
 
         databaseSpy.findNearPois(poiTest.position(), 10, findPoiListener);
         geoQueryEventListener.getValue().onKeyEntered("key", null);
-        getPOIListener.getValue().onSuccess(poiTest);
+        getPOIListener.getValue().onNewValue(poiTest);
         assertThat(nbPOIs.get(), is(1));
-        getPOIListener.getValue().onSuccess(poiTest);
-        getPOIListener.getValue().onSuccess(poiTest);
-        getPOIListener.getValue().onSuccess(poiTest);
-        getPOIListener.getValue().onSuccess(poiTest);
+        getPOIListener.getValue().onNewValue(poiTest);
+        getPOIListener.getValue().onNewValue(poiTest);
+        getPOIListener.getValue().onNewValue(poiTest);
+        getPOIListener.getValue().onNewValue(poiTest);
         assertThat(nbPOIs.get(), is(5));
-        getPOIListener.getValue().onModified(poiTest);
+        getPOIListener.getValue().onModifiedValue(poiTest);
         getPOIListener.getValue().onDoesntExist();
         getPOIListener.getValue().onFailure();
         geoQueryEventListener.getValue().onKeyExited("key");
@@ -362,14 +362,14 @@ public class FirebaseDatabasePOITest {
         searchPOIsByTextListener.getValue().onSuccess(Collections.singletonList("poi"));
 
         assertThat(nbPOIs.get(), is(0));
-        getPOIListener.getValue().onSuccess(null);
+        getPOIListener.getValue().onNewValue(null);
         assertThat(nbPOIs.get(), is(1));
-        getPOIListener.getValue().onSuccess(null);
-        getPOIListener.getValue().onSuccess(null);
-        getPOIListener.getValue().onSuccess(null);
-        getPOIListener.getValue().onSuccess(null);
+        getPOIListener.getValue().onNewValue(null);
+        getPOIListener.getValue().onNewValue(null);
+        getPOIListener.getValue().onNewValue(null);
+        getPOIListener.getValue().onNewValue(null);
         assertThat(nbPOIs.get(), is(5));
-        getPOIListener.getValue().onModified(poiTest);
+        getPOIListener.getValue().onModifiedValue(poiTest);
         getPOIListener.getValue().onDoesntExist();
         getPOIListener.getValue().onFailure();
         assertThat(nbPOIs.get(), is(5));

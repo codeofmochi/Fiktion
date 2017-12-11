@@ -89,7 +89,7 @@ public class LocationActivity extends MapLocationActivity {
                     // get POI from db
                     DatabaseProvider.getInstance().getPoi(marker.getTitle(), new DatabaseProvider.GetPoiListener() {
                         @Override
-                        public void onSuccess(PointOfInterest poi) {
+                        public void onNewValue(PointOfInterest poi) {
                             // remove old view if any
                             if (pv != null) frame.removeView(pv);
                             // create POI card
@@ -105,7 +105,7 @@ public class LocationActivity extends MapLocationActivity {
                         }
 
                         @Override
-                        public void onModified(PointOfInterest poi) {
+                        public void onModifiedValue(PointOfInterest poi) {
 
                         }
 

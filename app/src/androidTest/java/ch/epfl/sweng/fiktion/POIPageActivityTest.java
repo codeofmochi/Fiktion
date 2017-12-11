@@ -289,12 +289,12 @@ public class POIPageActivityTest {
     public void voteTest() {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 setUser(user);
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 
@@ -441,12 +441,12 @@ public class POIPageActivityTest {
         onView(withText("Favourite")).perform(click());
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(user.getFavourites().contains("poiTest"), is(true));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 
@@ -495,12 +495,12 @@ public class POIPageActivityTest {
         onView(withText("Wishlist")).perform(click());
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 assertThat(user.getWishlist().contains("poiTest"), is(true));
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
                 Assert.fail();
             }
 

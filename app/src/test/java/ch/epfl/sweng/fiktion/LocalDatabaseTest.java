@@ -108,12 +108,12 @@ public class LocalDatabaseTest {
         final Mutable<String> result = new Mutable<>("");
         DatabaseProvider.GetPoiListener listener = new DatabaseProvider.GetPoiListener() {
             @Override
-            public void onSuccess(PointOfInterest poi) {
+            public void onNewValue(PointOfInterest poi) {
                 result.set("S");
             }
 
             @Override
-            public void onModified(PointOfInterest poi) {
+            public void onModifiedValue(PointOfInterest poi) {
                 result.set("M");
             }
 
@@ -362,12 +362,12 @@ public class LocalDatabaseTest {
         final Mutable<String> result = new Mutable<>("");
         DatabaseProvider.GetUserListener listener = new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User u) {
+            public void onNewValue(User u) {
                 result.set("S");
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 

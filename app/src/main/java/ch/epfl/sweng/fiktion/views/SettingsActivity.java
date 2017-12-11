@@ -99,7 +99,7 @@ public class SettingsActivity extends MenuDrawerActivity {
 
         auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User currUser) {
+            public void onNewValue(User currUser) {
                 user = currUser;
                 userNewName.setHint(user.getName());
                 userNewEmail.setHint(auth.getEmail());
@@ -144,7 +144,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 

@@ -441,12 +441,12 @@ public class FirebaseAuthTest {
         Mockito.when(fbAuth.getCurrentUser()).thenReturn(null);
         auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 Assert.fail();
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 
@@ -547,12 +547,12 @@ public class FirebaseAuthTest {
 
         DatabaseProvider.GetUserListener testListener = new DatabaseProvider.GetUserListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onNewValue(User user) {
                 setResult(Result.SUCCESS);
             }
 
             @Override
-            public void onModified(User user) {
+            public void onModifiedValue(User user) {
 
             }
 
@@ -570,7 +570,7 @@ public class FirebaseAuthTest {
         Mockito.when(fbUser.getUid()).thenReturn("id");
         auth.getCurrentUser(testListener);
 
-        getUserDatabaseListener.onSuccess(new User("name", "id"));
+        getUserDatabaseListener.onNewValue(new User("name", "id"));
         assertThat(opResult, is(Result.SUCCESS));
         getUserDatabaseListener.onDoesntExist();
         assertThat(opResult, is(Result.DOESNOTEXIST));
