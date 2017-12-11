@@ -53,6 +53,9 @@ public abstract class PhotoProvider {
         void updateProgress(double progress);
     }
 
+    public interface GetPhotoNamesListener extends Get<String>, Failure {
+    }
+
     /**
      * Listener that listens the download of (a) bitmap(s)
      */
@@ -68,12 +71,14 @@ public abstract class PhotoProvider {
      */
     public abstract void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPhotoListener listener);
 
+    public abstract void getPOIPhotoNames(String poiName, int numberOfPhotos, GetPhotoNamesListener listener);
+
     /**
      * download the bitmaps associated to a poi and send them to the listener
      *
-     * @param poiName         the name of the poi
-     * @param numberOfBitmaps the number of bitmaps to download, ALL_PHOTOS for all the photos
-     * @param listener        the listener
+     * @param poiName   the name of the poi
+     * @param photoName the name of the photo
+     * @param listener  the listener
      */
-    public abstract void downloadPOIBitmaps(String poiName, int numberOfBitmaps, DownloadBitmapListener listener);
+    public abstract void downloadPOIBitmap(String poiName, String photoName, DownloadBitmapListener listener);
 }
