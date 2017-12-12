@@ -14,9 +14,9 @@ import java.security.NoSuchAlgorithmException;
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
+import ch.epfl.sweng.fiktion.views.utils.PhotoController;
 
 /**
  * Activity which writes the comments, called from the POIPageActivity
@@ -50,7 +50,7 @@ public class WriteCommentActivity extends MenuDrawerActivity {
         final int imgWidth = 900;
         final int imgHeight = 400;
         img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.default_image), imgWidth, imgHeight));
-        PhotoProvider.getInstance().downloadPOIBitmaps(poiName, 1, new PhotoProvider.DownloadBitmapListener() {
+        PhotoController.getPOIBitmaps(this, poiName, 1, new PhotoController.GetBitmapsListener() {
             @Override
             public void onNewValue(Bitmap b) {
                 img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(b, imgWidth, imgHeight));

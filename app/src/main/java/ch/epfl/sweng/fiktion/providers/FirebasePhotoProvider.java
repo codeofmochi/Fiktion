@@ -136,35 +136,19 @@ public class FirebasePhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void downloadPOIBitmaps(final String poiName, int numberOfBitmaps, final DownloadBitmapListener listener) {
-
+    public void getPOIPhotoNames(String poiName, int numberOfPhotos, final GetPhotoNamesListener listener) {
         // first, get the reference of the poi and listen for its photo references
         Query query = dbRef.child("Photo references").child(poiName).orderByKey();
 
-        if (numberOfBitmaps > 0)
+        if (numberOfPhotos > 0)
             // limit the number of photo references
-            query = query.limitToFirst(numberOfBitmaps);
+            query = query.limitToFirst(numberOfPhotos);
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // For every photo name, download the associated photo from firebase
                 String photoName = dataSnapshot.getValue() + ".jpg";
-                StorageReference photoRef = stRef.child("Points of interest").child(poiName).child(photoName);
-                photoRef.getBytes(MAXIMUM_SIZE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        // convert the bytes into a bitmap
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        if (bitmap != null) {
-                            // "send" the new bitmap to the listener
-                            listener.onNewValue(bitmap);
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
+                listener.onNewValue(photoName);
             }
 
             @Override
@@ -181,6 +165,33 @@ public class FirebasePhotoProvider extends PhotoProvider {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void downloadPOIBitmap(final String poiName, String photoName, final DownloadBitmapListener listener) {
+
+        StorageReference photoRef = stRef.child("Points of interest").child(poiName).child(photoName);
+        photoRef.getBytes(MAXIMUM_SIZE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                // convert the bytes into a bitmap
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                if (bitmap != null) {
+                    // "send" the downloaded bitmap to the listener
+                    listener.onNewValue(bitmap);
+                } else {
+                    listener.onFailure();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
                 listener.onFailure();
             }
         });
