@@ -19,7 +19,6 @@ import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
-import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 /**
@@ -64,10 +63,11 @@ public class POIDisplayer {
         Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.default_image);
         processAndPutImage(img, b);
         // Try to load a picture for this poi from DB
-        PhotoProvider.getInstance().downloadPOIBitmaps(
+        PhotoController.getPOIBitmaps(
+                ctx,
                 poi.name(),
                 1,
-                new PhotoProvider.DownloadBitmapListener() {
+                new PhotoController.GetBitmapsListener() {
                     @Override
                     public void onNewValue(Bitmap b) {
                         processAndPutImage(img, b);
