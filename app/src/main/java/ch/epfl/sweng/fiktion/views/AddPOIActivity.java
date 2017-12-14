@@ -23,6 +23,7 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.CollectionsUtils;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
+import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
 
 import static ch.epfl.sweng.fiktion.views.GetLocationFromMapActivity.NEW_POI_LATITUDE;
@@ -34,8 +35,6 @@ public class AddPOIActivity extends MenuDrawerActivity {
     private final Set<String> fictionSet = new TreeSet<>();
     // Displayed fiction list (as a big string)
     private String fictionListText = "";
-    // intent result codes
-    private static final int LOCATION_RESULT = 1;
     // this activity's context
     private Context ctx = this;
     // activities codes
@@ -151,21 +150,21 @@ public class AddPOIActivity extends MenuDrawerActivity {
     @SuppressLint("SetTextI18n") // latitude and longitude are inputs, not hardcoded
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case LOCATION_RESULT:
+            case ActivityCodes.LOCATION_RESULT:
                 if (resultCode == RESULT_OK) {
                     Double latitude = data.getDoubleExtra(NEW_POI_LATITUDE, 0);
                     Double longitude = data.getDoubleExtra(NEW_POI_LONGITUDE, 0);
 
-
                     ((EditText) findViewById(R.id.add_poi_latitude)).setText(latitude.toString());
                     ((EditText) findViewById(R.id.add_poi_longitude)).setText(longitude.toString());
                 }
-            case SIGNIN_REQUEST: {
+                break;
+            case ActivityCodes.SIGNIN_REQUEST:
                 if (resultCode == RESULT_OK) {
                     this.recreate();
                 }
                 break;
-            }
+
         }
     }
 
@@ -178,7 +177,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
      */
     public void startGetLocationFromMapActivity(View view) {
         Intent i = new Intent(this, GetLocationFromMapActivity.class);
-        startActivityForResult(i, LOCATION_RESULT);
+        startActivityForResult(i, ActivityCodes.LOCATION_RESULT);
     }
 
     /**
@@ -189,7 +188,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
      */
     public void startGetLocationFromWikipedia(View view) {
         Intent i = new Intent(this, GetLocationFromWikipediaActivity.class);
-        startActivityForResult(i, LOCATION_RESULT);
+        startActivityForResult(i, ActivityCodes.LOCATION_RESULT);
     }
 
     /**
