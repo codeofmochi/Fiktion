@@ -12,8 +12,13 @@ public abstract class Post {
     protected final String id;
     protected final Date date;
 
-
-
+    /**
+     * constructs a post
+     *
+     * @param type the post type
+     * @param id   the id of the post
+     * @param date the date of the post
+     */
     public Post(PostType type, String id, Date date) {
         this.type = type;
         this.id = id;
