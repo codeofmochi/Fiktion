@@ -13,12 +13,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.AddPOIPost;
+import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.CollectionsUtils;
@@ -290,7 +295,7 @@ public class AddPOIActivity extends MenuDrawerActivity {
 
         if (isCorrect) {
             // create new poi object with current data
-            PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
+            final PointOfInterest newPoi = new PointOfInterest(name, new Position(latitude, longitude), fictionSet, description, 0, country, city);
 
             switch (action) {
                 case ADD: {
@@ -303,6 +308,39 @@ public class AddPOIActivity extends MenuDrawerActivity {
                             i.putExtra("POI_NAME", name);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(i);
+
+                            // get the user id to add a post of the poi addition
+                            AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
+                                @Override
+                                public void onNewValue(User user) {
+                                    try {
+                                        Post post = new AddPOIPost(newPoi.name(), Calendar.getInstance().getTime());
+                                        DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                            }
+                                        });
+                                    } catch (NoSuchAlgorithmException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onModifiedValue(User user) {
+                                }
+
+                                @Override
+                                public void onDoesntExist() {
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                }
+                            });
                         }
 
                         @Override

@@ -42,6 +42,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
@@ -51,6 +53,10 @@ import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.FavoritePOIPost;
+import ch.epfl.sweng.fiktion.models.posts.Post;
+import ch.epfl.sweng.fiktion.models.posts.VisitPOIPost;
+import ch.epfl.sweng.fiktion.models.posts.WishlistPOIPost;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.CurrentLocationProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -231,6 +237,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                                         @Override
                                         public void onSuccess() {
                                             Snackbar.make(mainImage, getString(R.string.added_to_visited, poiName), Snackbar.LENGTH_LONG).show();
+
+                                            // add a post about the visit of the poi
+                                            try {
+                                                Post post = new VisitPOIPost(poiName, Calendar.getInstance().getTime());
+                                                DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                                                    @Override
+                                                    public void onFailure() {
+                                                    }
+
+                                                    @Override
+                                                    public void onSuccess() {
+                                                    }
+                                                });
+                                            } catch (NoSuchAlgorithmException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
 
                                         @Override
@@ -748,6 +770,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                             @Override
                             public void onSuccess() {
                                 Toast.makeText(ctx, poiName + " was added to favourites!", Toast.LENGTH_SHORT).show();
+
+                                // add a post of the addition of the poi to the favorites
+                                try {
+                                    Post post = new FavoritePOIPost(poiName, Calendar.getInstance().getTime());
+                                    DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                                        @Override
+                                        public void onFailure() {
+                                        }
+
+                                        @Override
+                                        public void onSuccess() {
+                                        }
+                                    });
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
                             @Override
@@ -773,6 +811,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                             @Override
                             public void onSuccess() {
                                 Toast.makeText(ctx, poiName + " was added to the wishlist!", Toast.LENGTH_SHORT).show();
+
+                                // add a post of the addition of the poi to the wishlist
+                                try {
+                                    Post post = new WishlistPOIPost(poiName, Calendar.getInstance().getTime());
+                                    DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                                        @Override
+                                        public void onFailure() {
+                                        }
+
+                                        @Override
+                                        public void onSuccess() {
+                                        }
+                                    });
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
                             @Override
