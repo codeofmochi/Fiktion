@@ -899,6 +899,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
 
         // set the value in firebase
         postRef.setValue(fPost);
+        postRef.child("invMilliseconds").setValue(-post.getDate().getTime());
         listener.onSuccess();
     }
 
@@ -910,8 +911,8 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         // get the posts reference of the user
         DatabaseReference userPostsReference = dbRef.child(userPostsRef).child(userId);
 
-        // order the posts by time (milliseconds) and get the posts
-        userPostsReference.orderByChild("milliseconds").addChildEventListener(new ChildEventListener() {
+        // order the posts by time (inverse of milliseconds to get in descending order) and get the posts
+        userPostsReference.orderByChild("invMilliseconds").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // get the type of the post
