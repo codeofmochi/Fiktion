@@ -3,9 +3,9 @@ package ch.epfl.sweng.fiktion.providers;
 import android.app.Activity;
 import android.location.Location;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.utils.Config;
 
 /**
@@ -42,9 +42,10 @@ public abstract class CurrentLocationProvider {
     /**
      * Checks the permissions and starts a request for a lastLocation of the device
      *
-     * @param ctx      Activity that requests the lastLocation
-     * @param listener handles the actions after the request is successful
+     * @param ctx                 Activity that requests the lastLocation
+     * @param listener            handles the actions after the request is successful
+     * @param gpsDisabledCallback Action if the GPS is disabled
      */
-    public abstract void getLastLocation(Activity ctx, final OnSuccessListener<Location> listener);
+    public abstract void getLastLocation(Activity ctx, final OnSuccessListener<Location> listener, final AndroidServices.OnGPSDisabledCallback gpsDisabledCallback);
 
 }
