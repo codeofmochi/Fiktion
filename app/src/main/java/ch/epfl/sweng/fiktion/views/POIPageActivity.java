@@ -216,35 +216,44 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // add POI to its Visited list if it is not already there
 
         if (!user.getVisited().contains(poiName)) {
-            CurrentLocationProvider.getInstance((Activity) ctx).getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        Position poiPos = poi.position();
-                        double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
-                                , poiPos.longitude(), poiPos.latitude());
-                        if (1 > dist) {
-                            user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
-                                @Override
-                                public void onSuccess() {
-                                    Toast.makeText(ctx, "Visiting " + poiName, Toast.LENGTH_SHORT).show();
-                                }
+            CurrentLocationProvider.getInstance((Activity) ctx).getLastLocation(
+                    (Activity) ctx,
+                    new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                Position poiPos = poi.position();
+                                double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
+                                        , poiPos.longitude(), poiPos.latitude());
+                                if (1 > dist) {
+                                    user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Snackbar.make(mainImage, getString(R.string.added_to_visited, poiName), Snackbar.LENGTH_SHORT).show();
+                                        }
 
-                                @Override
-                                public void onDoesntExist() {
-                                    Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
-                                }
+                                        @Override
+                                        public void onDoesntExist() {
+                                            Snackbar.make(mainImage, R.string.user_not_found, Snackbar.LENGTH_SHORT).show();
+                                        }
 
-                                @Override
-                                public void onFailure() {
-                                    Toast.makeText(ctx, "Failed to visit this place", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                        @Override
+                                        public void onFailure() {
+                                            Snackbar.make(mainImage, R.string.request_failed, Snackbar.LENGTH_SHORT).show();
+                                        }
+                                    });
 
+                                }
+                            }
+                        }
+                    },
+                    new AndroidServices.OnGPSDisabledCallback() {
+                        @Override
+                        public void onGPSDisabed() {
+                            Snackbar.make(mainImage, R.string.gps_disabled, Snackbar.LENGTH_LONG).show();
                         }
                     }
-                }
-            });
+            );
         }
 
     }

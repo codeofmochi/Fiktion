@@ -122,4 +122,7 @@
     <string name="friend_deleted">Friend deleted</string>
     <string name="friend_request_sent">Friend request sent</string>
     <string name="already_in_friend_list">User already in friend list</string>
+    <string name="gps_disabled">GPS is disabled.</string>
+    <string name="added_to_visited">%s added to visited</string>
+    <string name="view">View</string>
 </resources>
