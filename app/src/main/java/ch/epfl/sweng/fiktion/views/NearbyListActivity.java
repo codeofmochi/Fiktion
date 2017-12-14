@@ -73,11 +73,4 @@ public class NearbyListActivity extends AppCompatActivity implements OnMapReadyC
             }
         });
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // relaunch activity to check if GPS has changed
-        this.recreate();
-    }
 }

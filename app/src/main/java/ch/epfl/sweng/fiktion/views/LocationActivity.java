@@ -137,11 +137,4 @@ public class LocationActivity extends MapLocationActivity {
         i.putExtra("LONGITUDE", cache.longitude());
         startActivity(i);
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // relaunch activity to check if GPS has changed
-        this.recreate();
-    }
 }

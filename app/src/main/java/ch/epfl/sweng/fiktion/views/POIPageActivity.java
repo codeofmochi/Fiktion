@@ -795,14 +795,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // check if GPS has been enabled
-        visitPOI();
-    }
-
-
 }
 
 
