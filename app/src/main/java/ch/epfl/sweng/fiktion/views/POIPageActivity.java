@@ -416,7 +416,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
 
         // set the mainImage as the first photo of the poi
-        PhotoController.getPOIBitmaps(ctx, poi.name(), 1, new PhotoController.GetBitmapsListener() {
+        PhotoController.getPOIBitmaps(ctx, poi.name(), 1, new PhotoController.GetBitmapListener() {
             @Override
             public void onNewValue(Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
@@ -430,7 +430,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // download the photos of the poi
-        PhotoController.getPOIBitmaps(ctx, poi.name(), ALL_PHOTOS, new PhotoController.GetBitmapsListener() {
+        PhotoController.getPOIBitmaps(ctx, poi.name(), ALL_PHOTOS, new PhotoController.GetBitmapListener() {
             @Override
             public void onNewValue(final Bitmap b) {
                 // create a new ImageView which will hold the photo

@@ -294,12 +294,6 @@ public class FirebasePhotoProvider extends PhotoProvider {
         });
     }
 
-    /**
-     * get the bytes representation of a bitmap
-     *
-     * @param b the bitmap
-     * @return the bytes of the bitmap
-     */
     private byte[] bitmapBytes(Bitmap b) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

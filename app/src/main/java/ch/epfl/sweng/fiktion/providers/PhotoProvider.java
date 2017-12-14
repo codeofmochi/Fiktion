@@ -89,7 +89,7 @@ public abstract class PhotoProvider {
      */
     public abstract void downloadPOIBitmap(String poiName, String photoName, DownloadBitmapListener listener);
 
-    enum UserPhotoType {PROFILE, BANNER}
+    public enum UserPhotoType {PROFILE, BANNER}
 
     /**
      * uploads a bitmap for a user picture and inform the listener of the result

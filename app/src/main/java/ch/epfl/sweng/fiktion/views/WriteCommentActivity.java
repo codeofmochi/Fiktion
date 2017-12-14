@@ -50,7 +50,7 @@ public class WriteCommentActivity extends MenuDrawerActivity {
         final int imgWidth = 900;
         final int imgHeight = 400;
         img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.default_image), imgWidth, imgHeight));
-        PhotoController.getPOIBitmaps(this, poiName, 1, new PhotoController.GetBitmapsListener() {
+        PhotoController.getPOIBitmaps(this, poiName, 1, new PhotoController.GetBitmapListener() {
             @Override
             public void onNewValue(Bitmap b) {
                 img.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(b, imgWidth, imgHeight));

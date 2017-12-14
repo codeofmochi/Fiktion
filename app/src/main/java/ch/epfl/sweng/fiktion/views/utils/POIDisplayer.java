@@ -67,7 +67,7 @@ public class POIDisplayer {
                 ctx,
                 poi.name(),
                 1,
-                new PhotoController.GetBitmapsListener() {
+                new PhotoController.GetBitmapListener() {
                     @Override
                     public void onNewValue(Bitmap b) {
                         processAndPutImage(img, b);
