@@ -1,13 +1,16 @@
 package ch.epfl.sweng.fiktion.views;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,6 +34,7 @@ public class UserPlacesActivity extends AppCompatActivity {
     }
 
     private Action state = Action.VISITED;
+    private String profileType;
     // linear layout display
     private LinearLayout poiList;
     // empty text
@@ -93,6 +97,8 @@ public class UserPlacesActivity extends AppCompatActivity {
         // get user id
         Intent from = getIntent();
         userId = from.getStringExtra(ProfileActivity.USER_ID_KEY);
+        profileType = from.getStringExtra(ProfileActivity.PROFILE_ACTION_KEY);
+        if (profileType == null) profileType = ProfileActivity.PROFILE_ACTION_ANOTHER;
 
         // get first state
         updateContent();
@@ -139,9 +145,14 @@ public class UserPlacesActivity extends AppCompatActivity {
                 for (String poiId : collection) {
                     DatabaseProvider.getInstance().getPOI(poiId, new DatabaseProvider.GetPOIListener() {
                         @Override
-                        public void onNewValue(PointOfInterest poi) {
+                        public void onNewValue(final PointOfInterest poi) {
                             // display card of POI
                             View v = POIDisplayer.createPoiCard(poi, ctx);
+
+                            if (profileType.equals(ProfileActivity.PROFILE_ACTION_ME)) {
+                                addPOICardTouchActions(v, poi);
+                            }
+
                             poiList.addView(v);
                             // hide empty message
                             empty.setVisibility(View.GONE);
@@ -160,9 +171,7 @@ public class UserPlacesActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onModifiedValue(User user) {
-                
-            }
+            public void onModifiedValue(User u) { /* nothing */ }
 
             @Override
             public void onDoesntExist() {
@@ -176,4 +185,75 @@ public class UserPlacesActivity extends AppCompatActivity {
         });
     }
 
+
+    private void addPOICardTouchActions(View v, final PointOfInterest poi) {
+        // define all events that happen when modifying the user
+        final DatabaseProvider.ModifyUserListener listener = new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onSuccess() {
+                Snackbar.make(poiList, R.string.place_removed, Snackbar.LENGTH_SHORT).show();
+                updateContent();
+            }
+
+            @Override
+            public void onDoesntExist() {
+                Snackbar.make(poiList, R.string.data_not_found, Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Snackbar.make(poiList, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+            }
+        };
+
+        // background change
+        v.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == android.view.MotionEvent.ACTION_DOWN)
+                    v.setBackgroundColor(getResources().getColor(R.color.bgLightGray));
+                else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
+                    v.setBackgroundColor(getResources().getColor(R.color.white));
+                // not consumed
+                return false;
+            }
+        });
+
+        // add deletion
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                builder.setMessage(getString(R.string.deletion_confirmation_of, poi.name()))
+                        .setCancelable(true)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                switch (state) {
+                                    case WISHLIST:
+                                        user.removeFromWishlist(poi.name(), listener);
+                                        break;
+                                    case FAVORITES:
+                                        user.removeFavourite(poi.name(), listener);
+                                        break;
+                                    case VISITED:
+                                        user.removeFromVisited(poi.name(), listener);
+                                        break;
+                                }
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = builder.create();
+                alert.show();
+
+                // not consumed
+                return false;
+            }
+        });
+    }
 }

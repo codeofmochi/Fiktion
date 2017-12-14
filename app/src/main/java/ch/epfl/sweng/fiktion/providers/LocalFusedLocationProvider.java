@@ -5,7 +5,10 @@ import android.location.Location;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 
-/** Provider of lastPosition for testing
+import ch.epfl.sweng.fiktion.android.AndroidServices;
+
+/**
+ * Provider of lastPosition for testing
  * Created by Rodrigo on 11.12.2017.
  */
 
@@ -17,7 +20,7 @@ class LocalFusedLocationProvider extends CurrentLocationProvider {
      * @param listener handles the actions after the request is successful
      */
     @Override
-    public void getLastLocation(Activity ctx, OnSuccessListener<Location> listener) {
+    public void getLastLocation(Activity ctx, OnSuccessListener<Location> listener, AndroidServices.OnGPSDisabledCallback gpsDisabledCallback) {
         Location defaultLocation = new Location("mockprovider");
         defaultLocation.setLatitude(6.56);
         defaultLocation.setLongitude(46.5167);
