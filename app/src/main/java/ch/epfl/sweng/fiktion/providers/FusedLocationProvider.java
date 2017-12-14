@@ -34,7 +34,7 @@ public class FusedLocationProvider extends CurrentLocationProvider {
         mFuseProvider = mockProv;
     }
 
-    public void getLastLocation(Activity ctx, final OnSuccessListener<Location> listener) {
+    public void getLastLocation(Activity ctx, final OnSuccessListener<Location> listener, final AndroidServices.OnGPSDisabledCallback gpsDisabledCallback) {
         // check permissions
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -43,7 +43,7 @@ public class FusedLocationProvider extends CurrentLocationProvider {
             AndroidPermissions.promptLocationPermission(ctx);
         } else {
             // check location enable and ask otherwise
-            AndroidServices.promptLocationEnable(ctx);
+            AndroidServices.checkLocationEnable(ctx, gpsDisabledCallback);
             mFuseProvider.getLastLocation().addOnSuccessListener(ctx, listener);
         }
     }

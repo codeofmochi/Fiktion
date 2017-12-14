@@ -93,6 +93,12 @@ public class AndroidPermissionsTest {
         assertNotNull(ap);
     }
 
+    @Test
+    public void testReachAndroidPermissions() {
+        AndroidPermissions ap = new AndroidPermissions();
+        assertNotNull(ap);
+    }
+
     /**
      * Tests the reachability of the location check, however we will never
      * be able to test the case where the location is disabled on Jenkins

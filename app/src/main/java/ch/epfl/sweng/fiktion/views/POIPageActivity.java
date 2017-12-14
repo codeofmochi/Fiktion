@@ -21,6 +21,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -216,35 +217,44 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // add POI to its Visited list if it is not already there
 
         if (!user.getVisited().contains(poiName)) {
-            CurrentLocationProvider.getInstance((Activity) ctx).getLastLocation((Activity) ctx, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        Position poiPos = poi.position();
-                        double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
-                                , poiPos.longitude(), poiPos.latitude());
-                        if (1 > dist) {
-                            user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
-                                @Override
-                                public void onSuccess() {
-                                    Toast.makeText(ctx, "Visiting " + poiName, Toast.LENGTH_SHORT).show();
-                                }
+            CurrentLocationProvider.getInstance((Activity) ctx).getLastLocation(
+                    (Activity) ctx,
+                    new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                Position poiPos = poi.position();
+                                double dist = HelperMethods.dist(location.getLongitude(), location.getLatitude()
+                                        , poiPos.longitude(), poiPos.latitude());
+                                if (1 > dist) {
+                                    user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Snackbar.make(mainImage, getString(R.string.added_to_visited, poiName), Snackbar.LENGTH_LONG).show();
+                                        }
 
-                                @Override
-                                public void onDoesntExist() {
-                                    Toast.makeText(ctx, "Database Exception : user missing", Toast.LENGTH_SHORT).show();
-                                }
+                                        @Override
+                                        public void onDoesntExist() {
+                                            Snackbar.make(mainImage, R.string.user_not_found, Snackbar.LENGTH_LONG).show();
+                                        }
 
-                                @Override
-                                public void onFailure() {
-                                    Toast.makeText(ctx, "Failed to visit this place", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                        @Override
+                                        public void onFailure() {
+                                            Snackbar.make(mainImage, R.string.request_failed, Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
 
+                                }
+                            }
+                        }
+                    },
+                    new AndroidServices.OnGPSDisabledCallback() {
+                        @Override
+                        public void onGPSDisabed() {
+                            Snackbar.make(mainImage, R.string.gps_disabled, Snackbar.LENGTH_LONG).show();
                         }
                     }
-                }
-            });
+            );
         }
 
     }
@@ -504,10 +514,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         // add a marker to the poi position
         Position pos = poi.position();
-        LatLng mark = new LatLng(pos.latitude(), pos.longitude());
+        final LatLng mark = new LatLng(pos.latitude(), pos.longitude());
         googleMap.addMarker(new MarkerOptions().position(mark)
                 .title(poi.name()));
 
@@ -515,6 +525,17 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(mark));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         map.onResume();
+
+        // add listener to center map button
+        ImageButton centerButton = (ImageButton) findViewById(R.id.center_map_button);
+        centerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // move to the position and zoom
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(mark));
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+            }
+        });
     }
 
 
@@ -785,7 +806,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         popup.show();
 
     }
-
 
 }
 

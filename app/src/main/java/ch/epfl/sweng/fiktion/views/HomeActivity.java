@@ -51,10 +51,13 @@ public class HomeActivity extends MenuDrawerActivity {
         // get search field
         EditText placeText = (EditText) findViewById(R.id.placeText);
         EditText fictionText = (EditText) findViewById(R.id.fictionText);
-        String searchText = placeText.getText().toString();
-        if (searchText.isEmpty()) searchText = fictionText.getText().toString();
+        String place = placeText.getText().toString();
+        String fiction = fictionText.getText().toString();
+        String search = place;
+        if (place.isEmpty()) search = fiction;
+        else if (!fiction.isEmpty()) search += ", " + fiction;
 
-        i.putExtra("SEARCH_TEXT", searchText);
+        i.putExtra("SEARCH_TEXT", search);
         startActivity(i);
     }
 }

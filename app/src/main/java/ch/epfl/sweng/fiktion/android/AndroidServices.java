@@ -19,12 +19,20 @@ import ch.epfl.sweng.fiktion.R;
 
 public final class AndroidServices {
 
+    public interface OnGPSDisabledCallback {
+        void onGPSDisabed();
+    }
+
+    // Permissions identifiers
     public static final int MY_PERMISSIONS_CAMERA = 1;
 
     /**
-     * Prompts enable location dialog if GPS is disabled
+     * Checks if location is enabled, trigger callback otherwise
+     *
+     * @param context             from where we check the location
+     * @param gpsDisabledCallback what to do if GPS is disabled
      */
-    public static void promptLocationEnable(final Context context) {
+    public static void checkLocationEnable(final Context context, final OnGPSDisabledCallback gpsDisabledCallback) {
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = false;
         boolean network_enabled = false;
@@ -40,30 +48,35 @@ public final class AndroidServices {
         }
 
         if (!gps_enabled && !network_enabled) {
-            // notify user
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-            dialog.setMessage(context.getResources().getString(R.string.gps_network_not_enabled));
-            dialog.setPositiveButton(context.getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
-                    Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    context.startActivity(myIntent);
-                    //get gps
-                }
-            });
-            dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
-
-                }
-            });
-            dialog.show();
+            gpsDisabledCallback.onGPSDisabed();
         }
     }
 
+    /**
+     * Prompts enable location dialog if GPS is disabled
+     */
+    public static void promptLocationEnable(final Context context) {
+        checkLocationEnable(context, new OnGPSDisabledCallback() {
+            @Override
+            public void onGPSDisabed() {
+                // notify user
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                dialog.setMessage(context.getResources().getString(R.string.gps_network_not_enabled));
+                dialog.setPositiveButton(context.getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        context.startActivity(myIntent);
+                    }
+                });
+                dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) { /* do nothing */ }
+                });
+                dialog.show();
+            }
+        });
+    }
 
     public static void promptCameraEnable(final Context context) {
         CameraManager cm = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
@@ -87,12 +100,8 @@ public final class AndroidServices {
                     }
             );
             dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
-
                 @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
-
-                }
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) { /* do nothing */ }
             });
             dialog.show();
         }
