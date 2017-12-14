@@ -23,8 +23,38 @@ public class CommentPOIPost extends Post {
      * @throws NoSuchAlgorithmException
      */
     public CommentPOIPost(String commentId, String poiName, Date date) throws NoSuchAlgorithmException {
-        super(PostType.COMMENT_POI, HashUtils.sha256(commentId + poiName + date.getTime()), date);
+        this(commentId, poiName, date, HashUtils.sha256(commentId + poiName + date.getTime()));
+    }
+
+    /**
+     * creates a poi comment post
+     *
+     * @param commentId the comment id
+     * @param poiName   the name of the poi
+     * @param date      the date of the comment
+     * @param postId    the id of the post
+     */
+    public CommentPOIPost(String commentId, String poiName, Date date, String postId) {
+        super(PostType.COMMENT_POI, postId, date);
         this.commentId = commentId;
         this.poiName = poiName;
+    }
+
+    /**
+     * get the id of the comment
+     *
+     * @return the id of the comment
+     */
+    public String getCommentId() {
+        return commentId;
+    }
+
+    /**
+     * get the name of the poi
+     *
+     * @return the name of the poi
+     */
+    public String getPOIName() {
+        return poiName;
     }
 }

@@ -24,4 +24,31 @@ public abstract class Post {
         this.id = id;
         this.date = date;
     }
+
+    /**
+     * get the post type
+     *
+     * @return the type of the post
+     */
+    public PostType getType() {
+        return type;
+    }
+
+    /**
+     * get the id of the post
+     *
+     * @return the id of the post
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * get the date of the post
+     *
+     * @return the date of the post
+     */
+    public Date getDate() {
+        return new Date(date.getTime());
+    }
 }
