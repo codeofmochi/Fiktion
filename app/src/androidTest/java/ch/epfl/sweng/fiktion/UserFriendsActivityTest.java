@@ -27,8 +27,11 @@ import ch.epfl.sweng.fiktion.views.UserFriendsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withResourceName;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 
 public class UserFriendsActivityTest {
@@ -109,10 +112,23 @@ public class UserFriendsActivityTest {
         //TODO : click on V and X , accept or ignore request
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void visitFriendProfile(){
+        DatabaseProvider.getInstance().addUser(userWithRequestAndFriend, emptyAddUserListener);
+        Intent i = new Intent();
+        i.putExtra(ProfileActivity.USER_ID_KEY, "popularID");
+        i.putExtra(ProfileActivity.PROFILE_ACTION_KEY, ProfileActivity.PROFILE_ACTION_ME);
+        testRule.launchActivity(i);
+
+        onView(withText("user1")).perform(click());
+        onView(withText("user1")).check(matches(isDisplayed()));
+
     }
 
     @Test
@@ -126,7 +142,7 @@ public class UserFriendsActivityTest {
         //TODO : click on X : remove friend
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
