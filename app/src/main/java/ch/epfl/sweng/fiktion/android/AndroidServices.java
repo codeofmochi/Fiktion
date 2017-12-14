@@ -67,7 +67,6 @@ public final class AndroidServices {
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         context.startActivity(myIntent);
-                        //get gps
                     }
                 });
                 dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
@@ -101,12 +100,8 @@ public final class AndroidServices {
                     }
             );
             dialog.setNegativeButton(context.getString(R.string.Cancel), new DialogInterface.OnClickListener() {
-
                 @Override
-                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
-
-                }
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) { /* do nothing */ }
             });
             dialog.show();
         }
