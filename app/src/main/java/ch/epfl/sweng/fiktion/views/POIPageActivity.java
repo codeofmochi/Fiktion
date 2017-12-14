@@ -229,17 +229,17 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                                     user.visit(poiName, new DatabaseProvider.ModifyUserListener() {
                                         @Override
                                         public void onSuccess() {
-                                            Snackbar.make(mainImage, getString(R.string.added_to_visited, poiName), Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(mainImage, getString(R.string.added_to_visited, poiName), Snackbar.LENGTH_LONG).show();
                                         }
 
                                         @Override
                                         public void onDoesntExist() {
-                                            Snackbar.make(mainImage, R.string.user_not_found, Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(mainImage, R.string.user_not_found, Snackbar.LENGTH_LONG).show();
                                         }
 
                                         @Override
                                         public void onFailure() {
-                                            Snackbar.make(mainImage, R.string.request_failed, Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(mainImage, R.string.request_failed, Snackbar.LENGTH_LONG).show();
                                         }
                                     });
 
