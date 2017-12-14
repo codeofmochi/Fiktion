@@ -21,6 +21,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -513,10 +514,10 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         // add a marker to the poi position
         Position pos = poi.position();
-        LatLng mark = new LatLng(pos.latitude(), pos.longitude());
+        final LatLng mark = new LatLng(pos.latitude(), pos.longitude());
         googleMap.addMarker(new MarkerOptions().position(mark)
                 .title(poi.name()));
 
@@ -524,6 +525,17 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(mark));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         map.onResume();
+
+        // add listener to center map button
+        ImageButton centerButton = (ImageButton) findViewById(R.id.center_map_button);
+        centerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // move to the position and zoom
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(mark));
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+            }
+        });
     }
 
 
