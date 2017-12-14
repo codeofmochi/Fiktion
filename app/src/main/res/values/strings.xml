@@ -126,4 +126,5 @@
     <string name="added_to_visited">%s added to visited</string>
     <string name="view">View</string>
     <string name="center_map">Center map</string>
+    <string name="place_removed">Place removed</string>
 </resources>
