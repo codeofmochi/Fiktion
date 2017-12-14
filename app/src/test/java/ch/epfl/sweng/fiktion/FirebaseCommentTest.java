@@ -19,7 +19,7 @@ import java.util.List;
 
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.FirebaseComment;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseComment;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Mutable;
 

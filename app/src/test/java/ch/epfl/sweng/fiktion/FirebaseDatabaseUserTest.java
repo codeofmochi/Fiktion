@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.FirebaseUser;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseUser;
 
 import static ch.epfl.sweng.fiktion.FirebaseDatabaseUserTest.Result.ALREADYEXISTS;
 import static ch.epfl.sweng.fiktion.FirebaseDatabaseUserTest.Result.DOESNTEXIST;

@@ -17,6 +17,8 @@ import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseComment;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseUser;
 
 /**
  * Firebase database provider

@@ -22,6 +22,9 @@ public class FirebaseCommentPOIPost extends FirebasePost {
     public FirebaseCommentPOIPost() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Post toPost() {
         return new CommentPOIPost(commentId, poiName, new Date(milliseconds), id);
