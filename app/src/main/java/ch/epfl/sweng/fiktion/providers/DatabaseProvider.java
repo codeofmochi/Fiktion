@@ -10,6 +10,7 @@ import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.utils.Config;
 
 
@@ -279,4 +280,33 @@ public abstract class DatabaseProvider {
      * @param listener  the listener
      */
     public abstract void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener);
+
+    /**
+     * Listener that listens for the addition of a post
+     */
+    public interface AddPostListener extends Success, Failure {
+    }
+
+    /**
+     * Listener that listens for the retrieval of (a) post(s)
+     */
+    public interface GetPostListener extends Get<Post>, Failure {
+    }
+
+    /**
+     * add a user post and inform the listener of the result of the operation
+     *
+     * @param userId   the id of the user
+     * @param post     the post
+     * @param listener the listener
+     */
+    public abstract void addUserPost(String userId, Post post, AddPostListener listener);
+
+    /**
+     * get the posts of a user in time order, informt the listener of the results
+     *
+     * @param userId   the id of the user
+     * @param listener the listener
+     */
+    public abstract void getUserPosts(String userId, GetPostListener listener);
 }

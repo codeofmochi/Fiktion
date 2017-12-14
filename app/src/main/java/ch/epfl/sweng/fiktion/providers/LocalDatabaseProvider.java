@@ -16,6 +16,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.utils.HelperMethods;
 
 
@@ -175,8 +176,8 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         for (int i = 0; i < poiList.size(); ++i) {
             PointOfInterest aPOI = poiList.get(i);
             if (poi.equals(aPOI)) {
-                PointOfInterest mPOI = new PointOfInterest(poi.name(),poi.position(),poi.fictions(),
-                        poi.description(),aPOI.rating(),poi.country(), poi.city());
+                PointOfInterest mPOI = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
+                        poi.description(), aPOI.rating(), poi.country(), poi.city());
                 poiList.set(i, mPOI);
                 listener.onSuccess();
 
@@ -316,7 +317,6 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             }
         }
     }
-
 
 
     /**
@@ -565,6 +565,16 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     @Override
     public void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener) {
+
+    }
+
+    @Override
+    public void addUserPost(String userId, Post post, AddPostListener listener) {
+
+    }
+
+    @Override
+    public void getUserPosts(String userId, GetPostListener listener) {
 
     }
 }

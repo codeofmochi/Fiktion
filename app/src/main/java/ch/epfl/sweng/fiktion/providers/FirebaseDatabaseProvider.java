@@ -17,8 +17,23 @@ import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.AddPOIPost;
+import ch.epfl.sweng.fiktion.models.posts.CommentPOIPost;
+import ch.epfl.sweng.fiktion.models.posts.FavoritePOIPost;
+import ch.epfl.sweng.fiktion.models.posts.PhotoUploadPost;
+import ch.epfl.sweng.fiktion.models.posts.Post;
+import ch.epfl.sweng.fiktion.models.posts.PostType;
+import ch.epfl.sweng.fiktion.models.posts.VisitPOIPost;
+import ch.epfl.sweng.fiktion.models.posts.WishlistPOIPost;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseAddPOIPost;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseComment;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseCommentPOIPost;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseFavoritePOIPost;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePhotoUploadPost;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePost;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseUser;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseVisitPOIPost;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseWishlistPOIPost;
 
 /**
  * Firebase database provider
@@ -34,6 +49,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private final String commentsRef = "Comments";
     private final String poiCommentsRef = "POI comments";
     private final String commentVotersRef = "Comment voters";
+    private final String userPostsRef = "User posts";
 
     /**
      * Constructs a firebase database class that provides database methods
@@ -830,6 +846,130 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // inform the listener that the operation failed
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addUserPost(String userId, Post post, AddPostListener listener) {
+        // get the reference of the new post
+        DatabaseReference postRef = dbRef.child(userPostsRef).child(userId).child(post.getId());
+
+        // convert it in its firebase version
+        FirebasePost fPost;
+        try {
+            switch (post.getType()) {
+                case ADD_POI:
+                    fPost = new FirebaseAddPOIPost((AddPOIPost) post);
+                    break;
+
+                case VISIT_POI:
+                    fPost = new FirebaseVisitPOIPost((VisitPOIPost) post);
+                    break;
+
+                case COMMENT_POI:
+                    fPost = new FirebaseCommentPOIPost((CommentPOIPost) post);
+                    break;
+
+                case FAVORITE_POI:
+                    fPost = new FirebaseFavoritePOIPost((FavoritePOIPost) post);
+                    break;
+
+                case PHOTO_UPLOAD:
+                    fPost = new FirebasePhotoUploadPost((PhotoUploadPost) post);
+                    break;
+
+                case WISHLIST_POI:
+                    fPost = new FirebaseWishlistPOIPost((WishlistPOIPost) post);
+                    break;
+
+                default:
+                    listener.onFailure();
+                    return;
+            }
+        } catch (ClassCastException e) {
+            // if there is a cast problem (shouldn't happen), abort the operation
+            listener.onFailure();
+            return;
+        }
+
+        // set the value in firebase
+        postRef.setValue(fPost);
+        listener.onSuccess();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getUserPosts(String userId, final GetPostListener listener) {
+        // get the posts reference of the user
+        DatabaseReference userPostsReference = dbRef.child(userPostsRef).child(userId);
+
+        // order the posts by time (milliseconds) and get the posts
+        userPostsReference.orderByChild("milliseconds").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // get the type of the post
+                PostType type = dataSnapshot.child("type").getValue(PostType.class);
+                if (type == null) {
+                    return;
+                }
+
+                // get the post in its firebase form
+                FirebasePost fPost;
+                switch (type) {
+                    case ADD_POI:
+                        fPost = dataSnapshot.getValue(FirebaseAddPOIPost.class);
+                        break;
+
+                    case VISIT_POI:
+                        fPost = dataSnapshot.getValue(FirebaseVisitPOIPost.class);
+                        break;
+
+                    case COMMENT_POI:
+                        fPost = dataSnapshot.getValue(FirebaseCommentPOIPost.class);
+                        break;
+
+                    case FAVORITE_POI:
+                        fPost = dataSnapshot.getValue(FirebaseFavoritePOIPost.class);
+                        break;
+
+                    case PHOTO_UPLOAD:
+                        fPost = dataSnapshot.getValue(FirebasePhotoUploadPost.class);
+                        break;
+
+                    case WISHLIST_POI:
+                        fPost = dataSnapshot.getValue(FirebaseWishlistPOIPost.class);
+                        break;
+
+                    default:
+                        return;
+                }
+                if (fPost != null) {
+                    // convert it into a real post and inform the listener
+                    listener.onNewValue(fPost.toPost());
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
                 listener.onFailure();
             }
         });
