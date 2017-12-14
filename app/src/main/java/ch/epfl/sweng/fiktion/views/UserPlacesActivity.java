@@ -97,7 +97,6 @@ public class UserPlacesActivity extends AppCompatActivity {
         // get user id
         Intent from = getIntent();
         userId = from.getStringExtra(ProfileActivity.USER_ID_KEY);
-        if (userId == null) this.finish();
         profileType = from.getStringExtra(ProfileActivity.PROFILE_ACTION_KEY);
         if (profileType == null) profileType = ProfileActivity.PROFILE_ACTION_ANOTHER;
 
