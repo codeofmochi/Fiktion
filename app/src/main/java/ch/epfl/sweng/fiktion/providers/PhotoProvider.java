@@ -88,4 +88,25 @@ public abstract class PhotoProvider {
      * @param listener  the listener
      */
     public abstract void downloadPOIBitmap(String poiName, String photoName, DownloadBitmapListener listener);
+
+    enum UserPhotoType {PROFILE, BANNER}
+
+    /**
+     * uploads a bitmap for a user picture and inform the listener of the result
+     *
+     * @param bitmap   the bitmap to upload
+     * @param userId   the id of the user
+     * @param type     the type of the photo, PROFILE or BANNER
+     * @param listener the listener
+     */
+    public abstract void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, UploadPhotoListener listener);
+
+    /**
+     * downloads the photo of a user (profile or banner) as a bitmap, inform the listener of the result
+     *
+     * @param userId   the id of the user
+     * @param type     the type of the photo, PROFILE or BANNER
+     * @param listener the listener
+     */
+    public abstract void downloadUserBitmap(String userId, UserPhotoType type, DownloadBitmapListener listener);
 }
