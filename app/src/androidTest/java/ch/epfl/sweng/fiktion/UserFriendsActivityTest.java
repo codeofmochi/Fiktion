@@ -124,7 +124,7 @@ public class UserFriendsActivityTest {
         testRule.launchActivity(i);
 
         //TODO : click on X : remove friend
-        
+
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
