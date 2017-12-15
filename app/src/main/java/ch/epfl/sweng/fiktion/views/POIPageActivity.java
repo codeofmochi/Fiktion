@@ -493,7 +493,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
     }
 
-
     private void displayNearPois() {
         // find nearby pois
         DatabaseProvider.getInstance().findNearPOIs(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPOIsListener() {
@@ -537,7 +536,6 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
             }
         });
     }
-
 
     //photo and gallery
 
