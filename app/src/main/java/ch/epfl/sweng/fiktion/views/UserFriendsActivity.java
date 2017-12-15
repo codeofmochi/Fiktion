@@ -46,12 +46,14 @@ public class UserFriendsActivity extends AppCompatActivity {
         userId = from.getStringExtra(ProfileActivity.USER_ID_KEY);
         // activity action
         String stateKey = from.getStringExtra(ProfileActivity.PROFILE_ACTION_KEY);
+        if (stateKey == null) return;
+
         if (stateKey.equals(ProfileActivity.PROFILE_ACTION_ME))
             state = ProfileActivity.Action.MY_PROFILE;
         else if (stateKey.equals(ProfileActivity.PROFILE_ACTION_ANOTHER))
             state = ProfileActivity.Action.ANOTHER_PROFILE;
         // if no extra data found, give up
-        if (userId == null || stateKey == null) return;
+        if (userId == null) return;
 
         // find views
         friendsRequestsTitle = (TextView) findViewById(R.id.friends_requests_title);

@@ -998,12 +998,16 @@ public class UserTest {
         String id = "id1";
         userFR.removeRequest(id);
         assertFalse(userFR.getRequests().contains(id));
+        userFR.removeRequest(id);
+        assertFalse(userFR.getRequests().contains(id));
     }
 
     @Test
     public void testRemoveRequestAndGet() {
         String id = "id1";
         User u = userFR.removeRequestAndGet(id);
+        assertFalse(u.getRequests().contains(id));
+        userFR.removeRequestAndGet(id);
         assertFalse(u.getRequests().contains(id));
     }
 
@@ -1026,6 +1030,8 @@ public class UserTest {
         String id = "defaultID";
         userFR.removeFriend(id);
         assertFalse(userFR.getFriendlist().contains(id));
+        userFR.removeFriend(id);
+        assertFalse(userFR.getFriendlist().contains(id));
     }
 
     @Test
@@ -1033,5 +1039,28 @@ public class UserTest {
         String id = "defaultID";
         User u = userFR.removeFriendAndGet(id);
         assertFalse(u.getFriendlist().contains(id));
+        userFR.removeFriendAndGet(id);
+        assertFalse(u.getFriendlist().contains(id));
+
+    }
+
+    @Test
+    public void testRemoveInexistantVote(){
+        userFR.removeVote(defPoi.name(), new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+        });
     }
 }
