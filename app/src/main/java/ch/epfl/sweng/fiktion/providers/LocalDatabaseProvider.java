@@ -410,6 +410,9 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         listener.onDoesntExist();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
         if (user.getID().contains("MODIFYUSERS")) {
@@ -481,6 +484,9 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         listener.onSuccess();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getComment(String commentId, GetCommentListener listener) {
         if (commentId.contains("GETCOMMENTN")) {
@@ -562,16 +568,25 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void voteComment(String commentId, String userID, int vote, int previousVote, VoteListener listener) {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener) {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addUserPost(String userId, Post post, AddPostListener listener) {
         if (!posts.containsKey(userId)) {
@@ -588,6 +603,9 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         listener.onSuccess();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getUserPosts(String userId, GetPostListener listener) {
         if (posts.containsKey(userId)) {
