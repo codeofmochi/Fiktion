@@ -5,6 +5,8 @@ import java.util.Date;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.models.posts.PostType;
 
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;
+
 /**
  * A post implementation for Firebase
  *
@@ -22,7 +24,7 @@ public abstract class FirebasePost {
      */
     public FirebasePost(Post post) {
         this.type = post.getType();
-        this.id = post.getId();
+        this.id = encode(post.getId());
         this.milliseconds = post.getDate().getTime();
     }
 

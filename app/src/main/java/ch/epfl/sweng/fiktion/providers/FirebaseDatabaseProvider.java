@@ -44,12 +44,12 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     private DatabaseReference dbRef;
     private GeoFire geofire;
     private SearchProvider searchProvider;
-    private final String poisRefName = "Points of interest";
-    private final String usersRefName = "Users";
-    private final String commentsRef = "Comments";
-    private final String poiCommentsRef = "POI comments";
-    private final String commentVotersRef = "Comment voters";
-    private final String userPostsRef = "User posts";
+    private static final String poisRefName = "Points of interest";
+    private static final String usersRefName = "Users";
+    private static final String commentsRef = "Comments";
+    private static final String poiCommentsRef = "POI comments";
+    private static final String commentVotersRef = "Comment voters";
+    private static final String userPostsRef = "User posts";
 
     /**
      * Constructs a firebase database class that provides database methods
@@ -856,6 +856,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void addUserPost(String userId, Post post, AddPostListener listener) {
+        if (userId.isEmpty() || post.getId().isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
         // get the reference of the new post
         DatabaseReference postRef = dbRef.child(userPostsRef).child(userId).child(post.getId());
 
@@ -908,6 +913,11 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getUserPosts(String userId, final GetPostListener listener) {
+        if (userId.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
         // get the posts reference of the user
         DatabaseReference userPostsReference = dbRef.child(userPostsRef).child(userId);
 

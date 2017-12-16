@@ -5,6 +5,9 @@ import java.util.Date;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.models.posts.VisitPOIPost;
 
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.decode;
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;
+
 /**
  * A VisitPOIPost implementation for Firebase
  *
@@ -20,7 +23,7 @@ public class FirebaseVisitPOIPost extends FirebasePost {
      */
     public FirebaseVisitPOIPost(VisitPOIPost post) {
         super(post);
-        this.poiName = post.getPOIName();
+        this.poiName = encode(post.getPOIName());
     }
 
     /**
@@ -34,6 +37,6 @@ public class FirebaseVisitPOIPost extends FirebasePost {
      */
     @Override
     public Post toPost() {
-        return new VisitPOIPost(poiName, new Date(milliseconds), id);
+        return new VisitPOIPost(decode(poiName), new Date(milliseconds), decode(id));
     }
 }

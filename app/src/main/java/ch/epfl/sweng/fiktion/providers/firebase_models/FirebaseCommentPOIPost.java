@@ -5,6 +5,9 @@ import java.util.Date;
 import ch.epfl.sweng.fiktion.models.posts.CommentPOIPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.decode;
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;
+
 /**
  * Created by painguin on 14.12.17.
  */
@@ -15,8 +18,8 @@ public class FirebaseCommentPOIPost extends FirebasePost {
 
     public FirebaseCommentPOIPost(CommentPOIPost post) {
         super(post);
-        this.commentId = post.getCommentId();
-        this.poiName = post.getPOIName();
+        this.commentId = encode(post.getCommentId());
+        this.poiName = encode(post.getPOIName());
     }
 
     public FirebaseCommentPOIPost() {
@@ -27,6 +30,6 @@ public class FirebaseCommentPOIPost extends FirebasePost {
      */
     @Override
     public Post toPost() {
-        return new CommentPOIPost(commentId, poiName, new Date(milliseconds), id);
+        return new CommentPOIPost(decode(commentId), decode(poiName), new Date(milliseconds), decode(id));
     }
 }

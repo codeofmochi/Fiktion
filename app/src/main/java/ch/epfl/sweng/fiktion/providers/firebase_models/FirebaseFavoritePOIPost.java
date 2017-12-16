@@ -5,6 +5,9 @@ import java.util.Date;
 import ch.epfl.sweng.fiktion.models.posts.FavoritePOIPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.decode;
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;
+
 /**
  * A FavoritePOIPost implementation for Firebase
  *
@@ -20,7 +23,7 @@ public class FirebaseFavoritePOIPost extends FirebasePost {
      */
     public FirebaseFavoritePOIPost(FavoritePOIPost post) {
         super(post);
-        this.poiName = post.getPOIName();
+        this.poiName = encode(post.getPOIName());
     }
 
     /**
@@ -34,6 +37,6 @@ public class FirebaseFavoritePOIPost extends FirebasePost {
      */
     @Override
     public Post toPost() {
-        return new FavoritePOIPost(poiName, new Date(milliseconds), id);
+        return new FavoritePOIPost(decode(poiName), new Date(milliseconds), decode(id));
     }
 }

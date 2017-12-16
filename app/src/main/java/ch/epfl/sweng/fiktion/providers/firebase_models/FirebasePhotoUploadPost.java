@@ -5,6 +5,9 @@ import java.util.Date;
 import ch.epfl.sweng.fiktion.models.posts.PhotoUploadPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.decode;
+import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;
+
 /**
  * A PhotoUploadPost implementation for Firebase
  *
@@ -21,8 +24,8 @@ public class FirebasePhotoUploadPost extends FirebasePost {
      */
     public FirebasePhotoUploadPost(PhotoUploadPost post) {
         super(post);
-        this.photoId = post.getPhotoId();
-        this.poiName = post.getPOIName();
+        this.photoId = encode(post.getPhotoId());
+        this.poiName = encode(post.getPOIName());
     }
 
     /**
@@ -36,6 +39,6 @@ public class FirebasePhotoUploadPost extends FirebasePost {
      */
     @Override
     public Post toPost() {
-        return new PhotoUploadPost(photoId, poiName, new Date(milliseconds), id);
+        return new PhotoUploadPost(decode(photoId), decode(poiName), new Date(milliseconds), decode(id));
     }
 }

@@ -8,9 +8,9 @@ import java.util.Date;
  * @author pedro
  */
 public abstract class Post {
-    protected final PostType type;
-    protected final String id;
-    protected final Date date;
+    private final PostType type;
+    private final String id;
+    private final Date date;
 
     /**
      * constructs a post
@@ -50,5 +50,17 @@ public abstract class Post {
      */
     public Date getDate() {
         return new Date(date.getTime());
+    }
+
+    /**
+     * equality if parameter is a post and has the same field values
+     *
+     * @param that the compared object
+     * @return true if they are equal
+     */
+    @Override
+    public boolean equals(Object that) {
+        return that instanceof Post && type.equals(((Post) that).getType()) &&
+                id.equals(((Post) that).getId()) && date.equals(((Post) that).getDate());
     }
 }
