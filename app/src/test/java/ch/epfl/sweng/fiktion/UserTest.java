@@ -26,6 +26,7 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseUser;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
+import ch.epfl.sweng.fiktion.utils.LocalDatabaseFiller;
 
 import static ch.epfl.sweng.fiktion.UserTest.Result.DOESNOTEXIST;
 import static ch.epfl.sweng.fiktion.UserTest.Result.FAILURE;
@@ -125,6 +126,7 @@ public class UserTest {
 
     @Before
     public void setUp() {
+        LocalDatabaseFiller.addBasicUsers();
         localDB = DatabaseProvider.getInstance();
 
         result = NOTHING;

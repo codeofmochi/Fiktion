@@ -1,10 +1,8 @@
 package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +12,6 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
-import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.utils.HelperMethods;
 
@@ -25,40 +22,9 @@ import ch.epfl.sweng.fiktion.utils.HelperMethods;
  * @author pedro
  */
 public class LocalDatabaseProvider extends DatabaseProvider {
-    private final User defaultUser = new User("default", "defaultID");
-    private final User user1 = new User("user1", "id1");
-    // Initiating friendlists and friendRequests
-    private final String[] frList = new String[]{"defaultID"};
-    private final String[] rList = new String[]{"id1"};
-    private final String[] fakeFList = new String[]{"idfake"};
-    private final String[] fakeRList = new String[]{"idfake"};
-    private final String[] favList = new String[]{"fav POI"};
-    private final String[] whishList = new String[]{"wish POI"};
-    private final String[] visitedList = new String[]{"vis POI"};
 
-    // user has "fav POI" as favourite, "vis POI" in visited and "wish POI" in wishlist
-    private final User userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)), new TreeSet<>(Arrays.asList(whishList)),
-            new TreeSet<String>(), new TreeSet<String>(),
-            new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
-
-    // user is friend with defaultUser and has user1 in his requests
-    private final User userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
-            new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)),
-            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
-
-    // user with a friend that is not stored in the database
-    private final User userFakeF = new User("userFakeF", "idfakef", new TreeSet<String>(), new TreeSet<String>(),
-            new TreeSet<>(Arrays.asList(fakeFList)), new TreeSet<String>(),
-            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
-
-    // user has request from fake friend
-    private final User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
-            new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)),
-            new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
-
-    private final List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
     private List<PointOfInterest> poiList = new ArrayList<>();
-    public List<User> users = new ArrayList<>(initialList);
+    public List<User> users = new ArrayList<>();
     private Map<String, List<String>> poiComments = new TreeMap<>();
     private Map<String, Comment> comments = new TreeMap<>();
 
@@ -177,8 +143,8 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         for (int i = 0; i < poiList.size(); ++i) {
             PointOfInterest aPOI = poiList.get(i);
             if (poi.equals(aPOI)) {
-                PointOfInterest mPOI = new PointOfInterest(poi.name(),poi.position(),poi.fictions(),
-                        poi.description(),aPOI.rating(),poi.country(), poi.city());
+                PointOfInterest mPOI = new PointOfInterest(poi.name(), poi.position(), poi.fictions(),
+                        poi.description(), aPOI.rating(), poi.country(), poi.city());
                 poiList.set(i, mPOI);
                 listener.onSuccess();
 
@@ -318,7 +284,6 @@ public class LocalDatabaseProvider extends DatabaseProvider {
             }
         }
     }
-
 
 
     /**

@@ -17,6 +17,7 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.LocalAuthProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
+import ch.epfl.sweng.fiktion.utils.LocalDatabaseFiller;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -55,6 +56,7 @@ public class UserControllerTest {
 
     @Before
     public void setUp() {
+        LocalDatabaseFiller.addBasicUsers();
 
         auth = AuthProvider.getInstance();
         // Initiating friendlists and friendRequests
