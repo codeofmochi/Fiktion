@@ -67,6 +67,10 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private Map<String, Set<GetCommentsListener>> getCommentsListeners = new TreeMap<>();
     private Map<String, Set<GetPOIListener>> getPOIListeners = new TreeMap();
 
+    private Map<String, Set<Post>> posts = new TreeMap<>();
+    private Map<String, Set<GetPostListener>> getPostListeners = new TreeMap<>();
+
+
     /**
      * {@inheritDoc}
      */
@@ -570,11 +574,31 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
     @Override
     public void addUserPost(String userId, Post post, AddPostListener listener) {
+        if (!posts.containsKey(userId)) {
+            posts.put(userId, new HashSet<Post>());
+        }
+        posts.get(userId).add(post);
 
+        if (getPostListeners.containsKey(userId)) {
+            for (GetPostListener l : getPostListeners.get(userId)) {
+                l.onNewValue(post);
+            }
+        }
+
+        listener.onSuccess();
     }
 
     @Override
     public void getUserPosts(String userId, GetPostListener listener) {
+        if (posts.containsKey(userId)) {
+            for (Post post : posts.get(userId)) {
+                listener.onNewValue(post);
+            }
+        }
 
+        if (!getPostListeners.containsKey(userId)) {
+            getPostListeners.put(userId, new HashSet<GetPostListener>());
+        }
+        getPostListeners.get(userId).add(listener);
     }
 }
