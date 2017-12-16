@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.providers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +25,9 @@ import ch.epfl.sweng.fiktion.utils.HelperMethods;
 public class LocalDatabaseProvider extends DatabaseProvider {
 
     private List<PointOfInterest> poiList = new ArrayList<>();
-    public List<User> users = new ArrayList<>();
+
+    private final User defaultUser = new User("default", "defaultID");
+    public List<User> users = new ArrayList<>(Collections.singletonList(defaultUser));
     private Map<String, List<String>> poiComments = new TreeMap<>();
     private Map<String, Comment> comments = new TreeMap<>();
 

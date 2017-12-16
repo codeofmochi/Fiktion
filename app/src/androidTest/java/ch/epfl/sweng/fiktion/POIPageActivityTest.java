@@ -144,19 +144,6 @@ public class POIPageActivityTest {
             public void onFailure() {
             }
         });
-        DatabaseProvider.getInstance().addUser(new User("default", "defaultID"), new DatabaseProvider.AddUserListener() {
-            @Override
-            public void onAlreadyExists() {
-            }
-
-            @Override
-            public void onFailure() {
-            }
-
-            @Override
-            public void onSuccess() {
-            }
-        });
         AuthProvider.getInstance().signIn("default@email.ch", "testing", new AuthProvider.AuthListener() {
             @Override
             public void onSuccess() {

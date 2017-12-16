@@ -17,7 +17,6 @@ public class LocalDatabaseFiller {
 
     public static void addBasicUsers() {
         if (Config.TEST_MODE) {
-            User defaultUser = new User("default", "defaultID");
             final User user1 = new User("user1", "id1");
 
             // Initiating friendlists and friendRequests
@@ -48,7 +47,7 @@ public class LocalDatabaseFiller {
             User userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
                     new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)),
                     new LinkedList<String>(), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
-            List<User> initialList = Arrays.asList(defaultUser, user1, userFR, userFakeF, userFakeR, userWVFav);
+            List<User> initialList = Arrays.asList(user1, userFR, userFakeF, userFakeR, userWVFav);
 
             DatabaseProvider.AddUserListener listener = new DatabaseProvider.AddUserListener() {
                 @Override
