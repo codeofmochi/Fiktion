@@ -553,7 +553,7 @@ public class POIPageActivityTest {
     }
 
     @Test
-    public void addToVisited(){
+    public void addToVisited() {
         PointOfInterest poiClose = new PointOfInterest("poiClose", new Position(6.56, 46.5167), new TreeSet<String>(), "", 0, "", "");
         DatabaseProvider.getInstance().addPOI(poiClose, emptyAddPOIListener);
         Intent i = new Intent();
