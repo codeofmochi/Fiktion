@@ -27,6 +27,14 @@ public abstract class AuthProvider {
         return auth;
     }
 
+    /**
+     * Sets the current instance to the given authentication instance
+     *
+     * @param authInstance authentication instance
+     */
+    public static void setInstance(AuthProvider authInstance) {
+        auth = authInstance;
+    }
 
     /**
      * Destroys current authentication instance
