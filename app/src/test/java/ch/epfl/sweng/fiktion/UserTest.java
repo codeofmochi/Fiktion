@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseUser;
 import ch.epfl.sweng.fiktion.providers.LocalDatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
+import ch.epfl.sweng.fiktion.utils.LocalDatabaseFiller;
 
 import static ch.epfl.sweng.fiktion.UserTest.Result.DOESNOTEXIST;
 import static ch.epfl.sweng.fiktion.UserTest.Result.FAILURE;
@@ -52,7 +54,7 @@ public class UserTest {
 
     private PointOfInterest defPoi = poiWithName("poi");
 
-    private DatabaseProvider localDB = DatabaseProvider.getInstance();
+    private DatabaseProvider localDB;
 
     private DatabaseProvider.ModifyUserListener mUserListener;
 
@@ -124,6 +126,8 @@ public class UserTest {
 
     @Before
     public void setUp() {
+        LocalDatabaseFiller.addBasicUsers();
+        localDB = DatabaseProvider.getInstance();
 
         result = NOTHING;
 
@@ -149,6 +153,11 @@ public class UserTest {
 
         doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
 
+    }
+
+    @After
+    public void destroy() {
+        DatabaseProvider.destroyInstance();
     }
 
 
