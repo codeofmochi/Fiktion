@@ -121,6 +121,7 @@ public class UserFriendsActivityTest {
     @Test
     public void visitFriendProfile(){
         DatabaseProvider.getInstance().addUser(userWithRequestAndFriend, emptyAddUserListener);
+        DatabaseProvider.getInstance().addUser(new User("user1", "id1"), emptyAddUserListener);
         Intent i = new Intent();
         i.putExtra(ProfileActivity.USER_ID_KEY, "popularID");
         i.putExtra(ProfileActivity.PROFILE_ACTION_KEY, ProfileActivity.PROFILE_ACTION_ME);
@@ -128,7 +129,6 @@ public class UserFriendsActivityTest {
 
         onView(withText("user1")).perform(click());
         onView(withText("user1")).check(matches(isDisplayed()));
-
     }
 
     @Test
