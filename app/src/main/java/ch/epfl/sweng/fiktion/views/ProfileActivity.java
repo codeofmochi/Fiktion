@@ -269,7 +269,6 @@ public class ProfileActivity extends MenuDrawerActivity {
         String firstName = userInfos.getFirstName();
         String lastName = userInfos.getLastName();
         String homeCountry = userInfos.getCountry();
-        int age = userInfos.getAge();
         // hide loading
         loading.dismiss();
         // display infos
@@ -279,9 +278,9 @@ public class ProfileActivity extends MenuDrawerActivity {
             builder.append(" ");
             builder.append(lastName);
         }
-        if (age != 0) {
+        if (userInfos.getAge()!=0) {
             builder.append(", ");
-            builder.append(age);
+            builder.append(userInfos.getAge());
         }
 
         realInfos.setText(builder.toString());

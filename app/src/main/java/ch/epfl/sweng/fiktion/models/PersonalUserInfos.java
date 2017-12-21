@@ -60,8 +60,11 @@ public class PersonalUserInfos {
     }
 
     public int getAge() {
+        if(year==1){
+            return 0;
+        }
         LocalDate now = new LocalDate();
-        LocalDate birthday = new LocalDate(year, month-1, day);
+        LocalDate birthday = new LocalDate(year, month, day);
         Period period = new Period(birthday, now, PeriodType.years());
         return period.getYears();
     }
