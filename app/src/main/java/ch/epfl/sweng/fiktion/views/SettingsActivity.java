@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -95,7 +94,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             // Do something with the date chosen by the user
             //month needs to be incrementd because of API
             birthday = new LocalDate(year, month, day);
-            birthdayText.setText(day + "/" + (month+1) + "/" + year);
+            birthdayText.setText(day + "/" + (month + 1) + "/" + year);
         }
     }
 
@@ -160,6 +159,24 @@ public class SettingsActivity extends MenuDrawerActivity {
         countryEdit = (EditText) findViewById(R.id.countryEdit);
         birthdayText = (TextView) findViewById(R.id.birthdayDisplay);
 
+        // profile is public setting
+        profilePublicSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+                user.changeProfilePrivacy(isChecked, new AuthProvider.AuthListener() {
+                    @Override
+                    public void onFailure() {
+                        Toast.makeText(ctx, R.string.request_failed, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(ctx, R.string.privacy_updated, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
         // notifs
         randomNotif = (Switch) findViewById(R.id.someNotificationSwitch);
         randomNotif.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -188,7 +205,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     @Override
     public void onStart() {
         super.onStart();
-        
+
         auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onNewValue(User currUser) {
@@ -202,7 +219,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 lastnameEdit.setHint(userPersonalInfos.getLastName());
                 countryEdit.setHint(userPersonalInfos.getCountry());
                 LocalDate userBirthday = userPersonalInfos.getBirthday();
-                birthdayText.setText(userBirthday.getDayOfMonth() + "/" + (userBirthday.getMonthOfYear()+1) + "/" + userBirthday.getYear());
+                birthdayText.setText(userBirthday.getDayOfMonth() + "/" + (userBirthday.getMonthOfYear() + 1) + "/" + userBirthday.getYear());
                 settings = user.getSettings();
                 int progress = settings.getSearchRadius();
                 radiusValue.setText(String.valueOf(progress));
@@ -370,6 +387,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         verifyButton.setEnabled(enabled);
         signOutButton.setEnabled(enabled);
         birthdayPickerButton.setEnabled(enabled);
+        profilePublicSwitch.setEnabled(enabled);
     }
 
     /**

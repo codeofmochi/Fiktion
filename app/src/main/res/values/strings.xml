@@ -132,4 +132,5 @@
     <string name="date_format">DD/MM/YYYY</string>
     <string name="Change">Change</string>
     <string name="save_profile_settings">Save profile settings</string>
+    <string name="privacy_updated">Privacy setting updated</string>
 </resources>
