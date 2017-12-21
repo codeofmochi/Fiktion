@@ -30,7 +30,6 @@ public class DiscoverActivity extends MenuDrawerActivity {
 
             @Override
             public void onNewValue(final PointOfInterest poi) {
-                Log.d("mylogs", "onNewValue: " + layout.getChildCount());
                 layout.addView(POIDisplayer.createPoiCard(poi, ctx));
             }
         });
