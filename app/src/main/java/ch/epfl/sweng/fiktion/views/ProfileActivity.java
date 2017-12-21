@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -273,7 +274,6 @@ public class ProfileActivity extends MenuDrawerActivity {
         loading.dismiss();
         // display infos
         username.setText(user.getName());
-        //TODO : implement these in class User and retrieve them here
         if (!firstName.isEmpty() || !lastName.isEmpty()) {
             builder.append(firstName);
             builder.append(" ");

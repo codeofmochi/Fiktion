@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -43,18 +44,20 @@ public class SettingsActivity extends MenuDrawerActivity {
     private EditText userNewEmail;
 
     private Button saveSettingsButton;
+    private Button saveProfileSettingsButton;
     private Button verifyButton;
     private Button deleteButton;
     private Button signOutButton;
     private Button resetButton;
 
     // profile infos
+    private PersonalUserInfos userPersonalInfos;
     private static LocalDate birthday;
     private Switch profilePublicSwitch;
     private EditText firstnameEdit;
     private EditText lastnameEdit;
     private EditText countryEdit;
-    private TextView birthdayText;
+    private static TextView birthdayText;
     private Button birthdayPickerButton;
 
     // notifications
@@ -65,7 +68,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     private User user;
     private Settings settings;
-    private DatabaseProvider database = DatabaseProvider.getInstance();
 
     private AuthProvider auth = AuthProvider.getInstance();
 
@@ -91,8 +93,9 @@ public class SettingsActivity extends MenuDrawerActivity {
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
-            birthday = new LocalDate(year,month, day);
-
+            //month needs to be incrementd because of API
+            birthday = new LocalDate(year, month, day);
+            birthdayText.setText(day + "/" + (month+1) + "/" + year);
         }
     }
 
@@ -106,11 +109,23 @@ public class SettingsActivity extends MenuDrawerActivity {
         userNewEmail = (EditText) findViewById(R.id.emailEdit);
         userNewName = (EditText) findViewById(R.id.usernameEdit);
 
+        saveProfileSettingsButton = (Button) findViewById(R.id.saveProfileSettingsButton);
         saveSettingsButton = (Button) findViewById(R.id.saveAccountSettingsButton);
         verifyButton = (Button) findViewById(R.id.verifiedButton);
         deleteButton = (Button) findViewById(R.id.deleteAccountButton);
         signOutButton = (Button) findViewById(R.id.signOutButton);
         resetButton = (Button) findViewById(R.id.passwordReset);
+        // get date picker
+        birthdayPickerButton = (Button) findViewById(R.id.birthdayButton);
+        birthdayPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getFragmentManager(), "datePicker");
+            }
+        });
+
+        setButtons(false);
         //search radius slider and text set up
 
         radiusValue = (TextView) findViewById(R.id.searchRadiusNum);
@@ -137,15 +152,6 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
         });
 
-        // get date picker
-        birthdayPickerButton = (Button) findViewById(R.id.birthdayButton);
-        birthdayPickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DialogFragment newFragment = new DatePickerFragment();
-                newFragment.show(getFragmentManager(), "datePicker");
-            }
-        });
 
         // find profile infos fields
         profilePublicSwitch = (Switch) findViewById(R.id.publicProfileSwitch);
@@ -188,8 +194,16 @@ public class SettingsActivity extends MenuDrawerActivity {
             @Override
             public void onNewValue(User currUser) {
                 user = currUser;
+                userPersonalInfos = user.getPersonalUserInfos();
+                setButtons(true);
+                // set current values as hints
                 userNewName.setHint(user.getName());
                 userNewEmail.setHint(auth.getEmail());
+                firstnameEdit.setHint(userPersonalInfos.getFirstName());
+                lastnameEdit.setHint(userPersonalInfos.getLastName());
+                countryEdit.setHint(userPersonalInfos.getCountry());
+                LocalDate userBirthday = userPersonalInfos.getBirthday();
+                birthdayText.setText(userBirthday.getDayOfMonth() + "/" + userBirthday.getMonthOfYear() + "/" + userBirthday.getYear());
                 settings = user.getSettings();
                 int progress = settings.getSearchRadius();
                 radiusValue.setText(String.valueOf(progress));
@@ -347,6 +361,16 @@ public class SettingsActivity extends MenuDrawerActivity {
         } else {
             userNewName.setError("Please type a new and valid username");
         }
+    }
+
+    private void setButtons(boolean enabled) {
+        deleteButton.setEnabled(enabled);
+        resetButton.setEnabled(enabled);
+        saveSettingsButton.setEnabled(enabled);
+        saveProfileSettingsButton.setEnabled(enabled);
+        verifyButton.setEnabled(enabled);
+        signOutButton.setEnabled(enabled);
+        birthdayPickerButton.setEnabled(enabled);
     }
 
     /**
@@ -545,7 +569,7 @@ public class SettingsActivity extends MenuDrawerActivity {
      * Triggered by save profile button
      */
     public void saveProfile(View view) {
-        PersonalUserInfos oldValues = user.getPersonalUserInfos();
+        PersonalUserInfos oldValues = userPersonalInfos;
         String inputFirstName = firstnameEdit.getText().toString();
         String inputLastName = lastnameEdit.getText().toString();
         String inputCountry = countryEdit.getText().toString();
@@ -557,17 +581,17 @@ public class SettingsActivity extends MenuDrawerActivity {
         user.updatePersonalInfos(newValues, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onDoesntExist() {
-                Toast.makeText(ctx , "Data not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Data not found", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure() {
-                Toast.makeText(ctx , "Failed to update profile", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Failed to update profile", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSuccess() {
-                Toast.makeText(ctx , "Profile updates successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Profile updates successfully!", Toast.LENGTH_SHORT).show();
             }
         });
     }
