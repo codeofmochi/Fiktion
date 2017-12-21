@@ -63,7 +63,8 @@ public class AddPOIPost extends Post {
         TextView header = new TextView(ctx);
         header.setTextColor(ctx.getResources().getColor(R.color.darkGray));
         header.setText(username + " added this place :");
-        header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.location_icon_24, 0, 0, 0);
+        header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.location_icon_20, 0, 0, 0);
+        header.setCompoundDrawablePadding(5);
         inner.addView(header);
 
         // main content
