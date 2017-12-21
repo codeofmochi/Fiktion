@@ -7,7 +7,6 @@
     <string name="gps_network_not_enabled">GPS location is not enabled.</string>
     <string name="open_location_settings">Settings</string>
     <string name="Cancel">Cancel</string>
-    <string name="add_poi_title">Add a Point of Interest</string>
     <string name="add_poi_name">ex: Akihabara</string>
     <string name="add_poi_fiction">ex: Steins;Gate</string>
     <string name="add_poi_position_wiki">From wiki link</string>
@@ -30,9 +29,6 @@
     <string name="register">Register</string>
     <string name="sign_out_button">Sign Out</string>
     <string name="search">Search</string>
-
-    <string name="request_poi_name">Please write the name of your Point of interest</string>
-    <string name="invalid_characters">Those characters are not accepted: . $ # [ ] /</string>
 
     <!-- MainActivity -->
     <string name="singn_in_button">SignIn</string>

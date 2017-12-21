@@ -59,7 +59,7 @@ public class UserTest {
 
     private DatabaseProvider.ModifyUserListener mUserListener;
 
-    PersonalUserInfos newInfos = new PersonalUserInfos(2016, 11, 27, "test", "sweng", "epfl");
+    private PersonalUserInfos newInfos = new PersonalUserInfos(2016, 11, 27, "test", "sweng", "epfl");
 
     private PointOfInterest poiWithName(String name) {
         return new PointOfInterest(name, new Position(0, 0),
