@@ -24,7 +24,7 @@ public class FirebasePhotoUploadPost extends FirebasePost {
      */
     public FirebasePhotoUploadPost(PhotoUploadPost post) {
         super(post);
-        this.photoId = encode(post.getPhotoId());
+        this.photoId = encode(post.getPhotoName());
         this.poiName = encode(post.getPOIName());
     }
 

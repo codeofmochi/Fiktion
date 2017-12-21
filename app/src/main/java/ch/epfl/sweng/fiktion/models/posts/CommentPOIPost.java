@@ -1,6 +1,7 @@
 package ch.epfl.sweng.fiktion.models.posts;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.HashUtils;
+import ch.epfl.sweng.fiktion.views.POIPageActivity;
 
 /**
  * A post that represents the addition of a comment to a poi
@@ -74,7 +76,7 @@ public class CommentPOIPost extends Post {
         // header comment
         TextView header = new TextView(ctx);
         header.setTextColor(ctx.getResources().getColor(R.color.darkGray));
-        header.setText(username + " added this place :");
+        header.setText(username + " added wrote a comment for " + poiName + " :");
         header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.rate_review_icon_20, 0, 0, 0);
         header.setCompoundDrawablePadding(5);
         inner.addView(header);
@@ -97,6 +99,15 @@ public class CommentPOIPost extends Post {
 
             @Override
             public void onModifiedValue(Comment value) { /* nothing*/ }
+        });
+
+        inner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ctx, POIPageActivity.class);
+                i.putExtra("POI_NAME", poiName);
+                ctx.startActivity(i);
+            }
         });
 
         return super.display(inner, ctx);

@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:background="@color/bgLightGray"
     android:clipToPadding="false"
-    android:paddingBottom="20dp"
+    android:paddingBottom="100dp"
     tools:context="ch.epfl.sweng.fiktion.views.ProfileActivity"
     tools:ignore="Overdraw">
 
@@ -366,6 +366,15 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
+        android:text="@string/thats_all"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/posts" />
 
 
 </android.support.constraint.ConstraintLayout>

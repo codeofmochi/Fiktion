@@ -138,4 +138,5 @@
     <string name="Change">Change</string>
     <string name="save_profile_settings">Save profile settings</string>
     <string name="privacy_updated">Privacy setting updated</string>
+    <string name="thats_all">That\'s all.</string>
 </resources>

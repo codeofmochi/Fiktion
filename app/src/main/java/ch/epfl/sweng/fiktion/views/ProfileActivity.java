@@ -27,9 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Calendar;
-import java.util.Date;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
@@ -37,8 +34,6 @@ import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.User;
-import ch.epfl.sweng.fiktion.models.posts.AddPOIPost;
-import ch.epfl.sweng.fiktion.models.posts.CommentPOIPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -322,6 +317,8 @@ public class ProfileActivity extends MenuDrawerActivity {
         setPictureOnClickListener(PhotoProvider.UserPhotoType.BANNER);
 
         // get user history
+        // reset history
+        posts.removeAllViews();
         if (isVisibleFromPrivacy()) {
             DatabaseProvider.getInstance().getUserPosts(userId, new DatabaseProvider.GetPostListener() {
                 @Override
@@ -331,20 +328,9 @@ public class ProfileActivity extends MenuDrawerActivity {
 
                 @Override
                 public void onNewValue(Post value) {
-                    // add post to linear layout
-                    // TODO uncomment
-                    // posts.addView(value.display(ctx, user.getName()));
+                    posts.addView(value.display(ctx, user.getName()));
                 }
             });
-        }
-
-        // TODO DEBUG TEST
-        try {
-            Post p = new CommentPOIPost("2c1db8b1bab09cc9598b25fc02ad66635ffeedf82f3391abff30c94afd868909", "Akihabara", new Date());
-            View v = p.display(ctx, user.getName());
-            posts.addView(v);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
         }
     }
 
