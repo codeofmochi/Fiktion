@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
@@ -107,6 +110,8 @@ public class ProfileActivity extends MenuDrawerActivity {
                     // user is logged in but it is not his profile
                     showAnotherProfile();
                 }
+
+                downloadUserPictures();
             }
 
             @Override
@@ -270,6 +275,36 @@ public class ProfileActivity extends MenuDrawerActivity {
         //TODO : implement these in class User and retrieve them here
         realInfos.setText("John Doe, 21");
         country.setText("Switzerland");
+    }
+
+    private final String TAG = "mylogs";
+
+    private void downloadUserPictures() {
+        if (userId != null) {
+            PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.PROFILE, new PhotoProvider.DownloadBitmapListener() {
+                @Override
+                public void onNewValue(Bitmap value) {
+                    profilePicture.setImageBitmap(value);
+                    Log.d(TAG, "onNewValue: ");
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.d(TAG, "onFailure: ");
+                }
+            });
+
+            PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.BANNER, new PhotoProvider.DownloadBitmapListener() {
+                @Override
+                public void onNewValue(Bitmap value) {
+                    profileBanner.setImageBitmap(value);
+                }
+
+                @Override
+                public void onFailure() {
+                }
+            });
+        }
     }
 
     /**
