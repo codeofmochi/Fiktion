@@ -282,6 +282,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:clipToPadding="false"
             android:orientation="vertical"
             android:padding="20dp">
 
@@ -377,6 +378,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
+                android:clipToPadding="false"
                 android:orientation="horizontal">
 
                 <TextView
@@ -398,6 +400,7 @@
                     android:id="@+id/birthdayButton"
                     android:layout_width="100dp"
                     android:layout_height="36dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@color/lightGray"
                     android:ems="10"
