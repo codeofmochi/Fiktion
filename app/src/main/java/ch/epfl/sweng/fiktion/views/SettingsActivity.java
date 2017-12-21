@@ -5,11 +5,13 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -153,7 +155,22 @@ public class SettingsActivity extends MenuDrawerActivity {
         randomNotif.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                if (isChecked) {
+                    int notifId = 0;
+                    NotificationCompat.Builder notifBuilder =
+                            new NotificationCompat.Builder(context)
+                                    .setAutoCancel(true)
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setContentTitle("New notification from Fiktion")
+                                    .setContentText("Congratz. Happy now?")
+                                    .setVibrate(new long[]{500, 500})
+                                    .setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+                    NotificationManager notifManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (notifManager != null) {
+                        notifManager.notify(notifId, notifBuilder.build());
+                    }
+                }
             }
         });
     }
