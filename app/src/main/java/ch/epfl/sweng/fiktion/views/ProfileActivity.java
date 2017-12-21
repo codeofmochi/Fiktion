@@ -279,7 +279,7 @@ public class ProfileActivity extends MenuDrawerActivity {
             builder.append(" ");
             builder.append(lastName);
         }
-        if(age != 0){
+        if (age != 0) {
             builder.append(", ");
             builder.append(age);
         }

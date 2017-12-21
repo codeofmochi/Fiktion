@@ -2,6 +2,9 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,10 +12,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.Settings;
@@ -25,6 +31,30 @@ import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
 
+    /**
+     * Date picker for birthday
+     */
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            // Do something with the date chosen by the user
+            // TODO
+        }
+    }
+
     private Activity ctx = this;
     private EditText userNewName;
     private EditText userNewEmail;
@@ -34,6 +64,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button deleteButton;
     private Button signOutButton;
     private Button resetButton;
+    private Button birthdayPickerButton;
 
     private SeekBar radiusSlider;
     private TextView radiusValue;
@@ -85,6 +116,16 @@ public class SettingsActivity extends MenuDrawerActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 Config.settings = new Settings(Integer.parseInt(radiusValue.getText().toString()));
+            }
+        });
+        
+        // get date picker
+        birthdayPickerButton = (Button) findViewById(R.id.birthdayButton);
+        birthdayPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getFragmentManager(), "datePicker");
             }
         });
 
