@@ -128,4 +128,6 @@
     <string name="place_removed">Place removed</string>
     <string name="change_picture">Change the picture</string>
     <string name="fullscreen">Fullscreen</string>
+    <string name="no_pictures_yet">No pictures yet. Add some?</string>
+    <string name="no_achievements_yet">No achievements yet. Get some?</string>
 </resources>
