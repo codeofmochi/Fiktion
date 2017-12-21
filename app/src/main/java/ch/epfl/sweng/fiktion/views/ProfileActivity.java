@@ -33,6 +33,7 @@ import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
@@ -290,8 +291,59 @@ public class ProfileActivity extends MenuDrawerActivity {
         realInfos.setText("John Doe, 21");
         country.setText("Switzerland");
 
+        // set pictures onClick actions
         setPictureOnClickListener(PhotoProvider.UserPhotoType.PROFILE);
         setPictureOnClickListener(PhotoProvider.UserPhotoType.BANNER);
+
+        // get user history
+        if (isVisibleFromPrivacy()) {
+            DatabaseProvider.getInstance().getUserPosts(userId, new DatabaseProvider.GetPostListener() {
+                @Override
+                public void onFailure() {
+                    Snackbar.make(profileBanner, R.string.request_failed, Snackbar.LENGTH_INDEFINITE).show();
+                }
+
+                @Override
+                public void onNewValue(Post value) {
+                    // add post to linear layout
+                    // TODO
+                }
+            });
+        }
+    }
+
+    /**
+     * Check if profile is visible given the privacy settings, the action and the friends list
+     * Has to be called after state is set
+     */
+    private boolean isVisibleFromPrivacy() {
+        boolean res;
+        // safe check : if no user, don't allow
+        if (user == null || me == null || state == null) {
+            res = false;
+        }
+        // check if my profile
+        else if (state == Action.MY_PROFILE) {
+            res = true;
+        }
+        // check privacy setting
+        else if (user.isPublicProfile()) {
+            res = true;
+        }
+        // check if in my friend list
+        else if (me.getFriendlist().contains(userId)) {
+            res = true;
+        }
+        // trap case : refuse
+        else {
+            res = false;
+        }
+
+        // show snackbar if profile is not visible
+        if (!res) {
+            Snackbar.make(profileBanner, R.string.profile_is_private, Snackbar.LENGTH_INDEFINITE).show();
+        }
+        return res;
     }
 
     /**
@@ -571,7 +623,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserPlacesActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserPlacesActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);
@@ -585,7 +637,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserPicturesActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserPicturesActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);
@@ -599,7 +651,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserFriendsActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserFriendsActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);
@@ -613,7 +665,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserAchievementsActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserAchievementsActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);
