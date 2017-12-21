@@ -2,10 +2,15 @@ package ch.epfl.sweng.fiktion.models.posts;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.Comment;
+import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.HashUtils;
 
 /**
@@ -62,7 +67,38 @@ public class CommentPOIPost extends Post {
     }
 
     @Override
-    public View display(Context ctx, String username) {
-        return null;
+    public View display(final Context ctx, String username) {
+        final LinearLayout inner = new LinearLayout(ctx);
+        inner.setOrientation(LinearLayout.VERTICAL);
+
+        // header comment
+        TextView header = new TextView(ctx);
+        header.setTextColor(ctx.getResources().getColor(R.color.darkGray));
+        header.setText(username + " added this place :");
+        header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.rate_review_icon_20, 0, 0, 0);
+        header.setCompoundDrawablePadding(5);
+        inner.addView(header);
+
+        // comment text
+        DatabaseProvider.getInstance().getComment(commentId, new DatabaseProvider.GetCommentListener() {
+            @Override
+            public void onNewValue(Comment value) {
+                TextView t = new TextView(ctx);
+                t.setText(value.getText());
+                t.setPadding(10, 10, 10, 10);
+                inner.addView(t);
+            }
+
+            @Override
+            public void onDoesntExist() { /* nothing*/ }
+
+            @Override
+            public void onFailure() { /* nothing*/ }
+
+            @Override
+            public void onModifiedValue(Comment value) { /* nothing*/ }
+        });
+
+        return super.display(inner, ctx);
     }
 }

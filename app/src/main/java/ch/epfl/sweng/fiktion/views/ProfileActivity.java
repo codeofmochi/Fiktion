@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
+import java.util.Date;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
@@ -37,6 +38,7 @@ import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.models.posts.AddPOIPost;
+import ch.epfl.sweng.fiktion.models.posts.CommentPOIPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -338,7 +340,7 @@ public class ProfileActivity extends MenuDrawerActivity {
 
         // TODO DEBUG TEST
         try {
-            Post p = new AddPOIPost("Akihabara", Calendar.getInstance().getTime());
+            Post p = new CommentPOIPost("2c1db8b1bab09cc9598b25fc02ad66635ffeedf82f3391abff30c94afd868909", "Akihabara", new Date());
             View v = p.display(ctx, user.getName());
             posts.addView(v);
         } catch (NoSuchAlgorithmException e) {
