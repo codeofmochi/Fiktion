@@ -176,6 +176,7 @@ public class User {
 
             @Override
             public void onDoesntExist() {
+                isPublicProfile = oldPrivacy;
                 listener.onFailure();
             }
 

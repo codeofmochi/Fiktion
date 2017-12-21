@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -124,7 +125,6 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
         });
 
-        setButtons(false);
         //search radius slider and text set up
 
         radiusValue = (TextView) findViewById(R.id.searchRadiusNum);
@@ -163,6 +163,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         profilePublicSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+                Log.d("user is ", user.getName());
                 user.changeProfilePrivacy(isChecked, new AuthProvider.AuthListener() {
                     @Override
                     public void onFailure() {
@@ -200,6 +201,8 @@ public class SettingsActivity extends MenuDrawerActivity {
                 }
             }
         });
+        setButtons(false);
+
     }
 
     @Override
