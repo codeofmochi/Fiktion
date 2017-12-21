@@ -1,14 +1,20 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,12 +23,20 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.android.AndroidPermissions;
+import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
@@ -349,7 +363,8 @@ public class ProfileActivity extends MenuDrawerActivity {
                                 public boolean onMenuItemClick(MenuItem item) {
                                     switch (item.getItemId()) {
                                         case R.id.change_picture:
-
+                                            requestPhotoType = photoType;
+                                            requestPictureModification();
                                             break;
 
                                         case R.id.fullscreen_picture:
@@ -367,22 +382,173 @@ public class ProfileActivity extends MenuDrawerActivity {
         }
     }
 
-    /**
-     * Triggered when an activity called here returns with a result
-     *
-     * @param requestCode the request code
-     * @param resultCode  the result code
-     * @param data
-     */
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    PhotoProvider.UserPhotoType requestPhotoType;
+
+    //photo and gallery
+
+    // string to pass to onRequestPerm to know if camera or gallery was chosen
+    private String userChoice;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case ActivityCodes.SIGNIN_REQUEST: {
-                if (resultCode == RESULT_OK) {
-                    this.recreate();
+            case AndroidPermissions.MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    AndroidServices.promptCameraEnable(this);
+                    if (userChoice.equals("Camera"))
+                        intentCamera();
+                    else if (userChoice.equals("Gallery"))
+                        intentGallery();
+                } else {
+                    // permission denied
                 }
-                break;
+        }
+    }
+
+    //method to open a pop up window for Image
+    private void requestPictureModification() {
+
+        //pop up box to chose how to take picture
+        final CharSequence[] choice = {"Camera", "Gallery", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+
+        if (!Config.TEST_MODE && ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            AndroidPermissions.promptCameraPermission(this);
+        } else {
+            if (!Config.TEST_MODE)
+                // check camera enable and ask otherwise
+                AndroidServices.promptCameraEnable(this);
+
+            builder.setItems(choice, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    if (choice[item].equals("Camera")) {
+                        userChoice = "TakePhoto";
+                        intentCamera();
+                    } else if (choice[item].equals("Gallery")) {
+                        userChoice = "Gallery";
+                        intentGallery();
+                    } else if (choice[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+
+                }
+            });
+            builder.show();
+        }
+
+    }
+
+    //camera intent
+    private void intentCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, ActivityCodes.REQUEST_CAMERA);
+    }
+
+
+    //gallery intent
+    private void intentGallery() {
+        Intent gallery = new Intent();
+        gallery.setType("image/*");
+        gallery.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(gallery, "Select File"), ActivityCodes.SELECT_FILE);
+    }
+
+
+    //method for what do to when we got the camera/gallery result
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == ActivityCodes.SELECT_FILE) {
+                onGalleryResult(data);
+            } else if (requestCode == ActivityCodes.REQUEST_CAMERA) {
+                onCameraResult(data);
+            } else if (requestCode == ActivityCodes.SIGNIN_REQUEST) {
+                recreate();
+            }
+
+        }
+    }
+
+    //gallery result which uploads the image
+    private void onGalleryResult(Intent data) {
+        Bitmap image = null;
+        if (data != null) {
+            try {
+                image = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+            } catch (IOException e) {
+                return;
             }
         }
+        uploadUserPicture(image);
+    }
+
+    //camera result, creates the ImageFile and uploads it
+    private void onCameraResult(Intent data) {
+
+        if (data == null) {
+            return;
+        }
+        Bitmap image = (Bitmap) data.getExtras().get("data");
+        if (image == null) {
+            return;
+        }
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        //(format, quality, outstream)
+        image.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+
+        //need to create the image file from the camera
+        File destination = new File(Environment.getExternalStorageDirectory(),
+                System.currentTimeMillis() + ".jpg");
+
+        FileOutputStream outstream;
+        try {
+            destination.createNewFile();
+            outstream = new FileOutputStream(destination);
+            outstream.write(bytes.toByteArray());
+            outstream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        uploadUserPicture(image);
+    }
+
+    private void uploadUserPicture(final Bitmap b) {
+        PhotoProvider.getInstance().uploadUserBitmap(b, userId, requestPhotoType, new PhotoProvider.UploadPhotoListener() {
+            @Override
+            public void onSuccess() {
+                switch (requestPhotoType) {
+                    case PROFILE:
+                        profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(b));
+                        break;
+                    case BANNER:
+                        profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(b, bannerWidth, bannerHeight));
+                        break;
+                    default:
+                }
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+            }
+
+            @Override
+            public void onFailure() {
+                switch (requestPhotoType) {
+                    case PROFILE:
+                        Snackbar.make(profilePicture, "the photo failed to upload", Snackbar.LENGTH_SHORT);
+                        break;
+                    case BANNER:
+                        Snackbar.make(profileBanner, "the photo failed to upload", Snackbar.LENGTH_SHORT);
+                        break;
+                    default:
+                }
+            }
+        });
     }
 
     /**
