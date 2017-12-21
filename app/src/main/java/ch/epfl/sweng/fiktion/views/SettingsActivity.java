@@ -147,7 +147,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
             @Override
             public void onDoesntExist() {
-                //TODO: decide what to do if user does not exist in database
                 user = null;
                 //Account settings disappear
                 findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
@@ -159,7 +158,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
             @Override
             public void onFailure() {
-                //TODO: decide what to do if user fails to load from database or is not connected
                 user = null;
                 //Account settings disappear
                 findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
@@ -171,7 +169,6 @@ public class SettingsActivity extends MenuDrawerActivity {
         });
 
         if (auth.isEmailVerified()) {
-            //TODO: modify button to verify email -> deactivate?
             //or set visibility gone to text and button
             verifyButton.setVisibility(View.GONE);
             findViewById(R.id.verifiedText).setVisibility(View.GONE);

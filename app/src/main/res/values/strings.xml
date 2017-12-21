@@ -127,4 +127,10 @@
     <string name="view">View</string>
     <string name="center_map">Center map</string>
     <string name="place_removed">Place removed</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="Birthday">Birthday</string>
+    <string name="date_format">DD/MM/YYYY</string>
+    <string name="Change">Change</string>
+    <string name="save_profile_settings">Save profile settings</string>
 </resources>
