@@ -585,7 +585,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private void selectImage() {
 
         if (poi == null) {
-            Toast.makeText(this, "Point of interest information isn't loaded", Toast.LENGTH_SHORT).show();
+            Snackbar.make(imageLayout, R.string.loading_data, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -730,6 +730,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //Button with id = AddReviewButton calls this, opens the WriteCommentActivity
     public void startWriteCommentActivity(View view) {
+
+        if (poi == null) {
+            Snackbar.make(imageLayout, R.string.loading_data, Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         // check if user is connected and has a valid account
         AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
         // check if user's account is verified, otherwise prompt verification and/or refresh
@@ -755,6 +761,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+
+                // don't do anything if POI not loaded
+                if (poi == null) {
+                    Snackbar.make(imageLayout, R.string.loading_data, Snackbar.LENGTH_SHORT).show();
+                    return true;
+                }
+
                 switch (item.getItemId()) {
                     case R.id.favourite:
                         // check if user is connected and has a valid account
