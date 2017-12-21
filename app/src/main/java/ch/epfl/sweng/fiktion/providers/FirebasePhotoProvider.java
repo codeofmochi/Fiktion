@@ -53,6 +53,11 @@ public class FirebasePhotoProvider extends PhotoProvider {
      */
     @Override
     public void uploadPOIBitmap(Bitmap bitmap, final String poiName, final UploadPhotoListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
         byte[] data = bitmapBytes(bitmap);
 
         // if the number of bytes exceeds MAXIMUM_SIZE, abort the upload
@@ -136,6 +141,11 @@ public class FirebasePhotoProvider extends PhotoProvider {
      */
     @Override
     public void getPOIPhotoNames(String poiName, int numberOfPhotos, final GetPhotoNamesListener listener) {
+        if (poiName.isEmpty() || numberOfPhotos < 0) {
+            listener.onFailure();
+            return;
+        }
+
         // first, get the reference of the poi and listen for its photo references
         Query query = dbRef.child(photoRefsString).child(poiName).orderByKey();
 
@@ -173,7 +183,11 @@ public class FirebasePhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void downloadPOIBitmap(final String poiName, String photoName, final DownloadBitmapListener listener) {
+    public void downloadPOIBitmap(final String poiName, final String photoName, final DownloadBitmapListener listener) {
+        if (poiName.isEmpty() || photoName.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
 
         StorageReference photoRef = stRef.child(poisRef).child(poiName).child(photoName);
         photoRef.getBytes(MAXIMUM_SIZE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -201,6 +215,11 @@ public class FirebasePhotoProvider extends PhotoProvider {
      */
     @Override
     public void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, final UploadPhotoListener listener) {
+        if (userId.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
         byte[] data = bitmapBytes(bitmap);
 
         // if the number of bytes exceeds MAXIMUM_SIZE, abort the upload
@@ -260,6 +279,11 @@ public class FirebasePhotoProvider extends PhotoProvider {
      */
     @Override
     public void downloadUserBitmap(final String userId, final UserPhotoType type, final DownloadBitmapListener listener) {
+        if (userId.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
         StorageReference userRef = stRef.child(usersRef).child(userId);
         StorageReference photoRef;
         switch (type) {
