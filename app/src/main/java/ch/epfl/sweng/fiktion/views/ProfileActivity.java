@@ -1,12 +1,12 @@
 package ch.epfl.sweng.fiktion.views;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.controllers.UserController;
+import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -261,15 +262,29 @@ public class ProfileActivity extends MenuDrawerActivity {
     /**
      * Update visible infos
      */
-    @SuppressLint("SetTextI18n") // sample content that will be dynamically modified later
     private void updateInfos() {
+        // initialize values
+        PersonalUserInfos userInfos = user.getPersonalUserInfos();
+        StringBuilder builder = new StringBuilder();
+        String firstName = userInfos.getFirstName();
+        String lastName = userInfos.getLastName();
+        String homeCountry = userInfos.getCountry();
         // hide loading
         loading.dismiss();
         // display infos
         username.setText(user.getName());
-        //TODO : implement these in class User and retrieve them here
-        realInfos.setText("John Doe, 21");
-        country.setText("Switzerland");
+        if (!firstName.isEmpty() || !lastName.isEmpty()) {
+            builder.append(firstName);
+            builder.append(" ");
+            builder.append(lastName);
+        }
+        if (userInfos.getAge()!=0) {
+            builder.append(", ");
+            builder.append(userInfos.getAge());
+        }
+
+        realInfos.setText(builder.toString());
+        country.setText(homeCountry);
     }
 
     /**

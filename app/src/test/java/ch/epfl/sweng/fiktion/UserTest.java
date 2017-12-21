@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion;
 
 import junit.framework.Assert;
 
+import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -17,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.Settings;
@@ -143,13 +145,15 @@ public class UserTest {
         user = new User("default", "defaultID");
         userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(),
-                true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
+                true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS), new PersonalUserInfos());
         userWVFav = new User("userWVFav", "idwvfav", new TreeSet<>(Arrays.asList(favList)),
                 new TreeSet<>(Arrays.asList(whishList)), new TreeSet<String>(), new TreeSet<String>(),
-                new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
+                new LinkedList<>(Arrays.asList(visitedList)), true, new TreeSet<String>(),
+                new Settings(Settings.DEFAULT_SEARCH_RADIUS), new PersonalUserInfos());
         userWithUpvoted = new User("userWVFav", "idwvfav", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<String>(), new TreeSet<String>(), new LinkedList<String>(),
-                true, new TreeSet<>(Arrays.asList(upvotedList)), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
+                true, new TreeSet<>(Arrays.asList(upvotedList)), new Settings(Settings.DEFAULT_SEARCH_RADIUS),
+                new PersonalUserInfos());
 
         doNothing().when(mockDB).modifyUser(any(User.class), modifyUserListenerArgumentCaptor.capture());
 
@@ -1047,7 +1051,7 @@ public class UserTest {
     }
 
     @Test
-    public void testRemoveInexistantVote(){
+    public void testRemoveInexistantVote() {
         userFR.removeVote(defPoi.name(), new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onDoesntExist() {
@@ -1064,5 +1068,14 @@ public class UserTest {
                 Assert.fail();
             }
         });
+    }
+
+    @Test
+    public void personInfosTest() {
+        PersonalUserInfos infos = user.getPersonalUserInfos();
+        assertThat(infos.getCountry(), is(""));
+        assertThat(infos.getLastName(), is(""));
+        assertThat(infos.getFirstName(), is(""));
+        assertThat(infos.getAge(), is(0));
     }
 }
