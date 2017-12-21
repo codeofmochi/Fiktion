@@ -450,10 +450,20 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // set the mainImage as the first photo of the poi
         PhotoController.getPOIBitmaps(ctx, poi.name(), 1, new PhotoController.GetBitmapListener() {
             @Override
-            public void onNewValue(Bitmap b) {
+            public void onNewValue(final Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
                 mainImage.setImageBitmap(resized);
                 mainImage.setVisibility(View.VISIBLE);
+                mainImage.setContentDescription("a photo of " + poi.name());
+
+                // on click open the image in fullscreen
+                mainImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // show in fullscreen
+                        FullscreenPictureActivity.showBitmapInFullscreen(ctx, b);
+                    }
+                });
             }
 
             @Override
@@ -476,25 +486,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 params.setMarginEnd(10);
                 imgView.setLayoutParams(params);
                 imgView.setContentDescription("a photo of " + poi.name());
+
                 //renders each image clickable. Calls FullscreenPictureActivity
                 imgView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String fileName = "image";
-                        try {
-                            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                            b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                            FileOutputStream fo = openFileOutput(fileName, Context.MODE_PRIVATE);
-                            fo.write(bytes.toByteArray());
-                            //close file
-                            fo.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            fileName = null;
-                        }
-                        Intent intent = new Intent(ctx, FullscreenPictureActivity.class);
-                        intent.putExtra("Photo", fileName);
-                        startActivity(intent);
+                        // show in fullscreen
+                        FullscreenPictureActivity.showBitmapInFullscreen(ctx, b);
                     }
                 });
 

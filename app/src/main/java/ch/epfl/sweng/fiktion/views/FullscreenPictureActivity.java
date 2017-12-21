@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import ch.epfl.sweng.fiktion.R;
 
@@ -61,5 +64,29 @@ public class FullscreenPictureActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * show the bitmap in fullscreen
+     *
+     * @param ctx    the activity of the caller
+     * @param bitmap the bitmap we want to see in fullscreen
+     */
+    public static void showBitmapInFullscreen(Context ctx, Bitmap bitmap) {
+        String fileName = "image";
+        try {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            FileOutputStream fo = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
+            fo.write(bytes.toByteArray());
+            //close file
+            fo.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fileName = null;
+        }
+        Intent intent = new Intent(ctx, FullscreenPictureActivity.class);
+        intent.putExtra("Photo", fileName);
+        ctx.startActivity(intent);
     }
 }

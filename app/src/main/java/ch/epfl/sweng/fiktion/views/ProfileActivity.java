@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -282,8 +281,17 @@ public class ProfileActivity extends MenuDrawerActivity {
             // download the user profile picture
             PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.PROFILE, new PhotoProvider.DownloadBitmapListener() {
                 @Override
-                public void onNewValue(Bitmap bitmap) {
+                public void onNewValue(final Bitmap bitmap) {
                     profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(bitmap));
+
+                    // on click open the image in fullscreen
+                    profilePicture.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // show in fullscreen
+                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, bitmap);
+                        }
+                    });
                 }
 
                 @Override
@@ -294,8 +302,17 @@ public class ProfileActivity extends MenuDrawerActivity {
             // download the user banner picture
             PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.BANNER, new PhotoProvider.DownloadBitmapListener() {
                 @Override
-                public void onNewValue(Bitmap bitmap) {
+                public void onNewValue(final Bitmap bitmap) {
                     profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(bitmap, bannerWidth, bannerHeight));
+
+                    // on click open the image in fullscreen
+                    profileBanner.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // show in fullscreen
+                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, bitmap);
+                        }
+                    });
                 }
 
                 @Override
