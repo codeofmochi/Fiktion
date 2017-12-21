@@ -27,7 +27,7 @@ public class User {
     private final Set<String> friendRequests;
     private final Set<String> upvoted;
     private final Settings settings;
-    private final PersonalUserInfos userInfos;
+    private PersonalUserInfos userInfos;
 
     /**
      * Creates a new User with given parameters
@@ -489,6 +489,30 @@ public class User {
 
     }
 
+    public void updatePersonalInfos(PersonalUserInfos newInfos, final DatabaseProvider.ModifyUserListener listener) {
+        final PersonalUserInfos backup = userInfos;
+        userInfos = new PersonalUserInfos(newInfos.getBirthday(), newInfos.getFirstName(),
+                newInfos.getLastName(), newInfos.getCountry());
+
+        DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onDoesntExist() {
+                userInfos = backup;
+                listener.onDoesntExist();
+            }
+
+            @Override
+            public void onFailure() {
+                userInfos = backup;
+                listener.onFailure();
+            }
+
+            @Override
+            public void onSuccess() {
+                listener.onSuccess();
+            }
+        });
+    }
 
     @Override
     public boolean equals(Object other) {
@@ -574,7 +598,7 @@ public class User {
         return settings;
     }
 
-    public PersonalUserInfos getPersonalUserInfos(){
+    public PersonalUserInfos getPersonalUserInfos() {
         return userInfos;
     }
 }

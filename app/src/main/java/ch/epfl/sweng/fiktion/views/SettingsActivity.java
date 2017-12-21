@@ -20,9 +20,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.LocalDate;
+
 import java.util.Calendar;
 
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
@@ -32,30 +35,6 @@ import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
-
-    /**
-     * Date picker for birthday
-     */
-    public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date chosen by the user
-            // TODO
-        }
-    }
 
     private Activity ctx = this;
     private EditText userNewName;
@@ -68,6 +47,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button resetButton;
 
     // profile infos
+    private static LocalDate birthday;
     private Switch profilePublicSwitch;
     private EditText firstnameEdit;
     private EditText lastnameEdit;
@@ -89,7 +69,31 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     private Context context = this;
 
-    private final int SIGNIN_REQUEST = 0;
+    /**
+     * Date picker for birthday
+     */
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            // Do something with the date chosen by the user
+            birthday = new LocalDate(year,month, day);
+
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -524,7 +528,31 @@ public class SettingsActivity extends MenuDrawerActivity {
      * Triggered by save profile button
      */
     public void saveProfile(View view) {
+        PersonalUserInfos oldValues = user.getPersonalUserInfos();
+        String inputFirstName = firstnameEdit.getText().toString();
+        String inputLastName = lastnameEdit.getText().toString();
+        String inputCountry = countryEdit.getText().toString();
+        String newFirstName = inputFirstName.isEmpty() ? oldValues.getFirstName() : inputFirstName;
+        String newLastName = inputLastName.isEmpty() ? oldValues.getLastName() : inputLastName;
+        String newCountry = inputCountry.isEmpty() ? oldValues.getCountry() : inputCountry;
 
+        PersonalUserInfos newValues = new PersonalUserInfos(birthday, newFirstName, newLastName, newCountry);
+        user.updatePersonalInfos(newValues, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onDoesntExist() {
+                Toast.makeText(ctx , "Data not found", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(ctx , "Failed to update profile", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess() {
+                Toast.makeText(ctx , "Profile updates successfully!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -548,7 +576,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case SIGNIN_REQUEST: {
+            case ActivityCodes.SIGNIN_REQUEST: {
                 if (resultCode == RESULT_OK) {
                     this.recreate();
                 }

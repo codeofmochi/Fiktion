@@ -22,7 +22,7 @@ public class PersonalUserInfos {
         if (firstName == null || lastName == null || country == null) {
             throw new IllegalArgumentException("Cannot create personal infos with null strings");
         }
-        this.birthday = birthday;
+        this.birthday = birthday; // we may set this null
         this.firstName = firstName;
         this.lastName = lastName;
         this.country = country;
