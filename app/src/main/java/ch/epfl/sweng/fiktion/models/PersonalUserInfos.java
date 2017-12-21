@@ -29,7 +29,11 @@ public class PersonalUserInfos {
     }
 
     public LocalDate getBirthday() {
-        return new LocalDate(birthday);
+        if (birthday == null) {
+            return new LocalDate();
+        } else {
+            return new LocalDate(birthday);
+        }
     }
 
     public int getAge() {

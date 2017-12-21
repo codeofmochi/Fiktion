@@ -2,6 +2,7 @@ package ch.epfl.sweng.fiktion;
 
 import junit.framework.Assert;
 
+import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -1067,5 +1068,15 @@ public class UserTest {
                 Assert.fail();
             }
         });
+    }
+
+    @Test
+    public void personInfosTest() {
+        PersonalUserInfos infos = user.getPersonalUserInfos();
+        assertThat(infos.getCountry(), is(""));
+        assertThat(infos.getLastName(), is(""));
+        assertThat(infos.getFirstName(), is(""));
+        assertThat(infos.getBirthday(), is(new LocalDate()));
+        assertThat(infos.getAge(), is(0));
     }
 }
