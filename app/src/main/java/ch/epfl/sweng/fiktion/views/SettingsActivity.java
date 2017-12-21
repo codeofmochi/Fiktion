@@ -21,7 +21,6 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
-import ch.epfl.sweng.fiktion.views.tests.SocialDemoActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
@@ -483,10 +482,5 @@ public class SettingsActivity extends MenuDrawerActivity {
                 break;
             }
         }
-    }
-
-    public void startSocialDemo(View v) {
-        Intent i = new Intent(this, SocialDemoActivity.class);
-        this.startActivity(i);
     }
 }
