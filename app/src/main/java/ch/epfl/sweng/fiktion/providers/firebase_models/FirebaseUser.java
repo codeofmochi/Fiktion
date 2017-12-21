@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 
@@ -25,6 +26,7 @@ public class FirebaseUser {
     public Boolean isPublicProfile = true;
     public Map<String, Boolean> upvotes = new TreeMap<>();
     public FirebaseSettings settings = new FirebaseSettings(new Settings(Settings.DEFAULT_SEARCH_RADIUS));
+    public FirebasePersonalUserInfos personalUserInfos = new FirebasePersonalUserInfos(new PersonalUserInfos());
 
     /**
      * Default constructor for calls to DataSnapshot.getValue(FirebaseUser.class)
@@ -67,6 +69,8 @@ public class FirebaseUser {
         }
 
         settings = new FirebaseSettings(user.getSettings());
+
+        personalUserInfos = new FirebasePersonalUserInfos(user.getPersonalUserInfos());
     }
 
     /**
@@ -82,6 +86,7 @@ public class FirebaseUser {
                 new LinkedList<>(visited.keySet()),
                 isPublicProfile,
                 new TreeSet<>(upvotes.keySet()),
-                settings.toSettings());
+                settings.toSettings(),
+                personalUserInfos.toPersonalUserInfos());
     }
 }

@@ -211,18 +211,6 @@
                 android:onClick="clickSignOut"
                 android:text="@string/sign_out_button"
                 android:textColor="@color/white" />
-            <Button
-                android:id="@+id/socialDemoButton"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:background="@color/colorPrimary"
-                android:onClick="startSocialDemo"
-                android:text="Social Demo"
-                android:textColor="@color/white"
-                tools:ignore="HardcodedText" />
-                <!-- Hardcoded text will be removed-->
 
         </LinearLayout>
 
@@ -274,6 +262,7 @@
                     android:layout_weight="1" />
 
             </LinearLayout>
+
         </LinearLayout>
 
         <TextView
@@ -291,19 +280,147 @@
         <LinearLayout
             android:id="@+id/profileSettings"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:clipToPadding="false"
             android:orientation="vertical"
             android:padding="20dp">
 
             <Switch
                 android:id="@+id/publicProfileSwitch"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="36dp"
                 android:layout_weight="1"
                 android:text="@string/profile_is_public"
-                android:textColor="@color/colorText"
+                android:textColor="#666"
                 tools:ignore="NestedWeights" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/firstNameLabel"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/firstNameEdit"
+                    android:text="@string/first_name" />
+
+                <EditText
+                    android:id="@+id/firstNameEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lastNameLabel"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/lastNameEdit"
+                    android:text="@string/last_name" />
+
+                <EditText
+                    android:id="@+id/lastNameEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/countryLabel"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/countryEdit"
+                    android:text="@string/Country" />
+
+                <EditText
+                    android:id="@+id/countryEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/birthdayLabel"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:labelFor="@+id/birthdayButton"
+                    android:text="@string/Birthday" />
+
+                <TextView
+                    android:id="@+id/birthdayDisplay"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/date_format" />
+
+                <Button
+                    android:id="@+id/birthdayButton"
+                    android:layout_width="100dp"
+                    android:layout_height="36dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@color/lightGray"
+                    android:ems="10"
+                    android:text="@string/Change"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" /> <!-- text is dynamically updated -->
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/saveProfileSettingsButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="saveProfile"
+                android:text="@string/save_profile_settings"
+                android:textColor="@color/white" />
+
         </LinearLayout>
 
         <TextView
@@ -331,7 +448,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/some_annoying_notifications"
-                android:textColor="@color/colorText" />
+                android:textColor="#666" />
+
         </LinearLayout>
 
     </LinearLayout>

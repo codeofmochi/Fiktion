@@ -31,6 +31,7 @@ import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseComment;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseCommentPOIPost;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseFavoritePOIPost;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePhotoUploadPost;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePointOfInterest;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePost;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseUser;
 import ch.epfl.sweng.fiktion.providers.firebase_models.FirebaseVisitPOIPost;

@@ -2,26 +2,38 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.LocalDate;
+
+import java.util.Calendar;
+
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
-import ch.epfl.sweng.fiktion.views.tests.SocialDemoActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
@@ -31,23 +43,61 @@ public class SettingsActivity extends MenuDrawerActivity {
     private EditText userNewEmail;
 
     private Button saveSettingsButton;
+    private Button saveProfileSettingsButton;
     private Button verifyButton;
     private Button deleteButton;
     private Button signOutButton;
     private Button resetButton;
+
+    // profile infos
+    private PersonalUserInfos userPersonalInfos;
+    private static LocalDate birthday;
+    private Switch profilePublicSwitch;
+    private EditText firstnameEdit;
+    private EditText lastnameEdit;
+    private EditText countryEdit;
+    private static TextView birthdayText;
+    private Button birthdayPickerButton;
+
+    // notifications
+    private Switch randomNotif;
 
     private SeekBar radiusSlider;
     private TextView radiusValue;
 
     private User user;
     private Settings settings;
-    private DatabaseProvider database = DatabaseProvider.getInstance();
 
     private AuthProvider auth = AuthProvider.getInstance();
 
     private Context context = this;
 
-    private final int SIGNIN_REQUEST = 0;
+    /**
+     * Date picker for birthday
+     */
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            // Do something with the date chosen by the user
+            //month needs to be incrementd because of API
+            birthday = new LocalDate(year, month, day);
+            birthdayText.setText(day + "/" + (month+1) + "/" + year);
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +108,22 @@ public class SettingsActivity extends MenuDrawerActivity {
         userNewEmail = (EditText) findViewById(R.id.emailEdit);
         userNewName = (EditText) findViewById(R.id.usernameEdit);
 
+        saveProfileSettingsButton = (Button) findViewById(R.id.saveProfileSettingsButton);
         saveSettingsButton = (Button) findViewById(R.id.saveAccountSettingsButton);
         verifyButton = (Button) findViewById(R.id.verifiedButton);
         deleteButton = (Button) findViewById(R.id.deleteAccountButton);
         signOutButton = (Button) findViewById(R.id.signOutButton);
         resetButton = (Button) findViewById(R.id.passwordReset);
+        // get date picker
+        birthdayPickerButton = (Button) findViewById(R.id.birthdayButton);
+        birthdayPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getFragmentManager(), "datePicker");
+            }
+        });
+
         //search radius slider and text set up
 
         radiusValue = (TextView) findViewById(R.id.searchRadiusNum);
@@ -89,19 +150,82 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
         });
 
+
+        // find profile infos fields
+        profilePublicSwitch = (Switch) findViewById(R.id.publicProfileSwitch);
+        firstnameEdit = (EditText) findViewById(R.id.firstNameEdit);
+        lastnameEdit = (EditText) findViewById(R.id.lastNameEdit);
+        countryEdit = (EditText) findViewById(R.id.countryEdit);
+        birthdayText = (TextView) findViewById(R.id.birthdayDisplay);
+
+        // profile is public setting
+        profilePublicSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+                user.changeProfilePrivacy(isChecked, new AuthProvider.AuthListener() {
+                    @Override
+                    public void onFailure() {
+                        Toast.makeText(ctx, R.string.request_failed, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(ctx, R.string.privacy_updated, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+        // notifs
+        randomNotif = (Switch) findViewById(R.id.someNotificationSwitch);
+        randomNotif.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    int notifId = 0;
+                    NotificationCompat.Builder notifBuilder =
+                            new NotificationCompat.Builder(context)
+                                    .setAutoCancel(true)
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setContentTitle("New notification from Fiktion")
+                                    .setContentText("Congratz. Happy now?")
+                                    .setVibrate(new long[]{500, 500})
+                                    .setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+                    NotificationManager notifManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (notifManager != null) {
+                        notifManager.notify(notifId, notifBuilder.build());
+                    }
+                }
+            }
+        });
+        setButtons(false);
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-
         auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onNewValue(User currUser) {
                 user = currUser;
+                userPersonalInfos = user.getPersonalUserInfos();
+                setButtons(true);
+                // set current values as hints
                 userNewName.setHint(user.getName());
                 userNewEmail.setHint(auth.getEmail());
+                firstnameEdit.setHint(userPersonalInfos.getFirstName());
+                lastnameEdit.setHint(userPersonalInfos.getLastName());
+                countryEdit.setHint(userPersonalInfos.getCountry());
+                // handle birthday
+                if(userPersonalInfos.getYear() != 1){
+                    birthdayText.setText(userPersonalInfos.getDay() + "/" + (userPersonalInfos.getMonth()) + "/" + userPersonalInfos.getYear());
+
+                }
+
+
                 settings = user.getSettings();
                 int progress = settings.getSearchRadius();
                 radiusValue.setText(String.valueOf(progress));
@@ -148,7 +272,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
             @Override
             public void onDoesntExist() {
-                //TODO: decide what to do if user does not exist in database
                 user = null;
                 //Account settings disappear
                 findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
@@ -160,7 +283,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
             @Override
             public void onFailure() {
-                //TODO: decide what to do if user fails to load from database or is not connected
                 user = null;
                 //Account settings disappear
                 findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
@@ -172,7 +294,6 @@ public class SettingsActivity extends MenuDrawerActivity {
         });
 
         if (auth.isEmailVerified()) {
-            //TODO: modify button to verify email -> deactivate?
             //or set visibility gone to text and button
             verifyButton.setVisibility(View.GONE);
             findViewById(R.id.verifiedText).setVisibility(View.GONE);
@@ -262,6 +383,17 @@ public class SettingsActivity extends MenuDrawerActivity {
         } else {
             userNewName.setError("Please type a new and valid username");
         }
+    }
+
+    private void setButtons(boolean enabled) {
+        deleteButton.setEnabled(enabled);
+        resetButton.setEnabled(enabled);
+        saveSettingsButton.setEnabled(enabled);
+        saveProfileSettingsButton.setEnabled(enabled);
+        verifyButton.setEnabled(enabled);
+        signOutButton.setEnabled(enabled);
+        birthdayPickerButton.setEnabled(enabled);
+        profilePublicSwitch.setEnabled(enabled);
     }
 
     /**
@@ -457,6 +589,38 @@ public class SettingsActivity extends MenuDrawerActivity {
     }
 
     /**
+     * Triggered by save profile button
+     */
+    public void saveProfile(View view) {
+        PersonalUserInfos oldValues = userPersonalInfos;
+        String inputFirstName = firstnameEdit.getText().toString();
+        String inputLastName = lastnameEdit.getText().toString();
+        String inputCountry = countryEdit.getText().toString();
+        String newFirstName = inputFirstName.isEmpty() ? oldValues.getFirstName() : inputFirstName;
+        String newLastName = inputLastName.isEmpty() ? oldValues.getLastName() : inputLastName;
+        String newCountry = inputCountry.isEmpty() ? oldValues.getCountry() : inputCountry;
+
+        PersonalUserInfos newValues = new PersonalUserInfos(birthday.getYear(),birthday.getMonthOfYear()+1, birthday.getDayOfMonth(), newFirstName, newLastName, newCountry);
+        user.updatePersonalInfos(newValues, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onDoesntExist() {
+                Toast.makeText(ctx, "Data not found", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(ctx, "Failed to update profile", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess() {
+                Toast.makeText(ctx, "Profile updates successfully!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    /**
      * Triggered by login button click
      *
      * @param view The caller view
@@ -476,17 +640,12 @@ public class SettingsActivity extends MenuDrawerActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case SIGNIN_REQUEST: {
+            case ActivityCodes.SIGNIN_REQUEST: {
                 if (resultCode == RESULT_OK) {
                     this.recreate();
                 }
                 break;
             }
         }
-    }
-
-    public void startSocialDemo(View v) {
-        Intent i = new Intent(this, SocialDemoActivity.class);
-        this.startActivity(i);
     }
 }

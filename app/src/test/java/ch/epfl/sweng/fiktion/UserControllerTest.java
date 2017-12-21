@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.controllers.UserController;
+import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.Settings;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
@@ -81,10 +82,10 @@ public class UserControllerTest {
         user1 = new User("user1", "id1");
         userFR = new User("userFR", "idfr", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<>(Arrays.asList(frList)), new TreeSet<>(Arrays.asList(rList)), new LinkedList<String>(),
-                true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
+                true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS), new PersonalUserInfos());
         userFakeR = new User("userFakeR", "idfaker", new TreeSet<String>(), new TreeSet<String>(),
                 new TreeSet<String>(), new TreeSet<>(Arrays.asList(fakeRList)), new LinkedList<String>(),
-                true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS));
+                true, new TreeSet<String>(), new Settings(Settings.DEFAULT_SEARCH_RADIUS), new PersonalUserInfos());
     }
 
     @After

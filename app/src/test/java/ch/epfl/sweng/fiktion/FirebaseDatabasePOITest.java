@@ -23,7 +23,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.FirebasePointOfInterest;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePointOfInterest;
 import ch.epfl.sweng.fiktion.providers.SearchProvider;
 import ch.epfl.sweng.fiktion.utils.Mutable;
 
