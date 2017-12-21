@@ -134,6 +134,16 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
+    public void getAllPOIs(int numberOfPOIs, GetMultiplePOIsListener listener) {
+        for (int i = 0; (numberOfPOIs == ALL_POIS || i < numberOfPOIs) && i < poiList.size(); ++i) {
+            listener.onNewValue(poiList.get(i));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void modifyPOI(PointOfInterest poi, ModifyPOIListener listener) {
         if (poi.name().contains("MODIFYPOIS")) {
             listener.onSuccess();
@@ -250,7 +260,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void findNearPOIs(Position pos, int radius, FindNearPOIsListener listener) {
+    public void findNearPOIs(Position pos, int radius, ch.epfl.sweng.fiktion.providers.DatabaseProvider.GetMultiplePOIsListener listener) {
         if (pos.latitude() == 1000 && pos.longitude() == 1000) {
             listener.onFailure();
             return;
@@ -267,7 +277,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void searchByText(String text, SearchPOIByTextListener listener) {
+    public void searchByText(String text, DatabaseProvider.GetMultiplePOIsListener listener) {
         if (text.contains("SEARCHN")) {
             listener.onNewValue(new PointOfInterest("NEWVALUE",
                     new Position(0, 0),

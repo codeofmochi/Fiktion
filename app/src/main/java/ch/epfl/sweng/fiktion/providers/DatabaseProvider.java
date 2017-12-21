@@ -73,15 +73,9 @@ public abstract class DatabaseProvider {
     }
 
     /**
-     * Listener that listens the results of searching near points of interest
+     * Listener that listens the retrieval of multiple pois
      */
-    public interface FindNearPOIsListener extends Get<PointOfInterest>, Failure {
-    }
-
-    /**
-     * Listener that  listens the results of searching points of interest by text
-     */
-    public interface SearchPOIByTextListener extends Get<PointOfInterest>, Failure {
+    public interface GetMultiplePOIsListener extends Get<PointOfInterest>, Failure {
     }
 
     /**
@@ -99,6 +93,16 @@ public abstract class DatabaseProvider {
      * @param listener the listener
      */
     public abstract void getPOI(String name, final GetPOIListener listener);
+
+    public static final int ALL_POIS = 0;
+
+    /**
+     * retrieve a certain number of points of interest, inform the listeners of the results
+     *
+     * @param numberOfPOIs the number of points of interest, ALL_POIS for all of them
+     * @param listener     the listener
+     */
+    public abstract void getAllPOIs(final int numberOfPOIs, final GetMultiplePOIsListener listener);
 
     /**
      * Modify an existing point of interest and inform the listener of the result, the modification
@@ -133,7 +137,7 @@ public abstract class DatabaseProvider {
      * @param radius   the radius
      * @param listener the listener
      */
-    public abstract void findNearPOIs(Position pos, int radius, FindNearPOIsListener listener);
+    public abstract void findNearPOIs(Position pos, int radius, ch.epfl.sweng.fiktion.providers.DatabaseProvider.GetMultiplePOIsListener listener);
 
     /**
      * seach the points of interest that contain a text in one of their fields and "send" them to
@@ -142,7 +146,7 @@ public abstract class DatabaseProvider {
      * @param text     the text we search
      * @param listener the listener
      */
-    public abstract void searchByText(String text, SearchPOIByTextListener listener);
+    public abstract void searchByText(String text, GetMultiplePOIsListener listener);
 
     /**
      * Listener that listens the result of the addition of a user
