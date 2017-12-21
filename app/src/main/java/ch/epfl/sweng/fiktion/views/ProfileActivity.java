@@ -1,6 +1,5 @@
 package ch.epfl.sweng.fiktion.views;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.controllers.UserController;
+import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -261,15 +261,31 @@ public class ProfileActivity extends MenuDrawerActivity {
     /**
      * Update visible infos
      */
-    @SuppressLint("SetTextI18n") // sample content that will be dynamically modified later
     private void updateInfos() {
+        // initialize values
+        PersonalUserInfos userInfos = user.getPersonalUserInfos();
+        StringBuilder builder = new StringBuilder();
+        String firstName = userInfos.getFirstName();
+        String lastName = userInfos.getLastName();
+        String homeCountry = userInfos.getCountry();
+        int age = userInfos.getAge();
         // hide loading
         loading.dismiss();
         // display infos
         username.setText(user.getName());
         //TODO : implement these in class User and retrieve them here
-        realInfos.setText("John Doe, 21");
-        country.setText("Switzerland");
+        if (!firstName.isEmpty() || !lastName.isEmpty()) {
+            builder.append(firstName);
+            builder.append(" ");
+            builder.append(lastName);
+        }
+        if(age != 0){
+            builder.append(", ");
+            builder.append(age);
+        }
+
+        realInfos.setText(builder.toString());
+        country.setText(homeCountry);
     }
 
     /**

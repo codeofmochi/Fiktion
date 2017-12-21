@@ -20,13 +20,14 @@ public class User {
     //we could use same id as firebase id or create our own id system
     private final String id;
     private Boolean isPublicProfile;
-    private Set<String> favourites;
-    private Set<String> wishlist;
-    private LinkedList<String> visited;
-    private Set<String> friendlist;
-    private Set<String> friendRequests;
-    private Set<String> upvoted;
-    private Settings settings;
+    private final Set<String> favourites;
+    private final Set<String> wishlist;
+    private final LinkedList<String> visited;
+    private final Set<String> friendlist;
+    private final Set<String> friendRequests;
+    private final Set<String> upvoted;
+    private final Settings settings;
+    private final PersonalUserInfos userInfos;
 
     /**
      * Creates a new User with given parameters
@@ -41,17 +42,18 @@ public class User {
     public User(String input_name, String input_id, Set<String> favs,
                 Set<String> wishes, Set<String> friends, Set<String> fRequests,
                 LinkedList<String> visits, Boolean isPublic, Set<String> upVotes,
-                Settings settings) {
+                Settings settings, PersonalUserInfos infos) {
         name = input_name;
         id = input_id;
-        favourites = favs;
-        wishlist = wishes;
-        visited = visits;
-        friendlist = friends;
-        friendRequests = fRequests;
+        favourites = new TreeSet<>(favs);
+        wishlist = new TreeSet<>(wishes);
+        visited = new LinkedList<>(visits);
+        friendlist = new TreeSet<>(friends);
+        friendRequests = new TreeSet<>(fRequests);
         isPublicProfile = isPublic;
-        upvoted = upVotes;
-        this.settings = settings;
+        upvoted = new TreeSet<>(upVotes);
+        this.settings = new Settings(settings.getSearchRadius());
+        userInfos = infos;
     }
 
     /**
@@ -66,15 +68,15 @@ public class User {
     public User(String input_name, String input_id, Set<String> favs, Set<String> wishes, LinkedList<String> visits) {
         name = input_name;
         id = input_id;
-        favourites = favs;
-        wishlist = wishes;
-        visited = visits;
+        favourites = new TreeSet<>(favs);
+        wishlist = new TreeSet<>(wishes);
+        visited = new LinkedList<>(visits);
         friendlist = new TreeSet<>();
         friendRequests = new TreeSet<>();
         isPublicProfile = true;
         upvoted = new TreeSet<>();
         settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
-
+        userInfos = new PersonalUserInfos();
     }
 
     /**
@@ -94,6 +96,7 @@ public class User {
         isPublicProfile = true;
         upvoted = new TreeSet<>();
         settings = new Settings(Settings.DEFAULT_SEARCH_RADIUS);
+        userInfos = new PersonalUserInfos();
     }
 
     /**
@@ -569,5 +572,9 @@ public class User {
 
     public Settings getSettings() {
         return settings;
+    }
+
+    public PersonalUserInfos getPersonalUserInfos(){
+        return userInfos;
     }
 }
