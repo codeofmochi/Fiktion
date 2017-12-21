@@ -12,9 +12,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,7 +66,17 @@ public class SettingsActivity extends MenuDrawerActivity {
     private Button deleteButton;
     private Button signOutButton;
     private Button resetButton;
+
+    // profile infos
+    private Switch profilePublicSwitch;
+    private EditText firstnameEdit;
+    private EditText lastnameEdit;
+    private EditText countryEdit;
+    private TextView birthdayText;
     private Button birthdayPickerButton;
+
+    // notifications
+    private Switch randomNotif;
 
     private SeekBar radiusSlider;
     private TextView radiusValue;
@@ -118,7 +130,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 Config.settings = new Settings(Integer.parseInt(radiusValue.getText().toString()));
             }
         });
-        
+
         // get date picker
         birthdayPickerButton = (Button) findViewById(R.id.birthdayButton);
         birthdayPickerButton.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +141,21 @@ public class SettingsActivity extends MenuDrawerActivity {
             }
         });
 
+        // find profile infos fields
+        profilePublicSwitch = (Switch) findViewById(R.id.publicProfileSwitch);
+        firstnameEdit = (EditText) findViewById(R.id.firstNameEdit);
+        lastnameEdit = (EditText) findViewById(R.id.lastNameEdit);
+        countryEdit = (EditText) findViewById(R.id.countryEdit);
+        birthdayText = (TextView) findViewById(R.id.birthdayDisplay);
+
+        // notifs
+        randomNotif = (Switch) findViewById(R.id.someNotificationSwitch);
+        randomNotif.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            }
+        });
     }
 
     @Override
@@ -492,6 +519,14 @@ public class SettingsActivity extends MenuDrawerActivity {
         }
         resetButton.setEnabled(true);
     }
+
+    /**
+     * Triggered by save profile button
+     */
+    public void saveProfile(View view) {
+
+    }
+
 
     /**
      * Triggered by login button click
