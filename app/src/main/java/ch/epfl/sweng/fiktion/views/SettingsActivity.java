@@ -188,8 +188,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     @Override
     public void onStart() {
         super.onStart();
-
-
+        
         auth.getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onNewValue(User currUser) {
@@ -203,7 +202,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 lastnameEdit.setHint(userPersonalInfos.getLastName());
                 countryEdit.setHint(userPersonalInfos.getCountry());
                 LocalDate userBirthday = userPersonalInfos.getBirthday();
-                birthdayText.setText(userBirthday.getDayOfMonth() + "/" + userBirthday.getMonthOfYear() + "/" + userBirthday.getYear());
+                birthdayText.setText(userBirthday.getDayOfMonth() + "/" + (userBirthday.getMonthOfYear()+1) + "/" + userBirthday.getYear());
                 settings = user.getSettings();
                 int progress = settings.getSearchRadius();
                 radiusValue.setText(String.valueOf(progress));
