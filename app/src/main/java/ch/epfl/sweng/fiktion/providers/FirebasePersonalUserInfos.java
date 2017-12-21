@@ -1,9 +1,5 @@
 package ch.epfl.sweng.fiktion.providers;
 
-import android.util.Log;
-
-import org.joda.time.LocalDate;
-
 import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 
 

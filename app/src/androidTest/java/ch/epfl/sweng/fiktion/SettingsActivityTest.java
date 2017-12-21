@@ -9,6 +9,7 @@ import android.support.test.espresso.intent.rule.IntentsTestRule;
 
 import junit.framework.Assert;
 
+import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -22,6 +23,7 @@ import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.SettingsActivity;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
@@ -99,7 +101,6 @@ public class SettingsActivityTest {
     }
 
 
-
     @Test
     public void updateMinSearchRadiusWhileConnected() {
         Intent i = new Intent();
@@ -149,6 +150,30 @@ public class SettingsActivityTest {
         onView(withId(R.id.searchRadiusNum)).check(matches(withText("1")));
 
         assertThat(Config.settings.getSearchRadius(), is(1));
+    }
+
+    @Test
+    public void clickNotificationSwitcher() {
+        Intent i = new Intent();
+        testRule.launchActivity(i);
+
+        onView(withId(R.id.someNotificationSwitch)).perform(scrollTo()).perform(click());
+        onView(withId(R.id.someNotificationSwitch)).perform(scrollTo()).perform(click());
+    }
+
+    @Test
+    public void clickChangeDate() {
+        Intent i = new Intent();
+        testRule.launchActivity(i);
+
+        LocalDate now = new LocalDate();
+        onView(withId(R.id.birthdayButton)).perform(scrollTo()).perform(click());
+        onView(withText("OK")).perform(click());
+
+        onView(withId(R.id.birthdayDisplay)).
+                check(matches(withText(now.getDayOfMonth() + "/" + now.getMonthOfYear() + "/" + now.getYear())));
+
+
     }
 
 }
