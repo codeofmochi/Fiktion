@@ -2,7 +2,6 @@ package ch.epfl.sweng.fiktion.views;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.LinearLayout;
 
 import ch.epfl.sweng.fiktion.R;
@@ -21,7 +20,8 @@ public class DiscoverActivity extends MenuDrawerActivity {
 
         ctx = this;
 
-        DatabaseProvider.getInstance().getAllPOIs(200, new DatabaseProvider.GetMultiplePOIsListener() {
+        int numberOfResults = 200;
+        DatabaseProvider.getInstance().getAllPOIs(numberOfResults, new DatabaseProvider.GetMultiplePOIsListener() {
             private LinearLayout layout = (LinearLayout) findViewById(R.id.discover_layout);
 
             @Override
