@@ -263,7 +263,7 @@ public class LocalDatabaseTest {
         final Mutable<String> result = new Mutable<>("good");
         final Mutable<Integer> count = new Mutable<>(0);
 
-        DatabaseProvider.FindNearPOIsListener listener = new DatabaseProvider.FindNearPOIsListener() {
+        DatabaseProvider.GetMultiplePOIsListener listener = new DatabaseProvider.GetMultiplePOIsListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 count.set(count.get() + 1);
@@ -290,7 +290,7 @@ public class LocalDatabaseTest {
     public void searchByTextTest() {
         final Mutable<String> result = new Mutable<>("good");
         final Mutable<Integer> count = new Mutable<>(0);
-        DatabaseProvider.SearchPOIByTextListener listener = new DatabaseProvider.SearchPOIByTextListener() {
+        DatabaseProvider.GetMultiplePOIsListener listener = new DatabaseProvider.GetMultiplePOIsListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 count.set(count.get() + 1);

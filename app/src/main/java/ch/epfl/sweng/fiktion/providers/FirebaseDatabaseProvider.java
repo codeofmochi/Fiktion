@@ -9,6 +9,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
@@ -214,6 +215,31 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
+    public void getAllPOIs(int numberOfPOIs, final GetMultiplePOIsListener listener) {
+        Query query = dbRef.child(poisRefName);
+        if (numberOfPOIs > 0) {
+            query = query.limitToFirst(numberOfPOIs);
+        }
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                FirebasePointOfInterest fPOI = dataSnapshot.getValue(FirebasePointOfInterest.class);
+                if (fPOI != null) {
+                    listener.onNewValue(fPOI.toPoi());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void modifyPOI(final PointOfInterest poi, final ModifyPOIListener listener) {
         final String poiName = poi.name();
 
@@ -362,7 +388,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void findNearPOIs(Position pos, int radius, final FindNearPOIsListener listener) {
+    public void findNearPOIs(Position pos, int radius, final ch.epfl.sweng.fiktion.providers.DatabaseProvider.GetMultiplePOIsListener listener) {
         // query the points of interests within the radius
         GeoQuery geoQuery = geofire.queryAtLocation(new GeoLocation(pos.latitude(), pos.longitude()), radius);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
@@ -421,7 +447,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void searchByText(String text, final SearchPOIByTextListener listener) {
+    public void searchByText(String text, final DatabaseProvider.GetMultiplePOIsListener listener) {
         // ask the search provider to retrieve the pois
         searchProvider.searchByText(text, new SearchProvider.SearchPOIsByTextListener() {
             @Override

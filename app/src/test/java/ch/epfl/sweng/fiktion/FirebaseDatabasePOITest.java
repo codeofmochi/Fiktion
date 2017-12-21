@@ -300,7 +300,7 @@ public class FirebaseDatabasePOITest {
         final Mutable<Boolean> isFailure = new Mutable<>(false);
         final Mutable<Integer> nbPOIs = new Mutable<>(0);
 
-        DatabaseProvider.FindNearPOIsListener findPoiListener = new DatabaseProvider.FindNearPOIsListener() {
+        DatabaseProvider.GetMultiplePOIsListener findPoiListener = new DatabaseProvider.GetMultiplePOIsListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 nbPOIs.set(nbPOIs.get() + 1);
@@ -342,7 +342,7 @@ public class FirebaseDatabasePOITest {
         final Mutable<Boolean> isFailure = new Mutable<>(false);
         final Mutable<Integer> nbPOIs = new Mutable<>(0);
 
-        DatabaseProvider.SearchPOIByTextListener listener = new DatabaseProvider.SearchPOIByTextListener() {
+        DatabaseProvider.GetMultiplePOIsListener listener = new DatabaseProvider.GetMultiplePOIsListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 nbPOIs.set(nbPOIs.get() + 1);
