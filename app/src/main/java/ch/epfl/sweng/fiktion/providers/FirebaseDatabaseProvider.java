@@ -220,13 +220,25 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
         if (numberOfPOIs > 0) {
             query = query.limitToFirst(numberOfPOIs);
         }
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        query.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 FirebasePointOfInterest fPOI = dataSnapshot.getValue(FirebasePointOfInterest.class);
                 if (fPOI != null) {
                     listener.onNewValue(fPOI.toPoi());
                 }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
             }
 
             @Override

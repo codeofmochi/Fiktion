@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.views.AddPOIActivity;
+import ch.epfl.sweng.fiktion.views.DiscoverActivity;
 import ch.epfl.sweng.fiktion.views.HomeActivity;
 import ch.epfl.sweng.fiktion.views.LocationActivity;
 import ch.epfl.sweng.fiktion.views.ProfileActivity;
@@ -104,6 +105,14 @@ public abstract class MenuDrawerActivity extends AppCompatActivity {
                 break;
             case "Discover":
                 // discover activity
+                if (this.getClass().equals(DiscoverActivity.class)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    Intent i = new Intent(this, DiscoverActivity.class);
+                    // clear the activity stack
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
                 break;
             case "Contribute": {
                 // add POI activity

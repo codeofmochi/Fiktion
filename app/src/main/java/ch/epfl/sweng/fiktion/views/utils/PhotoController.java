@@ -44,6 +44,11 @@ public class PhotoController {
      * @param listener        a listener that listens for the results
      */
     public static void getPOIBitmaps(final Context ctx, final String poiName, int numberOfBitmaps, final GetBitmapListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
         // get the photo names
         PhotoProvider.getInstance().getPOIPhotoNames(poiName, numberOfBitmaps, new PhotoProvider.GetPhotoNamesListener() {
             @Override
