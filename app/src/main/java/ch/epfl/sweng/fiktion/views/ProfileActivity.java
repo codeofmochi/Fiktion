@@ -274,9 +274,12 @@ public class ProfileActivity extends MenuDrawerActivity {
         country.setText("Switzerland");
     }
 
-
+    /**
+     * download the user profile and banner picture
+     */
     private void downloadUserPictures() {
         if (userId != null) {
+            // download the user profile picture
             PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.PROFILE, new PhotoProvider.DownloadBitmapListener() {
                 @Override
                 public void onNewValue(Bitmap bitmap) {
@@ -288,10 +291,11 @@ public class ProfileActivity extends MenuDrawerActivity {
                 }
             });
 
+            // download the user banner picture
             PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.BANNER, new PhotoProvider.DownloadBitmapListener() {
                 @Override
                 public void onNewValue(Bitmap bitmap) {
-                    profileBanner.setImageBitmap(bitmap);
+                    profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(bitmap, bannerWidth, bannerHeight));
                 }
 
                 @Override
