@@ -21,7 +21,6 @@ import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
 import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
-import ch.epfl.sweng.fiktion.views.tests.SocialDemoActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 
 public class SettingsActivity extends MenuDrawerActivity {
@@ -148,7 +147,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
             @Override
             public void onDoesntExist() {
-                //TODO: decide what to do if user does not exist in database
                 user = null;
                 //Account settings disappear
                 findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
@@ -160,7 +158,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
             @Override
             public void onFailure() {
-                //TODO: decide what to do if user fails to load from database or is not connected
                 user = null;
                 //Account settings disappear
                 findViewById(R.id.accountLoginButton).setVisibility(View.VISIBLE);
@@ -172,7 +169,6 @@ public class SettingsActivity extends MenuDrawerActivity {
         });
 
         if (auth.isEmailVerified()) {
-            //TODO: modify button to verify email -> deactivate?
             //or set visibility gone to text and button
             verifyButton.setVisibility(View.GONE);
             findViewById(R.id.verifiedText).setVisibility(View.GONE);
@@ -483,10 +479,5 @@ public class SettingsActivity extends MenuDrawerActivity {
                 break;
             }
         }
-    }
-
-    public void startSocialDemo(View v) {
-        Intent i = new Intent(this, SocialDemoActivity.class);
-        this.startActivity(i);
     }
 }
