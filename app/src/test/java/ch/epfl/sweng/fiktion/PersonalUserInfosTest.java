@@ -18,32 +18,32 @@ public class PersonalUserInfosTest {
         assertThat(infos.getCountry(), is(""));
         assertThat(infos.getFirstName(), is(""));
         assertThat(infos.getLastName(), is(""));
-        assertThat(infos.getBirthday(), is(new LocalDate()));
+        assertThat(infos.getYear(), is(1));
     }
 
     @Test
     public void initializeReal() {
-        PersonalUserInfos infos = new PersonalUserInfos(new LocalDate(1992, 11, 27), "John", "Doe", "Switzerland");
+        PersonalUserInfos infos = new PersonalUserInfos(1992, 11, 27, "John", "Doe", "Switzerland");
         assertThat(infos.getAge(), is(25));
         assertThat(infos.getCountry(), is("Switzerland"));
         assertThat(infos.getFirstName(), is("John"));
         assertThat(infos.getLastName(), is("Doe"));
-        assertNotNull(infos.getBirthday());
+        assertThat(infos.getYear(), is(1992));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalFirstNameArgument() {
-        new PersonalUserInfos(new LocalDate(), null, "", "");
+        new PersonalUserInfos(1,1,1, null, "", "");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalLastNameArgument() {
-        new PersonalUserInfos(new LocalDate(), "", null, "");
+        new PersonalUserInfos(1,1,1, "", null, "");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalCountryArgument() {
-        new PersonalUserInfos(new LocalDate(), "", "", null);
+        new PersonalUserInfos(1,1,1, "", "", null);
     }
 
 

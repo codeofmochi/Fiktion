@@ -1076,7 +1076,6 @@ public class UserTest {
         assertThat(infos.getCountry(), is(""));
         assertThat(infos.getLastName(), is(""));
         assertThat(infos.getFirstName(), is(""));
-        assertThat(infos.getBirthday(), is(new LocalDate()));
         assertThat(infos.getAge(), is(0));
     }
 }

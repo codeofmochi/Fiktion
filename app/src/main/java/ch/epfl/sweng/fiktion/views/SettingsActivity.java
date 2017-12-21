@@ -219,8 +219,13 @@ public class SettingsActivity extends MenuDrawerActivity {
                 firstnameEdit.setHint(userPersonalInfos.getFirstName());
                 lastnameEdit.setHint(userPersonalInfos.getLastName());
                 countryEdit.setHint(userPersonalInfos.getCountry());
-                LocalDate userBirthday = userPersonalInfos.getBirthday();
-                birthdayText.setText(userBirthday.getDayOfMonth() + "/" + (userBirthday.getMonthOfYear() + 1) + "/" + userBirthday.getYear());
+                // handle birthday
+                if(userPersonalInfos.getYear() != 1){
+                    birthdayText.setText(userPersonalInfos.getDay() + "/" + (userPersonalInfos.getMonth() + 1) + "/" + userPersonalInfos.getYear());
+
+                }
+
+
                 settings = user.getSettings();
                 int progress = settings.getSearchRadius();
                 radiusValue.setText(String.valueOf(progress));
@@ -595,7 +600,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         String newLastName = inputLastName.isEmpty() ? oldValues.getLastName() : inputLastName;
         String newCountry = inputCountry.isEmpty() ? oldValues.getCountry() : inputCountry;
 
-        PersonalUserInfos newValues = new PersonalUserInfos(birthday, newFirstName, newLastName, newCountry);
+        PersonalUserInfos newValues = new PersonalUserInfos(userPersonalInfos.getYear(),userPersonalInfos.getMonth(), userPersonalInfos.getDay(), newFirstName, newLastName, newCountry);
         user.updatePersonalInfos(newValues, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onDoesntExist() {

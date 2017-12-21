@@ -19,16 +19,15 @@ public class FirebasePersonalUserInfos {
     }
 
     public FirebasePersonalUserInfos(PersonalUserInfos infos){
-        LocalDate date = infos.getBirthday();
-        year = date.getYear();
-        day = date.getDayOfMonth();
-        month = date.getMonthOfYear();
+        year = infos.getYear();
+        day = infos.getDay();
+        month = infos.getMonth();
         country = infos.getCountry();
         firstName = infos.getFirstName();
         lastName = infos.getLastName();
     }
 
     public PersonalUserInfos toPersonalUserInfos(){
-        return new PersonalUserInfos(new LocalDate(year,month,day), firstName, lastName, country);
+        return new PersonalUserInfos(year,month, day, firstName, lastName, country);
     }
 }

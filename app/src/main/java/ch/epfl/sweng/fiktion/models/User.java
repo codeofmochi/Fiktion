@@ -492,7 +492,7 @@ public class User {
 
     public void updatePersonalInfos(PersonalUserInfos newInfos, final DatabaseProvider.ModifyUserListener listener) {
         final PersonalUserInfos backup = userInfos;
-        userInfos = new PersonalUserInfos(newInfos.getBirthday(), newInfos.getFirstName(),
+        userInfos = new PersonalUserInfos(newInfos.getYear(), newInfos.getMonth(), newInfos.getDay(), newInfos.getFirstName(),
                 newInfos.getLastName(), newInfos.getCountry());
 
         DatabaseProvider.getInstance().modifyUser(this, new DatabaseProvider.ModifyUserListener() {
