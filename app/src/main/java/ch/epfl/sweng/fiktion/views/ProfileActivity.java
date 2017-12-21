@@ -95,42 +95,12 @@ public class ProfileActivity extends MenuDrawerActivity {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onNewValue(User currUser) {
-                // set my infos
-                me = currUser;
-                userCtrl = new UserController(me);
-                myUserId = currUser.getID();
-
-                // assume my profile if no userId set or if it is my own id
-                if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
-                    user = currUser;
-                    // don't forget to set userId in case it was actually empty
-                    userId = myUserId;
-                    showMyProfile();
-                } else {
-                    // user is logged in but it is not his profile
-                    showAnotherProfile();
-                }
-
-                downloadUserPictures();
+                selectAction(currUser);
             }
 
             @Override
             public void onModifiedValue(User currUser) {
-                // reset my infos
-                me = currUser;
-                userCtrl = new UserController(me);
-                myUserId = currUser.getID();
-
-                // assume my profile if no userId set or if it is my own id
-                if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
-                    user = currUser;
-                    // don't forget to set userId in case it was actually empty
-                    userId = myUserId;
-                    showMyProfile();
-                } else {
-                    // user is logged in but it is not his profile
-                    showAnotherProfile();
-                }
+                selectAction(currUser);
             }
 
             @Override
@@ -150,6 +120,28 @@ public class ProfileActivity extends MenuDrawerActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Selects the correct profile action
+     */
+    private void selectAction(User value) {
+        // set my infos
+        me = value;
+        userCtrl = new UserController(me);
+        myUserId = value.getID();
+
+        // assume my profile if no userId set or if it is my own id
+        if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
+            user = value;
+            // don't forget to set userId in case it was actually empty
+            userId = myUserId;
+            showMyProfile();
+        } else {
+            // user is logged in but it is not his profile
+            showAnotherProfile();
+        }
+        downloadUserPictures();
     }
 
     /**
@@ -225,10 +217,15 @@ public class ProfileActivity extends MenuDrawerActivity {
             }
         } else {
             // if user not connected, prompt with dialog to allow login
-            AuthenticationChecks.checkVerifieddAuth(ctx, new DialogInterface.OnCancelListener() {
+            action.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCancel(DialogInterface dialog) {
-                    dialog.dismiss();
+                public void onClick(View v) {
+                    AuthenticationChecks.checkVerifieddAuth(ctx, new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            dialog.dismiss();
+                        }
+                    });
                 }
             });
         }
@@ -277,27 +274,24 @@ public class ProfileActivity extends MenuDrawerActivity {
         country.setText("Switzerland");
     }
 
-    private final String TAG = "mylogs";
 
     private void downloadUserPictures() {
         if (userId != null) {
             PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.PROFILE, new PhotoProvider.DownloadBitmapListener() {
                 @Override
-                public void onNewValue(Bitmap value) {
-                    profilePicture.setImageBitmap(value);
-                    Log.d(TAG, "onNewValue: ");
+                public void onNewValue(Bitmap bitmap) {
+                    profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(bitmap));
                 }
 
                 @Override
                 public void onFailure() {
-                    Log.d(TAG, "onFailure: ");
                 }
             });
 
             PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.BANNER, new PhotoProvider.DownloadBitmapListener() {
                 @Override
-                public void onNewValue(Bitmap value) {
-                    profileBanner.setImageBitmap(value);
+                public void onNewValue(Bitmap bitmap) {
+                    profileBanner.setImageBitmap(bitmap);
                 }
 
                 @Override
