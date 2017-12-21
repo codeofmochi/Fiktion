@@ -94,7 +94,7 @@ public class SettingsActivity extends MenuDrawerActivity {
             // Do something with the date chosen by the user
             //month needs to be incrementd because of API
             birthday = new LocalDate(year, month, day);
-            birthdayText.setText(day + "/" + (month + 1) + "/" + year);
+            birthdayText.setText(day + "/" + (month+1) + "/" + year);
         }
     }
 
@@ -221,7 +221,7 @@ public class SettingsActivity extends MenuDrawerActivity {
                 countryEdit.setHint(userPersonalInfos.getCountry());
                 // handle birthday
                 if(userPersonalInfos.getYear() != 1){
-                    birthdayText.setText(userPersonalInfos.getDay() + "/" + (userPersonalInfos.getMonth() + 1) + "/" + userPersonalInfos.getYear());
+                    birthdayText.setText(userPersonalInfos.getDay() + "/" + (userPersonalInfos.getMonth()) + "/" + userPersonalInfos.getYear());
 
                 }
 
@@ -600,7 +600,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         String newLastName = inputLastName.isEmpty() ? oldValues.getLastName() : inputLastName;
         String newCountry = inputCountry.isEmpty() ? oldValues.getCountry() : inputCountry;
 
-        PersonalUserInfos newValues = new PersonalUserInfos(userPersonalInfos.getYear(),userPersonalInfos.getMonth(), userPersonalInfos.getDay(), newFirstName, newLastName, newCountry);
+        PersonalUserInfos newValues = new PersonalUserInfos(birthday.getYear(),birthday.getMonthOfYear()+1, birthday.getDayOfMonth(), newFirstName, newLastName, newCountry);
         user.updatePersonalInfos(newValues, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onDoesntExist() {

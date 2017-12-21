@@ -31,7 +31,7 @@ public class PersonalUserInfos {
             throw new IllegalArgumentException("Years must be a value between 0 and 9999 inclusive");
         }
 
-        if (m < 0 || m > 11) {
+        if (m < 1 || m > 12) {
             throw new IllegalArgumentException("Months are from 0 to 11");
         }
 
@@ -61,7 +61,7 @@ public class PersonalUserInfos {
 
     public int getAge() {
         LocalDate now = new LocalDate();
-        LocalDate birthday = new LocalDate(year, month, day);
+        LocalDate birthday = new LocalDate(year, month-1, day);
         Period period = new Period(birthday, now, PeriodType.years());
         return period.getYears();
     }
