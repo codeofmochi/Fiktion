@@ -234,7 +234,7 @@ public class CommentsDisplayer {
         // date text
         TextView date = new TextView(ctx);
         date.setTextSize(14);
-        DateFormat df = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+        DateFormat df = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.ENGLISH);
         date.setText(df.format(c.getDate()));
         date.setTextColor(ctx.getResources().getColor(R.color.colorText));
         left.addView(date);

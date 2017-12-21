@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -27,12 +28,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.android.AndroidPermissions;
 import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.AddPOIPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -80,6 +84,8 @@ public class ProfileActivity extends MenuDrawerActivity {
     // this activity's context
     private Activity ctx = this;
     private Snackbar loading;
+    // user history view
+    private LinearLayout posts;
 
 
     @Override
@@ -100,6 +106,9 @@ public class ProfileActivity extends MenuDrawerActivity {
         // show loading snackbar
         loading = Snackbar.make(profileBanner, R.string.loading_text, Snackbar.LENGTH_INDEFINITE);
         loading.show();
+
+        // user history
+        posts = (LinearLayout) findViewById(R.id.posts);
 
         // set default images
         profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
@@ -306,9 +315,19 @@ public class ProfileActivity extends MenuDrawerActivity {
                 @Override
                 public void onNewValue(Post value) {
                     // add post to linear layout
-                    // TODO
+                    // TODO uncomment
+                    // posts.addView(value.display(ctx, user.getName()));
                 }
             });
+        }
+
+        // TODO DEBUG TEST
+        try {
+            Post p = new AddPOIPost("Akihabara", Calendar.getInstance().getTime());
+            View v = p.display(ctx, user.getName());
+            posts.addView(v);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
     }
 

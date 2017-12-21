@@ -1,5 +1,8 @@
 package ch.epfl.sweng.fiktion.models.posts;
 
+import android.content.Context;
+import android.view.View;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
@@ -56,5 +59,10 @@ public class PhotoUploadPost extends Post {
      */
     public String getPOIName() {
         return poiName;
+    }
+
+    @Override
+    public View display(Context ctx, String username) {
+        return null;
     }
 }
