@@ -2,7 +2,6 @@ package ch.epfl.sweng.fiktion;
 
 import junit.framework.Assert;
 
-import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -59,6 +58,8 @@ public class UserTest {
     private DatabaseProvider localDB;
 
     private DatabaseProvider.ModifyUserListener mUserListener;
+
+    PersonalUserInfos newInfos = new PersonalUserInfos(2016, 11, 27, "test", "sweng", "epfl");
 
     private PointOfInterest poiWithName(String name) {
         return new PointOfInterest(name, new Position(0, 0),
@@ -1070,12 +1071,104 @@ public class UserTest {
         });
     }
 
-    @Test
-    public void personInfosTest() {
-        PersonalUserInfos infos = user.getPersonalUserInfos();
-        assertThat(infos.getCountry(), is(""));
-        assertThat(infos.getLastName(), is(""));
-        assertThat(infos.getFirstName(), is(""));
-        assertThat(infos.getAge(), is(0));
+    private void assertDefaultPersonalUsersInfos(PersonalUserInfos defaultInfos) {
+        assertThat(defaultInfos.getCountry(), is(""));
+        assertThat(defaultInfos.getLastName(), is(""));
+        assertThat(defaultInfos.getFirstName(), is(""));
+        assertThat(defaultInfos.getAge(), is(0));
     }
+
+    private void assertNewPersonalUserInfos(PersonalUserInfos newInfos) {
+        assertThat(newInfos.getCountry(), is("epfl"));
+        assertThat(newInfos.getLastName(), is("sweng"));
+        assertThat(newInfos.getFirstName(), is("test"));
+        assertThat(newInfos.getAge(), is(1));
+    }
+
+    @Test
+    public void personalInfosTest() {
+
+
+        user.updatePersonalInfos(newInfos, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onSuccess() {
+
+
+                DatabaseProvider.getInstance().getUserById(user.getID(), new DatabaseProvider.GetUserListener() {
+                    @Override
+                    public void onDoesntExist() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Assert.fail();
+                    }
+
+                    @Override
+                    public void onNewValue(User value) {
+                        PersonalUserInfos current = value.getPersonalUserInfos();
+                        assertNewPersonalUserInfos(current);
+                    }
+
+                    @Override
+                    public void onModifiedValue(User value) {
+                        Assert.fail();
+                    }
+                });
+            }
+        });
+    }
+
+    @Test
+    public void testUpdatePersonalInfosListener() {
+        final User doesntExistListenerUser = new User("", "MODIFYUSERD");
+        final User failureListenerUser = new User("", "MODIFYUSERF");
+        doesntExistListenerUser.updatePersonalInfos(newInfos, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onDoesntExist() {
+                assertDefaultPersonalUsersInfos(doesntExistListenerUser.getPersonalUserInfos());
+            }
+
+            @Override
+            public void onFailure() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+        });
+
+        failureListenerUser.updatePersonalInfos(newInfos, new DatabaseProvider.ModifyUserListener() {
+            @Override
+            public void onDoesntExist() {
+                Assert.fail();
+            }
+
+            @Override
+            public void onFailure() {
+                assertDefaultPersonalUsersInfos(failureListenerUser.getPersonalUserInfos());
+            }
+
+            @Override
+            public void onSuccess() {
+                Assert.fail();
+            }
+        });
+
+    }
+
+
 }
