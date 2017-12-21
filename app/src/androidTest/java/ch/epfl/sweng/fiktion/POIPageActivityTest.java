@@ -29,10 +29,13 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
+import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
@@ -48,6 +51,7 @@ import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
@@ -581,6 +585,26 @@ public class POIPageActivityTest {
                 Assert.fail();
             }
         });
+    }
+
+    @Test
+    public void displayCommentTest() throws NoSuchAlgorithmException{
+        DatabaseProvider.getInstance().addComment(new Comment("This is a test", "defaultID", new Date(), 2017), poiTest.name(),
+                new DatabaseProvider.AddCommentListener() {
+                    @Override
+                    public void onFailure() {
+
+                    }
+
+                    @Override
+                    public void onSuccess() {
+
+                    }
+                });
+        Intent i = new Intent();
+        i.putExtra("POI_NAME", "poiTest");
+        toastRule.launchActivity(i);
+        onView(withText("This is a test")).perform(scrollTo());
     }
 
 }
