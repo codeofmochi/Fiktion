@@ -23,11 +23,11 @@ public class PersonalUserInfosTest {
 
     @Test
     public void initializeReal() {
-        PersonalUserInfos infos = new PersonalUserInfos(new LocalDate(1992, 11, 27), "Rodrigo", "Soares Granja", "Switzerland");
+        PersonalUserInfos infos = new PersonalUserInfos(new LocalDate(1992, 11, 27), "John", "Doe", "Switzerland");
         assertThat(infos.getAge(), is(25));
         assertThat(infos.getCountry(), is("Switzerland"));
-        assertThat(infos.getFirstName(), is("Rodrigo"));
-        assertThat(infos.getLastName(), is("Soares Granja"));
+        assertThat(infos.getFirstName(), is("John"));
+        assertThat(infos.getLastName(), is("Doe"));
         assertNotNull(infos.getBirthday());
     }
 
