@@ -32,7 +32,7 @@ public class PhotoController {
     /**
      * Listener for the retrieval of bitmaps
      */
-    public interface GetBitmapsListener extends Get<Bitmap>, Failure {
+    public interface GetBitmapListener extends Get<Bitmap>, Failure {
     }
 
     /**
@@ -43,7 +43,7 @@ public class PhotoController {
      * @param numberOfBitmaps the maximum number of bitmaps to retrieve (PhotoProvider.ALL_PHOTOS for all photos)
      * @param listener        a listener that listens for the results
      */
-    public static void getPOIBitmaps(final Context ctx, final String poiName, int numberOfBitmaps, final GetBitmapsListener listener) {
+    public static void getPOIBitmaps(final Context ctx, final String poiName, int numberOfBitmaps, final GetBitmapListener listener) {
         // get the photo names
         PhotoProvider.getInstance().getPOIPhotoNames(poiName, numberOfBitmaps, new PhotoProvider.GetPhotoNamesListener() {
             @Override
@@ -75,15 +75,7 @@ public class PhotoController {
                             bitmapCache.put(photoName, b);
 
                             // put the bitmap in the internal storage
-                            try {
-                                ByteArrayOutputStream photoBytes = new ByteArrayOutputStream();
-                                b.compress(Bitmap.CompressFormat.JPEG, 100, photoBytes);
-                                FileOutputStream fileOutputStream = ctx.openFileOutput(photoName, Context.MODE_PRIVATE);
-                                fileOutputStream.write(photoBytes.toByteArray());
-                                fileOutputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            writeToInternalStorage(ctx, b, photoName);
                         }
 
                         @Override
@@ -99,5 +91,91 @@ public class PhotoController {
                 listener.onFailure();
             }
         });
+    }
+
+    /**
+     * get the profile photo of a user, inform the listener of the result
+     *
+     * @param ctx      the activity context
+     * @param userId   the id of the user
+     * @param listener the listener
+     */
+    public static void getUserProfilePicture(Context ctx, String userId, GetBitmapListener listener) {
+        getUserPicture(ctx, userId, PhotoProvider.UserPhotoType.PROFILE, listener);
+    }
+
+    /**
+     * get the banner photo of a user, inform the listener of the result
+     *
+     * @param ctx      the activity context
+     * @param userId   the id of the user
+     * @param listener the listener
+     */
+    public static void getUserBannerPicture(Context ctx, String userId, GetBitmapListener listener) {
+        getUserPicture(ctx, userId, PhotoProvider.UserPhotoType.BANNER, listener);
+    }
+
+    private static void getUserPicture(final Context ctx, String userId, final PhotoProvider.UserPhotoType type, final GetBitmapListener listener) {
+        final String photoName;
+        switch (type) {
+            case PROFILE:
+                photoName = userId + "profile.jpg";
+                break;
+            case BANNER:
+                photoName = userId + "banner.jpg";
+                break;
+            default:
+                listener.onFailure();
+                return;
+        }
+
+        // check if it is in the cache
+        Bitmap bitmap = bitmapCache.get(photoName);
+        if (bitmap != null) {
+            listener.onNewValue(bitmap);
+            return;
+        }
+
+        try {
+            // try to get the bitmap from storage
+            FileInputStream fileInputStream = ctx.openFileInput(photoName);
+            Bitmap b = BitmapFactory.decodeStream(fileInputStream);
+            fileInputStream.close();
+            listener.onNewValue(b);
+
+            // put the bitmap in the cache
+            bitmapCache.put(photoName, b);
+        } catch (IOException e) {
+            // download the bitmap
+            PhotoProvider.getInstance().downloadUserBitmap(userId, type, new PhotoProvider.DownloadBitmapListener() {
+                @Override
+                public void onNewValue(Bitmap b) {
+                    listener.onNewValue(b);
+
+                    // put the bitmap in the cache
+                    bitmapCache.put(photoName, b);
+
+                    // put the bitmap in the internal storage
+                    writeToInternalStorage(ctx, b, photoName);
+                }
+
+                @Override
+                public void onFailure() {
+                    listener.onFailure();
+                }
+            });
+        }
+    }
+
+    private static void writeToInternalStorage(Context ctx, Bitmap b, String photoName) {
+        try {
+            ByteArrayOutputStream photoBytes = new ByteArrayOutputStream();
+            b.compress(Bitmap.CompressFormat.JPEG, 100, photoBytes);
+            FileOutputStream fileOutputStream = ctx.openFileOutput(photoName, Context.MODE_PRIVATE);
+            fileOutputStream.write(photoBytes.toByteArray());
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
