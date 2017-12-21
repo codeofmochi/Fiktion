@@ -6,11 +6,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
@@ -271,52 +275,93 @@ public class ProfileActivity extends MenuDrawerActivity {
         //TODO : implement these in class User and retrieve them here
         realInfos.setText("John Doe, 21");
         country.setText("Switzerland");
+
+        setPictureOnClickListener(PhotoProvider.UserPhotoType.PROFILE);
+        setPictureOnClickListener(PhotoProvider.UserPhotoType.BANNER);
     }
 
     /**
      * download the user profile and banner picture
      */
     private void downloadUserPictures() {
+        downloadUserPicture(PhotoProvider.UserPhotoType.PROFILE);
+        downloadUserPicture(PhotoProvider.UserPhotoType.BANNER);
+    }
+
+    /**
+     * Download a user picture
+     *
+     * @param photoType the type of picture to download
+     */
+    private void downloadUserPicture(final PhotoProvider.UserPhotoType photoType) {
         if (userId != null) {
-            // download the user profile picture
-            PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.PROFILE, new PhotoProvider.DownloadBitmapListener() {
+            // download the user picture
+            PhotoProvider.getInstance().downloadUserBitmap(userId, photoType, new PhotoProvider.DownloadBitmapListener() {
                 @Override
                 public void onNewValue(final Bitmap bitmap) {
-                    profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(bitmap));
-
-                    // on click open the image in fullscreen
-                    profilePicture.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // show in fullscreen
-                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, bitmap);
-                        }
-                    });
+                    switch (photoType) {
+                        case PROFILE:
+                            profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(bitmap));
+                            break;
+                        case BANNER:
+                            profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(bitmap, bannerWidth, bannerHeight));
+                            break;
+                        default:
+                            return;
+                    }
+                    setPictureOnClickListener(photoType);
                 }
 
                 @Override
                 public void onFailure() {
                 }
             });
+        }
+    }
 
-            // download the user banner picture
-            PhotoProvider.getInstance().downloadUserBitmap(userId, PhotoProvider.UserPhotoType.BANNER, new PhotoProvider.DownloadBitmapListener() {
+    private void setPictureOnClickListener(final PhotoProvider.UserPhotoType photoType) {
+        final ImageView imgView;
+        switch (photoType) {
+            case PROFILE:
+                imgView = profilePicture;
+                break;
+            case BANNER:
+                imgView = profileBanner;
+                break;
+            default:
+                return;
+        }
+        if (imgView != null) {
+            imgView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onNewValue(final Bitmap bitmap) {
-                    profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(bitmap, bannerWidth, bannerHeight));
+                public void onClick(View v) {
 
-                    // on click open the image in fullscreen
-                    profileBanner.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // show in fullscreen
-                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, bitmap);
-                        }
-                    });
-                }
+                    switch (state) {
+                        case ANOTHER_PROFILE:
+                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, ((BitmapDrawable) imgView.getDrawable()).getBitmap());
+                            break;
 
-                @Override
-                public void onFailure() {
+                        case MY_PROFILE:
+                            PopupMenu popup = new PopupMenu(ctx, imgView, Gravity.END);
+                            popup.inflate(R.menu.profile_picture_actions);
+                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    switch (item.getItemId()) {
+                                        case R.id.change_picture:
+
+                                            break;
+
+                                        case R.id.fullscreen_picture:
+                                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, ((BitmapDrawable) imgView.getDrawable()).getBitmap());
+                                            break;
+                                    }
+                                    return true;
+                                }
+                            });
+                            popup.show();
+                    }
+
                 }
             });
         }
