@@ -58,16 +58,16 @@ public class UserPicturesActivity extends AppCompatActivity {
             if (convertView == null) {
                 // if it's not recycled, initialize some attributes
                 imageView = new ImageView(mContext);
-                imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                imageView.setPadding(8, 8, 8, 8);
+                imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                imageView.setPadding(5, 10, 5, 0);
             } else {
                 imageView = (ImageView) convertView;
             }
 
             Bitmap pic = images.get(position);
-            pic = POIDisplayer.scaleBitmap(pic, 200);
             pic = POIDisplayer.cropBitmapToSquare(pic);
+            pic = POIDisplayer.scaleBitmap(pic, 500);
+            imageView.setAdjustViewBounds(true);
             imageView.setImageBitmap(pic);
             return imageView;
         }
@@ -77,6 +77,8 @@ public class UserPicturesActivity extends AppCompatActivity {
     ProfileActivity.Action state;
     List<Bitmap> photos;
     GridView photosGrid;
+    ImageAdapter adapter;
+    int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +99,11 @@ public class UserPicturesActivity extends AppCompatActivity {
 
         // init array list of photos
         photos = new ArrayList<>();
+        adapter = new ImageAdapter(this, photos);
 
         // get photos grid
         photosGrid = (GridView) findViewById(R.id.photos_grid);
-        photosGrid.setAdapter(new ImageAdapter(this, photos));
+        photosGrid.setAdapter(adapter);
         photosGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
             }
@@ -127,6 +130,8 @@ public class UserPicturesActivity extends AppCompatActivity {
                         @Override
                         public void onNewValue(Bitmap bitmap) {
                             photos.add(bitmap);
+                            adapter.notifyDataSetChanged();
+                            count++;
                         }
                     });
                 }
