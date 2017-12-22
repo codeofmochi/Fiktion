@@ -76,7 +76,8 @@ public class CommentPOIPost extends Post {
         // header comment
         TextView header = new TextView(ctx);
         header.setTextColor(ctx.getResources().getColor(R.color.darkGray));
-        header.setText(username + " added wrote a comment for " + poiName + " :");
+        String text = username + " added wrote a comment for " + poiName + " :";
+        header.setText(text);
         header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.rate_review_icon_20, 0, 0, 0);
         header.setCompoundDrawablePadding(5);
         inner.addView(header);
