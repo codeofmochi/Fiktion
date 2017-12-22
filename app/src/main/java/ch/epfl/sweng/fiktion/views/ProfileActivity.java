@@ -1,23 +1,44 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import ch.epfl.sweng.fiktion.R;
+import ch.epfl.sweng.fiktion.android.AndroidPermissions;
+import ch.epfl.sweng.fiktion.android.AndroidServices;
 import ch.epfl.sweng.fiktion.controllers.UserController;
 import ch.epfl.sweng.fiktion.models.PersonalUserInfos;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
+import ch.epfl.sweng.fiktion.utils.Config;
 import ch.epfl.sweng.fiktion.views.parents.MenuDrawerActivity;
 import ch.epfl.sweng.fiktion.views.utils.ActivityCodes;
 import ch.epfl.sweng.fiktion.views.utils.AuthenticationChecks;
@@ -60,6 +81,8 @@ public class ProfileActivity extends MenuDrawerActivity {
     // this activity's context
     private Activity ctx = this;
     private Snackbar loading;
+    // user history view
+    private LinearLayout posts;
 
 
     @Override
@@ -67,6 +90,9 @@ public class ProfileActivity extends MenuDrawerActivity {
         // pass layout to parent
         includeLayout = R.layout.activity_profile;
         super.onCreate(savedInstanceState);
+
+        // set background
+        findViewById(R.id.drawer_layout).setBackgroundColor(getResources().getColor(R.color.bgLightGray));
 
         //create user infos fields
         username = (TextView) findViewById(R.id.username);
@@ -81,6 +107,9 @@ public class ProfileActivity extends MenuDrawerActivity {
         loading = Snackbar.make(profileBanner, R.string.loading_text, Snackbar.LENGTH_INDEFINITE);
         loading.show();
 
+        // user history
+        posts = (LinearLayout) findViewById(R.id.posts);
+
         // set default images
         profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(BitmapFactory.decodeResource(getResources(), R.drawable.akibairl2), bannerWidth, bannerHeight));
         profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(BitmapFactory.decodeResource(getResources(), R.drawable.default_user)));
@@ -93,40 +122,12 @@ public class ProfileActivity extends MenuDrawerActivity {
         AuthProvider.getInstance().getCurrentUser(new DatabaseProvider.GetUserListener() {
             @Override
             public void onNewValue(User currUser) {
-                // set my infos
-                me = currUser;
-                userCtrl = new UserController(me);
-                myUserId = currUser.getID();
-
-                // assume my profile if no userId set or if it is my own id
-                if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
-                    user = currUser;
-                    // don't forget to set userId in case it was actually empty
-                    userId = myUserId;
-                    showMyProfile();
-                } else {
-                    // user is logged in but it is not his profile
-                    showAnotherProfile();
-                }
+                selectAction(currUser);
             }
 
             @Override
             public void onModifiedValue(User currUser) {
-                // reset my infos
-                me = currUser;
-                userCtrl = new UserController(me);
-                myUserId = currUser.getID();
-
-                // assume my profile if no userId set or if it is my own id
-                if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
-                    user = currUser;
-                    // don't forget to set userId in case it was actually empty
-                    userId = myUserId;
-                    showMyProfile();
-                } else {
-                    // user is logged in but it is not his profile
-                    showAnotherProfile();
-                }
+                selectAction(currUser);
             }
 
             @Override
@@ -146,6 +147,28 @@ public class ProfileActivity extends MenuDrawerActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Selects the correct profile action
+     */
+    private void selectAction(User value) {
+        // set my infos
+        me = value;
+        userCtrl = new UserController(me);
+        myUserId = value.getID();
+
+        // assume my profile if no userId set or if it is my own id
+        if (userId == null || userId.isEmpty() || userId.equals(myUserId)) {
+            user = value;
+            // don't forget to set userId in case it was actually empty
+            userId = myUserId;
+            showMyProfile();
+        } else {
+            // user is logged in but it is not his profile
+            showAnotherProfile();
+        }
+        downloadUserPictures();
     }
 
     /**
@@ -221,10 +244,15 @@ public class ProfileActivity extends MenuDrawerActivity {
             }
         } else {
             // if user not connected, prompt with dialog to allow login
-            AuthenticationChecks.checkVerifieddAuth(ctx, new DialogInterface.OnCancelListener() {
+            action.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCancel(DialogInterface dialog) {
-                    dialog.dismiss();
+                public void onClick(View v) {
+                    AuthenticationChecks.checkVerifieddAuth(ctx, new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            dialog.dismiss();
+                        }
+                    });
                 }
             });
         }
@@ -273,36 +301,336 @@ public class ProfileActivity extends MenuDrawerActivity {
         loading.dismiss();
         // display infos
         username.setText(user.getName());
+
         if (!firstName.isEmpty() || !lastName.isEmpty()) {
             builder.append(firstName);
             builder.append(" ");
             builder.append(lastName);
         }
-        if (userInfos.getAge()!=0) {
+        if (userInfos.getAge() != 0) {
             builder.append(", ");
             builder.append(userInfos.getAge());
         }
 
         realInfos.setText(builder.toString());
         country.setText(homeCountry);
+
+        // set pictures onClick actions
+        setPictureOnClickListener(PhotoProvider.UserPhotoType.PROFILE);
+        setPictureOnClickListener(PhotoProvider.UserPhotoType.BANNER);
+
+        // get user history
+        // reset history
+        posts.removeAllViews();
+        if (isVisibleFromPrivacy()) {
+            DatabaseProvider.getInstance().getUserPosts(userId, new DatabaseProvider.GetPostListener() {
+                @Override
+                public void onFailure() {
+                    Snackbar.make(profileBanner, R.string.request_failed, Snackbar.LENGTH_INDEFINITE).show();
+                }
+
+                @Override
+                public void onNewValue(Post value) {
+                    posts.addView(value.display(ctx, user.getName()));
+                }
+            });
+        }
     }
 
     /**
-     * Triggered when an activity called here returns with a result
-     *
-     * @param requestCode the request code
-     * @param resultCode  the result code
-     * @param data
+     * Check if profile is visible given the privacy settings, the action and the friends list
+     * Has to be called after state is set
      */
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case ActivityCodes.SIGNIN_REQUEST: {
-                if (resultCode == RESULT_OK) {
-                    this.recreate();
+    private boolean isVisibleFromPrivacy() {
+        boolean res;
+        // safe check : if no user, don't allow
+        if (user == null || me == null || state == null) {
+            res = false;
+        }
+        // check if my profile
+        else if (state == Action.MY_PROFILE) {
+            res = true;
+        }
+        // check privacy setting
+        else if (user.isPublicProfile()) {
+            res = true;
+        }
+        // check if in my friend list
+        else if (me.getFriendlist().contains(userId)) {
+            res = true;
+        }
+        // trap case : refuse
+        else {
+            res = false;
+        }
+
+        // show snackbar if profile is not visible
+        if (!res) {
+            Snackbar.make(profileBanner, R.string.profile_is_private, Snackbar.LENGTH_INDEFINITE).show();
+        }
+        return res;
+    }
+
+    /**
+     * download the user profile and banner picture
+     */
+    private void downloadUserPictures() {
+        downloadUserPicture(PhotoProvider.UserPhotoType.PROFILE);
+        downloadUserPicture(PhotoProvider.UserPhotoType.BANNER);
+    }
+
+    /**
+     * Download a user picture
+     *
+     * @param photoType the type of picture to download
+     */
+    private void downloadUserPicture(final PhotoProvider.UserPhotoType photoType) {
+        if (userId != null) {
+            // download the user picture
+            PhotoProvider.getInstance().downloadUserBitmap(userId, photoType, new PhotoProvider.DownloadBitmapListener() {
+                @Override
+                public void onNewValue(final Bitmap bitmap) {
+                    switch (photoType) {
+                        case PROFILE:
+                            profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(bitmap));
+                            break;
+                        case BANNER:
+                            profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(bitmap, bannerWidth, bannerHeight));
+                            break;
+                        default:
+                            return;
+                    }
+                    setPictureOnClickListener(photoType);
                 }
+
+                @Override
+                public void onFailure() {
+                }
+            });
+        }
+    }
+
+    private void setPictureOnClickListener(final PhotoProvider.UserPhotoType photoType) {
+        final ImageView imgView;
+        switch (photoType) {
+            case PROFILE:
+                imgView = profilePicture;
                 break;
+            case BANNER:
+                imgView = profileBanner;
+                break;
+            default:
+                return;
+        }
+        if (imgView != null) {
+            imgView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    switch (state) {
+                        case ANOTHER_PROFILE:
+                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, ((BitmapDrawable) imgView.getDrawable()).getBitmap());
+                            break;
+
+                        case MY_PROFILE:
+                            PopupMenu popup = new PopupMenu(ctx, imgView, Gravity.END);
+                            popup.inflate(R.menu.profile_picture_actions);
+                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    switch (item.getItemId()) {
+                                        case R.id.change_picture:
+                                            requestPhotoType = photoType;
+                                            requestPictureModification();
+                                            break;
+
+                                        case R.id.fullscreen_picture:
+                                            FullscreenPictureActivity.showBitmapInFullscreen(ctx, ((BitmapDrawable) imgView.getDrawable()).getBitmap());
+                                            break;
+                                    }
+                                    return true;
+                                }
+                            });
+                            popup.show();
+                    }
+
+                }
+            });
+        }
+    }
+
+    PhotoProvider.UserPhotoType requestPhotoType;
+
+    //photo and gallery
+
+    // string to pass to onRequestPerm to know if camera or gallery was chosen
+    private String userChoice;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case AndroidPermissions.MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    AndroidServices.promptCameraEnable(this);
+                    if (userChoice.equals("Camera"))
+                        intentCamera();
+                    else if (userChoice.equals("Gallery"))
+                        intentGallery();
+                } else {
+                    // permission denied
+                }
+        }
+    }
+
+    //method to open a pop up window for Image
+    private void requestPictureModification() {
+
+        //pop up box to chose how to take picture
+        final CharSequence[] choice = {"Camera", "Gallery", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+
+        if (!Config.TEST_MODE && ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            AndroidPermissions.promptCameraPermission(this);
+        } else {
+            if (!Config.TEST_MODE)
+                // check camera enable and ask otherwise
+                AndroidServices.promptCameraEnable(this);
+
+            builder.setItems(choice, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    if (choice[item].equals("Camera")) {
+                        userChoice = "TakePhoto";
+                        intentCamera();
+                    } else if (choice[item].equals("Gallery")) {
+                        userChoice = "Gallery";
+                        intentGallery();
+                    } else if (choice[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+
+                }
+            });
+            builder.show();
+        }
+
+    }
+
+    //camera intent
+    private void intentCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, ActivityCodes.REQUEST_CAMERA);
+    }
+
+
+    //gallery intent
+    private void intentGallery() {
+        Intent gallery = new Intent();
+        gallery.setType("image/*");
+        gallery.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(gallery, "Select File"), ActivityCodes.SELECT_FILE);
+    }
+
+
+    //method for what do to when we got the camera/gallery result
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == ActivityCodes.SELECT_FILE) {
+                onGalleryResult(data);
+            } else if (requestCode == ActivityCodes.REQUEST_CAMERA) {
+                onCameraResult(data);
+            } else if (requestCode == ActivityCodes.SIGNIN_REQUEST) {
+                recreate();
+            }
+
+        }
+    }
+
+    //gallery result which uploads the image
+    private void onGalleryResult(Intent data) {
+        Bitmap image = null;
+        if (data != null) {
+            try {
+                image = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+            } catch (IOException e) {
+                return;
             }
         }
+        uploadUserPicture(image);
+    }
+
+    //camera result, creates the ImageFile and uploads it
+    private void onCameraResult(Intent data) {
+
+        if (data == null) {
+            return;
+        }
+        Bitmap image = (Bitmap) data.getExtras().get("data");
+        if (image == null) {
+            return;
+        }
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        //(format, quality, outstream)
+        image.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+
+        //need to create the image file from the camera
+        File destination = new File(Environment.getExternalStorageDirectory(),
+                System.currentTimeMillis() + ".jpg");
+
+        FileOutputStream outstream;
+        try {
+            destination.createNewFile();
+            outstream = new FileOutputStream(destination);
+            outstream.write(bytes.toByteArray());
+            outstream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        uploadUserPicture(image);
+    }
+
+    private void uploadUserPicture(final Bitmap b) {
+        // resize if too big
+        int MAXIMUM_SIZE = 1000;
+        Bitmap uploadBitmap = b.getHeight() <= MAXIMUM_SIZE && b.getWidth() <= MAXIMUM_SIZE ?
+                b : POIDisplayer.scaleBitmap(b, MAXIMUM_SIZE);
+
+        PhotoProvider.getInstance().uploadUserBitmap(uploadBitmap, userId, requestPhotoType, new PhotoProvider.UploadUserPhotoListener() {
+            @Override
+            public void onSuccess() {
+                switch (requestPhotoType) {
+                    case PROFILE:
+                        profilePicture.setImageBitmap(POIDisplayer.cropBitmapToSquare(b));
+                        break;
+                    case BANNER:
+                        profileBanner.setImageBitmap(POIDisplayer.cropAndScaleBitmapTo(b, bannerWidth, bannerHeight));
+                        break;
+                    default:
+                }
+            }
+
+            @Override
+            public void updateProgress(double progress) {
+            }
+
+            @Override
+            public void onFailure() {
+                switch (requestPhotoType) {
+                    case PROFILE:
+                        Snackbar.make(profilePicture, "the photo failed to upload", Snackbar.LENGTH_SHORT);
+                        break;
+                    case BANNER:
+                        Snackbar.make(profileBanner, "the photo failed to upload", Snackbar.LENGTH_SHORT);
+                        break;
+                    default:
+                }
+            }
+        });
     }
 
     /**
@@ -325,7 +653,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserPlacesActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserPlacesActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);
@@ -339,7 +667,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserPicturesActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserPicturesActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);
@@ -353,7 +681,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserFriendsActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserFriendsActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);
@@ -367,7 +695,7 @@ public class ProfileActivity extends MenuDrawerActivity {
      */
     public void startUserAchievementsActivity(View view) {
         // if not loaded, don't do anything
-        if (this.state == null) return;
+        if (this.state == null || !isVisibleFromPrivacy()) return;
         Intent i = new Intent(this, UserAchievementsActivity.class);
         i.putExtra(USER_ID_KEY, userId);
         i.putExtra(PROFILE_ACTION_KEY, stateFlag);

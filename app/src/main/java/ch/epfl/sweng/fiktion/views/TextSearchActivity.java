@@ -90,7 +90,7 @@ public class TextSearchActivity extends MenuDrawerActivity {
         }
 
         // perform search
-        DatabaseProvider.getInstance().searchByText(text, new DatabaseProvider.SearchPOIByTextListener() {
+        DatabaseProvider.getInstance().searchByText(text, new DatabaseProvider.GetMultiplePOIsListener() {
             @Override
             public void onNewValue(PointOfInterest poi) {
                 View pv = POIDisplayer.createPoiCard(poi, ctx);

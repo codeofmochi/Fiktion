@@ -34,6 +34,10 @@ public class FirebasePhotoProvider extends PhotoProvider {
     private DatabaseReference dbRef;
     final private long MAXIMUM_SIZE = 10 * 1024 * 1024; // 10MB
 
+    private final String photoRefsString = "Photo references";
+    private final String poisRef = "Points of interest";
+    private final String usersRef = "Users";
+
     public FirebasePhotoProvider() {
         stRef = FirebaseStorage.getInstance().getReference();
         dbRef = FirebaseDatabase.getInstance().getReference();
@@ -48,12 +52,13 @@ public class FirebasePhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void uploadPOIBitmap(Bitmap bitmap, final String poiName, final UploadPhotoListener listener) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    public void uploadPOIBitmap(Bitmap bitmap, final String poiName, final UploadPOIPhotoListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
 
-        // fill the outputStream with the bitmap data and convert it into a byte array
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        byte[] data = outputStream.toByteArray();
+        byte[] data = bitmapBytes(bitmap);
 
         // if the number of bytes exceeds MAXIMUM_SIZE, abort the upload
         if (data.length > MAXIMUM_SIZE) {
@@ -62,26 +67,25 @@ public class FirebasePhotoProvider extends PhotoProvider {
         }
 
         // create a hash of the data, it will be the name of the photo
-        String photoName = "";
+        byte[] hash;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(data);
-            photoName = CollectionsUtils.bytesToHexString(hash);
+            hash = digest.digest(data);
+
         } catch (NoSuchAlgorithmException e) {
             listener.onFailure();
             return;
         }
+        final String photoName = CollectionsUtils.bytesToHexString(hash);
 
         // get the photo reference which is /Points of interest/#poiName/#photoName
-        StorageReference poisRef = stRef.child("Points of interest");
-        StorageReference poiRef = poisRef.child(poiName);
+        StorageReference poiRef = stRef.child(poisRef).child(poiName);
         final StorageReference photoRef = poiRef.child(photoName + ".jpg");
 
         // create an uploadTask which takes care of the upload
         UploadTask uploadTask = photoRef.putBytes(data);
 
         // add listeners to uploadTask to keep track of the status of the upload
-        final String finalPhotoName = photoName;
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
@@ -92,15 +96,15 @@ public class FirebasePhotoProvider extends PhotoProvider {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // store the photo name in the database so that we can retrieve it
-                final DatabaseReference dbPOIRef = dbRef.child("Photo references").child(poiName);
+                final DatabaseReference dbPOIRef = dbRef.child(photoRefsString).child(poiName);
                 dbPOIRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String index = String.valueOf(dataSnapshot.getChildrenCount());
-                        dbPOIRef.child(index).setValue(finalPhotoName);
+                        dbPOIRef.child(index).setValue(photoName);
 
                         // inform the listener that the upload succeeded
-                        listener.onSuccess();
+                        listener.onSuccess(photoName + ".jpg");
 
                     }
 
@@ -137,8 +141,13 @@ public class FirebasePhotoProvider extends PhotoProvider {
      */
     @Override
     public void getPOIPhotoNames(String poiName, int numberOfPhotos, final GetPhotoNamesListener listener) {
+        if (poiName.isEmpty() || numberOfPhotos < 0) {
+            listener.onFailure();
+            return;
+        }
+
         // first, get the reference of the poi and listen for its photo references
-        Query query = dbRef.child("Photo references").child(poiName).orderByKey();
+        Query query = dbRef.child(photoRefsString).child(poiName).orderByKey();
 
         if (numberOfPhotos > 0)
             // limit the number of photo references
@@ -174,9 +183,13 @@ public class FirebasePhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void downloadPOIBitmap(final String poiName, String photoName, final DownloadBitmapListener listener) {
+    public void downloadPOIBitmap(final String poiName, final String photoName, final DownloadBitmapListener listener) {
+        if (poiName.isEmpty() || photoName.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
 
-        StorageReference photoRef = stRef.child("Points of interest").child(poiName).child(photoName);
+        StorageReference photoRef = stRef.child(poisRef).child(poiName).child(photoName);
         photoRef.getBytes(MAXIMUM_SIZE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
@@ -195,5 +208,121 @@ public class FirebasePhotoProvider extends PhotoProvider {
                 listener.onFailure();
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, final UploadUserPhotoListener listener) {
+        if (userId.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
+        byte[] data = bitmapBytes(bitmap);
+
+        // if the number of bytes exceeds MAXIMUM_SIZE, abort the upload
+        if (data.length > MAXIMUM_SIZE) {
+            listener.onFailure();
+            return;
+        }
+
+        StorageReference userRef = stRef.child(usersRef).child(userId);
+        StorageReference photoRef;
+        switch (type) {
+            case PROFILE:
+                photoRef = userRef.child(userId + "profile.jpg");
+                break;
+            case BANNER:
+                photoRef = userRef.child(userId + "banner.jpg");
+                break;
+            default:
+                listener.onFailure();
+                return;
+        }
+
+        // create an uploadTask which takes care of the upload
+        UploadTask uploadTask = photoRef.putBytes(data);
+
+        // add listeners to keep track of the status of the upload
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                listener.onSuccess();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                listener.onFailure();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                long totalBytes = taskSnapshot.getTotalByteCount();
+                long bytesTransfered = taskSnapshot.getBytesTransferred();
+
+                // inform the listener that the progress has been updated
+                if (totalBytes == 0) {
+                    // if there is no bytes then the upload is done
+                    listener.updateProgress(100.0);
+                } else {
+                    double progress = (100.0 * bytesTransfered) / taskSnapshot.getTotalByteCount();
+                    listener.updateProgress(progress);
+                }
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void downloadUserBitmap(final String userId, final UserPhotoType type, final DownloadBitmapListener listener) {
+        if (userId.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
+        StorageReference userRef = stRef.child(usersRef).child(userId);
+        StorageReference photoRef;
+        switch (type) {
+            case PROFILE:
+                photoRef = userRef.child(userId + "profile.jpg");
+                break;
+            case BANNER:
+                photoRef = userRef.child(userId + "banner.jpg");
+                break;
+            default:
+                listener.onFailure();
+                return;
+        }
+
+        photoRef.getBytes(MAXIMUM_SIZE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                // convert the bytes into a bitmap
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                if (bitmap != null) {
+                    // "send" the downloaded bitmap to the listener
+                    listener.onNewValue(bitmap);
+                } else {
+                    listener.onFailure();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                listener.onFailure();
+            }
+        });
+    }
+
+    private byte[] bitmapBytes(Bitmap b) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // fill the outputStream with the bitmap data and convert it into a byte array
+        b.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        return outputStream.toByteArray();
     }
 }

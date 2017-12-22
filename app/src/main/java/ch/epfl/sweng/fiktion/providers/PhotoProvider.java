@@ -44,7 +44,15 @@ public abstract class PhotoProvider {
     /**
      * Listener that listens the status of a photo upload
      */
-    public interface UploadPhotoListener extends Success, Failure {
+    public interface UploadPOIPhotoListener extends Failure {
+
+        /**
+         * what to do when the upload succeeds
+         *
+         * @param photoName the name of the photo
+         */
+        void onSuccess(String photoName);
+
         /**
          * what to do with the progress
          *
@@ -69,7 +77,7 @@ public abstract class PhotoProvider {
      * @param poiName  the name of the poi
      * @param listener the listener
      */
-    public abstract void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPhotoListener listener);
+    public abstract void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPOIPhotoListener listener);
 
     /**
      * get the names of the photos associated to a point of interest, inform the listener of the results
@@ -88,4 +96,37 @@ public abstract class PhotoProvider {
      * @param listener  the listener
      */
     public abstract void downloadPOIBitmap(String poiName, String photoName, DownloadBitmapListener listener);
+
+    public enum UserPhotoType {PROFILE, BANNER}
+
+    /**
+     * Listener that listens the status of a photo upload
+     */
+    public interface UploadUserPhotoListener extends Success, Failure {
+        /**
+         * what to do with the progress
+         *
+         * @param progress the progress
+         */
+        void updateProgress(double progress);
+    }
+
+    /**
+     * uploads a bitmap for a user picture and inform the listener of the result
+     *
+     * @param bitmap   the bitmap to upload
+     * @param userId   the id of the user
+     * @param type     the type of the photo, PROFILE or BANNER
+     * @param listener the listener
+     */
+    public abstract void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, UploadUserPhotoListener listener);
+
+    /**
+     * downloads the photo of a user (profile or banner) as a bitmap, inform the listener of the result
+     *
+     * @param userId   the id of the user
+     * @param type     the type of the photo, PROFILE or BANNER
+     * @param listener the listener
+     */
+    public abstract void downloadUserBitmap(String userId, UserPhotoType type, DownloadBitmapListener listener);
 }

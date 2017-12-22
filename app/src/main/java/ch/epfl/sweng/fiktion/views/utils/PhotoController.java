@@ -32,7 +32,7 @@ public class PhotoController {
     /**
      * Listener for the retrieval of bitmaps
      */
-    public interface GetBitmapsListener extends Get<Bitmap>, Failure {
+    public interface GetBitmapListener extends Get<Bitmap>, Failure {
     }
 
     /**
@@ -43,7 +43,12 @@ public class PhotoController {
      * @param numberOfBitmaps the maximum number of bitmaps to retrieve (PhotoProvider.ALL_PHOTOS for all photos)
      * @param listener        a listener that listens for the results
      */
-    public static void getPOIBitmaps(final Context ctx, final String poiName, int numberOfBitmaps, final GetBitmapsListener listener) {
+    public static void getPOIBitmaps(final Context ctx, final String poiName, int numberOfBitmaps, final GetBitmapListener listener) {
+        if (poiName.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
         // get the photo names
         PhotoProvider.getInstance().getPOIPhotoNames(poiName, numberOfBitmaps, new PhotoProvider.GetPhotoNamesListener() {
             @Override
@@ -75,15 +80,7 @@ public class PhotoController {
                             bitmapCache.put(photoName, b);
 
                             // put the bitmap in the internal storage
-                            try {
-                                ByteArrayOutputStream photoBytes = new ByteArrayOutputStream();
-                                b.compress(Bitmap.CompressFormat.JPEG, 100, photoBytes);
-                                FileOutputStream fileOutputStream = ctx.openFileOutput(photoName, Context.MODE_PRIVATE);
-                                fileOutputStream.write(photoBytes.toByteArray());
-                                fileOutputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            writeToInternalStorage(ctx, b, photoName);
                         }
 
                         @Override
@@ -99,5 +96,17 @@ public class PhotoController {
                 listener.onFailure();
             }
         });
+    }
+
+    private static void writeToInternalStorage(Context ctx, Bitmap b, String photoName) {
+        try {
+            ByteArrayOutputStream photoBytes = new ByteArrayOutputStream();
+            b.compress(Bitmap.CompressFormat.JPEG, 100, photoBytes);
+            FileOutputStream fileOutputStream = ctx.openFileOutput(photoName, Context.MODE_PRIVATE);
+            fileOutputStream.write(photoBytes.toByteArray());
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

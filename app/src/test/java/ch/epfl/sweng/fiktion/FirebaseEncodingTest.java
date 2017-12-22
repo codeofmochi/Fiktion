@@ -8,7 +8,7 @@ import java.util.TreeSet;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.FirebasePointOfInterest;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePointOfInterest;
 
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.is;

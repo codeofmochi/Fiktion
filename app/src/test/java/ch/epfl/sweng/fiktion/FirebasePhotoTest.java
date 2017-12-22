@@ -1,7 +1,6 @@
 package ch.epfl.sweng.fiktion;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,7 +20,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
@@ -121,9 +119,9 @@ public class FirebasePhotoTest {
         when(velSnapshot.getChildrenCount()).thenReturn((long) 2);
         when(stRef.delete()).thenReturn(null);
 
-        PhotoProvider.UploadPhotoListener listener = new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.UploadPOIPhotoListener listener = new PhotoProvider.UploadPOIPhotoListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String photoName) {
                 setResult(Result.SUCCESS);
             }
 

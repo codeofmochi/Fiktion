@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.providers;
+package ch.epfl.sweng.fiktion.providers.firebase_models;
 
 import ch.epfl.sweng.fiktion.models.Position;
 

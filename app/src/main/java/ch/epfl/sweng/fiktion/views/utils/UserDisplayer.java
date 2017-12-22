@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import ch.epfl.sweng.fiktion.R;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.ProfileActivity;
 
 /**
@@ -32,7 +33,7 @@ public class UserDisplayer {
         v.setPadding(0, 15, 0, 0);
 
         // profile picture
-        ImageView pic = new ImageView(ctx);
+        final ImageView pic = new ImageView(ctx);
         LinearLayout.LayoutParams picParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
         pic.setLayoutParams(picParams);
 
@@ -42,12 +43,26 @@ public class UserDisplayer {
         pic.setImageDrawable(round);
         v.addView(pic);
 
+        PhotoProvider.getInstance().downloadUserBitmap(u.getID(), PhotoProvider.UserPhotoType.PROFILE, new PhotoProvider.DownloadBitmapListener() {
+            @Override
+            public void onFailure() { /* nothing */ }
+
+            @Override
+            public void onNewValue(Bitmap value) {
+                Bitmap src = POIDisplayer.cropBitmapToSquare(value);
+                src = POIDisplayer.scaleBitmap(src, 120);
+                RoundedBitmapDrawable round = RoundedBitmapDrawableFactory.create(ctx.getResources(), src);
+                round.setCornerRadius(Math.max(src.getWidth(), src.getHeight()) / 2.0f);
+                pic.setImageDrawable(round);
+            }
+        });
+
         // user infos layout
         LinearLayout texts = new LinearLayout(ctx);
         texts.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams textsParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 10);
         texts.setLayoutParams(textsParams);
-        texts.setPadding(20, 12, 20, 0);
+        texts.setPadding(20, 13, 20, 0);
 
         // nickname
         TextView nickname = new TextView(ctx);
@@ -59,7 +74,7 @@ public class UserDisplayer {
 
         // name
         TextView name = new TextView(ctx);
-        name.setText("John Doe");
+        name.setText(u.getPersonalUserInfos().getFirstName() + " " + u.getPersonalUserInfos().getLastName());
         name.setTextSize(15);
         texts.addView(name);
 

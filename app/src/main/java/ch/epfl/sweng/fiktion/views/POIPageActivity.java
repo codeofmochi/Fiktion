@@ -42,6 +42,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.Set;
 
 import ch.epfl.sweng.fiktion.R;
@@ -51,6 +53,11 @@ import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.FavoritePOIPost;
+import ch.epfl.sweng.fiktion.models.posts.PhotoUploadPost;
+import ch.epfl.sweng.fiktion.models.posts.Post;
+import ch.epfl.sweng.fiktion.models.posts.VisitPOIPost;
+import ch.epfl.sweng.fiktion.models.posts.WishlistPOIPost;
 import ch.epfl.sweng.fiktion.providers.AuthProvider;
 import ch.epfl.sweng.fiktion.providers.CurrentLocationProvider;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
@@ -231,6 +238,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                                         @Override
                                         public void onSuccess() {
                                             Snackbar.make(mainImage, getString(R.string.added_to_visited, poiName), Snackbar.LENGTH_LONG).show();
+
+                                            // add a post about the visit of the poi
+                                            try {
+                                                Post post = new VisitPOIPost(poiName, Calendar.getInstance().getTime());
+                                                DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                                                    @Override
+                                                    public void onFailure() {
+                                                    }
+
+                                                    @Override
+                                                    public void onSuccess() {
+                                                    }
+                                                });
+                                            } catch (NoSuchAlgorithmException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
 
                                         @Override
@@ -426,12 +449,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         final ImageView mainImage = (ImageView) findViewById(R.id.mainImage);
 
         // set the mainImage as the first photo of the poi
-        PhotoController.getPOIBitmaps(ctx, poi.name(), 1, new PhotoController.GetBitmapsListener() {
+        PhotoController.getPOIBitmaps(ctx, poi.name(), 1, new PhotoController.GetBitmapListener() {
             @Override
-            public void onNewValue(Bitmap b) {
+            public void onNewValue(final Bitmap b) {
                 Bitmap resized = POIDisplayer.cropAndScaleBitmapTo(b, 900, 600);
                 mainImage.setImageBitmap(resized);
                 mainImage.setVisibility(View.VISIBLE);
+                mainImage.setContentDescription("a photo of " + poi.name());
+
+                // on click open the image in fullscreen
+                mainImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // show in fullscreen
+                        FullscreenPictureActivity.showBitmapInFullscreen(ctx, b);
+                    }
+                });
             }
 
             @Override
@@ -440,7 +473,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         });
 
         // download the photos of the poi
-        PhotoController.getPOIBitmaps(ctx, poi.name(), ALL_PHOTOS, new PhotoController.GetBitmapsListener() {
+        PhotoController.getPOIBitmaps(ctx, poi.name(), ALL_PHOTOS, new PhotoController.GetBitmapListener() {
             @Override
             public void onNewValue(final Bitmap b) {
                 // create a new ImageView which will hold the photo
@@ -454,25 +487,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 params.setMarginEnd(10);
                 imgView.setLayoutParams(params);
                 imgView.setContentDescription("a photo of " + poi.name());
+
                 //renders each image clickable. Calls FullscreenPictureActivity
                 imgView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String fileName = "image";
-                        try {
-                            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                            b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                            FileOutputStream fo = openFileOutput(fileName, Context.MODE_PRIVATE);
-                            fo.write(bytes.toByteArray());
-                            //close file
-                            fo.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            fileName = null;
-                        }
-                        Intent intent = new Intent(ctx, FullscreenPictureActivity.class);
-                        intent.putExtra("Photo", fileName);
-                        startActivity(intent);
+                        // show in fullscreen
+                        FullscreenPictureActivity.showBitmapInFullscreen(ctx, b);
                     }
                 });
 
@@ -495,7 +516,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     private void displayNearPois() {
         // find nearby pois
-        DatabaseProvider.getInstance().findNearPOIs(poi.position(), SEARCH_RADIUS, new DatabaseProvider.FindNearPOIsListener() {
+        DatabaseProvider.getInstance().findNearPOIs(poi.position(), SEARCH_RADIUS, new DatabaseProvider.GetMultiplePOIsListener() {
             @Override
             public void onNewValue(PointOfInterest p) {
                 View v = POIDisplayer.createPoiCard(p, ctx);
@@ -563,7 +584,7 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
     private void selectImage() {
 
         if (poi == null) {
-            Toast.makeText(this, "Point of interest information isn't loaded", Toast.LENGTH_SHORT).show();
+            Snackbar.make(imageLayout, R.string.loading_data, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -686,11 +707,27 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // upload the photo to the cloud
         // show the progress with the progressbar
         uploadProgressBar.setVisibility(View.VISIBLE);
-        PhotoProvider.getInstance().uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPOIPhotoListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String photoName) {
                 uploadProgressBar.setVisibility(View.INVISIBLE);
                 uploadProgressBar.setProgress(0);
+
+                // add a post about the upload of the photo
+                try {
+                    Post post = new PhotoUploadPost(photoName, poiName, Calendar.getInstance().getTime());
+                    DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                        @Override
+                        public void onFailure() {
+                        }
+
+                        @Override
+                        public void onSuccess() {
+                        }
+                    });
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -708,6 +745,12 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
 
     //Button with id = AddReviewButton calls this, opens the WriteCommentActivity
     public void startWriteCommentActivity(View view) {
+
+        if (poi == null) {
+            Snackbar.make(imageLayout, R.string.loading_data, Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         // check if user is connected and has a valid account
         AuthenticationChecks.checkVerifieddAuth((Activity) ctx, cancelListener);
         // check if user's account is verified, otherwise prompt verification and/or refresh
@@ -733,6 +776,13 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+
+                // don't do anything if POI not loaded
+                if (poi == null) {
+                    Snackbar.make(imageLayout, R.string.loading_data, Snackbar.LENGTH_SHORT).show();
+                    return true;
+                }
+
                 switch (item.getItemId()) {
                     case R.id.favourite:
                         // check if user is connected and has a valid account
@@ -746,6 +796,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                             @Override
                             public void onSuccess() {
                                 Toast.makeText(ctx, poiName + " was added to favourites!", Toast.LENGTH_SHORT).show();
+
+                                // add a post of the addition of the poi to the favorites
+                                try {
+                                    Post post = new FavoritePOIPost(poiName, Calendar.getInstance().getTime());
+                                    DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                                        @Override
+                                        public void onFailure() {
+                                        }
+
+                                        @Override
+                                        public void onSuccess() {
+                                        }
+                                    });
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
                             @Override
@@ -771,6 +837,22 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                             @Override
                             public void onSuccess() {
                                 Toast.makeText(ctx, poiName + " was added to the wishlist!", Toast.LENGTH_SHORT).show();
+
+                                // add a post of the addition of the poi to the wishlist
+                                try {
+                                    Post post = new WishlistPOIPost(poiName, Calendar.getInstance().getTime());
+                                    DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                                        @Override
+                                        public void onFailure() {
+                                        }
+
+                                        @Override
+                                        public void onSuccess() {
+                                        }
+                                    });
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
                             @Override

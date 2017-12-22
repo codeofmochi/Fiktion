@@ -122,6 +122,11 @@
     <string name="added_to_visited">%s added to visited</string>
     <string name="center_map">Center map</string>
     <string name="place_removed">Place removed</string>
+    <string name="change_picture">Change the picture</string>
+    <string name="fullscreen">Fullscreen</string>
+    <string name="no_pictures_yet">No pictures yet. Add some?</string>
+    <string name="no_achievements_yet">No achievements yet. Get some?</string>
+    <string name="profile_is_private">This profile is private</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
     <string name="Birthday">Birthday</string>
@@ -129,4 +134,5 @@
     <string name="Change">Change</string>
     <string name="save_profile_settings">Save profile settings</string>
     <string name="privacy_updated">Privacy setting updated</string>
+    <string name="thats_all">That\'s all.</string>
 </resources>

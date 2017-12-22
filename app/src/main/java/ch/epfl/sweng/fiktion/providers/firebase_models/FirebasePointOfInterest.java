@@ -1,4 +1,4 @@
-package ch.epfl.sweng.fiktion.providers;
+package ch.epfl.sweng.fiktion.providers.firebase_models;
 
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
+import ch.epfl.sweng.fiktion.providers.firebase_models.FirebasePosition;
 
 import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.decode;
 import static ch.epfl.sweng.fiktion.providers.FirebaseDatabaseProvider.encode;

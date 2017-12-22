@@ -5,6 +5,7 @@
 
     <!-- Permissions -->
 
+
     <!-- Network Status for connectivity check -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -93,7 +94,6 @@
         <activity
             android:name=".views.TextSearchActivity"
             android:label="Search" />
-
         <activity android:name=".views.WriteCommentActivity" />
         <activity
             android:name=".views.NearbyListActivity"
@@ -135,6 +135,7 @@
                 android:value="ch.epfl.sweng.fiktion.views.ProfileActivity" />
         </activity>
         <activity android:name=".views.FullscreenPictureActivity" />
+        <activity android:name=".views.DiscoverActivity"></activity>
     </application>
 
 </manifest>

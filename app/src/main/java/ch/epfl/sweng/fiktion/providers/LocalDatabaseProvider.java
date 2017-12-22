@@ -14,6 +14,7 @@ import ch.epfl.sweng.fiktion.models.Comment;
 import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
+import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.utils.HelperMethods;
 
 
@@ -36,6 +37,10 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     private Map<String, Set<GetPOIListener>> getPOIListeners = new TreeMap<>();
 
     private Map<String, Set<GetUserListener>> getUserListeners = new TreeMap<>();
+
+    private Map<String, Set<Post>> posts = new TreeMap<>();
+    private Map<String, Set<GetPostListener>> getPostListeners = new TreeMap<>();
+
 
     /**
      * {@inheritDoc}
@@ -123,6 +128,16 @@ public class LocalDatabaseProvider extends DatabaseProvider {
 
         // inform the listener that the poi doesnt exist
         listener.onDoesntExist();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getAllPOIs(int numberOfPOIs, GetMultiplePOIsListener listener) {
+        for (int i = 0; (numberOfPOIs == ALL_POIS || i < numberOfPOIs) && i < poiList.size(); ++i) {
+            listener.onNewValue(poiList.get(i));
+        }
     }
 
     /**
@@ -245,7 +260,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
     /**
      * {@inheritDoc}
      */
-    public void findNearPOIs(Position pos, int radius, FindNearPOIsListener listener) {
+    public void findNearPOIs(Position pos, int radius, ch.epfl.sweng.fiktion.providers.DatabaseProvider.GetMultiplePOIsListener listener) {
         if (pos.latitude() == 1000 && pos.longitude() == 1000) {
             listener.onFailure();
             return;
@@ -262,7 +277,7 @@ public class LocalDatabaseProvider extends DatabaseProvider {
      * {@inheritDoc}
      */
     @Override
-    public void searchByText(String text, SearchPOIByTextListener listener) {
+    public void searchByText(String text, DatabaseProvider.GetMultiplePOIsListener listener) {
         if (text.contains("SEARCHN")) {
             listener.onNewValue(new PointOfInterest("NEWVALUE",
                     new Position(0, 0),
@@ -386,6 +401,9 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         listener.onDoesntExist();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void modifyUser(final User user, final ModifyUserListener listener) {
         if (user.getID().contains("MODIFYUSERS")) {
@@ -462,6 +480,9 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         listener.onSuccess();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getComment(String commentId, GetCommentListener listener) {
         if (commentId.contains("GETCOMMENTN")) {
@@ -543,13 +564,55 @@ public class LocalDatabaseProvider extends DatabaseProvider {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void voteComment(String commentId, String userID, int vote, int previousVote, VoteListener listener) {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getCommentVoteOfUser(String commentId, String userID, GetVoteListener listener) {
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addUserPost(String userId, Post post, AddPostListener listener) {
+        if (!posts.containsKey(userId)) {
+            posts.put(userId, new HashSet<Post>());
+        }
+        posts.get(userId).add(post);
+
+        if (getPostListeners.containsKey(userId)) {
+            for (GetPostListener l : getPostListeners.get(userId)) {
+                l.onNewValue(post);
+            }
+        }
+
+        listener.onSuccess();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void getUserPosts(String userId, GetPostListener listener) {
+        if (posts.containsKey(userId)) {
+            for (Post post : posts.get(userId)) {
+                listener.onNewValue(post);
+            }
+        }
+
+        if (!getPostListeners.containsKey(userId)) {
+            getPostListeners.put(userId, new HashSet<GetPostListener>());
+        }
+        getPostListeners.get(userId).add(listener);
     }
 }
