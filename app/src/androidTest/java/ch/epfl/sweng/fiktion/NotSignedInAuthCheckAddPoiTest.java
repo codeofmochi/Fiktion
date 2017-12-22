@@ -9,6 +9,7 @@ import android.support.test.espresso.action.Swipe;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,6 +59,10 @@ public class NotSignedInAuthCheckAddPoiTest {
         AuthProvider.getInstance().signOut();
     }
 
+    @Before
+    public void signOut(){
+        AuthProvider.getInstance().signOut();
+    }
     @After
     public void resetAuth(){
         AuthProvider.destroyInstance();
