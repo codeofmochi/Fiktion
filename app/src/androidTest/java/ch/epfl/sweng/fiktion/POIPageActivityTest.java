@@ -249,7 +249,7 @@ public class POIPageActivityTest {
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadUserPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -264,7 +264,7 @@ public class POIPageActivityTest {
         });
 
         b = BitmapFactory.decodeResource(InstrumentationRegistry.getTargetContext().getResources(), R.mipmap.ic_launcher_round);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadUserPhotoListener() {
             @Override
             public void onSuccess() {
             }
@@ -422,7 +422,7 @@ public class POIPageActivityTest {
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadUserPhotoListener() {
             @Override
             public void onSuccess() {
             }

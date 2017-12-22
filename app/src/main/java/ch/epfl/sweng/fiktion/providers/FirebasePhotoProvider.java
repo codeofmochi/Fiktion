@@ -52,7 +52,7 @@ public class FirebasePhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void uploadPOIBitmap(Bitmap bitmap, final String poiName, final UploadPhotoListener listener) {
+    public void uploadPOIBitmap(Bitmap bitmap, final String poiName, final UploadPOIPhotoListener listener) {
         if (poiName.isEmpty()) {
             listener.onFailure();
             return;
@@ -104,7 +104,7 @@ public class FirebasePhotoProvider extends PhotoProvider {
                         dbPOIRef.child(index).setValue(photoName);
 
                         // inform the listener that the upload succeeded
-                        listener.onSuccess();
+                        listener.onSuccess(photoName + ".jpg");
 
                     }
 
@@ -214,7 +214,7 @@ public class FirebasePhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, final UploadPhotoListener listener) {
+    public void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, final UploadUserPhotoListener listener) {
         if (userId.isEmpty()) {
             listener.onFailure();
             return;

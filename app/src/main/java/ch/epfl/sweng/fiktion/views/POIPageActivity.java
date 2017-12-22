@@ -54,6 +54,7 @@ import ch.epfl.sweng.fiktion.models.PointOfInterest;
 import ch.epfl.sweng.fiktion.models.Position;
 import ch.epfl.sweng.fiktion.models.User;
 import ch.epfl.sweng.fiktion.models.posts.FavoritePOIPost;
+import ch.epfl.sweng.fiktion.models.posts.PhotoUploadPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.models.posts.VisitPOIPost;
 import ch.epfl.sweng.fiktion.models.posts.WishlistPOIPost;
@@ -706,11 +707,27 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
         // upload the photo to the cloud
         // show the progress with the progressbar
         uploadProgressBar.setVisibility(View.VISIBLE);
-        PhotoProvider.getInstance().uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(uploadBitmap, poi.name(), new PhotoProvider.UploadPOIPhotoListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String photoName) {
                 uploadProgressBar.setVisibility(View.INVISIBLE);
                 uploadProgressBar.setProgress(0);
+
+                // add a post of the addition of the poi to the favorites
+                try {
+                    Post post = new PhotoUploadPost(poiName, photoName, Calendar.getInstance().getTime());
+                    DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
+                        @Override
+                        public void onFailure() {
+                        }
+
+                        @Override
+                        public void onSuccess() {
+                        }
+                    });
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

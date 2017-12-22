@@ -595,7 +595,7 @@ public class ProfileActivity extends MenuDrawerActivity {
     }
 
     private void uploadUserPicture(final Bitmap b) {
-        PhotoProvider.getInstance().uploadUserBitmap(b, userId, requestPhotoType, new PhotoProvider.UploadPhotoListener() {
+        PhotoProvider.getInstance().uploadUserBitmap(b, userId, requestPhotoType, new PhotoProvider.UploadUserPhotoListener() {
             @Override
             public void onSuccess() {
                 switch (requestPhotoType) {

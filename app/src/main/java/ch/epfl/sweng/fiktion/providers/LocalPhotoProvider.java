@@ -19,13 +19,14 @@ public class LocalPhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPhotoListener listener) {
+    public void uploadPOIBitmap(Bitmap bitmap, String poiName, UploadPOIPhotoListener listener) {
         if (!poiBitmaps.containsKey(poiName)) {
             poiBitmaps.put(poiName, new TreeMap<String, Bitmap>());
         }
         Map<String, Bitmap> poiPhotos = poiBitmaps.get(poiName);
-        poiPhotos.put(poiName + poiPhotos.size(), bitmap);
-        listener.onSuccess();
+        String photoName = poiName + poiPhotos.size();
+        poiPhotos.put(photoName, bitmap);
+        listener.onSuccess(photoName);
     }
 
     /**
@@ -71,7 +72,7 @@ public class LocalPhotoProvider extends PhotoProvider {
      * {@inheritDoc}
      */
     @Override
-    public void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, UploadPhotoListener listener) {
+    public void uploadUserBitmap(Bitmap bitmap, String userId, UserPhotoType type, UploadUserPhotoListener listener) {
         switch (type) {
             case PROFILE:
                 userProfileBitmaps.put(userId, bitmap);
