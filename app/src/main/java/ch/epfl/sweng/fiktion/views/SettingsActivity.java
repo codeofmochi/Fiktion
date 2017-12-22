@@ -22,8 +22,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.LocalDate;
-
 import java.util.Calendar;
 
 import ch.epfl.sweng.fiktion.R;
@@ -51,7 +49,6 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     // profile infos
     private PersonalUserInfos userPersonalInfos;
-    private static LocalDate birthday;
     private Switch profilePublicSwitch;
     private EditText firstnameEdit;
     private EditText lastnameEdit;
@@ -72,6 +69,14 @@ public class SettingsActivity extends MenuDrawerActivity {
 
     private Context context = this;
 
+    private static int userYear;
+    private static int userMonth;
+    private static int userDay;
+    private static void setDate(int y, int m, int d){
+        userYear = y;
+        userMonth = m;
+        userDay = d;
+    }
     /**
      * Date picker for birthday
      */
@@ -93,7 +98,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
             //month needs to be incrementd because of API
-            birthday = new LocalDate(year, month, day);
+            setDate(year,month,day);
             birthdayText.setText(day + "/" + (month+1) + "/" + year);
         }
     }
@@ -600,7 +605,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         String newLastName = inputLastName.isEmpty() ? oldValues.getLastName() : inputLastName;
         String newCountry = inputCountry.isEmpty() ? oldValues.getCountry() : inputCountry;
 
-        PersonalUserInfos newValues = new PersonalUserInfos(birthday.getYear(),birthday.getMonthOfYear()+1, birthday.getDayOfMonth(), newFirstName, newLastName, newCountry);
+        PersonalUserInfos newValues = new PersonalUserInfos(userYear,userMonth+1, userDay, newFirstName, newLastName, newCountry);
         user.updatePersonalInfos(newValues, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onDoesntExist() {
