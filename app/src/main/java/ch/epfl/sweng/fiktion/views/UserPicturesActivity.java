@@ -78,7 +78,7 @@ public class UserPicturesActivity extends AppCompatActivity {
     List<Bitmap> photos;
     GridView photosGrid;
     ImageAdapter adapter;
-    int count = 0;
+    Context ctx = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +106,7 @@ public class UserPicturesActivity extends AppCompatActivity {
         photosGrid.setAdapter(adapter);
         photosGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                FullscreenPictureActivity.showBitmapInFullscreen(ctx, photos.get(position));
             }
         });
 
@@ -131,7 +132,6 @@ public class UserPicturesActivity extends AppCompatActivity {
                         public void onNewValue(Bitmap bitmap) {
                             photos.add(bitmap);
                             adapter.notifyDataSetChanged();
-                            count++;
                         }
                     });
                 }
