@@ -94,4 +94,17 @@ public class NotSignedInAuthCheckAddPoiTest {
         onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
     }
 
+    @Test
+    public void notProceedWithProfileLogIn(){
+        homeMainLayout.perform(swipeRightFast());
+        menuDrawer.check(matches(isDisplayed()));
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(3).perform(click());
+
+        onView(withText("Return"))
+                .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
+                .perform(click());
+
+        onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
+    }
+
 }

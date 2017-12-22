@@ -102,4 +102,10 @@ public class ProfileActivityTest {
         onView(withId(R.id.achievementsLink)).perform(click());
         onView(withId(R.id.user_achievements_main)).check(matches(isDisplayed()));
     }
+
+    @Test
+    public void clickAction(){
+        onView(withId(R.id.userAction)).perform(click());
+        onView(withId(R.id.profileSettingsTitle)).check(matches(isDisplayed()));
+    }
 }
