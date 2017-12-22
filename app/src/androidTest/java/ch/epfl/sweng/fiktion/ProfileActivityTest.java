@@ -17,6 +17,7 @@ import ch.epfl.sweng.fiktion.views.ProfileActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -105,7 +106,7 @@ public class ProfileActivityTest {
 
     @Test
     public void clickAction(){
-        onView(withId(R.id.userAction)).perform(click());
-        onView(withId(R.id.profileSettingsTitle)).check(matches(isDisplayed()));
+        onView(withId(R.id.userAction)).perform(scrollTo()).perform(click());
+        onView(withId(R.id.accountSettingsTitle)).check(matches(isDisplayed()));
     }
 }

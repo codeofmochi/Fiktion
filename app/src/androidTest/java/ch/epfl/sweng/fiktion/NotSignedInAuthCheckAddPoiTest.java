@@ -64,7 +64,7 @@ public class NotSignedInAuthCheckAddPoiTest {
     }
 
     @Test
-    public void notSignedInContributeAndSIgnIn() {
+    public void notSignedInContributeAndSignIn() {
         homeMainLayout.perform(swipeRightFast());
         menuDrawer.check(matches(isDisplayed()));
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
