@@ -91,6 +91,9 @@ public class ProfileActivity extends MenuDrawerActivity {
         includeLayout = R.layout.activity_profile;
         super.onCreate(savedInstanceState);
 
+        // set background
+        findViewById(R.id.drawer_layout).setBackgroundColor(getResources().getColor(R.color.bgLightGray));
+
         //create user infos fields
         username = (TextView) findViewById(R.id.username);
         realInfos = (TextView) findViewById(R.id.userRealInfos);
