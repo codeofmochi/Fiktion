@@ -50,6 +50,7 @@ public class UserDisplayer {
             @Override
             public void onNewValue(Bitmap value) {
                 Bitmap src = POIDisplayer.cropBitmapToSquare(value);
+                src = POIDisplayer.scaleBitmap(src, 120);
                 RoundedBitmapDrawable round = RoundedBitmapDrawableFactory.create(ctx.getResources(), src);
                 round.setCornerRadius(Math.max(src.getWidth(), src.getHeight()) / 2.0f);
                 pic.setImageDrawable(round);
