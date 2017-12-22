@@ -595,7 +595,12 @@ public class ProfileActivity extends MenuDrawerActivity {
     }
 
     private void uploadUserPicture(final Bitmap b) {
-        PhotoProvider.getInstance().uploadUserBitmap(b, userId, requestPhotoType, new PhotoProvider.UploadUserPhotoListener() {
+        // resize if too big
+        int MAXIMUM_SIZE = 1000;
+        Bitmap uploadBitmap = b.getHeight() <= MAXIMUM_SIZE && b.getWidth() <= MAXIMUM_SIZE ?
+                b : POIDisplayer.scaleBitmap(b, MAXIMUM_SIZE);
+
+        PhotoProvider.getInstance().uploadUserBitmap(uploadBitmap, userId, requestPhotoType, new PhotoProvider.UploadUserPhotoListener() {
             @Override
             public void onSuccess() {
                 switch (requestPhotoType) {

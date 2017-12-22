@@ -713,9 +713,9 @@ public class POIPageActivity extends MenuDrawerActivity implements OnMapReadyCal
                 uploadProgressBar.setVisibility(View.INVISIBLE);
                 uploadProgressBar.setProgress(0);
 
-                // add a post of the addition of the poi to the favorites
+                // add a post about the upload of the photo
                 try {
-                    Post post = new PhotoUploadPost(poiName, photoName, Calendar.getInstance().getTime());
+                    Post post = new PhotoUploadPost(photoName, poiName, Calendar.getInstance().getTime());
                     DatabaseProvider.getInstance().addUserPost(user.getID(), post, new DatabaseProvider.AddPostListener() {
                         @Override
                         public void onFailure() {
