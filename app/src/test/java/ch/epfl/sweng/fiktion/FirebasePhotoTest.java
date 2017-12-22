@@ -119,9 +119,9 @@ public class FirebasePhotoTest {
         when(velSnapshot.getChildrenCount()).thenReturn((long) 2);
         when(stRef.delete()).thenReturn(null);
 
-        PhotoProvider.UploadUserPhotoListener listener = new PhotoProvider.UploadUserPhotoListener() {
+        PhotoProvider.UploadPOIPhotoListener listener = new PhotoProvider.UploadPOIPhotoListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String photoName) {
                 setResult(Result.SUCCESS);
             }
 

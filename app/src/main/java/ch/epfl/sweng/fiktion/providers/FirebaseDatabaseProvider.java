@@ -217,7 +217,7 @@ public class FirebaseDatabaseProvider extends DatabaseProvider {
      */
     @Override
     public void getAllPOIs(int numberOfPOIs, final GetMultiplePOIsListener listener) {
-        Query query = dbRef.child(poisRefName);
+        Query query = dbRef.child(poisRefName).orderByKey();
         if (numberOfPOIs > 0) {
             query = query.limitToFirst(numberOfPOIs);
         }

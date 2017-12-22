@@ -249,9 +249,9 @@ public class POIPageActivityTest {
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadUserPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadPOIPhotoListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String photoName) {
             }
 
             @Override
@@ -264,9 +264,9 @@ public class POIPageActivityTest {
         });
 
         b = BitmapFactory.decodeResource(InstrumentationRegistry.getTargetContext().getResources(), R.mipmap.ic_launcher_round);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadUserPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, poiTest.name(), new PhotoProvider.UploadPOIPhotoListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String photoName) {
             }
 
             @Override
@@ -422,9 +422,9 @@ public class POIPageActivityTest {
         Bitmap b = BitmapFactory.decodeResource(
                 InstrumentationRegistry.getTargetContext().getResources(),
                 R.mipmap.ic_launcher);
-        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadUserPhotoListener() {
+        PhotoProvider.getInstance().uploadPOIBitmap(b, "poiTest", new PhotoProvider.UploadPOIPhotoListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String photoName) {
             }
 
             @Override
