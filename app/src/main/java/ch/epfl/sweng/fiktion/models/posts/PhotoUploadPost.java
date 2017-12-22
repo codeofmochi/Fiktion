@@ -12,9 +12,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import ch.epfl.sweng.fiktion.R;
-import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.HashUtils;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
+import ch.epfl.sweng.fiktion.views.utils.PhotoController;
 
 /**
  * A post that represents the upload of a photo for a poi
@@ -77,13 +77,14 @@ public class PhotoUploadPost extends Post {
         // header comment
         TextView header = new TextView(ctx);
         header.setTextColor(ctx.getResources().getColor(R.color.darkGray));
-        header.setText(username + " took a picture in " + poiName + " : ");
+        String text = username + " took a picture in " + poiName + " : ";
+        header.setText(text);
         header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.camera_icon_20, 0, 0, 0);
         header.setCompoundDrawablePadding(5);
         inner.addView(header);
 
         // picture
-        PhotoProvider.getInstance().downloadPOIBitmap(poiName, photoName, new PhotoProvider.DownloadBitmapListener() {
+        PhotoController.getPOIBitmap(ctx, poiName, photoName, new PhotoController.GetBitmapListener() {
             @Override
             public void onFailure() { /* nothing */ }
 

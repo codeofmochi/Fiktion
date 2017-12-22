@@ -73,10 +73,11 @@ public class UserDisplayer {
         texts.addView(nickname);
 
         // name
-        TextView name = new TextView(ctx);
-        name.setText(u.getPersonalUserInfos().getFirstName() + " " + u.getPersonalUserInfos().getLastName());
-        name.setTextSize(15);
-        texts.addView(name);
+        TextView nameView = new TextView(ctx);
+        String name = u.getPersonalUserInfos().getFirstName() + " " + u.getPersonalUserInfos().getLastName();
+        nameView.setText(name);
+        nameView.setTextSize(15);
+        texts.addView(nameView);
 
         v.addView(texts);
 

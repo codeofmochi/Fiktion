@@ -62,7 +62,8 @@ public class FavoritePOIPost extends Post {
         // header comment
         TextView header = new TextView(ctx);
         header.setTextColor(ctx.getResources().getColor(R.color.darkGray));
-        header.setText(username + " added this place to his favorites :");
+        String text = username + " added this place to his favorites :";
+        header.setText(text);
         header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.star_icon_20, 0, 0, 0);
         header.setCompoundDrawablePadding(5);
         inner.addView(header);

@@ -1,5 +1,6 @@
 package ch.epfl.sweng.fiktion.views;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -53,6 +54,7 @@ public class SettingsActivity extends MenuDrawerActivity {
     private EditText firstnameEdit;
     private EditText lastnameEdit;
     private EditText countryEdit;
+    @SuppressLint("StaticFieldLeak") // we need it static because it is used in a static class
     private static TextView birthdayText;
     private Button birthdayPickerButton;
 
@@ -72,11 +74,13 @@ public class SettingsActivity extends MenuDrawerActivity {
     private static int userYear;
     private static int userMonth;
     private static int userDay;
-    private static void setDate(int y, int m, int d){
+
+    private static void setDate(int y, int m, int d) {
         userYear = y;
         userMonth = m;
         userDay = d;
     }
+
     /**
      * Date picker for birthday
      */
@@ -98,8 +102,9 @@ public class SettingsActivity extends MenuDrawerActivity {
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
             //month needs to be incrementd because of API
-            setDate(year,month,day);
-            birthdayText.setText(day + "/" + (month+1) + "/" + year);
+            setDate(year, month, day);
+            String text = day + "/" + (month + 1) + "/" + year;
+            birthdayText.setText(text);
         }
     }
 
@@ -225,8 +230,9 @@ public class SettingsActivity extends MenuDrawerActivity {
                 lastnameEdit.setHint(userPersonalInfos.getLastName());
                 countryEdit.setHint(userPersonalInfos.getCountry());
                 // handle birthday
-                if(userPersonalInfos.getYear() != 1){
-                    birthdayText.setText(userPersonalInfos.getDay() + "/" + (userPersonalInfos.getMonth()) + "/" + userPersonalInfos.getYear());
+                if (userPersonalInfos.getYear() != 1) {
+                    String text = userPersonalInfos.getDay() + "/" + (userPersonalInfos.getMonth()) + "/" + userPersonalInfos.getYear();
+                    birthdayText.setText(text);
 
                 }
 
@@ -605,7 +611,7 @@ public class SettingsActivity extends MenuDrawerActivity {
         String newLastName = inputLastName.isEmpty() ? oldValues.getLastName() : inputLastName;
         String newCountry = inputCountry.isEmpty() ? oldValues.getCountry() : inputCountry;
 
-        PersonalUserInfos newValues = new PersonalUserInfos(userYear,userMonth+1, userDay, newFirstName, newLastName, newCountry);
+        PersonalUserInfos newValues = new PersonalUserInfos(userYear, userMonth + 1, userDay, newFirstName, newLastName, newCountry);
         user.updatePersonalInfos(newValues, new DatabaseProvider.ModifyUserListener() {
             @Override
             public void onDoesntExist() {
