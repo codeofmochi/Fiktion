@@ -20,8 +20,8 @@ import ch.epfl.sweng.fiktion.models.posts.PhotoUploadPost;
 import ch.epfl.sweng.fiktion.models.posts.Post;
 import ch.epfl.sweng.fiktion.models.posts.PostType;
 import ch.epfl.sweng.fiktion.providers.DatabaseProvider;
-import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.views.utils.POIDisplayer;
+import ch.epfl.sweng.fiktion.views.utils.PhotoController;
 
 /**
  * User pictures activity class
@@ -124,7 +124,7 @@ public class UserPicturesActivity extends AppCompatActivity {
                     findViewById(R.id.default_empty_text).setVisibility(View.GONE);
 
                     // fetch picture
-                    PhotoProvider.getInstance().downloadPOIBitmap(pic.getPOIName(), pic.getPhotoName(), new PhotoProvider.DownloadBitmapListener() {
+                    PhotoController.getPOIBitmap(ctx, pic.getPOIName(), pic.getPhotoName(), new PhotoController.GetBitmapListener() {
                         @Override
                         public void onFailure() { /* show nothing */ }
 

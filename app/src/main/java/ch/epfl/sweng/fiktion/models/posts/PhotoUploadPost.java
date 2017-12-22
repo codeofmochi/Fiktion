@@ -12,9 +12,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import ch.epfl.sweng.fiktion.R;
-import ch.epfl.sweng.fiktion.providers.PhotoProvider;
 import ch.epfl.sweng.fiktion.utils.HashUtils;
 import ch.epfl.sweng.fiktion.views.POIPageActivity;
+import ch.epfl.sweng.fiktion.views.utils.PhotoController;
 
 /**
  * A post that represents the upload of a photo for a poi
@@ -84,7 +84,7 @@ public class PhotoUploadPost extends Post {
         inner.addView(header);
 
         // picture
-        PhotoProvider.getInstance().downloadPOIBitmap(poiName, photoName, new PhotoProvider.DownloadBitmapListener() {
+        PhotoController.getPOIBitmap(ctx, poiName, photoName, new PhotoController.GetBitmapListener() {
             @Override
             public void onFailure() { /* nothing */ }
 

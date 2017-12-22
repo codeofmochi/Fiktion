@@ -98,6 +98,50 @@ public class PhotoController {
         });
     }
 
+    public static void getPOIBitmap(final Context ctx, final String poiName, final String photoName, final GetBitmapListener listener) {
+        if (poiName.isEmpty() || photoName.isEmpty()) {
+            listener.onFailure();
+            return;
+        }
+
+        // check if it is in the cache
+        Bitmap bitmap = bitmapCache.get(photoName);
+        if (bitmap != null) {
+            listener.onNewValue(bitmap);
+            return;
+        }
+
+        try {
+            // try to get the bitmap from storage
+            FileInputStream fileInputStream = ctx.openFileInput(photoName);
+            Bitmap b = BitmapFactory.decodeStream(fileInputStream);
+            fileInputStream.close();
+            listener.onNewValue(b);
+
+            // put the bitmap in the cache
+            bitmapCache.put(photoName, b);
+        } catch (IOException e) {
+            // download the bitmap with the photo name
+            PhotoProvider.getInstance().downloadPOIBitmap(poiName, photoName, new PhotoProvider.DownloadBitmapListener() {
+                @Override
+                public void onFailure() {
+                    listener.onFailure();
+                }
+
+                @Override
+                public void onNewValue(Bitmap b) {
+                    listener.onNewValue(b);
+
+                    // put the bitmap in the cache
+                    bitmapCache.put(photoName, b);
+
+                    // put the bitmap in the internal storage
+                    writeToInternalStorage(ctx, b, photoName);
+                }
+            });
+        }
+    }
+
     private static void writeToInternalStorage(Context ctx, Bitmap b, String photoName) {
         try {
             ByteArrayOutputStream photoBytes = new ByteArrayOutputStream();
