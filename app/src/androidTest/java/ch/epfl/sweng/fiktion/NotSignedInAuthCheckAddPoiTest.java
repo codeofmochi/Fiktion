@@ -9,6 +9,7 @@ import android.support.test.espresso.action.Swipe;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,13 +59,17 @@ public class NotSignedInAuthCheckAddPoiTest {
         AuthProvider.getInstance().signOut();
     }
 
+    @Before
+    public void signOut(){
+        AuthProvider.getInstance().signOut();
+    }
     @After
     public void resetAuth(){
         AuthProvider.destroyInstance();
     }
 
     @Test
-    public void notSignedInContributeAndSIgnIn() {
+    public void notSignedInContributeAndSignIn() {
         homeMainLayout.perform(swipeRightFast());
         menuDrawer.check(matches(isDisplayed()));
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
@@ -86,6 +91,19 @@ public class NotSignedInAuthCheckAddPoiTest {
         homeMainLayout.perform(swipeRightFast());
         menuDrawer.check(matches(isDisplayed()));
         onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(5).perform(click());
+
+        onView(withText("Return"))
+                .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
+                .perform(click());
+
+        onView(withId(R.id.home_main_layout)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void notProceedWithProfileLogIn(){
+        homeMainLayout.perform(swipeRightFast());
+        menuDrawer.check(matches(isDisplayed()));
+        onData(anything()).inAdapterView(withId(R.id.menu_drawer)).atPosition(3).perform(click());
 
         onView(withText("Return"))
                 .inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView()))))
