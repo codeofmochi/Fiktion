@@ -77,7 +77,8 @@ public class PhotoUploadPost extends Post {
         // header comment
         TextView header = new TextView(ctx);
         header.setTextColor(ctx.getResources().getColor(R.color.darkGray));
-        header.setText(username + " took a picture in " + poiName + " : ");
+        String text = username + " took a picture in " + poiName + " : ";
+        header.setText(text);
         header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.camera_icon_20, 0, 0, 0);
         header.setCompoundDrawablePadding(5);
         inner.addView(header);
