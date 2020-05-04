@@ -1,0 +1,774 @@
+/*
+* FIKTION website stylesheet
+* (c) 2017 FIKTION Team
+* @author : Alexandre CHAU
+*/
+
+/* reset */
+
+body, html {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	font-family: 'Open Sans', Helvetica, Arial ,serif;
+	color: #646464;
+}
+
+
+/* layout boxes */
+
+.wrap {
+	float: left;
+	width: 100%;
+}
+
+.mid {
+	width: 70%;
+	margin: 0px auto;
+}
+
+.box {
+	float: left;
+}
+
+.full {
+	width: 100%;
+}
+
+.half {
+	width: 50%;
+}
+
+.third {
+	width: 33%;
+}
+
+.sixth {
+	width: 16%;
+}
+
+.two-third {
+	width: 65%;
+}
+
+.third-phone {
+	width: 35%;
+}
+
+.phone {
+	width: 50%;
+}
+
+.phone-desc {
+	width: 50%;
+}
+
+.header {
+	width: 100%;
+	height: 90px;
+}
+
+header {
+	position: fixed;
+	display: none;
+	width: 100%;
+	height: 70px;
+	box-shadow: 0 0 10px #666666;
+	z-index: 1;
+}
+
+.logo {
+	float: left;
+	height: 70px;
+	padding: 10px;
+}
+
+.logo img {
+	float: left;
+	height: 70px;
+}
+
+.menu {
+	float: right;
+	padding: 10px;
+	padding-top: 20px;
+}
+
+.menu ul {
+	float: left;
+	list-style: none;
+	display: block;
+}
+
+.menu ul li {
+	float: left;
+	display: block;
+	margin-left: 20px;
+}
+
+.menu ul li a {
+	color: #FFFFFF;
+	padding: 10px;
+}
+
+.menu ul li a:hover {
+	background: #FFFFFF;
+	color: #646464;
+}
+
+header .header {
+	height: 70px;
+}
+
+header .logo, header .logo img {
+	height: 50px;
+}
+
+header .menu {
+	height: 50px;
+	padding-top: 10px;
+}
+
+header .menu ul li a {
+	color: #646464;
+}
+
+header .menu ul li a:hover {
+	color: #FFFFFF;
+	background: #646464;
+}
+
+header .menu ul li a.border-white {
+	border: 2px solid #646464;
+}
+
+#feature-selector {
+	float: left;
+	width: 100%;
+	margin-top: 20px;
+}
+
+#feature-column {
+	float: left;
+	width: 33%;
+}
+
+#feature-column .item {
+	float: left;
+	width: 100%;
+	margin-bottom: 10px;
+	background: #FFFFFF;
+	box-shadow: 0 0 1px #888888;
+	cursor: pointer;
+}
+
+#feature-column .item.selected, #feature-column .item:hover{
+	background : #3489E3;
+}
+
+#feature-column .item.selected p, #feature-column .item:hover p {
+	color : #FFFFFF;
+}
+
+#feature-column .item i {
+	margin-left: 10px;
+}
+
+
+#feature-text {
+	float: left;
+	width: 65%;
+	margin-left: 2%;
+	background: #FFFFFF;
+	box-shadow: 0 0 1px #888888;
+}
+
+#feature-text i {
+	margin-bottom: 30px;
+	color: #3489E3;
+}
+
+.member {
+	margin-bottom: 10px;
+}
+
+.member img {
+	float: left;
+	width: 23%;
+	padding: 5px;
+	border-radius: 100%;
+	border: 1px solid #3489E3;
+	margin-left: 10%;
+}
+
+.member p {
+	float: left;
+	font-weight: 300;
+	width: 60%;
+	margin: 0;
+	padding: 0;
+	margin-left: 10px;
+}
+
+.member p.name {
+	margin-top: 20px;
+	font-size: 24px;
+}
+
+.member p.position {
+	font-size: 20px;
+	color: #3489E3;
+}
+
+.epfl img {
+	float: left;
+	margin-right: 20px;
+	margin-bottom: 20px;
+	width: 15%;
+}
+
+.epfl .text {
+		padding: 0;
+		margin: 0;
+		margin-left: 3%;
+		width: 70%;
+}
+
+.epfl .coach {
+	width: 20%;
+	margin-left: 3%;
+	margin-right: 3%;
+	font-weight: bold;
+}
+
+.footer {
+	padding-top: 50px;
+	padding-bottom: 100px;
+}
+
+.right-align {
+	text-align: right;
+}
+
+
+.footer .bottom-menu a {
+	float: right;
+	width: 100%;
+	margin-bottom: 7px;
+}
+
+.footer .third {
+	width: 32%;
+	margin-right: 1%;
+}
+
+/* backgrounds */
+
+.bg-primary {
+	background: #3489E3;
+}
+
+.bg-white {
+	background: #FFFFFF;
+}
+
+.bg-black-transparent {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.bg-lightgray {
+	background: #EEEEEE;
+}
+
+.bg-tokyo {
+	background-image: url("../img/tokyo_banner.jpg");
+	background-repeat: no-repeat;
+	background-position: center top;
+	background-size: cover;
+}
+
+.bg-tokyo-anime {
+	background-image: url("../img/tokyo_banner_anime.jpg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
+
+.bg-graydark {
+	background: #999999;
+}
+
+/* margins */
+
+.margin-vertical {
+	margin-top: 100px;
+	margin-bottom: 100px;
+}
+
+.margin-vertical-small {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.padded {
+	padding: 20px;
+}
+
+/* borders */
+
+.border-white {
+	border: 2px solid #FFFFFF;
+}
+
+/* shadows */
+
+.shadow-strong {
+	box-shadow: 0 0 20px #333333;
+}
+
+/* fonts */
+
+h1 {
+	font: normal 50px 'Open Sans', Helvetica, Arial, sans-serif;
+	color: #3489E3;
+	font-weight: 300;
+	margin: 0 0 10px 0;
+	padding: 0;
+}
+
+h2 {
+	font: normal 30px 'Open Sans', Helvetica, Arial, sans-serif;
+	font-weight: 300;
+	margin: 0 0 10px 0;
+	padding: 0;
+}
+
+h3 {
+	font: normal 20px 'Open Sans', Helvetica, Arial, sans-serif;
+	margin: 0 0 10px 0;
+	padding: 0;
+}
+
+p {
+	font: normal 16px 'Open Sans', Helvetica, Arial, sans-serif;
+	color: #646464;
+}
+
+a {
+	font: normal 16px 'Open Sans', Helvetica, Arial, sans-serif;
+	color: #3489E3;
+	text-decoration: none;
+}
+
+.button-white {
+	color: #FFFFFF;
+	border: 2px solid #FFFFFF;
+	padding: 10px;
+	margin: 5px;
+}
+
+.button-white:hover {
+	color: #3489E3;
+	background: #FFFFFF;
+}
+
+.disabled {
+	color: #CCCCCC;
+	border: 2px solid #CCCCCC;
+}
+
+.disabled:hover {
+	color: #CCCCCC;
+	background: #999999;
+	cursor: not-allowed;
+}
+
+/* forms */
+
+form {
+	float: left;
+	margin-bottom: 20px;
+}
+
+input, textarea, button {
+	display: block;
+	margin: 10px;
+	width: 90%;
+	float: left;
+	padding: 10px;
+	border: 2px solid #3489E3;
+	font: normal 14px 'Open Sans', Helvetica, Arial, sans-serif;
+	color: #333333;
+}
+
+textarea {
+	height: 210px;
+}
+
+button {
+	width: 97%;
+	background: #3489E3;
+	color: #FFFFFF;
+	cursor: pointer;
+}
+
+/* text properties */
+
+.justified {
+	text-align: justify;
+}
+
+.center {
+	text-align: center;
+}
+
+/* font colors */
+
+.primary-light {
+	color: #3AABFF;
+}
+
+.white {
+	color :  #FFFFFF;
+}
+
+.black {
+	color: #000000;
+}
+
+/* images */
+
+.phone .img-phone {
+	width: 56%;
+	margin: 20px 22%;
+	float: left;
+}
+
+.third-phone .img-phone {
+	float: left;
+	width: 90%;
+}
+
+.img-fullwidth{
+	width: 100%;
+}
+
+/* fix for material icons */
+.material-icons {
+	vertical-align: middle;
+	padding-bottom: 3px;
+}
+
+#quaeritur-logo {
+	width: 50%;
+}
+
+#wow-disable {
+	display: inline;
+}
+
+/* responsive design */
+
+#menuHideToggle {
+	display: inline;
+}
+
+@media (max-width: 1510px) {
+	.mid {
+		width: 80%;
+	}
+}
+
+@media (max-width: 1310px) {
+	.mid {
+		width: 90%;
+	}
+}
+
+@media (max-width: 1160px) {
+	#feature-column {
+		width: 40%;
+	}
+	#feature-text {
+		width: 55%;
+	}
+	#menuHideToggle {
+		display: none;
+	}
+	.header {
+		height: 270px;
+	}
+	.logo {
+		width: 100%;
+		height: auto;
+	}
+	.logo img {
+		float:  left;
+		width: 50%;
+		height: auto;
+		margin: 30px 25%;
+		margin-bottom: 10px;
+	}
+	.menu {
+		float: left;
+		margin-left: 12%;
+	}
+	.phone .img-phone {
+		width: 60%;
+		margin: 50px 20%;
+	}
+	.img-fullwidth {
+		margin-top: 150px;
+	}
+	.member p.name {
+		font-size: 18px;
+	}
+	.member p.position {
+		font-size: 16px;
+	}
+	.member p.github {
+		font-size: 14px;
+	}
+	.epfl .coach {
+		font-size: 13px;
+	}
+	#quaeritur-logo {
+		width: 70%;
+	}
+}
+
+@media (max-width: 1000px) {
+	.menu {
+		margin-left: 8%;
+	}
+	.phone .img-phone {
+		width: 80%;
+		margin: 50px 10%;
+	}
+	.expand-fast {
+		width: 100%;
+		margin: 0;
+	}
+	.expand-fast .margin-vertical {
+		margin-top: 30px;
+		margin-bottom: 30px;
+	}
+	.img-fullwidth.margin-vertical {
+		width: 70%;
+		margin: 0 15%;
+		margin-top: 0;
+		margin-bottom: 50px;
+	}
+}
+
+@media (max-width: 970px) {
+	#feature-column {
+		width: 46px;
+	}
+	#feature-column .item {
+		height: 60px;
+	}
+	#feature-text {
+		width: 80%;
+	}
+	.item .fttext {
+		display: none;
+	}
+}
+
+@media (max-width: 900px) {
+	.logo img {
+		width: 70%;
+		margin: 30px 15%;
+		margin-bottom: 10px;
+	}
+	.menu {
+		margin-left: 4%;
+	}
+	#feature-phone {
+		margin-top: 150px;
+	}
+	.member p.name {
+		margin-top: 10px;
+	}
+	#quaeritur-logo {
+		width: 90%;
+		margin: 0;
+		margin-left: 10%;
+	}
+}
+
+@media (max-width: 850px) {
+	.menu {
+		margin-left: 0;
+	}
+	.phone .img-phone {
+		width: 90%;
+		margin: 50px 5%;
+	}
+}
+
+@media (max-width: 800px) {
+	.menu {
+		display: none;
+	}
+	.header {
+		height: auto;
+	}
+	.phone {
+		width: 100%;
+		margin: 0;
+	}
+	.phone .img-phone {
+		width: 50%;
+		margin: 20px 25%;
+	}
+	.phone-desc {
+		width: 100%;
+		margin: 20px 0;
+	}
+	.margin-vertical {
+		margin-top: 20px;
+		margin-bottom: 20px;
+	}
+	.img-fullwidth.margin-vertical {
+		width: 90%;
+		margin: 0 5%;
+		margin-top: 0;
+		margin-bottom: 50px;
+	}
+	.member {
+		width: 80%;
+		margin: 0 10%;
+		margin-bottom: 10px;
+	}
+	.member p.name {
+		margin-top: 20px;
+		font-size: 24px;
+	}
+	.member p.position {
+		font-size: 22px;
+	}
+	.member p.github {
+		font-size: 18px;
+	}
+	.epfl .coach {
+		float: right;
+		width: 70%;
+	}
+	.footer .third {
+		width: 80%;
+		margin: 20px 10%;
+	}
+	.footer .third.right-align {
+		float: left;
+		text-align: left;
+		padding-top: 40px;
+		border-top: 1px solid #BBB;
+	}
+	#quaeritur-logo {
+		width: 250px;
+		margin: 0;
+		margin-right: auto;
+	}
+}
+
+@media (max-width: 700px) {
+	.member {
+		width: 100%;
+		margin: 0;
+		margin-bottom: 10px;
+	}
+}
+
+@media (max-width: 650px) {
+	form .half {
+		width: 100%;
+	}
+	#wow-disable {
+		display: none;
+	}
+}
+
+@media (max-width: 600px) {
+	.logo img {
+		width: 90%;
+		margin: 30px 5%;
+		margin-bottom: 10px;
+	}
+	.phone .img-phone {
+		width: 60%;
+		margin: 20px 20%;
+	}
+	#feature-phone-anim {
+		display: none;
+	}
+	#feature-text {
+		width: 85%;
+	}
+	.two-third {
+		width: 100%;
+		margin: 0;
+	}
+}
+
+@media (max-width: 550px) {
+	.member p.name {
+		margin-top: 5px;
+		font-size: 18px;
+	}
+	.member p.position {
+		font-size: 16px;
+	}
+	.member p.github {
+		font-size: 14px;
+	}
+	h1 {
+		font-size: 36px;
+		text-align: left;
+	}
+	#feature-text {
+		width: 85%;
+	}
+}
+
+@media(max-width: 440px) {
+	#feature-text {
+		width: 80%;
+	}
+}
+
+@media (max-width: 400px) {
+	.member {
+		text-align: center;
+	}
+	.member img {
+		width: 40%;
+		margin: 0 30%;
+	}
+	.member p.name {
+		font-size: 16px;
+		width: 100%;
+	}
+	.member p.position {
+		font-size: 16px;
+		width: 100%;
+	}
+	.member p.github {
+		font-size: 14px;
+		width: 100%;
+	}
+	.button-white {
+		float: left;
+	}
+	#quaeritur-logo {
+		width: 200px;
+	}
+}
+
+@media (max-width: 330px) {
+	#feature-text {
+		width: 70%;
+	}
+}
