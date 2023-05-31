@@ -1,78 +1,3 @@
-<?php
-	session_start();
-	require_once('php/token.php');
-
-	$header = '
-		<div class="mid">
-			<div class="box header">
-				<div class="logo">
-					<a href="#top"><img src="img/logo.png" alt="logo"/></a>
-				</div>
-				<div class="menu">
-					<ul>
-						<li><a href="#top">Home</a></li>
-						<li><a href="#about">About</a></li>
-						<li><a href="#features">Features</a></li>
-						<li><a href="#team">The team</a></li>
-						<li><a href="#contact">Contact</a></li>
-						<li><a href="#download" class="border-white">Download app</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	';
-
-	$error = false;
-	$sentError = false;
-	$submit = false;
-	$token = createNewToken();
-
-	if(isset($_POST['submit'])) $submit = true;
-
-	if($submit) {
-		$lastname = filter_var($_POST['lastname'], FILTER_SANITIZE_STRING);
-		$firstname = filter_var($_POST['firstname'], FILTER_SANITIZE_STRING);
-		$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-		$subject = filter_var($_POST['subject'], FILTER_SANITIZE_STRING);
-		$msg = filter_var($_POST['message'], FILTER_SANITIZE_STRING);
-		$sentToken = filter_var($_POST['sentToken'], FILTER_SANITIZE_STRING);
-	}
-
-	if (empty($lastname) || empty($firstname) || empty($email) || empty($subject) || empty($msg)) $error = true;
-
-    if (empty($sentToken) || !tokenIsValid($sentToken)) {
-      $sentError = true;
-    }
-
-	if (!$error && !$sentError) {
-		$message = '
-			<p>New message from fiktion.io</p>
-			<p>&nbsp;</p>
-			<p>Last name : '.$lastname.'</p>
-			<p>First name : '.$firstname.'</p>
-			<p>Email : '.$email.'</p>
-			<p>Subject : '.$subject.'</p>
-			<p>Message : '.$msg.'</p>
-		';
-
-		require 'php/PHPMailerAutoload.php';
-
-		$mail = new PHPMailer;
-
-		$mail->CharSet = 'UTF-8';
-		$mail->setFrom($email, $firstname, $lastname);
-		$mail->addAddress('info@fiktion.io');
-		$mail->isHTML(true);
-
-		$mail->Subject = 'New message from Fiktion.io : '.$subject;
-		$mail->Body = $message;
-
-		if(!$mail->send()) {
-			$sentError = true;
-		}
-	}
-?>
-
 <!--
 FIKTION web page
 (c) 2017 Fiktion Team
@@ -95,7 +20,23 @@ EPFL CS-305 Software engineering project
 
 <body>
 	<header class="bg-white">
-		<?php echo $header ?>
+		<div class="mid">
+			<div class="box header">
+				<div class="logo">
+					<a href="#top"><img src="img/logo.png" alt="logo"/></a>
+				</div>
+				<div class="menu">
+					<ul>
+						<li><a href="#top">Home</a></li>
+						<li><a href="#about">About</a></li>
+						<li><a href="#features">Features</a></li>
+						<li><a href="#team">The team</a></li>
+						<li><a href="#contact">Contact</a></li>
+						<li><a href="#download" class="border-white">Download app</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
 	</header>
 
 	<div id="main">
@@ -103,7 +44,23 @@ EPFL CS-305 Software engineering project
 
 		<div class="wrap bg-tokyo">
 			<a id="top"></a>
-			<?php echo $header ?>
+			<div class="mid">
+				<div class="box header">
+					<div class="logo">
+						<a href="#top"><img src="img/logo.png" alt="logo"/></a>
+					</div>
+					<div class="menu">
+						<ul>
+							<li><a href="#top">Home</a></li>
+							<li><a href="#about">About</a></li>
+							<li><a href="#features">Features</a></li>
+							<li><a href="#team">The team</a></li>
+							<li><a href="#contact">Contact</a></li>
+							<li><a href="#download" class="border-white">Download app</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
 
 			<div class="mid">
 				<div class="box phone">
@@ -307,46 +264,13 @@ EPFL CS-305 Software engineering project
 			</div>
 		</div>
 
-		<div class="wrap">
-			<a id="contact"></a>
-			<div class="mid">
-				<div class="box full">
-					<div class="padded">
-						<h1 class="black">Contact us</h1>
-						<p>Have a question, business proposal or want to greet us? Then feel free to contact us using the following form or at <a href="mailto:info@fiktion.io">info@fiktion.io</a></p>
-
-						<?php
-							if ($submit && $error) echo '<p style="color: red">Please fill in all required informations</p>';
-							else if ($submit && $sentError) echo '<p style="color:red">A server error occured. Please try again later.</p>';
-							else if ($submit && !$error && !$sentError) echo '<p>Thank you for your message!</p>';
-						?>
-
-						<form action="#contact" method="post" class="wow fadeIn" data-wow-duration="2s">
-							<div class="box half">
-								<input type="text" name="lastname" placeholder="Last name : ex. Doe" value="<?php if($submit) echo $lastname ?>" />
-								<input type="text" name="firstname" placeholder="First name : ex. John" value="<?php if($submit) echo $firstname ?>" />
-								<input type="email" name="email" placeholder="Email : ex. john.doe@example.com" value="<?php if($submit) echo $email ?>" />
-								<input type="subject" name="subject" placeholder="Subject : ex. Your app is kinda cool"  value="<?php if($submit) echo $subject ?>"/>
-							</div>
-							<div class="box half">
-								<textarea name="message" placeholder="Your message here..."><?php if($submit) echo $msg ?></textarea>
-							</div>
-							<input type="hidden" name="sentToken" value="<?php echo $token; ?>">
-							<button type="submit" name="submit">Send message</button>
-						</form>
-
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<div class="wrap bg-lightgray footer">
 			<div class="mid">
 				<div class="box third">
 					<img src="img/logo.png" alt="logo" width="50%"/>
 
 					<p>
-						&copy; <?php echo date('Y'); ?> Fiktion, all rights reserved.
+						&copy; 2023 Fiktion, all rights reserved.
 						<br />Fiktion is a production by <a href="http://epfl.ch">EPFL</a> IC students for the CS-305 Software Engineering course 2017. Copying any part is prohibited. All images, texts and designs belong to their respective owners.
 					</p>
 
